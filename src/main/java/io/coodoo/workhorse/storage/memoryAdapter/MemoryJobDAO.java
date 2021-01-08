@@ -24,12 +24,12 @@ public class MemoryJobDAO implements JobPersistence{
     @Override
     public Job get(Long id) {
 
-        return memoryService.jobs.get(id);
+        return memoryService.getJobs().get(id);
     }
 
     @Override
     public Job getByWorkerClassName(String jobClassName) {
-      for (Job job : memoryService.jobs.values()) {
+      for (Job job : memoryService.getJobs().values()) {
           if (job.getWorkerClassName().equals(jobClassName)) {
               return job;
           }
@@ -41,25 +41,25 @@ public class MemoryJobDAO implements JobPersistence{
     public void persist(Job job) {
         Long id = incId.getAndIncrement();
         job.setId(id);
-        memoryService.jobs.put(id ,job);
+        memoryService.getJobs().put(id ,job);
 
     }
 
     @Override
     public void update(Long id, Job job) {
-        memoryService.jobs.put(id, job);
+        memoryService.getJobs().put(id, job);
     }
 
     @Override
     public List<Job> getAll() {
         List<Job> result = new ArrayList<>();
-        result.addAll(memoryService.jobs.values());
+        result.addAll(memoryService.getJobs().values());
         return result;
     }
 
     @Override
     public Long count() {
-        return Long.valueOf( memoryService.jobs.size());
+        return Long.valueOf( memoryService.getJobs().size());
     }
 
     @Override
@@ -70,7 +70,7 @@ public class MemoryJobDAO implements JobPersistence{
     
 	@Override
 	public Job getByName(String jobName) {
-        for (Job job : memoryService.jobs.values()) {  
+        for (Job job : memoryService.getJobs().values()) {  
             if (Objects.equals(job.getName(), jobName)) {
                 return job;
             }
@@ -82,7 +82,7 @@ public class MemoryJobDAO implements JobPersistence{
 	public List<Job> getAllByStatus(JobStatus jobStatus) {
         List<Job> result = new ArrayList<>();
         
-        for (Job job : memoryService.jobs.values()) {  
+        for (Job job : memoryService.getJobs().values()) {  
             if (Objects.equals(job.getStatus(),  jobStatus)) {
                 result.add(job);
             }
@@ -95,7 +95,7 @@ public class MemoryJobDAO implements JobPersistence{
 	public List<Job> getAllScheduled() {
         List<Job> result = new ArrayList<>();
         
-        for (Job job : memoryService.jobs.values()) {  
+        for (Job job : memoryService.getJobs().values()) {  
             if (job.getSchedule() != null && !job.getSchedule().isEmpty()) {
                 result.add(job);
             }

@@ -1,6 +1,6 @@
 package io.coodoo.workhorse.config.boundary;
 
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
@@ -9,7 +9,7 @@ import io.coodoo.workhorse.config.entity.JobEngineConfig;
 import io.coodoo.workhorse.jobengine.control.events.RestartTheJobEngine;
 import io.coodoo.workhorse.storage.persistenceInterface.PersistenceTyp;
 
-@RequestScoped
+@ApplicationScoped
 public class JobEngineConfigService {
 
     @Inject

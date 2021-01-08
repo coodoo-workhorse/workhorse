@@ -13,11 +13,12 @@ import io.coodoo.workhorse.log.entity.JobEngineLog;
 
 @ApplicationScoped
 public class Memory {
-    public Map<Long, JobExecution> jobExecutions = new ConcurrentHashMap<>();
-     
-    public Map<Long, Job> jobs = new ConcurrentHashMap<>();
 
-    public Map<Long, JobEngineLog> jobEngineLog = new ConcurrentHashMap<>();
+    private Map<Long, JobExecution> jobExecutions = new ConcurrentHashMap<>();
+     
+    private Map<Long, Job> jobs = new ConcurrentHashMap<>();
+
+    private Map<Long, JobEngineLog> jobEngineLog = new ConcurrentHashMap<>();
 
     private JobEngineConfig engineConfig;
 
@@ -28,6 +29,18 @@ public class Memory {
     public synchronized JobEngineConfig  setJobEngineConfig(JobEngineConfig jobEngineConfig) {
         engineConfig = jobEngineConfig;
         return engineConfig;
+    }
+
+    public Map<Long, JobExecution> getJobExecutions() {
+      return jobExecutions;
+    }
+
+    public Map<Long, Job> getJobs() {
+      return jobs;
+    }
+
+    public Map<Long, JobEngineLog> getJobEngineLog() {
+      return jobEngineLog;
     }
 
 }

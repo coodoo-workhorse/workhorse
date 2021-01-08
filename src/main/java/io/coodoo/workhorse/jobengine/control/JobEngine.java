@@ -66,13 +66,12 @@ public class JobEngine {
     @Inject
     Event<AllJobExecutionsDoneJobEvent> allJobExecutionDoneEvent;
 
-    @Resource
-    ScheduledExecutorService scheduledExecutorService;
+    private ScheduledExecutorService scheduledExecutorService;
 
     private ScheduledFuture<?> scheduledFuture;
 
     @PostConstruct
-    public void init() throws Exception {
+    public void init() {
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     }
 

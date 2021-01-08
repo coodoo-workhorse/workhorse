@@ -25,19 +25,19 @@ public class MemoryJobEngineLog implements JobEngineLogPersistence {
 
     @Override
     public JobEngineLog get(Long id) {
-        return memoryService.jobEngineLog.get(id);
+        return memoryService.getJobEngineLog().get(id);
     }
 
     @Override
     public JobEngineLog update(Long id, JobEngineLog jobEngineLog) {
-        memoryService.jobEngineLog.put(id, jobEngineLog);
+        memoryService.getJobEngineLog().put(id, jobEngineLog);
         return jobEngineLog;
     }
 
     @Override
     public JobEngineLog delete(Long id) {
         // TODO Auto-generated method stub
-        return memoryService.jobEngineLog.remove(id);
+        return memoryService.getJobEngineLog().remove(id);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class MemoryJobEngineLog implements JobEngineLogPersistence {
         Long id = incId.getAndIncrement();
         jobEngineLog.setId(id);
         jobEngineLog.setCreatedAt(jobEngineConfig.timestamp());
-        memoryService.jobEngineLog.put(id, jobEngineLog);
+        memoryService.getJobEngineLog().put(id, jobEngineLog);
         return jobEngineLog;
     }
 
@@ -53,7 +53,7 @@ public class MemoryJobEngineLog implements JobEngineLogPersistence {
     public List<JobEngineLog> getAll(int limit) {
         List<JobEngineLog> result = new ArrayList<>();
         List<JobEngineLog> jobEngineLogs = new ArrayList<>();
-        jobEngineLogs.addAll(memoryService.jobEngineLog.values());
+        jobEngineLogs.addAll(memoryService.getJobEngineLog().values());
         // Long index = incId.get();
         // int count = 0;
 
@@ -73,9 +73,9 @@ public class MemoryJobEngineLog implements JobEngineLogPersistence {
     @Override
     public int deleteByJobId(Long jobId) {
         int count = 0;
-        for (JobEngineLog jobEngineLog : memoryService.jobEngineLog.values()) {
+        for (JobEngineLog jobEngineLog : memoryService.getJobEngineLog().values()) {
             if (jobEngineLog.getJobId() != null && jobEngineLog.getJobId().equals(jobId)) {
-                memoryService.jobEngineLog.remove(jobEngineLog.getId(), jobEngineLog);
+                memoryService.getJobEngineLog().remove(jobEngineLog.getId(), jobEngineLog);
                 count++;
             }
         }

@@ -2,7 +2,7 @@ package io.coodoo.workhorse.log.boundary;
 
 import java.util.List;
 
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import io.coodoo.workhorse.config.entity.JobEngineConfig;
@@ -12,7 +12,7 @@ import io.coodoo.workhorse.jobengine.entity.JobStatus;
 import io.coodoo.workhorse.log.control.JobEngineLogControl;
 import io.coodoo.workhorse.log.entity.JobEngineLog;
 
-@RequestScoped
+@ApplicationScoped
 public class JobEngineLogService {
 
     @Inject

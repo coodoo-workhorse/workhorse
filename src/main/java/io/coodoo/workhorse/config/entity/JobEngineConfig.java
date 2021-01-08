@@ -3,12 +3,12 @@ package io.coodoo.workhorse.config.entity;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-import javax.inject.Singleton;
+import javax.enterprise.context.ApplicationScoped;
 
 import io.coodoo.workhorse.jobengine.entity.JobExecutionStatus;
 import io.coodoo.workhorse.storage.persistenceInterface.PersistenceTyp;
 
-@Singleton
+@ApplicationScoped
 public class JobEngineConfig {
 
     /**

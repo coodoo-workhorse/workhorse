@@ -40,7 +40,7 @@ public class MemoryJobExecutionDAO implements JobExecutionPersistence {
 
     @Override
     public JobExecution getById(Long jobId, Long id) {
-        return memoryService.jobExecutions.get(id);
+        return memoryService.getJobExecutions().get(id);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class MemoryJobExecutionDAO implements JobExecutionPersistence {
         Long id = incId.getAndIncrement();
         jobExecution.setId(id);
         jobExecution.setCreatedAt(jobEngineConfig.timestamp());
-        memoryService.jobExecutions.put(id, jobExecution);
+        memoryService.getJobExecutions().put(id, jobExecution);
         
         newJobExecutionEvent.fireAsync(new NewJobExecutionEvent(jobExecution.getJobId(), jobExecution.getId()));
 
@@ -56,7 +56,7 @@ public class MemoryJobExecutionDAO implements JobExecutionPersistence {
 
     @Override
     public Long count() {
-        return Long.valueOf(memoryService.jobExecutions.size());
+        return Long.valueOf(memoryService.getJobExecutions().size());
     }
 
     @Override
@@ -68,7 +68,7 @@ public class MemoryJobExecutionDAO implements JobExecutionPersistence {
     public List<JobExecution> getByJobId(Long jobId, Long limit) {
         List<JobExecution> jobEx = new ArrayList<>();
 
-        for (JobExecution jobExecution : memoryService.jobExecutions.values()) {
+        for (JobExecution jobExecution : memoryService.getJobExecutions().values()) {
             if (jobExecution.getJobId().equals(jobId) && jobEx.size() < limit.intValue()) {
                 jobEx.add(jobExecution);
             }
@@ -87,7 +87,7 @@ public class MemoryJobExecutionDAO implements JobExecutionPersistence {
 
         LocalDateTime currentTimeStamp = LocalDateTime.now(ZoneId.of(jobEngineConfig.getTimeZone()));
 
-        for (JobExecution jobExecution : memoryService.jobExecutions.values()) {
+        for (JobExecution jobExecution : memoryService.getJobExecutions().values()) {
 
             if (jobExecution.getJobId().equals(jobId) && jobExecution.getStatus().equals(JobExecutionStatus.QUEUED)
                     && (jobExecution.getMaturity() == null
@@ -107,7 +107,7 @@ public class MemoryJobExecutionDAO implements JobExecutionPersistence {
 
     @Override
     public JobExecution update(Long jobId, Long id, JobExecution jobExecution) {
-        if (memoryService.jobExecutions.put(id, jobExecution) == null) {
+        if (memoryService.getJobExecutions().put(id, jobExecution) == null) {
             return null;
         } else {
             return jobExecution;
@@ -116,7 +116,7 @@ public class MemoryJobExecutionDAO implements JobExecutionPersistence {
 
     @Override
     public JobExecution addJobExecutionAtEndOfChain(Long jobId, Long chainId, JobExecution jobExecution) {
-        for (JobExecution jobEx : memoryService.jobExecutions.values()) {
+        for (JobExecution jobEx : memoryService.getJobExecutions().values()) {
             if (jobEx.getJobId().equals(jobId) && chainId.equals(jobEx.getChainId())
                     && jobEx.getChainedNextExecutionId() == null) {
 
@@ -132,7 +132,7 @@ public class MemoryJobExecutionDAO implements JobExecutionPersistence {
         JobExecution jobEx = getById(jobId, jobExecution.getChainedNextExecutionId());
         Long previousExecutionId = jobExecution.getId();
         if (jobEx == null) {
-            for (JobExecution execution : memoryService.jobExecutions.values()) {
+            for (JobExecution execution : memoryService.getJobExecutions().values()) {
                 if (execution != null && chainId.equals(execution.getChainId())
                         && previousExecutionId.equals(execution.getChainedPreviousExecutionId())
                         && JobExecutionStatus.QUEUED.equals(execution.getStatus())) {
@@ -151,7 +151,7 @@ public class MemoryJobExecutionDAO implements JobExecutionPersistence {
 
     @Override
     public JobExecution getQueuedBatchJobExecution(Long jobId, Long batchId) {
-        for (JobExecution jobExecution : memoryService.jobExecutions.values()) {
+        for (JobExecution jobExecution : memoryService.getJobExecutions().values()) {
             if (jobExecution.getJobId().equals(jobId) && Objects.equals(jobExecution.getBatchId(), batchId)
                     && jobExecution.getStatus().equals(JobExecutionStatus.QUEUED)) {
 
@@ -165,7 +165,7 @@ public class MemoryJobExecutionDAO implements JobExecutionPersistence {
     @Override
     public List<JobExecution> getFailedBatchJobExecutions(Long jobId, Long batchId) {
         List<JobExecution> jobEx = new ArrayList<>();
-        for (JobExecution jobExecution : memoryService.jobExecutions.values()) {
+        for (JobExecution jobExecution : memoryService.getJobExecutions().values()) {
             if (Objects.equals(jobExecution.getBatchId(), batchId)
                     && JobExecutionStatus.FAILED.equals(jobExecution.getStatus())) {
                 jobEx.add(jobExecution);
@@ -181,7 +181,7 @@ public class MemoryJobExecutionDAO implements JobExecutionPersistence {
 
     @Override
     public boolean abortChain(Long jobId, Long chainId) {
-        for (JobExecution jobExecution : memoryService.jobExecutions.values()) {
+        for (JobExecution jobExecution : memoryService.getJobExecutions().values()) {
             if (jobExecution.getJobId().equals(jobId) && Objects.equals(jobExecution.getChainId(), chainId)
                     && jobExecution.getStatus().equals(JobExecutionStatus.QUEUED)) {
 
@@ -196,7 +196,7 @@ public class MemoryJobExecutionDAO implements JobExecutionPersistence {
     public List<JobExecution> getBatch(Long jobId, Long batchId) {
 
         List<JobExecution> jobEx = new ArrayList<>();
-        for (JobExecution jobExecution : memoryService.jobExecutions.values()) {
+        for (JobExecution jobExecution : memoryService.getJobExecutions().values()) {
             if (Objects.equals(jobExecution.getBatchId(), batchId)) {
                 jobEx.add(jobExecution);
             }
@@ -207,7 +207,7 @@ public class MemoryJobExecutionDAO implements JobExecutionPersistence {
     @Override
     public List<JobExecution> getChain(Long jobId, Long chainId) {
         List<JobExecution> jobEx = new ArrayList<>();
-        for (JobExecution jobExecution : memoryService.jobExecutions.values()) {
+        for (JobExecution jobExecution : memoryService.getJobExecutions().values()) {
             if (Objects.equals(jobExecution.getChainId(), chainId)) {
                 jobEx.add(jobExecution);
             }
@@ -217,7 +217,7 @@ public class MemoryJobExecutionDAO implements JobExecutionPersistence {
 
     @Override
     public void delete(Long jobId, Long id) {
-        memoryService.jobExecutions.remove(id);
+        memoryService.getJobExecutions().remove(id);
     }
 
     @Override
@@ -228,7 +228,7 @@ public class MemoryJobExecutionDAO implements JobExecutionPersistence {
     @Override
     public int deleteOlderJobExecutions(Long jobId, LocalDateTime preDate) {
         int count = 0;
-        for (JobExecution jobExecution : memoryService.jobExecutions.values()) {
+        for (JobExecution jobExecution : memoryService.getJobExecutions().values()) {
             if (jobId.equals(jobExecution.getJobId()) &&  preDate.compareTo(jobExecution.getCreatedAt()) > 0) {
                 log.info("Next JobExecution have to be delete: " + jobExecution );
                delete(jobId, jobExecution.getId());

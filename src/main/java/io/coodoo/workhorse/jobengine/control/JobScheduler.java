@@ -38,13 +38,13 @@ public class JobScheduler {
     @Inject
     Event<JobErrorEvent> jobErrorEvent;
 
-    @Resource
-    ScheduledExecutorService scheduledExecutorService;
+    
+    private ScheduledExecutorService scheduledExecutorService;
 
     private Map<Long, ScheduledFuture<?>> scheduledJobFutures = new HashMap<>();
 
     @PostConstruct
-    public void init() throws Exception {
+    public void init() {
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     }
 
