@@ -210,7 +210,7 @@
 				</configuration>
 			</plugin>
 			<!-- Important for Quarkus cdi-implementation -->
-			<plugin>
+			<!-- <plugin>
 				<groupId>org.jboss.jandex</groupId>
 				<artifactId>jandex-maven-plugin</artifactId>
 				<version>1.0.7</version>
@@ -222,7 +222,7 @@
 					</goals>
 				  </execution>
 				</executions>
-			  </plugin>
+			  </plugin> -->
 		</plugins>
 	</build>
 	<distributionManagement>
