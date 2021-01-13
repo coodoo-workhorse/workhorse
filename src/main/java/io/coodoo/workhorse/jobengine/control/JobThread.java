@@ -2,7 +2,7 @@ package io.coodoo.workhorse.jobengine.control;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.locks.ReentrantLock;
-
+import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.ObservesAsync;
 import javax.inject.Inject;
@@ -19,6 +19,7 @@ import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
 import io.coodoo.workhorse.persistence.interfaces.qualifiers.JobDAO;
 import io.coodoo.workhorse.persistence.interfaces.qualifiers.JobExecutionDAO;
 
+@Dependent
 public class JobThread {
 
     @Inject
