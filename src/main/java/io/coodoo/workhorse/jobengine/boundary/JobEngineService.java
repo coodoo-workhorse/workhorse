@@ -10,8 +10,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.ObservesAsync;
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jboss.logging.Logger;
 
 import io.coodoo.workhorse.api.DTO.GroupInfo;
 import io.coodoo.workhorse.api.DTO.JobEngineInfo;
@@ -35,7 +34,7 @@ import io.coodoo.workhorse.util.CronExpression;
 @ApplicationScoped
 public class JobEngineService {
 
-    private static final Logger log = LoggerFactory.getLogger(JobEngineService.class);
+    private static final Logger log = Logger.getLogger(JobEngineService.class);
 
     @Inject
     JobEngine jobEngine;
@@ -118,7 +117,6 @@ public class JobEngineService {
         jobScheduler.stopScheduler();
         jobExecutionQueue.destroyQueue();
         persistenceManager.destroyStorage();
-        
 
         log.info("The job engine will be restart.");
         startTheEngine(restartPayload.getJobEngine().getPersistenceTyp(), restartPayload.getPersistenceParams(),
@@ -240,7 +238,7 @@ public class JobEngineService {
         jobExecution.setPriority(priority);
         jobExecution.setMaturity(maturity);
         jobExecution.setFailRetry(fails);
-        log.info("JobExecution updated: {}", jobExecution);
+        log.info("JobExecution updated: " + jobExecution);
 
         jobEngineController.updateJobExecution(jobId, jobExecutionId, jobExecution);
         return jobExecution;
@@ -271,7 +269,7 @@ public class JobEngineService {
         if (job == null) {
             throw new RuntimeException("Job not found");
         }
-        log.info("Activate job {}", job.getName());
+        log.info("Activate job " + job.getName());
         job.setStatus(JobStatus.ACTIVE);
         jobEngineController.update(job.getId(), job);
         if (job.getSchedule() != null && !job.getSchedule().isEmpty()) {
@@ -284,7 +282,7 @@ public class JobEngineService {
         if (job == null) {
             throw new RuntimeException("Job not found");
         }
-        log.info("Deactivate job {}", job.getName());
+        log.info("Deactivate job " + job.getName());
         job.setStatus(JobStatus.INACTIVE);
         jobEngineController.update(job.getId(), job);
         if (job.getSchedule() != null && !job.getSchedule().isEmpty()) {
