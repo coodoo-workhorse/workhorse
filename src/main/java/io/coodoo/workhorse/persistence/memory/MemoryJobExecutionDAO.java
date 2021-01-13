@@ -1,4 +1,4 @@
-package io.coodoo.workhorse.storage.memoryAdapter;
+package io.coodoo.workhorse.persistence.memory;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -19,8 +19,8 @@ import io.coodoo.workhorse.config.entity.JobEngineConfig;
 import io.coodoo.workhorse.jobengine.control.events.NewJobExecutionEvent;
 import io.coodoo.workhorse.jobengine.entity.JobExecution;
 import io.coodoo.workhorse.jobengine.entity.JobExecutionStatus;
-import io.coodoo.workhorse.storage.persistenceInterface.JobExecutionPersistence;
-import io.coodoo.workhorse.storage.persistenceInterface.PersistenceTyp;
+import io.coodoo.workhorse.persistence.interfaces.JobExecutionPersistence;
+import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 
 @ApplicationScoped
 public class MemoryJobExecutionDAO implements JobExecutionPersistence {

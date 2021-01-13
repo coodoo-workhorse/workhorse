@@ -13,8 +13,8 @@ import io.coodoo.workhorse.jobengine.control.events.JobErrorEvent;
 import io.coodoo.workhorse.jobengine.entity.JobStatus;
 import io.coodoo.workhorse.log.boundary.JobEngineLogService;
 import io.coodoo.workhorse.log.entity.JobEngineLog;
-import io.coodoo.workhorse.storage.persistenceInterface.JobEngineLogPersistence;
-import io.coodoo.workhorse.storage.qualifiers.JobEngineLogDAO;
+import io.coodoo.workhorse.persistence.interfaces.JobEngineLogPersistence;
+import io.coodoo.workhorse.persistence.interfaces.qualifiers.JobEngineLogDAO;
 import io.coodoo.workhorse.util.JobEngineUtil;
 
 @ApplicationScoped

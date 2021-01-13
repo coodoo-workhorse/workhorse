@@ -12,8 +12,8 @@ import org.jboss.logging.Logger;
 import io.coodoo.workhorse.config.entity.JobEngineConfig;
 import io.coodoo.workhorse.jobengine.entity.Job;
 import io.coodoo.workhorse.jobengine.entity.JobExecution;
-import io.coodoo.workhorse.storage.persistenceInterface.JobPersistence;
-import io.coodoo.workhorse.storage.qualifiers.JobDAO;
+import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
+import io.coodoo.workhorse.persistence.interfaces.qualifiers.JobDAO;
 import io.coodoo.workhorse.util.JobEngineUtil;
 
 public abstract class BaseJobWorker {

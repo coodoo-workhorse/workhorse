@@ -1,4 +1,4 @@
-package io.coodoo.workhorse.storage.qualifiers;
+package io.coodoo.workhorse.persistence.interfaces.qualifiers;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,5 +10,6 @@ import javax.inject.Qualifier;
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.FIELD})
-public @interface JobDAO {
+public @interface JobEngineLogDAO {
+    
 }

@@ -1,12 +1,10 @@
-package io.coodoo.workhorse.storage.memoryAdapter;
+package io.coodoo.workhorse.persistence.memory;
 
-
-import io.coodoo.workhorse.storage.persistenceInterface.PersistenceTyp;
 
 import io.coodoo.workhorse.config.entity.JobEngineConfig;
+import io.coodoo.workhorse.persistence.interfaces.JobEngineConfigPersistence;
+import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 
-
-import io.coodoo.workhorse.storage.persistenceInterface.JobEngineConfigPersistence;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 

@@ -1,4 +1,4 @@
-package io.coodoo.workhorse.storage.qualifiers;
+package io.coodoo.workhorse.persistence.interfaces.qualifiers;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -28,11 +28,11 @@ import io.coodoo.workhorse.jobengine.entity.JobEngineErrorType;
 import io.coodoo.workhorse.jobengine.entity.JobExecution;
 import io.coodoo.workhorse.jobengine.entity.JobExecutionStatus;
 import io.coodoo.workhorse.jobengine.entity.JobStatus;
-import io.coodoo.workhorse.storage.PersistenceManager;
-import io.coodoo.workhorse.storage.persistenceInterface.JobExecutionPersistence;
-import io.coodoo.workhorse.storage.persistenceInterface.JobPersistence;
-import io.coodoo.workhorse.storage.qualifiers.JobDAO;
-import io.coodoo.workhorse.storage.qualifiers.JobExecutionDAO;
+import io.coodoo.workhorse.persistence.PersistenceManager;
+import io.coodoo.workhorse.persistence.interfaces.JobExecutionPersistence;
+import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
+import io.coodoo.workhorse.persistence.interfaces.qualifiers.JobDAO;
+import io.coodoo.workhorse.persistence.interfaces.qualifiers.JobExecutionDAO;
 
 @ApplicationScoped
 public class JobEngine {

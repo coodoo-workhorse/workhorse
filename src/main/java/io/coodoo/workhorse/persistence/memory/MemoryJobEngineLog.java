@@ -1,4 +1,4 @@
-package io.coodoo.workhorse.storage.memoryAdapter;
+package io.coodoo.workhorse.persistence.memory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +9,8 @@ import javax.inject.Inject;
 
 import io.coodoo.workhorse.config.entity.JobEngineConfig;
 import io.coodoo.workhorse.log.entity.JobEngineLog;
-import io.coodoo.workhorse.storage.persistenceInterface.JobEngineLogPersistence;
-import io.coodoo.workhorse.storage.persistenceInterface.PersistenceTyp;
+import io.coodoo.workhorse.persistence.interfaces.JobEngineLogPersistence;
+import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 
 @ApplicationScoped
 public class MemoryJobEngineLog implements JobEngineLogPersistence {

@@ -1,4 +1,4 @@
-package io.coodoo.workhorse.storage.persistenceInterface;
+package io.coodoo.workhorse.persistence.interfaces;
 
 import java.time.LocalDateTime;
 import java.util.List;

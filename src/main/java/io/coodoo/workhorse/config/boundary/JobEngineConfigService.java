@@ -7,7 +7,7 @@ import javax.inject.Inject;
 import io.coodoo.workhorse.config.control.JobEngineConfigControl;
 import io.coodoo.workhorse.config.entity.JobEngineConfig;
 import io.coodoo.workhorse.jobengine.control.events.RestartTheJobEngine;
-import io.coodoo.workhorse.storage.persistenceInterface.PersistenceTyp;
+import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 
 @ApplicationScoped
 public class JobEngineConfigService {

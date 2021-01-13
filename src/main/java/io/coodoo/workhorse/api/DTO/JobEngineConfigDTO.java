@@ -1,7 +1,7 @@
 package io.coodoo.workhorse.api.DTO;
 
 import io.coodoo.workhorse.config.entity.JobEngineConfig;
-import io.coodoo.workhorse.storage.persistenceInterface.PersistenceTyp;
+import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 
 public class JobEngineConfigDTO {
     public String timeZone ;

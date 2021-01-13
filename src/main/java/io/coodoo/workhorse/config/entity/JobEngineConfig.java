@@ -6,7 +6,7 @@ import java.time.ZoneId;
 import javax.enterprise.context.ApplicationScoped;
 
 import io.coodoo.workhorse.jobengine.entity.JobExecutionStatus;
-import io.coodoo.workhorse.storage.persistenceInterface.PersistenceTyp;
+import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 
 @ApplicationScoped
 public class JobEngineConfig {

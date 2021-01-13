@@ -1,4 +1,4 @@
-package io.coodoo.workhorse.storage.memoryAdapter;
+package io.coodoo.workhorse.persistence.memory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,8 +10,8 @@ import javax.inject.Inject;
 
 import io.coodoo.workhorse.jobengine.entity.Job;
 import io.coodoo.workhorse.jobengine.entity.JobStatus;
-import io.coodoo.workhorse.storage.persistenceInterface.JobPersistence;
-import io.coodoo.workhorse.storage.persistenceInterface.PersistenceTyp;
+import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
+import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 
 @ApplicationScoped
 public class MemoryJobDAO implements JobPersistence{

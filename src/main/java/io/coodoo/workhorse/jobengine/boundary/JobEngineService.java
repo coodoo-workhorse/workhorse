@@ -28,8 +28,8 @@ import io.coodoo.workhorse.jobengine.entity.JobExecution;
 import io.coodoo.workhorse.jobengine.entity.JobExecutionStatus;
 import io.coodoo.workhorse.jobengine.entity.JobStatus;
 import io.coodoo.workhorse.log.control.JobEngineLogControl;
-import io.coodoo.workhorse.storage.PersistenceManager;
-import io.coodoo.workhorse.storage.persistenceInterface.PersistenceTyp;
+import io.coodoo.workhorse.persistence.PersistenceManager;
+import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 import io.coodoo.workhorse.util.CronExpression;
 
 @ApplicationScoped

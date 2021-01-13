@@ -12,9 +12,9 @@ import org.jboss.logging.Logger;
 import io.coodoo.workhorse.config.entity.JobEngineConfig;
 import io.coodoo.workhorse.jobengine.control.events.RestartTheJobEngine;
 import io.coodoo.workhorse.log.control.JobEngineLogControl;
-import io.coodoo.workhorse.storage.persistenceInterface.JobEngineConfigPersistence;
-import io.coodoo.workhorse.storage.persistenceInterface.PersistenceTyp;
-import io.coodoo.workhorse.storage.qualifiers.JobEngineConfigDAO;
+import io.coodoo.workhorse.persistence.interfaces.JobEngineConfigPersistence;
+import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
+import io.coodoo.workhorse.persistence.interfaces.qualifiers.JobEngineConfigDAO;
 
 @ApplicationScoped
 public class JobEngineConfigControl {
