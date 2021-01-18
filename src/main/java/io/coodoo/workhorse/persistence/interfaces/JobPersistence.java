@@ -2,8 +2,8 @@ package io.coodoo.workhorse.persistence.interfaces;
 
 import java.util.List;
 
-import io.coodoo.workhorse.jobengine.entity.Job;
-import io.coodoo.workhorse.jobengine.entity.JobStatus;
+import io.coodoo.workhorse.core.entity.Job;
+import io.coodoo.workhorse.core.entity.JobStatus;
 
 public interface JobPersistence {
      

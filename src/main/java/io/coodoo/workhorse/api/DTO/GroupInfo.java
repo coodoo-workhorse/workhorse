@@ -4,14 +4,14 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import io.coodoo.workhorse.jobengine.entity.JobExecutionStatus;
+import io.coodoo.workhorse.core.entity.ExecutionStatus;
 
 
 public class GroupInfo {
 
     private Long id;
 
-    private JobExecutionStatus status;
+    private ExecutionStatus status;
 
     private int size;
 
@@ -37,11 +37,11 @@ public class GroupInfo {
 
     private Long expectedDuration;
 
-    private List<JobExecutionInfo> executionInfos;
+    private List<ExecutionInfo> executionInfos;
 
     public GroupInfo() {}
 
-    public GroupInfo(Long id, List<JobExecutionInfo> executionInfos) {
+    public GroupInfo(Long id, List<ExecutionInfo> executionInfos) {
 
         this.id = id;
         size = executionInfos.size();
@@ -55,7 +55,7 @@ public class GroupInfo {
         this.executionInfos = executionInfos;
         this.duration = 0L;
 
-        for (JobExecutionInfo execution : executionInfos) {
+        for (ExecutionInfo execution : executionInfos) {
             switch (execution.getStatus()) {
                 case QUEUED:
                     queued++;
@@ -111,15 +111,15 @@ public class GroupInfo {
                 }
             }
             if (queued == size) {
-                status = JobExecutionStatus.QUEUED;
+                status = ExecutionStatus.QUEUED;
             } else if (doneCount == size) {
-                status = JobExecutionStatus.FINISHED;
+                status = ExecutionStatus.FINISHED;
                 if (aborted > 0) {
                     // when a chain execution fails, the remaining queued executions get aborted // FIXME: also a batch will be in state ABORTED...
-                    status = JobExecutionStatus.ABORTED;
+                    status = ExecutionStatus.ABORTED;
                 }
             } else if (queued < size) {
-                status = JobExecutionStatus.RUNNING;
+                status = ExecutionStatus.RUNNING;
                 endedAt = null;
             }
         }
@@ -137,11 +137,11 @@ public class GroupInfo {
         this.id = id;
     }
 
-    public JobExecutionStatus getStatus() {
+    public ExecutionStatus getStatus() {
         return status;
     }
 
-    public void setStatus(JobExecutionStatus status) {
+    public void setStatus(ExecutionStatus status) {
         this.status = status;
     }
 
@@ -241,11 +241,11 @@ public class GroupInfo {
         this.expectedDuration = expectedDuration;
     }
 
-    public List<JobExecutionInfo> getExecutionInfos() {
+    public List<ExecutionInfo> getExecutionInfos() {
         return executionInfos;
     }
 
-    public void setExecutionInfos(List<JobExecutionInfo> executionInfos) {
+    public void setExecutionInfos(List<ExecutionInfo> executionInfos) {
         this.executionInfos = executionInfos;
     }
 

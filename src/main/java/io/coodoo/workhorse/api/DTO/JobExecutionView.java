@@ -2,10 +2,10 @@ package io.coodoo.workhorse.api.DTO;
 
 import java.time.LocalDateTime;
 
-import io.coodoo.workhorse.jobengine.entity.Job;
-import io.coodoo.workhorse.jobengine.entity.JobExecution;
-import io.coodoo.workhorse.jobengine.entity.JobExecutionStatus;
-import io.coodoo.workhorse.jobengine.entity.JobStatus;
+import io.coodoo.workhorse.core.entity.Job;
+import io.coodoo.workhorse.core.entity.Execution;
+import io.coodoo.workhorse.core.entity.ExecutionStatus;
+import io.coodoo.workhorse.core.entity.JobStatus;
 
 public class JobExecutionView {
 
@@ -27,7 +27,7 @@ public class JobExecutionView {
 
     public int jobThreads;
 
-    public JobExecutionStatus status;
+    public ExecutionStatus status;
 
     public LocalDateTime startedAt;
 
@@ -55,7 +55,7 @@ public class JobExecutionView {
 
    public JobExecutionView () {}
 
-   public JobExecutionView(Job job, JobExecution jobExecution) {
+   public JobExecutionView(Job job, Execution jobExecution) {
        this.id = jobExecution.getId();
        this.createdAt = jobExecution.getCreatedAt();
        this.updatedAt = jobExecution.getUpdatedAt();

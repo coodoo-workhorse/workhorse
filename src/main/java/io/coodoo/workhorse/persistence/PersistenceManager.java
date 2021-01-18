@@ -8,16 +8,16 @@ import javax.inject.Inject;
 
 import org.jboss.logging.Logger;
 
-import io.coodoo.workhorse.config.entity.JobEngineConfig;
-import io.coodoo.workhorse.persistence.interfaces.JobEngineConfigPersistence;
-import io.coodoo.workhorse.persistence.interfaces.JobEngineLogPersistence;
-import io.coodoo.workhorse.persistence.interfaces.JobExecutionPersistence;
+import io.coodoo.workhorse.config.entity.WorkhorseConfig;
+import io.coodoo.workhorse.persistence.interfaces.ConfigPersistence;
+import io.coodoo.workhorse.persistence.interfaces.LogPersistence;
+import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
 import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
-import io.coodoo.workhorse.persistence.interfaces.qualifiers.JobDAO;
-import io.coodoo.workhorse.persistence.interfaces.qualifiers.JobEngineConfigDAO;
-import io.coodoo.workhorse.persistence.interfaces.qualifiers.JobEngineLogDAO;
-import io.coodoo.workhorse.persistence.interfaces.qualifiers.JobExecutionDAO;
+import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
+import io.coodoo.workhorse.persistence.interfaces.qualifier.ConfigQualifier;
+import io.coodoo.workhorse.persistence.interfaces.qualifier.LogQualifier;
+import io.coodoo.workhorse.persistence.interfaces.qualifier.ExecutionQualifier;
 
 @ApplicationScoped
 public class PersistenceManager {
@@ -30,34 +30,34 @@ public class PersistenceManager {
 
     @Inject
     @Any
-    Instance<JobExecutionPersistence> jobExecutionPersistenceInstances;
+    Instance<ExecutionPersistence> jobExecutionPersistenceInstances;
 
     @Inject
     @Any
-    Instance<JobEngineConfigPersistence> jobEngineConfigPersistenceInstances;
+    Instance<ConfigPersistence> jobEngineConfigPersistenceInstances;
 
     @Inject
     @Any
-    Instance<JobEngineLogPersistence> jobEngineLogPersistenceInstances;
+    Instance<LogPersistence> jobEngineLogPersistenceInstances;
 
     @Inject
-    JobEngineConfig jobEngineConfig;
+    WorkhorseConfig jobEngineConfig;
 
     @Produces
-    @JobDAO
+    @JobQualifier
     private JobPersistence jobPersistence;
 
     @Produces
-    @JobExecutionDAO
-    private JobExecutionPersistence jobExecutionPersistence;
+    @ExecutionQualifier
+    private ExecutionPersistence executionPersistence;
 
     @Produces
-    @JobEngineConfigDAO
-    private JobEngineConfigPersistence jobEngineConfigPersistence;
+    @ConfigQualifier
+    private ConfigPersistence configPersistence;
 
     @Produces
-    @JobEngineLogDAO
-    private JobEngineLogPersistence jobEngineLogPersistence;
+    @LogQualifier
+    private LogPersistence logPersistence;
 
     public void initializeStorage() {
         initializePersistence(jobEngineConfig.getPersistenceTyp(), null);
@@ -78,16 +78,16 @@ public class PersistenceManager {
 
         initializeJobEnigneLogPersistence(persistenceTyp);
 
-        if (jobPersistence == null || jobExecutionPersistence == null || jobEngineConfigPersistence == null || jobEngineLogPersistence == null) {
+        if (jobPersistence == null || executionPersistence == null || configPersistence == null || logPersistence == null) {
             throw new RuntimeException("The Persistence could not be load!!");
         }
     }
 
     public void destroyStorage() {
         jobPersistence = null;
-        jobExecutionPersistence = null;
-        jobEngineConfigPersistence = null;
-        jobEngineLogPersistence = null;
+        executionPersistence = null;
+        configPersistence = null;
+        logPersistence = null;
 
     }
 
@@ -106,43 +106,43 @@ public class PersistenceManager {
         return null;
     }
 
-    public JobExecutionPersistence initializeJobExecutionPersistence(PersistenceTyp persistenceTyp) {
-        log.info("Start of JobExecutionPersistence initialization");
-        for (JobExecutionPersistence persistenceJobExecution : jobExecutionPersistenceInstances) {
+    public ExecutionPersistence initializeJobExecutionPersistence(PersistenceTyp persistenceTyp) {
+        log.info("Start of ExecutionPersistence initialization");
+        for (ExecutionPersistence persistenceJobExecution : jobExecutionPersistenceInstances) {
             if (persistenceJobExecution != null && persistenceJobExecution.getPersistenceTyp().equals(persistenceTyp)) {
-                jobExecutionPersistence = persistenceJobExecution;
-                log.info("JobExecutionPersistence: " + jobExecutionPersistence);
-                log.info("End of JobExecutionPersistence initialization");
-                jobExecutionPersistence.connect();
-                return jobExecutionPersistence;
+                executionPersistence = persistenceJobExecution;
+                log.info("ExecutionPersistence: " + executionPersistence);
+                log.info("End of ExecutionPersistence initialization");
+                executionPersistence.connect();
+                return executionPersistence;
             }
         }
         return null;
     }
 
-    public JobEngineConfigPersistence initializeJobEngineConfigPersistence(PersistenceTyp persistenceTyp, Object persistenceConfiguration) {
-        log.info("Start of JobExecutionPersistence initialization");
-        for (JobEngineConfigPersistence persistenceJobEngineConfig : jobEngineConfigPersistenceInstances) {
+    public ConfigPersistence initializeJobEngineConfigPersistence(PersistenceTyp persistenceTyp, Object persistenceConfiguration) {
+        log.info("Start of ExecutionPersistence initialization");
+        for (ConfigPersistence persistenceJobEngineConfig : jobEngineConfigPersistenceInstances) {
             if (persistenceJobEngineConfig != null && persistenceJobEngineConfig.getPersistenceTyp().equals(persistenceTyp)) {
-                jobEngineConfigPersistence = persistenceJobEngineConfig;
-                log.info("jobEngineConfigPersistence: " + jobEngineConfigPersistence);
-                log.info("End of jobEngineConfigPersistence initialization");
-                jobEngineConfigPersistence.connect(persistenceConfiguration);
-                return jobEngineConfigPersistence;
+                configPersistence = persistenceJobEngineConfig;
+                log.info("configPersistence: " + configPersistence);
+                log.info("End of configPersistence initialization");
+                configPersistence.connect(persistenceConfiguration);
+                return configPersistence;
             }
         }
         return null;
     }
 
-    public JobEngineLogPersistence initializeJobEnigneLogPersistence(PersistenceTyp persistenceTyp) {
-        log.info("Start of JobEngineLogPersistence initialization");
-        for (JobEngineLogPersistence persistenceJobEngineLog : jobEngineLogPersistenceInstances) {
+    public LogPersistence initializeJobEnigneLogPersistence(PersistenceTyp persistenceTyp) {
+        log.info("Start of LogPersistence initialization");
+        for (LogPersistence persistenceJobEngineLog : jobEngineLogPersistenceInstances) {
             if (persistenceJobEngineLog != null && persistenceJobEngineLog.getPersistenceTyp().equals(persistenceTyp)) {
-                jobEngineLogPersistence = persistenceJobEngineLog;
-                log.info("JobEngineLogPersistence: " + jobEngineLogPersistence);
-                log.info("End of JobEngineLogPersistence initialization");
-                jobEngineLogPersistence.connect();
-                return jobEngineLogPersistence;
+                logPersistence = persistenceJobEngineLog;
+                log.info("LogPersistence: " + logPersistence);
+                log.info("End of LogPersistence initialization");
+                logPersistence.connect();
+                return logPersistence;
             }
         }
         return null;
@@ -150,27 +150,27 @@ public class PersistenceManager {
     }
 
     // @Produces
-    // @JobDAO
+    // @JobQualifier
     // public JobPersistence getJobPersistence() {
     // return jobPersistence;
     // }
 
     // @Produces
-    // @JobExecutionDAO
-    // public JobExecutionPersistence getJobExecutionPersistence() {
-    // return jobExecutionPersistence;
+    // @ExecutionQualifier
+    // public ExecutionPersistence getJobExecutionPersistence() {
+    // return executionPersistence;
     // }
 
     // @Produces
-    // @JobEngineConfigDAO
-    // public JobEngineConfigPersistence getJobEngineConfigPersistence() {
-    // return jobEngineConfigPersistence;
+    // @ConfigQualifier
+    // public ConfigPersistence getJobEngineConfigPersistence() {
+    // return configPersistence;
     // }
 
     // @Produces
-    // @JobEngineLogDAO
-    // public JobEngineLogPersistence getJobEngineLogPersistence() {
-    // return jobEngineLogPersistence;
+    // @LogQualifier
+    // public LogPersistence getJobEngineLogPersistence() {
+    // return logPersistence;
     // }
 
 }
