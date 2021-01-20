@@ -65,6 +65,7 @@ public class WorkhorseService {
      * @param persistenceTyp Type of the persistence to use
      * @param persistenceConfiguration Config data to connect the persistence
      */
+    @Deprecated
     public void startTheEngine(PersistenceTyp persistenceTyp, Object persistenceConfiguration) {
 
         persistenceManager.initializePersistence(persistenceTyp, persistenceConfiguration);
@@ -87,6 +88,7 @@ public class WorkhorseService {
      * @param jobQueueMax Max amount of executions to load into the memory queue per job
      * @param jobQueueMin Min amount of executions in memory queue before the poller gets to add more
      */
+    @Deprecated
     public void startTheEngine(PersistenceTyp persistenceTyp, Object persistenceConfiguration, String timeZone, int jobQueuePollerInterval,
                     int jobQueuePusherPoll, Long jobQueueMax, int jobQueueMin) {
 
@@ -105,6 +107,7 @@ public class WorkhorseService {
      * 
      * @param restartPayload
      */
+    @Deprecated
     public void startTheEngine(@ObservesAsync RestartWorkhorseEvent restartPayload) {
 
         workhorse.stop();
@@ -122,13 +125,16 @@ public class WorkhorseService {
     /**
      * Start the Job Engine
      */
+    @Deprecated
     public void startTheEngine() {
+
         startTheEngine(jobEngineConfig.getPersistenceTyp(), null);
     }
 
     /**
      * Stop the Workhorse
      */
+    @Deprecated
     public void stopTheEngine() {
         workhorse.stop();
         for (Job job : getAllScheduledJobs()) {
@@ -137,6 +143,26 @@ public class WorkhorseService {
         }
 
         jobExecutionQueue.destroyQueue();
+    }
+
+    public void start() {
+
+        if (workhorse.isRunning()) {
+            return;
+        }
+        // TODO oder
+        if (workhorse.isRunning()) {
+            stopTheEngine();
+        }
+        // TODO start
+    }
+
+    public void stop() {
+
+        if (!workhorse.isRunning()) {
+            return;
+        }
+        // TODO stopp
     }
 
     /**
