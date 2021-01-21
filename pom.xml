@@ -11,26 +11,26 @@
 	<inceptionYear>2021</inceptionYear>
 	<organization>
 		<name>coodoo GmbH</name>
-		<url>http://coodoo.io</url>
+		<url>https://coodoo.io</url>
 	</organization>
 	<developers>
 		<developer>
 			<name>Markus Kühle</name>
-			<email>Markus.Kuehle@coodoo.io</email>
+			<email>markus.kuehle@coodoo.de</email>
 			<organization>coodoo GmbH</organization>
-			<organizationUrl>http://coodoo.de</organizationUrl>
+			<organizationUrl>https://coodoo.io</organizationUrl>
 		</developer>
 		<developer>
 			<name>Arend Kühle</name>
-			<email>Arend.Kuehle@coodoo.io</email>
+			<email>arend.kuehle@coodoo.de</email>
 			<organization>coodoo GmbH</organization>
-			<organizationUrl>http://coodoo.de</organizationUrl>
+			<organizationUrl>https://coodoo.io</organizationUrl>
 		</developer>
 		<developer>
 			<name>Yvaris Yemeli Djouda</name>
 			<email>yvaris.djouda@coodoo.de</email>
 			<organization>coodoo GmbH</organization>
-			<organizationUrl>http://coodoo.de</organizationUrl>
+			<organizationUrl>https://coodoo.io</organizationUrl>
 		</developer>
 	</developers>
 	<licenses>
