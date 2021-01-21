@@ -1,4 +1,4 @@
-workhorse.png[logo]: logo.png "Workhorse: Extendable Java Job Engine for background jobs and business critical tasks"
+[logo]: https://gitlab.coodoo.io/workhorse/workhorse/-/raw/master/logo.png "Workhorse: Extendable Java Job Engine for background jobs and business critical tasks"
 
 # Workhorse ![alt text][logo]
 
