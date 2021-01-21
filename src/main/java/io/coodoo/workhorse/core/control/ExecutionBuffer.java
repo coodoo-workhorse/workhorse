@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -20,10 +19,10 @@ import javax.inject.Inject;
 import org.jboss.logging.Logger;
 
 import io.coodoo.workhorse.config.entity.WorkhorseConfig;
-import io.coodoo.workhorse.core.entity.Job;
-import io.coodoo.workhorse.core.entity.WorkhorseInfo;
 import io.coodoo.workhorse.core.entity.Execution;
+import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
+import io.coodoo.workhorse.core.entity.WorkhorseInfo;
 
 @ApplicationScoped
 public class ExecutionBuffer {
@@ -67,7 +66,6 @@ public class ExecutionBuffer {
         jobThreadCounts.put(job.getId(), job.getThreads());
         runningJobThreadCounts.put(job.getId(), 0);
         completionStages.put(job.getId(), new HashSet<>());
-        
     }
 
     public void destroyQueue() {
@@ -111,6 +109,7 @@ public class ExecutionBuffer {
 
     /**
      * Stop all thread linked with a given job
+     * 
      * @param job
      */
     public void stopAllJobThread(Job job) {
@@ -137,7 +136,7 @@ public class ExecutionBuffer {
         for (CompletionStage<Job> completion : completionStages.get(job.getId())) {
 
             // Stop the thread
-            ((CompletableFuture) completion).cancel(true);
+            completion.toCompletableFuture().cancel(true);
         }
 
         completionStages.get(job.getId()).clear();
@@ -226,8 +225,7 @@ public class ExecutionBuffer {
             return false;
         }
 
-        if (runningExecutions.get(jobId).contains(jobExecutionId)
-                || executions.get(jobId).contains(jobExecutionId)
+        if (runningExecutions.get(jobId).contains(jobExecutionId) || executions.get(jobId).contains(jobExecutionId)
                 || priorityExecutions.get(jobId).contains(jobExecutionId)) {
             return false;
         }
