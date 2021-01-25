@@ -3,10 +3,10 @@ package io.coodoo.workhorse.core.boundary;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
-import io.coodoo.workhorse.core.control.BaseJobWorker;
+import io.coodoo.workhorse.core.control.BaseWorker;
 import io.coodoo.workhorse.core.entity.Execution;
 
-public abstract class JobWorker extends BaseJobWorker {
+public abstract class Worker extends BaseWorker {
 
     public abstract void doWork() throws Exception;
 

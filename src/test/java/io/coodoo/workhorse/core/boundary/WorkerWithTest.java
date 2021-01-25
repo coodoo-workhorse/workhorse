@@ -25,7 +25,7 @@ import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
 @RunWith(MockitoJUnitRunner.class)
-public class JobWorkerWithTest {
+public class WorkerWithTest {
 
     private static String STRING;
     private static Long LONG;
@@ -36,49 +36,49 @@ public class JobWorkerWithTest {
     private static Set<String> STRING_SET;
     private static Map<Long, String> LONG_STRING_MAP;
 
-    public class TypeString extends JobWorkerWith<String> {
+    public class TypeString extends WorkerWith<String> {
         @Override
         public void doWork(String parameters) throws Exception {
             assertEquals(STRING, parameters);
         }
     }
-    public class TypeLong extends JobWorkerWith<Long> {
+    public class TypeLong extends WorkerWith<Long> {
         @Override
         public void doWork(Long parameters) throws Exception {
             assertEquals(LONG, parameters);
         }
     }
-    public class TypePojo extends JobWorkerWith<Pojo> {
+    public class TypePojo extends WorkerWith<Pojo> {
         @Override
         public void doWork(Pojo parameters) throws Exception {
             assertEquals(POJO, parameters);
         }
     }
-    public class TypeListLong extends JobWorkerWith<List<Long>> {
+    public class TypeListLong extends WorkerWith<List<Long>> {
         @Override
         public void doWork(List<Long> parameters) throws Exception {
             assertEquals(LONG_LIST.toString(), parameters.toString());
         }
     }
-    public class TypeListString extends JobWorkerWith<List<String>> {
+    public class TypeListString extends WorkerWith<List<String>> {
         @Override
         public void doWork(List<String> parameters) throws Exception {
             assertEquals(STRING_LIST.toString(), parameters.toString());
         }
     }
-    public class TypeListPojo extends JobWorkerWith<List<Pojo>> {
+    public class TypeListPojo extends WorkerWith<List<Pojo>> {
         @Override
         public void doWork(List<Pojo> parameters) throws Exception {
             assertEquals(POJO_LIST.toString(), parameters.toString());
         }
     }
-    public class TypeSetString extends JobWorkerWith<Set<String>> {
+    public class TypeSetString extends WorkerWith<Set<String>> {
         @Override
         public void doWork(Set<String> parameters) throws Exception {
             assertEquals(STRING_SET.toString(), parameters.toString());
         }
     }
-    public class TypeMapLongString extends JobWorkerWith<Map<Long, String>> {
+    public class TypeMapLongString extends WorkerWith<Map<Long, String>> {
         @Override
         public void doWork(Map<Long, String> parameters) throws Exception {
             assertEquals(LONG_STRING_MAP.toString(), parameters.toString());
@@ -92,28 +92,28 @@ public class JobWorkerWithTest {
     private WorkhorseService jobEngineService;
 
     @InjectMocks
-    private TypeString jobWorkerWithString = new TypeString();
+    private TypeString workerWithString = new TypeString();
 
     @InjectMocks
-    private TypeLong jobWorkerWithLong = new TypeLong();
+    private TypeLong workerWithLong = new TypeLong();
 
     @InjectMocks
-    private TypePojo jobWorkerWithPojo = new TypePojo();
+    private TypePojo workerWithPojo = new TypePojo();
 
     @InjectMocks
-    private TypeListString jobWorkerWithListString = new TypeListString();
+    private TypeListString workerWithListString = new TypeListString();
 
     @InjectMocks
-    private TypeListLong jobWorkerWithListLong = new TypeListLong();
+    private TypeListLong workerWithListLong = new TypeListLong();
 
     @InjectMocks
-    private TypeListPojo jobWorkerWithListPojo = new TypeListPojo();
+    private TypeListPojo workerWithListPojo = new TypeListPojo();
 
     @InjectMocks
-    private TypeSetString jobWorkerWithSetString = new TypeSetString();
+    private TypeSetString workerWithSetString = new TypeSetString();
 
     @InjectMocks
-    private TypeMapLongString jobWorkerWithMapLongString = new TypeMapLongString();
+    private TypeMapLongString workerWithMapLongString = new TypeMapLongString();
 
     @Before
     public void setUp() {
@@ -135,7 +135,7 @@ public class JobWorkerWithTest {
         Execution jobExecution = new Execution();
         jobExecution.setParameters(parameters);
 
-        String result = jobWorkerWithString.getParameters(jobExecution);
+        String result = workerWithString.getParameters(jobExecution);
 
         assertEquals(STRING, result);
     }
@@ -143,7 +143,7 @@ public class JobWorkerWithTest {
     @Test
     public void testGetParametersClassString() throws Exception {
 
-        Class<?> result = jobWorkerWithString.getParametersClass();
+        Class<?> result = workerWithString.getParametersClass();
 
         assertEquals(String.class, result);
     }
@@ -151,7 +151,7 @@ public class JobWorkerWithTest {
     @Test
     public void testDoWorkString() throws Exception {
 
-        jobWorkerWithString.doWork(STRING);
+        workerWithString.doWork(STRING);
     }
 
     @Ignore
@@ -160,7 +160,7 @@ public class JobWorkerWithTest {
 
         Execution jobExecution = new Execution();
         jobExecution.setParameters(WorkhorseUtil.parametersToJson(STRING));
-        jobWorkerWithString.doWork(jobExecution);
+        workerWithString.doWork(jobExecution);
 
         verify(jobContext).init(jobExecution);
     }
@@ -173,7 +173,7 @@ public class JobWorkerWithTest {
         Execution jobExecution = new Execution();
         jobExecution.setParameters(parameters);
 
-        Long result = jobWorkerWithLong.getParameters(jobExecution);
+        Long result = workerWithLong.getParameters(jobExecution);
 
         assertEquals(LONG, result);
     }
@@ -181,7 +181,7 @@ public class JobWorkerWithTest {
     @Test
     public void testGetParametersClassLong() throws Exception {
 
-        Class<?> result = jobWorkerWithLong.getParametersClass();
+        Class<?> result = workerWithLong.getParametersClass();
 
         assertEquals(Long.class, result);
     }
@@ -189,7 +189,7 @@ public class JobWorkerWithTest {
     @Test
     public void testDoWorkLong() throws Exception {
 
-        jobWorkerWithLong.doWork(LONG);
+        workerWithLong.doWork(LONG);
     }
 
     @Ignore
@@ -198,7 +198,7 @@ public class JobWorkerWithTest {
 
         Execution jobExecution = new Execution();
         jobExecution.setParameters(WorkhorseUtil.parametersToJson(LONG));
-        jobWorkerWithLong.doWork(jobExecution);
+        workerWithLong.doWork(jobExecution);
 
         verify(jobContext).init(jobExecution);
     }
@@ -211,7 +211,7 @@ public class JobWorkerWithTest {
         Execution jobExecution = new Execution();
         jobExecution.setParameters(parameters);
 
-        Pojo result = jobWorkerWithPojo.getParameters(jobExecution);
+        Pojo result = workerWithPojo.getParameters(jobExecution);
 
         assertEquals(POJO, result);
     }
@@ -219,7 +219,7 @@ public class JobWorkerWithTest {
     @Test
     public void testGetParametersClassPojo() throws Exception {
 
-        Class<?> result = jobWorkerWithPojo.getParametersClass();
+        Class<?> result = workerWithPojo.getParametersClass();
 
         assertEquals(Pojo.class, result);
     }
@@ -229,7 +229,7 @@ public class JobWorkerWithTest {
 
         POJO = new Pojo();
 
-        jobWorkerWithPojo.doWork(POJO);
+        workerWithPojo.doWork(POJO);
     }
 
     @Ignore
@@ -240,7 +240,7 @@ public class JobWorkerWithTest {
 
         Execution jobExecution = new Execution();
         jobExecution.setParameters(WorkhorseUtil.parametersToJson(POJO));
-        jobWorkerWithPojo.doWork(jobExecution);
+        workerWithPojo.doWork(jobExecution);
 
         verify(jobContext).init(jobExecution);
     }
@@ -275,7 +275,7 @@ public class JobWorkerWithTest {
 
         Execution jobExecution = new Execution();
         jobExecution.setParameters(WorkhorseUtil.parametersToJson(POJO));
-        jobWorkerWithPojo.doWork(jobExecution);
+        workerWithPojo.doWork(jobExecution);
     }
 
     @Ignore
@@ -284,7 +284,7 @@ public class JobWorkerWithTest {
 
         Execution jobExecution = new Execution();
         jobExecution.setParameters(WorkhorseUtil.parametersToJson(STRING_LIST));
-        jobWorkerWithListString.doWork(jobExecution);
+        workerWithListString.doWork(jobExecution);
 
         verify(jobContext).init(jobExecution);
     }
@@ -298,7 +298,7 @@ public class JobWorkerWithTest {
         Execution jobExecution = new Execution();
         jobExecution.setParameters(parameters);
 
-        List<String> result = jobWorkerWithListString.getParameters(jobExecution);
+        List<String> result = workerWithListString.getParameters(jobExecution);
 
         assertEquals(STRING_LIST, result);
     }
@@ -307,7 +307,7 @@ public class JobWorkerWithTest {
     @Test
     public void testGetParametersClassListString() throws Exception {
 
-        Class<?> result = jobWorkerWithListString.getParametersClass();
+        Class<?> result = workerWithListString.getParametersClass();
 
         assertEquals(List.class, result);
     }
@@ -315,7 +315,7 @@ public class JobWorkerWithTest {
     @Test
     public void testDoWorkListString() throws Exception {
 
-        jobWorkerWithListString.doWork(STRING_LIST);
+        workerWithListString.doWork(STRING_LIST);
     }
 
     @Ignore
@@ -326,7 +326,7 @@ public class JobWorkerWithTest {
 
         Execution jobExecution = new Execution();
         jobExecution.setParameters(WorkhorseUtil.parametersToJson(STRING_LIST));
-        jobWorkerWithListString.doWork(jobExecution);
+        workerWithListString.doWork(jobExecution);
 
         verify(jobContext).init(jobExecution);
     }
@@ -342,7 +342,7 @@ public class JobWorkerWithTest {
 
         Execution jobExecution = new Execution();
         jobExecution.setParameters(WorkhorseUtil.parametersToJson(STRING_LIST));
-        jobWorkerWithListString.doWork(jobExecution);
+        workerWithListString.doWork(jobExecution);
 
         verify(jobContext).init(jobExecution);
     }
@@ -353,7 +353,7 @@ public class JobWorkerWithTest {
 
         Execution jobExecution = new Execution();
         jobExecution.setParameters(WorkhorseUtil.parametersToJson(LONG_LIST));
-        jobWorkerWithListLong.doWork(jobExecution);
+        workerWithListLong.doWork(jobExecution);
 
         verify(jobContext).init(jobExecution);
     }
@@ -367,7 +367,7 @@ public class JobWorkerWithTest {
         Execution jobExecution = new Execution();
         jobExecution.setParameters(parameters);
 
-        List<Long> result = jobWorkerWithListLong.getParameters(jobExecution);
+        List<Long> result = workerWithListLong.getParameters(jobExecution);
 
         assertEquals(LONG_LIST, result);
     }
@@ -376,7 +376,7 @@ public class JobWorkerWithTest {
     @Test
     public void testGetParametersClassListLong() throws Exception {
 
-        Class<?> result = jobWorkerWithListLong.getParametersClass();
+        Class<?> result = workerWithListLong.getParametersClass();
 
         assertEquals(List.class, result);
     }
@@ -384,7 +384,7 @@ public class JobWorkerWithTest {
     @Test
     public void testDoWorkListLong() throws Exception {
 
-        jobWorkerWithListLong.doWork(LONG_LIST);
+        workerWithListLong.doWork(LONG_LIST);
     }
 
     @Ignore
@@ -395,7 +395,7 @@ public class JobWorkerWithTest {
 
         Execution jobExecution = new Execution();
         jobExecution.setParameters(WorkhorseUtil.parametersToJson(LONG_LIST));
-        jobWorkerWithListLong.doWork(jobExecution);
+        workerWithListLong.doWork(jobExecution);
 
         verify(jobContext).init(jobExecution);
     }
@@ -412,7 +412,7 @@ public class JobWorkerWithTest {
 
         Execution jobExecution = new Execution();
         jobExecution.setParameters(WorkhorseUtil.parametersToJson(LONG_LIST));
-        jobWorkerWithListLong.doWork(jobExecution);
+        workerWithListLong.doWork(jobExecution);
 
         verify(jobContext).init(jobExecution);
     }
@@ -423,7 +423,7 @@ public class JobWorkerWithTest {
 
         Execution jobExecution = new Execution();
         jobExecution.setParameters(WorkhorseUtil.parametersToJson(POJO_LIST));
-        jobWorkerWithListPojo.doWork(jobExecution);
+        workerWithListPojo.doWork(jobExecution);
 
         verify(jobContext).init(jobExecution);
     }
@@ -437,7 +437,7 @@ public class JobWorkerWithTest {
         Execution jobExecution = new Execution();
         jobExecution.setParameters(parameters);
 
-        List<Pojo> result = jobWorkerWithListPojo.getParameters(jobExecution);
+        List<Pojo> result = workerWithListPojo.getParameters(jobExecution);
 
         assertEquals(POJO_LIST, result);
     }
@@ -445,7 +445,7 @@ public class JobWorkerWithTest {
     @Test
     public void testDoWorkListPojo() throws Exception {
 
-        jobWorkerWithListPojo.doWork(POJO_LIST);
+        workerWithListPojo.doWork(POJO_LIST);
     }
 
     @Ignore
@@ -456,7 +456,7 @@ public class JobWorkerWithTest {
 
         Execution jobExecution = new Execution();
         jobExecution.setParameters(WorkhorseUtil.parametersToJson(POJO_LIST));
-        jobWorkerWithListPojo.doWork(jobExecution);
+        workerWithListPojo.doWork(jobExecution);
 
         verify(jobContext).init(jobExecution);
     }
@@ -497,7 +497,7 @@ public class JobWorkerWithTest {
 
         Execution jobExecution = new Execution();
         jobExecution.setParameters(WorkhorseUtil.parametersToJson(POJO_LIST));
-        jobWorkerWithListPojo.doWork(jobExecution);
+        workerWithListPojo.doWork(jobExecution);
     }
 
     @Ignore
@@ -506,7 +506,7 @@ public class JobWorkerWithTest {
 
         Execution jobExecution = new Execution();
         jobExecution.setParameters(WorkhorseUtil.parametersToJson(STRING_SET));
-        jobWorkerWithSetString.doWork(jobExecution);
+        workerWithSetString.doWork(jobExecution);
 
         verify(jobContext).init(jobExecution);
     }
@@ -520,7 +520,7 @@ public class JobWorkerWithTest {
         Execution jobExecution = new Execution();
         jobExecution.setParameters(parameters);
 
-        Set<String> result = jobWorkerWithSetString.getParameters(jobExecution);
+        Set<String> result = workerWithSetString.getParameters(jobExecution);
 
         assertEquals(STRING_SET, result);
     }
@@ -529,7 +529,7 @@ public class JobWorkerWithTest {
     @Test
     public void testGetParametersClassSetString() throws Exception {
 
-        Class<?> result = jobWorkerWithSetString.getParametersClass();
+        Class<?> result = workerWithSetString.getParametersClass();
 
         assertEquals(Set.class, result);
     }
@@ -537,7 +537,7 @@ public class JobWorkerWithTest {
     @Test
     public void testDoWorkSetString() throws Exception {
 
-        jobWorkerWithSetString.doWork(STRING_SET);
+        workerWithSetString.doWork(STRING_SET);
     }
 
     @Ignore
@@ -548,7 +548,7 @@ public class JobWorkerWithTest {
 
         Execution jobExecution = new Execution();
         jobExecution.setParameters(WorkhorseUtil.parametersToJson(STRING_SET));
-        jobWorkerWithSetString.doWork(jobExecution);
+        workerWithSetString.doWork(jobExecution);
 
         verify(jobContext).init(jobExecution);
     }
@@ -564,7 +564,7 @@ public class JobWorkerWithTest {
 
         Execution jobExecution = new Execution();
         jobExecution.setParameters(WorkhorseUtil.parametersToJson(STRING_SET));
-        jobWorkerWithSetString.doWork(jobExecution);
+        workerWithSetString.doWork(jobExecution);
 
         verify(jobContext).init(jobExecution);
     }
@@ -575,7 +575,7 @@ public class JobWorkerWithTest {
 
         Execution jobExecution = new Execution();
         jobExecution.setParameters(WorkhorseUtil.parametersToJson(LONG_STRING_MAP));
-        jobWorkerWithMapLongString.doWork(jobExecution);
+        workerWithMapLongString.doWork(jobExecution);
 
         verify(jobContext).init(jobExecution);
     }
@@ -589,7 +589,7 @@ public class JobWorkerWithTest {
         Execution jobExecution = new Execution();
         jobExecution.setParameters(parameters);
 
-        Map<Long, String> result = jobWorkerWithMapLongString.getParameters(jobExecution);
+        Map<Long, String> result = workerWithMapLongString.getParameters(jobExecution);
 
         assertEquals(LONG_STRING_MAP, result);
     }
@@ -598,7 +598,7 @@ public class JobWorkerWithTest {
     @Test
     public void testGetParametersClassMapLongString() throws Exception {
 
-        Class<?> result = jobWorkerWithMapLongString.getParametersClass();
+        Class<?> result = workerWithMapLongString.getParametersClass();
 
         assertEquals(Map.class, result);
     }
@@ -606,7 +606,7 @@ public class JobWorkerWithTest {
     @Test
     public void testDoWorkMapLongString() throws Exception {
 
-        jobWorkerWithMapLongString.doWork(LONG_STRING_MAP);
+        workerWithMapLongString.doWork(LONG_STRING_MAP);
     }
 
     @Ignore
@@ -617,7 +617,7 @@ public class JobWorkerWithTest {
 
         Execution jobExecution = new Execution();
         jobExecution.setParameters(WorkhorseUtil.parametersToJson(LONG_STRING_MAP));
-        jobWorkerWithMapLongString.doWork(jobExecution);
+        workerWithMapLongString.doWork(jobExecution);
 
         verify(jobContext).init(jobExecution);
     }
@@ -633,7 +633,7 @@ public class JobWorkerWithTest {
 
         Execution jobExecution = new Execution();
         jobExecution.setParameters(WorkhorseUtil.parametersToJson(LONG_STRING_MAP));
-        jobWorkerWithMapLongString.doWork(jobExecution);
+        workerWithMapLongString.doWork(jobExecution);
 
         verify(jobContext).init(jobExecution);
     }

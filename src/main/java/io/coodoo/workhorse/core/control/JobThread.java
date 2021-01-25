@@ -58,7 +58,7 @@ public class JobThread {
 
         executionBuffer.addJobThreads(jobId, this);
 
-        final BaseJobWorker workerInstance = workhorseController.getJobWorker(job);
+        final BaseWorker workerInstance = workhorseController.getWorker(job);
 
         while (true) {
             if (this.stopMe) {
@@ -204,7 +204,7 @@ public class JobThread {
     }
 
     private Execution handleChainedJobExecution(Long jobId, Execution jobExecution,
-            BaseJobWorker workerInstance) {
+            BaseWorker workerInstance) {
         Long chainId = jobExecution.getChainId();
         Execution nextInChain = null;
         if (chainId != null) {

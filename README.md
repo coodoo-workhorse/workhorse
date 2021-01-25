@@ -57,11 +57,11 @@ Depending on your environment there may be additional steps necessary. Have a lo
 
 ## Getting started
 
-Lets create a backup job. Therefore you just need to extend the `JobWorker` class that provides you the `doWork` method. And this method is where the magic happens!
+Lets create a backup job. Therefore you just need to extend the `Worker` class that provides you the `doWork` method. And this method is where the magic happens!
 
 ```java
 @Stateless
-public class BackupJob extends JobWorker {
+public class BackupJob extends Worker {
 
     private final Logger log = LoggerFactory.getLogger(BackupJob.class);
 
@@ -102,11 +102,11 @@ public void performBackup() {
 }
 ```
 
-You can access the parameters by changing the `JobWorker` to `JobWorkerWith` and using the parameters object as type.
+You can access the parameters by changing the `Worker` to `WorkerWith` and using the parameters object as type.
 
 ```java
 @Stateless
-public class BackupJob extends JobWorkerWith<String> {
+public class BackupJob extends WorkerWith<String> {
 
     private final Logger log = LoggerFactory.getLogger(BackupJob.class);
 
@@ -124,7 +124,7 @@ In this case we overwrite the method `onSchedule()` witch triggers the job to ad
 ```java
 @Stateless
 @InitialJobConfig(schedule = "0 30 3 0 0 0")
-public class BackupJob extends JobWorkerWith<String> {
+public class BackupJob extends WorkerWith<String> {
 
     private final Logger log = LoggerFactory.getLogger(BackupJob.class);
 
@@ -186,9 +186,9 @@ To register your job, just enter your `schedule` with the annotation `@InitialJo
 ```java
 @Dependent
 @InitialJobConfig(schedule = "30 0 0 0 0 0")
-public class ExampleJobWorker extends JobWorker {
+public class ExampleWorker extends Worker {
 
-    private static Logger log = Logger.getLogger(ExampleJobWorker.class);
+    private static Logger log = Logger.getLogger(ExampleWorker.class);
 
     @Override
     public void doWork() throws Exception {
@@ -198,7 +198,7 @@ public class ExampleJobWorker extends JobWorker {
 
 }
 ```
-With the schedule above a `ExampleJobWorker` job is created at second 30 of every minute in the queue to be be processed like any normal job.
+With the schedule above a `ExampleWorker` job is created at second 30 of every minute in the queue to be be processed like any normal job.
 
 #### Time Zones
 The cron expressions above use the Time Zone defined in `WorkhorseConfig` [look](link to WorkhorseConfig)!. The default is for example `UTC`. 
@@ -209,26 +209,26 @@ You can update it to correspond it to your Time [look](Link to update configurat
 A batch-job is a group of background jobs executions that is created atomically and considered as a single entity. The Batch Job is finished if all job's executions are finished. The job executions within a batch can be parallel executed.
 
 #### How to use
-To create a Batch-job, just call the function `createBatchExecutions(List<T> parameterList)`on your jobWorker instance. It takes as an argument the list of parameter for which Executions have to be created.
+To create a Batch-job, just call the function `createBatchExecutions(List<T> parameterList)`on your worker instance. It takes as an argument the list of parameter for which Executions have to be created.
 
 #### Example
 Let us take as Example a list of users as Excel spreadsheet to load into our database. This spreadsheet has tousand of rows and each row required a few seconds of processing. 
 In this case rather than process this spreadsheet as one normal job, we can break up the Excel spreadsheet into one job per row and get the benefit of parallelism offer by `Batch-Jobs` to significantly speed up the data load. 
-In the following example we suppose, we have created a jobworker `LoadDataJobWorker` that take one row of a spreadsheet as parameter to load the content into a database.
+In the following example we suppose, we have created a jobworker `LoadDataWorker` that take one row of a spreadsheet as parameter to load the content into a database.
 
 ```java
 @Inject
-LoadDataJobWorker loadDataJobWorker;
+LoadDataWorker loadDataWorker;
 
 public void performLoadToDataBase(List<User> rows) {
 
-    loadDataJobWorker.createBatchExecutions(rows);
+    loadDataWorker.createBatchExecutions(rows);
 }
 ```
 Here we have created a Batch-Job, that will created for each row an job's execution to perform the load of users data into the database.
 The Batch-Job is finished when all jobs have been processed successfully. 
 
-Futhermore Workhorse provides a callback Function that is executed at the end of the Batch-Job. This function can be overridden to add a custom reaction, when  all job's executions of the Batch-Job have been processed. Just override in the jobWorker's class the function `onFinishedBatch(Long batchId, Long jobExecutionId)`.
+Futhermore Workhorse provides a callback Function that is executed at the end of the Batch-Job. This function can be overridden to add a custom reaction, when  all job's executions of the Batch-Job have been processed. Just override in the worker's class the function `onFinishedBatch(Long batchId, Long jobExecutionId)`.
 The following code shows an examle of usage.
 
 ```java

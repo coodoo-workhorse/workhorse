@@ -70,7 +70,7 @@ public class WorkhorseService {
 
         persistenceManager.initializePersistence(persistenceTyp, persistenceConfiguration);
         jobEngineConfigService.initializeJobEngineConfig();
-        workhorseController.loadJobWorkers();
+        workhorseController.loadWorkers();
         jobExecutionQueue.initializeBuffer();
         workhorse.start();
         jobScheduler.startScheduler();
@@ -96,7 +96,7 @@ public class WorkhorseService {
 
         jobEngineConfigService.initializeJobEngineConfig(timeZone, jobQueuePollerInterval, jobQueuePusherPoll, jobQueueMax, jobQueueMin, persistenceTyp);
 
-        workhorseController.loadJobWorkers();
+        workhorseController.loadWorkers();
         jobExecutionQueue.initializeBuffer();
         workhorse.start();
         jobScheduler.startScheduler();

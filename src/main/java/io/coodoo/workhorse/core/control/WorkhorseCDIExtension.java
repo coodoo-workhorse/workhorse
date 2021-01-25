@@ -8,7 +8,7 @@ import io.coodoo.workhorse.config.control.WorkhorseConfigControl;
 import io.coodoo.workhorse.config.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
 import io.coodoo.workhorse.core.boundary.WorkhorseService;
-import io.coodoo.workhorse.core.boundary.job.JobExecutionCleanupJobWorker;
+import io.coodoo.workhorse.core.boundary.job.JobExecutionCleanupWorker;
 import io.coodoo.workhorse.persistence.PersistenceManager;
 import io.coodoo.workhorse.persistence.interfaces.ConfigPersistence;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
@@ -40,7 +40,7 @@ public class WorkhorseCDIExtension {
         bbdEvent.addAnnotatedType(JobScheduler.class, JobScheduler.class.getName());
         bbdEvent.addAnnotatedType(WorkhorseLogService.class, WorkhorseLogService.class.getName());
         bbdEvent.addAnnotatedType(PersistenceManager.class, PersistenceManager.class.getName());
-        bbdEvent.addAnnotatedType(JobExecutionCleanupJobWorker.class, JobExecutionCleanupJobWorker.class.getName());
+        bbdEvent.addAnnotatedType(JobExecutionCleanupWorker.class, JobExecutionCleanupWorker.class.getName());
         bbdEvent.addAnnotatedType(JobThread.class, JobThread.class.getName());
         bbdEvent.addAnnotatedType(MemoryPersistence.class, MemoryPersistence.class.getName());
         bbdEvent.addAnnotatedType(MemoryJobPersistence.class, MemoryJobPersistence.class.getName());

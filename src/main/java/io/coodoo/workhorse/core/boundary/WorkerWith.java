@@ -6,11 +6,11 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-import io.coodoo.workhorse.core.control.BaseJobWorker;
+import io.coodoo.workhorse.core.control.BaseWorker;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
-public abstract class JobWorkerWith<T> extends BaseJobWorker {
+public abstract class WorkerWith<T> extends BaseWorker {
 
     private Class<?> parametersClass;
 

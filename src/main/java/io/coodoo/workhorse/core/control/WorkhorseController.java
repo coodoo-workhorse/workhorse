@@ -15,14 +15,14 @@ import javax.inject.Inject;
 import org.jboss.logging.Logger;
 
 import io.coodoo.workhorse.config.entity.WorkhorseConfig;
-import io.coodoo.workhorse.core.boundary.JobWorkerWith;
+import io.coodoo.workhorse.core.boundary.WorkerWith;
 import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
 import io.coodoo.workhorse.core.boundary.annotation.InitialJobConfig;
 import io.coodoo.workhorse.core.control.event.JobErrorEvent;
+import io.coodoo.workhorse.core.entity.ErrorType;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
-import io.coodoo.workhorse.core.entity.ErrorType;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
@@ -37,7 +37,7 @@ public class WorkhorseController {
 
     @Inject
     @Any
-    Instance<BaseJobWorker> jobWorkerInstances;
+    Instance<BaseWorker> workerInstances;
 
     @Inject
     @JobQualifier
@@ -57,15 +57,15 @@ public class WorkhorseController {
     Event<JobErrorEvent> jobErrorEvent;
 
     /**
-     * Load all jobWorker-Class of the classpath
+     * Load all worker-Class of the classpath
      */
-    public void loadJobWorkers() {
+    public void loadWorkers() {
 
         List<Class<?>> workers = new ArrayList<>();
 
         // check Jobs of Worker classes
-        for (BaseJobWorker jobWorker : jobWorkerInstances) {
-            Class<?> workerclass = jobWorker.getWorkerClass();
+        for (BaseWorker worker : workerInstances) {
+            Class<?> workerclass = worker.getWorkerClass();
             Job job = jobPersistence.getByWorkerClassName(workerclass.getName());
             if (job == null) {
                 createJob(workerclass);
@@ -76,14 +76,14 @@ public class WorkhorseController {
         // check Worker class of persisted job
         for (Job job : jobPersistence.getAll()) {
             try {
-                Class<?> workerClass = getJobWorker(job).getWorkerClass();
+                Class<?> workerClass = getWorker(job).getWorkerClass();
                 if (!workers.contains(workerClass)) {
                     job.setStatus(JobStatus.NO_WORKER);
                     jobPersistence.update(job.getId(), job);
-                    log.error("No JobWorker Class found for Job: " + job);
+                    log.error("No Worker Class found for Job: " + job);
                     log.info("JobStatus of Job " + job + " updated from " + JobStatus.NO_WORKER + " to " + JobStatus.NO_WORKER);
-                    jobErrorEvent.fire(new JobErrorEvent(new Throwable(ErrorType.NO_JOB_WORKER_FOUND.getMessage()),
-                                    ErrorType.NO_JOB_WORKER_FOUND.getMessage(), job.getId(), job.getStatus()));
+                    jobErrorEvent.fire(new JobErrorEvent(new Throwable(ErrorType.NO_JOB_WORKER_FOUND.getMessage()), ErrorType.NO_JOB_WORKER_FOUND.getMessage(),
+                                    job.getId(), job.getStatus()));
                     continue;
                 }
                 if (job.getStatus().equals(JobStatus.NO_WORKER)) {
@@ -111,7 +111,7 @@ public class WorkhorseController {
             } catch (Exception e) {
 
                 job.setStatus(JobStatus.ERROR);
-                log.error("Can't handle JobWorker class found for job: " + job + " Exception " + e);
+                log.error("Can't handle Worker class found for job: " + job + " Exception " + e);
                 jobErrorEvent.fire(new JobErrorEvent(e, ErrorType.ERROR_BY_FOUND_JOB_WORKER.getMessage(), job.getId(), job.getStatus()));
             }
         }
@@ -173,31 +173,32 @@ public class WorkhorseController {
      * @return
      * @throws Exception
      */
+    @SuppressWarnings("rawtypes")
     public String getWorkerParameterName(Job job) throws Exception {
 
-        BaseJobWorker jobWorker = getJobWorker(job);
-        if (jobWorker instanceof JobWorkerWith) {
-            return ((JobWorkerWith) jobWorker).getParametersClassName();
+        BaseWorker worker = getWorker(job);
+        if (worker instanceof WorkerWith) {
+            return ((WorkerWith) worker).getParametersClassName();
         }
         return null;
     }
 
     /**
-     * retrieves the JobWorker of a Job.
+     * retrieves the Worker of a Job.
      * 
      * @param job
      * @return Baseworker
      * @throws ClassNotFoundException
      * @throws Exception
      */
-    public BaseJobWorker getJobWorker(Job job) throws ClassNotFoundException {
-        for (BaseJobWorker jobWorker : jobWorkerInstances) {
-            if (job.getWorkerClassName().equals(jobWorker.getWorkerClass().getName())) {
-                return jobWorker;
+    public BaseWorker getWorker(Job job) throws ClassNotFoundException {
+        for (BaseWorker worker : workerInstances) {
+            if (job.getWorkerClassName().equals(worker.getWorkerClass().getName())) {
+                return worker;
             }
         }
 
-        log.error("No JobWorker class found for " + job);
+        log.error("No Worker class found for " + job);
         workhorseLogService.logChange(job.getId(), JobStatus.NO_WORKER, "Status", job.getStatus(), JobStatus.NO_WORKER, null);
 
         job.setStatus(JobStatus.NO_WORKER);
@@ -209,14 +210,14 @@ public class WorkhorseController {
     }
 
     /**
-     * retrieves a jobWorker by his class name
+     * retrieves a worker by his class name
      * 
      * @param className
      * @return
      */
-    public Class<? extends BaseJobWorker> getWorkerByClassName(String className) {
-        for (BaseJobWorker jobWorker : jobWorkerInstances) {
-            Class<? extends BaseJobWorker> workerclass = jobWorker.getWorkerClass();
+    public Class<? extends BaseWorker> getWorkerByClassName(String className) {
+        for (BaseWorker worker : workerInstances) {
+            Class<? extends BaseWorker> workerclass = worker.getWorkerClass();
             if (workerclass.getName().equals(className)) {
                 return workerclass;
             }
@@ -231,8 +232,8 @@ public class WorkhorseController {
      * @throws ClassNotFoundException
      */
     public void triggerScheduledJobExecutionCreation(Job job) throws ClassNotFoundException {
-        BaseJobWorker jobWorker = getJobWorker(job);
-        jobWorker.createJobExecution();
+        BaseWorker worker = getWorker(job);
+        worker.createJobExecution();
     }
 
     /**
@@ -318,7 +319,7 @@ public class WorkhorseController {
 
     }
 
-    public synchronized Execution handleFailedJobExecution(Job job, Long jobExecutionId, Exception exception, Long duration, BaseJobWorker jobWorker,
+    public synchronized Execution handleFailedJobExecution(Job job, Long jobExecutionId, Exception exception, Long duration, BaseWorker worker,
                     String jobExecutionLog) {
         Execution failedJobExecution = executionPersistence.getById(job.getId(), jobExecutionId);
         Execution retryJobExecution = null;
@@ -339,12 +340,12 @@ public class WorkhorseController {
         failedJobExecution.setFailStacktrace(WorkhorseUtil.stacktraceToString(exception));
 
         if (retryJobExecution == null) {
-            jobWorker.onFailed(jobExecutionId);
+            worker.onFailed(jobExecutionId);
             if (failedJobExecution.getChainId() != null) {
-                jobWorker.onFailedChain(failedJobExecution.getChainId(), jobExecutionId);
+                worker.onFailedChain(failedJobExecution.getChainId(), jobExecutionId);
             }
         } else {
-            jobWorker.onRetry(jobExecutionId, retryJobExecution.getId());
+            worker.onRetry(jobExecutionId, retryJobExecution.getId());
         }
 
         executionPersistence.update(job.getId(), failedJobExecution.getId(), failedJobExecution);
@@ -395,7 +396,7 @@ public class WorkhorseController {
             job.setDescription(description);
         }
         if (!Objects.equals(job.getWorkerClassName(), workerClassName)) {
-            workhorseLogService.logChange(jobId, status, "JobWorker class name", job.getWorkerClassName(), workerClassName, null);
+            workhorseLogService.logChange(jobId, status, "Worker class name", job.getWorkerClassName(), workerClassName, null);
             job.setWorkerClassName(workerClassName);
         }
         if (!Objects.equals(job.getSchedule(), schedule)) {

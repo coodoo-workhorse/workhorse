@@ -32,7 +32,7 @@ Workhorse gone wild and furious! It finally broke free from the chains of Java E
 ### Features
 
 * Reworked the `JobQueuePoller` to be pure CDI, so we got rid of the EJB Timer Service and the pesky transaction when calling `JobEngine.addJobExecution`.
-* The `JobWorker` provides access to the method `getJob()` and provides the `jobEngineService` via `getJobEngineService()`.
+* The `Worker` provides access to the method `getJob()` and provides the `jobEngineService` via `getJobEngineService()`.
 * Batches and Chains can be aborted via `JobEngineService`.
 * All execution are now created with an own new transaction.
 * Updated dependencies:
@@ -73,7 +73,7 @@ Workhorse gone wild and furious! It finally broke free from the chains of Java E
 ### BREAKING CHANGES
 
 * Removed the `type` attribute from the job since it is not necessary at all.
-* Removed all deprecated stuff: `@JobConfig`, `@JobScheduleConfig`, `JobEngineService.listJobExecutions()` & `BaseJobWorker.scheduledJobExecutionCreation()`
+* Removed all deprecated stuff: `@JobConfig`, `@JobScheduleConfig`, `JobEngineService.listJobExecutions()` & `BaseWorker.scheduledJobExecutionCreation()`
 * Some more [database stuff](https://github.com/coodoo-io/workhorse/tree/master/src/main/resources/sql) is needed
 
 ### Bug Fixes
@@ -112,7 +112,7 @@ Workhorse gone wild and furious! It finally broke free from the chains of Java E
 * Get the scheduled times by the CRON expression
 * `logError` now also accepts a throwable for the server log
 * Reworked system job `JobExecutionCleanupWorker` to clear old execution for all jobs in one execution
-* Dubious way to manually trigger `JobWorkerWith.scheduledJobExecutionCreation`: `JobEngineService.triggerScheduledJobExecutionCreation()`
+* Dubious way to manually trigger `WorkerWith.scheduledJobExecutionCreation`: `JobEngineService.triggerScheduledJobExecutionCreation()`
 * If an execution is stuck in status RUNNING and doesn't change, it has became a zombie! Now we found a cure, see `JobEngineConfig`!
 
 ### BREAKING CHANGES
@@ -149,21 +149,21 @@ DROP TABLE jobengine_schedule;
 ### Features
 
 * There are Batch-Jobs! Like the chained jobs you can group a bunch of executions as batch and monitor them by `getJobExecutionChainInfo()` (also chains `getJobExecutionChainInfo()`)
-* There are also new callback methods regarding chained and batch jobs in `JobWorker`: 
+* There are also new callback methods regarding chained and batch jobs in `Worker`: 
   * `onFinishedBatch()`/`onFinishedChain()` gets called after all job executions of the batch/chain are done
   * `onFailedBatch()`/`onFailedChain()` gets called after a batch/chain failed
 * Limit throughput by defining the `maxPerMinute` attribute in the job  
 * Basic configuration that can be changed in the implementation, see `JobEngineConfig`
 * Yet some other logging convenience methods
-* Access to the parameters object via `getParameters()` in `JobWorkerWith`
-* Questionable possibility to get a `JobWorker` instance via `JobEngineService.getJobWorker(Job)`
+* Access to the parameters object via `getParameters()` in `WorkerWith`
+* Questionable possibility to get a `Worker` instance via `JobEngineService.getWorker(Job)`
 
 ### BREAKING CHANGES
 
 * `JobEngineService.start(Integer interval)` lost its interval parameter - it is now defined in `JobEngineConfig.JOB_QUEUE_POLLER_INTERVAL`
 * `JobEngineService.updateJobExecution()` lost its parameters `chainId` and `previousJobExecutionId`
 * `JobEngineService.activateJob()` and `JobEngineService.deactivateJob()` now just take the `jobId`, not the whole job object anymore
-* `JobWorker.onChainFinished(Long jobExecutionId)` changed name to `onFinishedChain` got extended with the parameter `chainId`
+* `Worker.onChainFinished(Long jobExecutionId)` changed name to `onFinishedChain` got extended with the parameter `chainId`
 * Table `jobengine_job` got a new nullable column `max_per_pinute` - [see](https://github.com/coodoo-io/workhorse/tree/master/src/main/resources/sql)
 * New nullable column `batch_id` in `jobengine_execution` to serve for batch executions - [see](https://github.com/coodoo-io/workhorse/tree/master/src/main/resources/sql)
 
@@ -177,7 +177,7 @@ DROP TABLE jobengine_schedule;
 
 ### Features
 
-* Added new callback methods the `JobWorker`: 
+* Added new callback methods the `Worker`: 
   * `onAllJobExecutionsDone()` gets called after all job executions in the queue are done
   * `onJobError()` gets called after the job went into status ERROR
 
@@ -192,9 +192,9 @@ DROP TABLE jobengine_schedule;
 
 ### Features
 
-* Added `getJobId()` to the `JobWorker` 
-* Created logging convenience methods `logInfo` and `logError` to `JobWorker` and `JobContext` that allows to log into the execution and the server log at once.
-* New job status `NO_WORKER` in case the `JobWorker` implementation is missing
+* Added `getJobId()` to the `Worker` 
+* Created logging convenience methods `logInfo` and `logError` to `Worker` and `JobContext` that allows to log into the execution and the server log at once.
+* New job status `NO_WORKER` in case the `Worker` implementation is missing
 
 ### Bug Fixes
 
@@ -212,12 +212,12 @@ DROP TABLE jobengine_schedule;
 * Annotation `@JobConfig` in now optional
 * No interface for job execution parameters is needed anymore
 * Simple logging on job execution level
-  * Add log entries in the `doWork()` method of `JobWorker` using `logLine(message)` or `logLineWithTimestamp(message)`
+  * Add log entries in the `doWork()` method of `Worker` using `logLine(message)` or `logLineWithTimestamp(message)`
   * Anywhere in the code, inject and use `JobLogger` for logging, provided that you are in the context of `doWork()`
 
 ### Breaking changes
 
-* Changes in `JobWorker`
+* Changes in `Worker`
   * Method `doWork()` doesn’t need the `JobExecution` object anymore.
   * It isn’t necessary to cast the JobExecutionParameters object, just use `getParameters()`
 * Changes in the database schema

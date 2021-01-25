@@ -16,7 +16,7 @@ import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
-public abstract class BaseJobWorker {
+public abstract class BaseWorker {
 
   @Inject
   @JobQualifier
@@ -140,7 +140,7 @@ public abstract class BaseJobWorker {
    * This method retrieves the exact class of this job worker. Without this, the
    * proxy-client class will be retrieves.
    */
-  public Class<? extends BaseJobWorker> getWorkerClass() {
+  public Class<? extends BaseWorker> getWorkerClass() {
     return getClass();
   }
 
