@@ -176,34 +176,147 @@ There is lots of options available like a [delay](#delayed-jobs), priority or pa
 
 
 ### Scheduled-Jobs
-Also known as CRON-Jobs. Start job executions with CRON syntax.
+Also known as CRON-Jobs they are recurring jobs that are configured with a cron syntax.
 
+#### How to use
+You just have to register your jobs with a schedule as cron-syntax upon startup and Workhorse will fire off corresponding jobs on that schedule.
+To register your job, just enter your `schedule` with the annotation `@InitialJobConfig`.
+
+#### Example
+```java
+@InitialJobConfig(schedule = "30 0 0 0 0 0")
+public class ExampleJobWorker extends JobWorker {
+
+    private static Logger log = Logger.getLogger(ExampleJobWorker.class);
+
+    @Override
+    public void doWork() throws Exception {
+
+        log.info(" Process a scheduled job");
+
+    }
+
+}
+```
+With the schedule above a `ExampleJobWorker` job is created at second 30 of every minute in the queue to be be processed like any normal job.
+
+#### Time Zones
+The cron expressions above use the Time Zone defined in `WorkhorseConfig` [look](link to WorkhorseConfig)!. The default is for example `UTC`. 
+You can update it to correspond it to your Time [look](Link to update configuration)!. 
+
+ 
 ### Batch-Jobs
-A batch-job is a group of background jobs executions that is created atomically and considered as a single entity. The Batch Job is finished if all job executions are finished. The job executions within a batch can be parallel executed.
+A batch-job is a group of background jobs executions that is created atomically and considered as a single entity. The Batch Job is finished if all job's executions are finished. The job executions within a batch can be parallel executed.
+
+#### How to use
+To create a Batch-job, just call the function `createBatchExecutions(List<T> parameterList)`on your jobWorker instance. It takes as an argument the list of parameter for which Executions have to be created.
+
+#### Example
+Let us take as Example a list of users as Excel spreadsheet to load into our database. This spreadsheet has tousand of rows and each row required a few seconds of processing. 
+In this case rather than process this spreadsheet as one normal job, we can break up the Excel spreadsheet into one job per row and get the benefit of parallelism offer by `Batch-Jobs` to significantly speed up the data load. 
+In the following example we suppose, we have created a jobworker `LoadDataJobWorker` that take one row of a spreadsheet as parameter to load the content into a database.
+
+```java
+@Inject
+LoadDataJobWorker loadDataJobWorker;
+
+public void performLoadToDataBase(List<User> rows) {
+
+    loadDataJobWorker.createBatchExecutions(rows);
+}
+```
+Here we have created a Batch-Job, that will created for each row an job's execution to perform the load of users data into the database.
+The Batch-Job is finished when all jobs have been processed successfully. 
+
+Futhermore Workhorse provides a callback Function that is executed at the end of the Batch-Job. This function can be overridden to add a custom reaction, when  all job's executions of the Batch-Job have been processed. Just override in the jobWorker's class the function `onFinishedBatch(Long batchId, Long jobExecutionId)`.
+The following code shows an examle of usage.
+
+```java
+@Override
+public void onFinishedBatch(Long batchId, Long jobExecutionId) {
+    
+    log.info(" End of the Batch-Job with Id: " + batchId);
+}
+```
 
 ### Delayed-Jobs
-A delayed job is executed only once after a certain time interval. So not immediately.
+A delayed job is executed only once either after a certain time interval or at a given timestamp. So not immediately.
+
+#### How to use
+The time is specified when a new  execution is created. 
+
+You use `createDelayedJobExecution(Long delayValue, ChronoUnit delayUnit)` to create an execution, to be processed after a given delay as `delayValue`.
+
+You use `createPlannedJobExecution(LocalDateTime maturity)` to create an execution to be processed at a given timstamp as `maturity`.
+
+#### Example
+```java
+@Inject
+ExampleJobWoker exampleJobWoker;
+
+public void performDelayedJob() {
+
+    exampleJobWoker.createDelayedJobExecution(4,  ChronoUnit.HOURS);
+
+}
+
+public void performPlannedJob() {
+
+    exampleJobWoker.createPlannedJobExecution(LocalDateTime.of(2021, Month.MAY, 1, 3, 30));
+
+}
+```
+By calling the function `performDelayedJob()` of the example, the job `ExampleJobWoker` will  be processed once after four hours.
+Calling the function `performPlannedJob()` will trigger an execution of the job `ExampleJobWoker` on 2021.03.01 at 3:30 hours.
 
 ### Chained-Jos
-Start next Job Exection only if the previous was finished succesfully.
+Start next Job Execution only if the previous was finished succesfully.
+
+#### How to use
+
+#### Example
 
 ### Unique Jobs in Queue
 If a job already exists as queued with the same parameters as the new job it can be configured whether the engine accepts this new same job or discards it.
 
+#### How to use
+
+#### Example
+
 ### Throughput control
 If needed the throughput of Job Executions can be limited JobContext create log for Execution
+
+#### How to use
+
+#### Example
 
 ### Multi Queues
 Each Job has its own queue (also priority queue)
 
+#### How to use
+
+#### Example
+
 ### Retry on failed Jobs
 Failed Job Execution can automaticlly get retried.
+
+#### How to use
+
+#### Example
 
 ### Logging
 A Job Execution can hold an own log
 
+#### How to use
+
+#### Example
+
 ### Error Handling/Callbacks
 Exceptions get logged trigger callback functions.
+
+#### How to use
+
+#### Example
 
 
 ## Configuration
