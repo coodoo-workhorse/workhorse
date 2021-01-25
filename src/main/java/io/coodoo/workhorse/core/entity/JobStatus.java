@@ -12,7 +12,7 @@ public enum JobStatus {
     INACTIVE,
 
     /** 
-     * No JobWorker-Class found for this Job
+     * No Worker-Class found for this Job
      * */
     NO_WORKER,
  

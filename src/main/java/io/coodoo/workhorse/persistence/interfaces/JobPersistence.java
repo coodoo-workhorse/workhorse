@@ -22,7 +22,7 @@ public interface JobPersistence {
      Job getByName(String jobName);
      
      /**
-      * Get a job by the JobWorker classname
+      * Get a job by the Worker classname
       * @param jobClassName
       * @return
       */
