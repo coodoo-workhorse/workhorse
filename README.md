@@ -161,10 +161,10 @@ _TODO_
 
 
 ### On-Demand / Direct execution
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nec elit sapien. Sed varius augue finibus ex hendrerit, aliquam porta erat pulvinar. Fusce egestas sem ac accumsan vulputate. Proin suscipit in sem at tempus. Nunc nec nunc tellus. Sed at libero sed nunc ornare porttitor a ut orci. Integer iaculis mauris sed condimentum imperdiet. Maecenas maximus ultrices ipsum pharetra posuere. In posuere mauris at diam tempor, quis tristique velit placerat. Morbi sodales risus eu condimentum tempor. Nam vel sem a metus fermentum consectetur ac et nisl.
+This is the default for most of the fire-and-forget task you have in mind
 
 #### How to use
-This is the default for most of the fire-and-forget task you have in mind. Just call `createExecution()` on your worker instance. It returns the ID of the resulting execution so you can log or track it afterwards.
+Just call `createExecution()` on your worker instance. It returns the ID of the resulting execution so you can log or track it afterwards.
 
 #### Example
 ```java
@@ -184,6 +184,7 @@ To register your job, just enter your `schedule` with the annotation `@InitialJo
 
 #### Example
 ```java
+@Dependent
 @InitialJobConfig(schedule = "30 0 0 0 0 0")
 public class ExampleJobWorker extends JobWorker {
 
@@ -193,7 +194,6 @@ public class ExampleJobWorker extends JobWorker {
     public void doWork() throws Exception {
 
         log.info(" Process a scheduled job");
-
     }
 
 }
@@ -240,7 +240,7 @@ public void onFinishedBatch(Long batchId, Long jobExecutionId) {
 ```
 
 ### Delayed-Jobs
-A delayed job is executed only once either after a certain time interval or at a given timestamp. So not immediately.
+A delayed job is executed only once either after a certain time interval or at a given timestamp.
 
 #### How to use
 The time is specified when a new  execution is created. 
@@ -257,17 +257,15 @@ ExampleJobWoker exampleJobWoker;
 public void performDelayedJob() {
 
     exampleJobWoker.createDelayedJobExecution(4,  ChronoUnit.HOURS);
-
 }
 
 public void performPlannedJob() {
 
     exampleJobWoker.createPlannedJobExecution(LocalDateTime.of(2021, Month.MAY, 1, 3, 30));
-
 }
 ```
-By calling the function `performDelayedJob()` of the example, the job `ExampleJobWoker` will  be processed once after four hours.
-Calling the function `performPlannedJob()` will trigger an execution of the job `ExampleJobWoker` on 2021.03.01 at 3:30 hours.
+By calling the function `performDelayedJob()` of the example above, the job `ExampleJobWoker` will  be processed once after four hours.
+By Calling the function `performPlannedJob()` will trigger an execution of the job `ExampleJobWoker` on 2021.03.01 at 3:30 hours.
 
 ### Chained-Jos
 Start next Job Execution only if the previous was finished succesfully.
@@ -280,8 +278,25 @@ Start next Job Execution only if the previous was finished succesfully.
 If a job already exists as queued with the same parameters as the new job it can be configured whether the engine accepts this new same job or discards it.
 
 #### How to use
+You can configure this feature at the creation of your jobWorker. Under the annotation `@InitialJobConfig` you can activate or disactive the Unique Jobs in Queue with the paramater `uniqueInQueue`.
 
 #### Example
+```java
+@Dependent
+@InitialJobConfig(uniqueInQueue = true)
+public class ExampleJobWorker extends JobWorkerWith<String> {
+
+    private static Logger log = Logger.getLogger(ExampleJobWorker.class);
+
+    @Override
+    public void doWork(String parameter) throws Exception {
+
+        log.info(" Process a job with paramter: " + parameter);
+    }
+
+}
+```
+In this example the argument uniqueInQueue is set to `true`. That means two Executions with the same paramater 
 
 ### Throughput control
 If needed the throughput of Job Executions can be limited JobContext create log for Execution
