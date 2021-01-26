@@ -168,7 +168,13 @@ Just call `createExecution()` on your worker instance. It returns the ID of the 
 
 #### Example
 ```java
-someWorker.createExecution();
+@Inject
+ExampleWorker exampleWorker
+
+public void performExampleWorker {
+
+    exampleWorker.createExecution();
+}
 ```
 
 #### See also
@@ -214,7 +220,7 @@ To create a Batch-job, just call the function `createBatchExecutions(List<T> par
 #### Example
 Let us take as Example a list of users as Excel spreadsheet to load into our database. This spreadsheet has tousand of rows and each row required a few seconds of processing. 
 In this case rather than process this spreadsheet as one normal job, we can break up the Excel spreadsheet into one job per row and get the benefit of parallelism offer by `Batch-Jobs` to significantly speed up the data load. 
-In the following example we suppose, we have created a jobworker `LoadDataWorker` that take one row of a spreadsheet as parameter to load the content into a database.
+In the following example we suppose, we have created a Worker `LoadDataWorker` that take one row of a spreadsheet as parameter to load the content into a database.
 
 ```java
 @Inject
@@ -267,26 +273,53 @@ public void performPlannedJob() {
 By calling the function `performDelayedJob()` of the example above, the job `ExampleJobWoker` will  be processed once after four hours.
 By Calling the function `performPlannedJob()` will trigger an execution of the job `ExampleJobWoker` on 2021.03.01 at 3:30 hours.
 
-### Chained-Jos
-Start next Job Execution only if the previous was finished succesfully.
+### Chained-Jobs
+It is a list of executions of a single type of job, that are two by two linked.
+
+The first execution of a Chained-Job has a child execution, the last execution of a Chained-Job has a parent execution and
+all other executions between these two have both, a parent and a child execution. 
+
+The relation between this members is: An child execution can only be processed, if the process of the parent execution was successful.
 
 #### How to use
+To create a chained-Job, you just have to call the function `createChainedExecutions(List<T> parametersList)` on an instance of a Worker with the list of parameter.
+
+For each element of this list an execution with the given element as parameter will be created to perform the task. 
+
+Workhorse will process the Chained-Job with the order of the elements  specified in the list. It assure that the element at `position = n` can't be process before an successful execution of the element at `position = n+1`.
 
 #### Example
+Let us suppose we have a Betcommunity application, that allows users to bet on the outcome of football matches. At the end of the season the application has to calcute how many points a lamda user has achieved. A obvious point here is: the global score achieved at the end of a given matchday also depends on the amount of point obtained on the last one. 
+
+In this case rather than sequentially create a job for each matchday we can use the Chained-Job as follow.
+
+```java
+@Inject
+PointcalculationWorker pointcalculationWorker;
+
+public void performPointcalculation(User user, List<Matchday> machtdays) {
+   
+    pointcalculationWorker.createChainedExecutions(machtdays);
+}
+```
+
+In this Example we suppose that a Worker `PointcalculationWorker` already exists. This Worker takes information of a given matchdays as parameters and perform the calculation of points. 
+
+Here the method `createChainedExecutions(machtdays)` is called to execute this job for the matchdays specidied in the list on a specific order. 
 
 ### Unique Jobs in Queue
 If a job already exists as queued with the same parameters as the new job it can be configured whether the engine accepts this new same job or discards it.
 
 #### How to use
-You can configure this feature at the creation of your jobWorker. Under the annotation `@InitialJobConfig` you can activate or disactive the Unique Jobs in Queue with the paramater `uniqueInQueue`.
+You can configure this feature at the creation of your Worker. Under the annotation `@InitialJobConfig` you can activate or disactive the Unique Jobs in Queue with the paramater `uniqueInQueue`.
 
 #### Example
 ```java
 @Dependent
 @InitialJobConfig(uniqueInQueue = true)
-public class ExampleJobWorker extends JobWorkerWith<String> {
+public class ExampleWorker extends WorkerWith<String> {
 
-    private static Logger log = Logger.getLogger(ExampleJobWorker.class);
+    private static Logger log = Logger.getLogger(ExampleWorker.class);
 
     @Override
     public void doWork(String parameter) throws Exception {
@@ -296,14 +329,32 @@ public class ExampleJobWorker extends JobWorkerWith<String> {
 
 }
 ```
-In this example the argument uniqueInQueue is set to `true`. That means two Executions with the same paramater 
+In this example the argument uniqueInQueue is set to `true`. That means two Executions with the same parameter can't be created.
 
 ### Throughput control
-If needed the throughput of Job Executions can be limited JobContext create log for Execution
+The throughput of Executions of a type of job can be limited.
 
 #### How to use
-
+You can configure this feature at the creation of your Worker. Through the annotation `@InitialJobConfig` you can configure the Throughput with the field `maxPerMinute`.
+You can choose how many executions of a given job you allow per minutes.
 #### Example
+
+```java
+@Dependent
+@InitialJobConfig(maxPerMinute = 1000)
+public class ExampleWorker extends Worker {
+
+    private static Logger log = Logger.getLogger(ExampleWorker.class);
+
+    @Override
+    public void doWork() throws Exception {
+
+        log.info( "Process a job");
+    }
+
+}
+```
+Here the job `ExampleWorker` can't be executed more than `1000 times per minutes`. Workhorse ensures that, on the one hand, all created jobs are processed and, on the other hand, the specified limit is adhered to. 
 
 ### Multi Queues
 Each Job has its own queue (also priority queue)
@@ -313,11 +364,29 @@ Each Job has its own queue (also priority queue)
 #### Example
 
 ### Retry on failed Jobs
-Failed Job Execution can automaticlly get retried.
+If your job encounters a problem during its execution, it can be retried automatically after a given delay.
 
 #### How to use
+You can configure this feature at the creation of your Worker. Through the annotation `@InitialJobConfig` You can configure the number of retries by setting a value to the parameter `failRetries`. The delay before retrying the job can be set using the parameter `retryDelay`.
 
 #### Example
+
+```java
+@Dependent
+@InitialJobConfig(failRetries = 3, retryDelay = 2000)
+public class ExampleWorker extends Worker {
+
+    private static Logger log = Logger.getLogger(ExampleWorker.class);
+
+    @Override
+    public void doWork() throws Exception {
+
+        log.info( "Process a job");
+    }
+
+}
+```
+Here an execution of type ExampleWorker can be retried until 3 times after failed. Between 2 executions a delay of `2000 milliseconds` is observed.
 
 ### Logging
 A Job Execution can hold an own log
