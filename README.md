@@ -160,11 +160,11 @@ public void start() {
 _TODO_
 
 
-### On-Demand / Direct execution
-This is the default for most of the fire-and-forget task you have in mind
+### On-Demand-Jobs
+This is the default job, that is executed based on the position in the queue.
 
 #### How to use
-Just call `createExecution()` on your worker instance. It returns the ID of the resulting execution so you can log or track it afterwards.
+You just have to call the function `createExecution()` on your worker instance. It returns the ID of the resulting execution so you can log or track it afterwards.
 
 #### Example
 ```java
@@ -173,7 +173,7 @@ ExampleWorker exampleWorker
 
 public void performExampleWorker {
 
-    exampleWorker.createExecution();
+  Long executionId = exampleWorker.createExecution();
 }
 ```
 
@@ -182,16 +182,17 @@ There is lots of options available like a [delay](#delayed-jobs), priority or pa
 
 
 ### Scheduled-Jobs
-Also known as CRON-Jobs they are recurring jobs that are configured with a cron syntax.
+Also known as CRON-Jobs, they are recurring jobs that are configured with a cron syntax.
 
 #### How to use
-You just have to register your jobs with a schedule as cron-syntax upon startup and Workhorse will fire off corresponding jobs on that schedule.
-To register your job, just enter your `schedule` with the annotation `@InitialJobConfig`.
+You just have to register your jobs with a schedule as cron-syntax during Worker's definition. Workhorse will fire off the corresponding execution on that schedule.
+
+To register your Scheduled-job, just enter your `schedule` with the annotation `@InitialJobConfig`.
 
 #### Example
 ```java
 @Dependent
-@InitialJobConfig(schedule = "30 0 0 0 0 0")
+@InitialJobConfig(schedule = "30 * * * * *")
 public class ExampleWorker extends Worker {
 
     private static Logger log = Logger.getLogger(ExampleWorker.class);
@@ -203,23 +204,22 @@ public class ExampleWorker extends Worker {
     }
 }
 ```
-With the schedule above a `ExampleWorker` job is created at second 30 of every minute in the queue to be be processed like any normal job.
+With the schedule above an execution of a job `ExampleWorker` is created at second 30 of every minute.
 
 #### Time Zones
-The cron expressions above use the Time Zone defined in `WorkhorseConfig` [look](link to WorkhorseConfig)!. The default is for example `UTC`. 
-You can update it to correspond it to your Time [look](Link to update configuration)!. 
+The cron expressions above use the Time Zone defined in `WorkhorseConfig` [look](link to WorkhorseConfig)!. The default Time Zone is for example `UTC`. 
+You can update it to correspond it to your Local Time. 
 
- 
 ### Batch-Jobs
-A batch-job is a group of background jobs executions that is created atomically and considered as a single entity. The Batch Job is finished if all job's executions are finished. The job executions within a batch can be parallel executed.
+A Batch-Job is a group of executions of a single Worker that is created atomically and considered as a single entity. The Batch-Job is finished if all these executions are finished. Futhermore the executions within a Batch-Job can be executed parallel .
 
 #### How to use
-To create a Batch-job, just call the function `createBatchExecutions(List<T> parameterList)`on your worker instance. It takes as an argument the list of parameter for which Executions have to be created.
+To create a Batch-Job, just call the function `createBatchExecutions(List<T> parameterList)`on your worker instance. It takes as argument the list of parameter for which Executions have to be created.
 
 #### Example
-Let us take as Example a list of users as Excel spreadsheet to load into our database. This spreadsheet has tousand of rows and each row required a few seconds of processing. 
+Let us take as example a list of users as Excel spreadsheet to load into our database. This spreadsheet has thousand of rows and each row requires a few seconds of processing. 
 In this case rather than process this spreadsheet as one normal job, we can break up the Excel spreadsheet into one job per row and get the benefit of parallelism offer by `Batch-Jobs` to significantly speed up the data load. 
-In the following example we suppose, we have created a Worker `LoadDataWorker` that take one row of a spreadsheet as parameter to load the content into a database.
+In the following source code we suppose, we have created a Worker `LoadDataWorker` that takes one row of a spreadsheet as parameter to load the content into our database.
 
 ```java
 @Inject
@@ -230,23 +230,35 @@ public void performLoadToDataBase(List<User> rows) {
     loadDataWorker.createBatchExecutions(rows);
 }
 ```
-Here we have created a Batch-Job, that will created for each row an job's execution to perform the load of users data into the database.
-The Batch-Job is finished when all jobs have been processed successfully. 
+Here we have created a Batch-Job, that will create for each row an execution to perform the load of user's data into the database.
+The Batch-Job is finished when all executions have been processed successfully. 
 
-Futhermore Workhorse provides a callback Function that is executed at the end of the Batch-Job. This function can be overridden to add a custom reaction, when  all job's executions of the Batch-Job have been processed. Just override in the worker's class the function `onFinishedBatch(Long batchId, Long jobExecutionId)`.
-The following code shows an examle of usage.
+Futhermore Workhorse provides a callback Function that is called at the end of the Batch-Job. This function can be overridden to add a custom reaction, if  all executions of the Batch-Job have been processed. Just override in the worker's class the function `onFinishedBatch(Long batchId, Long jobExecutionId)`.
+The following source code shows an example of usage of this function.
 
 ```java
-@Override
-public void onFinishedBatch(Long batchId, Long jobExecutionId) {
+@Dependent
+public class LoadDataWorker extends WorkerWith<User> {
+
+    private static Logger log = Logger.getLogger(LoadDataWorker.class);
+
+    @Override
+    public void doWork(User user) throws Exception {
+
+        log.info(" Process a job with paramter: " + user);
+    }
+
+    @Override
+    public void onFinishedBatch(Long batchId, Long jobExecutionId) {
     
-    log.info(" End of the Batch-Job with Id: " + batchId);
+        log.info(" End of the Batch-Job with Id: " + batchId);
+    }
 }
 ```
 
 
 ### Chained-Jobs
-It is a list of executions of a single type of job, that are two by two linked.
+A Chained-Job is a list of executions of a single type of job, that are two by two linked.
 
 The first execution of a Chained-Job has a child execution, the last execution of a Chained-Job has a parent execution and
 all other executions between these two have both, a parent and a child execution. 
