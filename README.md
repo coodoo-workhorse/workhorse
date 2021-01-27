@@ -13,8 +13,8 @@
   - [On-Demand](#on-demand-direct-execution)
   - [Scheduled-Jobs](#scheduled-jobs)
   - [Batch-Jobs](#batch-jobs)
-  - [Delayed-Jobs](#delayed-jobs)
   - [Chained-Jos](#chained-jos)
+  - [Delayed-Jobs](#delayed-jobs)
   - [Unique Jobs in Queue](#unique-jobs-in-queue)
   - [Throughput control](#throughput-control)
   - [Multi Queues](#multi-queues)
@@ -201,7 +201,6 @@ public class ExampleWorker extends Worker {
 
         log.info(" Process a scheduled job");
     }
-
 }
 ```
 With the schedule above a `ExampleWorker` job is created at second 30 of every minute in the queue to be be processed like any normal job.
@@ -245,33 +244,6 @@ public void onFinishedBatch(Long batchId, Long jobExecutionId) {
 }
 ```
 
-### Delayed-Jobs
-A delayed job is executed only once either after a certain time interval or at a given timestamp.
-
-#### How to use
-The time is specified when a new  execution is created. 
-
-You use `createDelayedJobExecution(Long delayValue, ChronoUnit delayUnit)` to create an execution, to be processed after a given delay as `delayValue`.
-
-You use `createPlannedJobExecution(LocalDateTime maturity)` to create an execution to be processed at a given timstamp as `maturity`.
-
-#### Example
-```java
-@Inject
-ExampleJobWoker exampleJobWoker;
-
-public void performDelayedJob() {
-
-    exampleJobWoker.createDelayedJobExecution(4,  ChronoUnit.HOURS);
-}
-
-public void performPlannedJob() {
-
-    exampleJobWoker.createPlannedJobExecution(LocalDateTime.of(2021, Month.MAY, 1, 3, 30));
-}
-```
-By calling the function `performDelayedJob()` of the example above, the job `ExampleJobWoker` will  be processed once after four hours.
-By Calling the function `performPlannedJob()` will trigger an execution of the job `ExampleJobWoker` on 2021.03.01 at 3:30 hours.
 
 ### Chained-Jobs
 It is a list of executions of a single type of job, that are two by two linked.
@@ -307,6 +279,35 @@ In this Example we suppose that a Worker `PointcalculationWorker` already exists
 
 Here the method `createChainedExecutions(machtdays)` is called to execute this job for the matchdays specidied in the list on a specific order. 
 
+### Delayed-Jobs
+A delayed job is executed only once either after a certain time interval or at a given timestamp.
+
+#### How to use
+The time is specified when a new  execution is created. 
+
+You use `createDelayedJobExecution(Long delayValue, ChronoUnit delayUnit)` to create an execution, to be processed after a given delay as `delayValue`.
+
+You use `createPlannedJobExecution(LocalDateTime maturity)` to create an execution to be processed at a given timstamp as `maturity`.
+
+#### Example
+```java
+@Inject
+ExampleJobWoker exampleJobWoker;
+
+public void performDelayedJob() {
+
+    exampleJobWoker.createDelayedJobExecution(4,  ChronoUnit.HOURS);
+}
+
+public void performPlannedJob() {
+
+    exampleJobWoker.createPlannedJobExecution(LocalDateTime.of(2021, Month.MAY, 1, 3, 30));
+}
+```
+By calling the function `performDelayedJob()` of the example above, the job `ExampleJobWoker` will  be processed once after four hours.
+By Calling the function `performPlannedJob()` will trigger an execution of the job `ExampleJobWoker` on 2021.03.01 at 3:30 hours.
+
+
 ### Unique Jobs in Queue
 If a job already exists as queued with the same parameters as the new job it can be configured whether the engine accepts this new same job or discards it.
 
@@ -326,7 +327,6 @@ public class ExampleWorker extends WorkerWith<String> {
 
         log.info(" Process a job with paramter: " + parameter);
     }
-
 }
 ```
 In this example the argument uniqueInQueue is set to `true`. That means two Executions with the same parameter can't be created.
@@ -351,13 +351,12 @@ public class ExampleWorker extends Worker {
 
         log.info( "Process a job");
     }
-
 }
 ```
 Here the job `ExampleWorker` can't be executed more than `1000 times per minutes`. Workhorse ensures that, on the one hand, all created jobs are processed and, on the other hand, the specified limit is adhered to. 
 
 ### Multi Queues
-Each Job has its own queue (also priority queue)
+Each Job has its own queue (also priority queue).
 
 #### How to use
 
@@ -383,26 +382,81 @@ public class ExampleWorker extends Worker {
 
         log.info( "Process a job");
     }
-
 }
 ```
 Here an execution of type ExampleWorker can be retried until 3 times after failed. Between 2 executions a delay of `2000 milliseconds` is observed.
 
 ### Logging
-A Job Execution can hold an own log
+
+An Execution can hold an own log. Workhorse provides functions to add log to an execution during the processing of a job. 
+
+So the logs can be getted afterward.
 
 #### How to use
 
+These logs can be created in the context of the `doWork()` method of any Worker. 
+
+Just call for example the function `logInfo(String message)` to add information's message or `logWarn(String message)` to add warning's message.
+
 #### Example
+
+```java
+@Dependent
+public class ExampleWorker extends Worker {
+
+    private static Logger log = Logger.getLogger(ExampleWorker.class);
+
+    @Override
+    public void doWork() throws Exception {
+
+        logInfo("Begin of the job");
+        
+        
+
+        logInfo("End of the job");
+    }
+}
+```
+In this example the messages `Begin of the job` and `End of the job` are included in all executions of the job `ExampleWorker`.
 
 ### Error Handling/Callbacks
-Exceptions get logged trigger callback functions.
+Executions of jobs can throw different types of exceptions. 
+
+Workhorse provides some mechanism to handle them.
+
+Exceptions are automatically logged  and  trigger callback functions.
+
+These callback functions can be overridden, to provide the most suitable reaction depending on the type of job. 
 
 #### How to use
 
+To provide a custom callback function after an execution has failed, you just have to override the function `onFailed(Long executionId)` in your worker's class. 
+The parameter `executionId` correspond to the `ID` of the affected execution.
 #### Example
 
+```java
+@Dependent
+public class ExampleWorker extends Worker {
 
+    private static Logger log = Logger.getLogger(ExampleWorker.class);
+
+    @Override
+    public void doWork() throws Exception {
+
+        logInfo("Begin of the job");
+        
+        logInfo("End of the job");
+    }
+
+    @Override
+    public void onFailed(Long executionId) {
+
+        log.info("The execution " + executionId + " of the worker ExampleWorker throws an exception");
+        // Do some stuff
+    }
+}
+```
+If an execution of the Worker `ExampleWorker` throws an exception, the function `onFailed(Long executionId)` will automatically be called by Workhorse.
 ## Configuration
 
 _TODO_
