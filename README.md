@@ -9,7 +9,7 @@
 - [Who is this Workhorse?](#who-is-this-workhorse)
 - [Install](#install)
 - [Getting started](#getting-started)
-- [Jobs](jobs)
+- [Jobs](#jobs)
   - [On-Demand jobs](#on-demand-jobs)
   - [Scheduled jobs](#scheduled-jobs)
   - [Batch jobs](#batch-jobs)
@@ -159,13 +159,9 @@ public void start() {
 }
 ```
 
+## Jobs
 
-## Features
-
-_TODO_
-
-
-### On-Demand-Jobs
+### On-Demand jobs
 This is the default job, that is executed based on the position in the queue.
 
 #### How to use
@@ -186,7 +182,7 @@ public void performExampleWorker {
 There is lots of options available like a [delay](#delayed-jobs), priority or parameters.
 
 
-### Scheduled-Jobs
+### Scheduled jobs
 Also known as CRON-Jobs, they are recurring jobs that are configured with a cron syntax.
 
 #### How to use
@@ -215,7 +211,7 @@ With the schedule above an execution of a job ExampleWorker is created at second
 The cron expressions above use the Time Zone defined in `WorkhorseConfig` [look](link to WorkhorseConfig)!. The default Time Zone is for example `UTC`. 
 You can update it to correspond it to your Local Time. 
 
-### Batch-Jobs
+### Batch jobs
 A Batch-Job is a group of executions of a single Worker that is created atomically and considered as a single entity. The Batch-Job is finished if all these executions are finished. Futhermore the executions within a Batch-Job can be executed parallel .
 
 #### How to use
@@ -264,7 +260,7 @@ public class LoadDataWorker extends WorkerWith<User> {
 ```
 
 
-### Chained-Jobs
+### Chained jobs
 A Chained-Job is a list of executions of a single type of job, that are two by two linked.
 
 The first execution of a Chained-Job is linked with an execution named child-execution. This child-execution is an execution, that get processed only if the first one has been successfully processed. The last execution of a Chained-Job is linked with an execution named parent-execution. This parent-execution is the contrapose of an child-execution. All other executions between these two have both, a parent- and a child-execution. 
@@ -295,7 +291,7 @@ public void performPointcalculation(User user, List<Matchday> machtdays) {
 
 Here the method `createChainedExecutions(machtdays)` is called to execute this job for the matchdays specidied in the list on a specific order. 
 
-### Delayed-Jobs
+### Delayed jobs
 A delayed job is a job that is executed only once either after a certain time interval or at a given timestamp.
 
 #### How to use
@@ -324,7 +320,21 @@ public void performPlannedJob() {
 By calling the function `performDelayedJob()` of the example above, the job `ExampleJobWoker` will  be processed once after four hours.
 By Calling the function `performPlannedJob()` will trigger an execution of the job `ExampleJobWoker` on 2021.03.01 at 3:30 hours.
 
-### Unique Jobs in Queue
+### Planned jobs
+
+#### How to use
+
+#### Example
+
+### Priority jobs
+
+#### How to use
+
+#### Example
+
+## Features
+
+### Unique in Queue
 If a job already exists in the queued with some parameters and a new job is created with the same paramters, it can be configured whether the engine accepts this new same job or discards it.
 
 #### How to use
@@ -378,7 +388,13 @@ Each Job has its own queue (also priority queue).
 
 #### Example
 
-### Retry on failed Jobs
+### Execution context
+
+#### How to use
+
+#### Example
+
+### Retry on failed
 If your job encounters a problem during its execution, it can be retried automatically after a given delay.
 
 #### How to use
@@ -431,7 +447,7 @@ public class ExampleWorker extends Worker {
 ```
 In this example the messages `Begin of the job` and `End of the job` are included in all executions of the job `ExampleWorker`.
 
-### Error Handling/Callbacks
+### Error Handling
 Executions of jobs can throw different types of exceptions. Workhorse provides some mechanism to handle them. Exceptions are automatically logged and trigger callback functions. These callback functions can be overridden, to provide the most suitable reaction depending on the type of job. 
 
 #### How to use
@@ -461,6 +477,14 @@ public classExampleWorker extends Worker {
 }
 ```
 If an execution of the Worker `ExampleWorker` throws an exception, the function `onFailed(Long executionId)` is automatically called by Workhorse.
+
+### Callbacks
+
+#### How to use
+
+#### Example
+
+
 ## Configuration
 
 _TODO_
