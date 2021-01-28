@@ -65,7 +65,7 @@ Depending on your environment there may be additional steps necessary. Have a lo
 Lets create a backup job. Therefore you just need to extend the `Worker` class that provides you the `doWork` method. And this method is where the magic happens!
 
 ```java
-@Stateless
+@Dependent
 public class BackupJob extends Worker {
 
     private final Logger log = LoggerFactory.getLogger(BackupJob.class);
@@ -110,7 +110,7 @@ public void performBackup() {
 You can access the parameters by changing the `Worker` to `WorkerWith` and using the parameters object as type.
 
 ```java
-@Stateless
+@Dependent
 public class BackupJob extends WorkerWith<String> {
 
     private final Logger log = LoggerFactory.getLogger(BackupJob.class);
@@ -127,7 +127,7 @@ Everybody knows backups should be made on a regular basis, so lets tell this job
 In this case we overwrite the method `onSchedule()` witch triggers the job to add some parameters.
 
 ```java
-@Stateless
+@Dependent
 @InitialJobConfig(schedule = "0 30 3 0 0 0")
 public class BackupJob extends WorkerWith<String> {
 
