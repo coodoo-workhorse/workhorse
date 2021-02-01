@@ -410,9 +410,53 @@ Each Job has its own queue.
 
 ### Execution context
 
+The contextual Information about an execution can be obtained also outside the corresponding worker's class.
+If the instructions to process a job aren't written in the worker's class under the `doWork()`-method, the context of the running execution is not lost.
+
 #### How to use
+To get the execution context you just have to inject the class `JobContext`. Through this class the running execution and the corresponding job can be retrieved and messages can be added to the execution as logs.
 
 #### Example
+Let's define a Worker `SendEmailWorker`.
+
+```java
+@Dependent
+@InitialJobConfig(uniqueInQueue = true)
+public class SendEmailWorker extends WorkerWith<EmailData> {
+
+    private static Logger log = Logger.getLogger(SendEmailWorker.class);
+
+    @Inject
+    EmailService emailService;
+
+    @Override
+    public void doWork(EmailData emailData) throws Exception {
+
+        log.info(" Process an execution with paramter: " + emailData);
+        emailService.send(emailData);
+    }
+}
+```
+The `doWork(EmailData emailData)`-method of this Worker don't contain the instructions to execute the job. Instead, the function `send(EmailData emailData)` of the class `EmailService` is called to process the job. To keep the context of the current execution in the class `EmailService`, we just have to inject `JobContext`. 
+
+```java
+public class EmailService {
+
+    @Inject
+    JobContext jobContext;
+
+    public void send() {
+
+        Execution execution = jobContext.getExecution();
+        Job job = jobContext.getJob();
+
+        jobContext.logInfo(" Start the processing of the execution " + execution + " of the job " + job);
+
+        // Do send..
+    }
+}
+```
+In this example the `Execution` and `Job` are retrieved through the injected instance of `JobContext`.
 
 ### Retry on failed
 If your job encounters a transient exception, it can be retried automatically after a given delay.
