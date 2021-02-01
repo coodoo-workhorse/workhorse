@@ -380,16 +380,17 @@ With the argument `uniqueInQueue` setted up to `true`, Workhorse ensure that the
 The throughput of executions of a job can be limited.
 
 #### How to use
-You can configure this feature at the definition of your Worker. Through the annotation `@InitialJobConfig` you can configure the `Throughput` with the field `maxPerMinute`.
-You can choose how many executions of a given job you allow per minutes.
+You can configure this feature at the definition of your Worker. Through the annotation `@InitialJobConfig` you can configure the `Throughput` with the paramater `maxPerMinute`.
+`maxPerMinute` allow you to set the limit of executions to processed in a minute.
+
 #### Example
 
 ```java
 @Dependent
 @InitialJobConfig(maxPerMinute = 1000)
-public class ExampleWorker extends Worker {
+public class MaxPerMinute extends Worker {
 
-    private static Logger log = Logger.getLogger(ExampleWorker.class);
+    private static Logger log = Logger.getLogger(MaxPerMinute.class);
 
     @Override
     public void doWork() throws Exception {
@@ -398,10 +399,10 @@ public class ExampleWorker extends Worker {
     }
 }
 ```
-Here the Worker `ExampleWorker` can't be executed more than `1000 times per minutes`. Workhorse ensures that, on the one hand, all created jobs are processed and, on the other hand, the specified limit is adhered to. 
+Here the Worker `ExampleWorker` can't be executed more than `1000 times per minutes`. Workhorse ensures that, on the one hand, all created executions are processed and, on the other hand, the specified limit is adhered to. 
 
 ### Multi Queues
-Each Job has its own queue (also priority queue).
+Each Job has its own queue.
 
 #### How to use
 
@@ -414,27 +415,29 @@ Each Job has its own queue (also priority queue).
 #### Example
 
 ### Retry on failed
-If your job encounters a problem during its execution, it can be retried automatically after a given delay.
+If your job encounters a transient exception, it can be retried automatically after a given delay.
 
 #### How to use
-You can configure this feature at the creation of your Worker. Through the annotation `@InitialJobConfig` You can configure the number of retries by setting a value to the parameter `failRetries`. The delay before retrying the job can be setted using the parameter `retryDelay`.
+You can configure this feature at the definition of your Worker. Through the annotation `@InitialJobConfig` you can configure the number of retries by setting a value to the parameter `failRetries`. The delay before retrying the job can be setted using the parameter `retryDelay`.
 
 #### Example
+In this example a Worker `GenerateStatisticsWorker` is created to generate statistics data from the database.
 ```java
 @Dependent
 @InitialJobConfig(failRetries = 3, retryDelay = 2000)
-public class ExampleWorker extends Worker {
+public class GenerateStatisticsWorker extends Worker {
 
-    private static Logger log = Logger.getLogger(ExampleWorker.class);
+    private static Logger log = Logger.getLogger(GenerateStatisticsWorker.class);
 
     @Override
     public void doWork() throws Exception {
 
         log.info( "Process a job");
+        // Generate statistics
     }
 }
 ```
-Here an execution of type `ExampleWorker` can be retried until 3 times after failed. Between 2 executions a delay of `2000 milliseconds` is observed.
+With the config `failRetries = 3` an execution is retried until three times after failed. With the config `retryDelay = 2000` a delay of `2000 milliseconds` is observed between two executions.
 
 ### Logging
 
@@ -446,25 +449,34 @@ So the logs can be getted afterward.
 
 These logs can be created in the context of the `doWork()` method of any Worker. 
 
-Just call for example the function `logInfo(String message)` to add information's messages or `logWarn(String message)` to add warning's messages.
+Just call for example the function `logInfo(String message)` to add information's messages or `logError(String message)` to add error's messages.
 
 #### Example
+In this example a Worker `GenerateStatisticsWorker` is created to generate statistics data from the database.
+
 ```java
 @Dependent
-public class ExampleWorker extends Worker {
+public class GenerateStatisticsWorker extends Worker {
 
-    private static Logger log = Logger.getLogger(ExampleWorker.class);
+    private static Logger log = Logger.getLogger(GenerateStatisticsWorker.class);
 
     @Override
     public void doWork() throws Exception {
+        
+        try() {
 
-        logInfo("Begin of the job");
+            logInfo("Begin of the job");
+            //Do work.
+            logInfo("End of the job");
 
-        logInfo("End of the job");
+        } catch (Exception exception) {
+
+            logError("Generate the statistics encounters an exception.");
+        }    
     }
 }
 ```
-In this example the messages `Begin of the job` and `End of the job` are included in all executions of the job `ExampleWorker`.
+In this example the messages `Begin of the job` and `End of the job` are included in all executions of the job `GenerateStatisticsWorker`. If an execution encounters an exception, the message `Generate the statistics encounters an exception.` is included in the execution.
 
 ### Error Handling
 Executions of jobs can throw different types of exceptions. Workhorse provides some mechanism to handle them. Exceptions are automatically logged and trigger callback functions. These callback functions can be overridden, to provide the most suitable reaction depending on the type of job. 
