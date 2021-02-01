@@ -170,17 +170,13 @@ You just have to call the function `createExecution()` on your worker instance. 
 #### Example
 ```java
 @Inject
-ExampleWorkerExampleWorker
+OnDemandWorker onDemandWorker
 
-public void performExampleWorker {
+public void performOnDemandWorker {
 
-  Long executionId =ExampleWorker.createExecution();
+  Long executionId = onDemandWorker.createExecution();
 }
 ```
-
-#### See also
-There is lots of options available like a [delay](#delayed-jobs), priority or parameters.
-
 
 ### Scheduled jobs
 Also known as CRON-Jobs, they are recurring jobs that are configured with a cron syntax.
@@ -194,9 +190,9 @@ To register your Scheduled-job, just enter your `schedule` with the annotation `
 ```java
 @Dependent
 @InitialJobConfig(schedule = "30 * * * * *")
-public class ExampleWorker extends Worker {
+public class ScheduledWorker extends Worker {
 
-    private static Logger log = Logger.getLogger(ExampleWorker.class);
+    private static Logger log = Logger.getLogger(ScheduledWorker.class);
 
     @Override
     public void doWork() throws Exception {
@@ -205,10 +201,10 @@ public class ExampleWorker extends Worker {
     }
 }
 ```
-With the schedule above an execution of a job ExampleWorker is created at second 30 of every minute.
+With the schedule above, an execution of a job `ScheduledWorker` is created at second 30 of every minute.
 
 #### Time Zones
-The cron expressions above use the Time Zone defined in `WorkhorseConfig` [look](link to WorkhorseConfig)!. The default Time Zone is for example `UTC`. 
+The cron expression above use the Time Zone defined in `WorkhorseConfig`. The default Time Zone is for example `UTC`. 
 You can update it to correspond it to your Local Time. 
 
 ### Batch jobs
@@ -218,7 +214,7 @@ A Batch-Job is a group of executions of a single Worker that is created atomical
 To create a Batch-Job, just call the function `createBatchExecutions(List<T> parameterList)`on your worker instance. It takes as argument the list of parameter for which Executions have to be created.
 
 #### Example
-Let us take as example a list of users as Excel spreadsheet to load into our database. This spreadsheet has thousand of rows and each row requires a few seconds of processing. 
+Let's take as example a list of users as Excel spreadsheet to load into our database. This spreadsheet has thousand of rows and each row requires a few seconds of processing. 
 In this case rather than process this spreadsheet as one normal job, we can break up the Excel spreadsheet into one job per row and get the benefit of parallelism offer by `Batch-Jobs` to significantly speed up the data load. 
 In the following source code we suppose, we have created a Worker `LoadDataWorker` that takes one row of a spreadsheet as parameter to load the content into our database.
 
@@ -275,7 +271,7 @@ For each element of this list an execution with the given element as parameter i
 Workhorse will process the Chained-Job with the order of the elements  specified in this list. It ensure that the element at `position = n` can't be processed before the successfully execution of a job with the element at `position = n+1`.
 
 #### Example
-Let us suppose we have a Betcommunity-application, that allows users to bet on the outcome of football matches. At the end of the season the application has to calcute how many points a lamda user has achieved. A obvious point here is: the global score achieved at the end of a given matchday also depends on the amount of point obtained on the last one. 
+Let's suppose we have a Betcommunity-application, that allows users to bet on the outcome of football matches. At the end of the season the application has to calcute how many points a lamda user has achieved. A obvious point here is: the global score achieved at the end of a given matchday also depends on the amount of point obtained on the last one. 
 In this case rather than sequentially create a job for each matchday we can use the Chained-Job as follow.
 
 In the following example we suppose that a Worker `PointcalculationWorker` already exists. This Worker takes informations about a given matchdays as parameter and perform the calculation of points. 
@@ -300,7 +296,7 @@ The time interval is specified when an new execution is created.
 You just have to call the function  `createDelayedJobExecution(Long delayValue, ChronoUnit delayUnit)` on the worker instance to create an execution, to be processed after a given delay as `delayValue`.
 
 #### Example
-Let us take as example a backup job, that haven't to be executed direct after calling.
+Let's take as example a backup job, that haven't to be executed direct after calling.
 
 ```java
 @Inject
@@ -335,36 +331,51 @@ public void performPlannedJob() {
 By Calling the function `performPlannedJob()`, an execution of the Worker `BackupWoker` is processed on 2021.03.01 at 3:30 hours.
 
 ### Priority jobs
+An execution can be prioritized over other executions of the queue of the corresponding job.
 
 #### How to use
+To prioritize an execution just call the function `createPriorityExecution()` instead of `createExecution()` or the function `createPriorityExecution(T parameters)` instead of `createExecution(T parameters)`  on the instance of your Worker.
 
 #### Example
+Let's take the example of the Worker `SendEmailWorker`. This worker send an e-mail to to user specidied as paramater. In this example we created a function `sendEmailToAdmin`, that send an e-mail to an adminitrator. In order to priotirize sending an e-mail to a administrator over other users, an prioritized execution is created with the function `createPriorityExecution(EmailData parameters)`.
 
+```java
+@Inject
+SendEmailWorker sendEmailWorker;
+
+public void sendEmailToAdmin(EmailData admin) {
+
+    sendEmailWorker.createPriorityExecution(admin);
+}
+```
 ## Features
 
 ### Unique in Queue
-If a job already exists in the queued with some parameters and a new job is created with the same paramters, it can be configured whether the engine accepts this new same job or discards it.
+If an execution with some parameters already exists in the queue and a new execution is created with the same parameters, it can be configured whether workhorse accepts or discards the creation of this new execution.
 
 #### How to use
-You can configure this feature at the definition of your Worker. Under the annotation `@InitialJobConfig` you can activate or disactive the `Unique Jobs in Queue` with the paramater `uniqueInQueue`.
+You can configure this feature at the definition of your Worker. Under the annotation `@InitialJobConfig` you can activate or deactive the `Unique in Queue` with the paramater `uniqueInQueue`.
 
 #### Example
+Let's suppose we have a worker `SendEmailWorker`, which job is to send e-mails. In this case we don't want to send the same e-mail to an user two times. To avoid this, we just have to use the feature `uniqueInQueue` at the definition of the Worker `SendEmailWorker`.
+
 ```java
 @Dependent
 @InitialJobConfig(uniqueInQueue = true)
-public class ExampleWorker extends WorkerWith<String> {
+public class SendEmailWorker extends WorkerWith<EmailData> {
 
-    private static Logger log = Logger.getLogger(ExampleWorker.class);
+    private static Logger log = Logger.getLogger(SendEmailWorker.class);
 
     @Override
-    public void doWork(String parameter) throws Exception {
+    public void doWork(EmailData emailData) throws Exception {
 
-        log.info(" Process a job with paramter: " + parameter);
+        log.info(" Process an execution with paramter: " + emailData);
+        //Send the e-mail ...
     }
 }
 ```
-In this example the argument uniqueInQueue is set to `true`. That means two executions with the same parameters can't be created.
-
+With the argument `uniqueInQueue` setted up to `true`, Workhorse ensure that the same e-mail can't be sent more than once to the same user.
+ 
 ### Throughput control
 The throughput of executions of a job can be limited.
 
