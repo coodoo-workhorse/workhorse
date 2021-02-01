@@ -482,14 +482,14 @@ In this example the messages `Begin of the job` and `End of the job` are include
 Executions of jobs can throw different types of exceptions. Workhorse provides some mechanism to handle them. Exceptions are automatically logged and trigger callback functions. These callback functions can be overridden, to provide the most suitable reaction depending on the type of job. 
 
 #### How to use
-To provide a custom callback function for error Handling, you just have to override the function `onFailed(Long executionId)` in your worker's class. 
+To provide a custom callback function for error handling, you just have to override the function `onFailed(Long executionId)` in your worker's class. 
 #### Example
 
 ```java
 @Dependent
-public classExampleWorker extends Worker {
+public class ErrorHandlingWorker extends Worker {
 
-    private static Logger log = Logger.getLogger(ExampleWorker.class);
+    private static Logger log = Logger.getLogger(ErrorHandlingWorker.class);
 
     @Override
     public void doWork() throws Exception {
@@ -502,19 +502,66 @@ public classExampleWorker extends Worker {
     @Override
     public void onFailed(Long executionId) {
 
-        log.info("The execution " + executionId + " of the worker `ExampleWorker` throws an exception");
+        log.info("The execution " + executionId + " of the worker `ErrorHandlingWorker` throws an exception");
         // Do some stuff
     }
 }
 ```
-If an execution of the Worker `ExampleWorker` throws an exception, the function `onFailed(Long executionId)` is automatically called by Workhorse.
+If an execution of the Worker `ErrorHandlingWorker` throws an exception, the function `onFailed(Long executionId)` is automatically called by Workhorse.
 
 ### Callbacks
+Workhorse provides a set of callback functions that are called after certain event. These functions can be overridden to get the most appropriate reaction on a given event.
 
 #### How to use
+You just have to override the callback functions in a Worker's class.
 
 #### Example
+In this example a Worker `ImportDataWorker` was created. 
+```java
+@Dependent
+public class ImportDataWorker extends Worker {
 
+    private static Logger log = Logger.getLogger(ImportDataWorker.class);
+
+    @Override
+    public void doWork() throws Exception {
+
+        logInfo("Begin of the job");
+        // Do work
+        logInfo("End of the job");
+    }
+
+    @Override
+    public void onFinished(Long executionId) {
+         log.info("The execution " + executionId + "is finished.");
+    }
+
+    @Override
+    public void onRetry(Long failedExecutionId, Long retryExecutionId) {
+        log.info("The execution " + failedExecutionId + " failed. The execution " + retryExecutionId + "is created to retry.");
+    }
+
+    @Override
+    public void onFailed(Long executionId) {
+        log.info("The execution " + executionId + " throws an exception");
+    }
+
+    @Override
+    public void onAllExecutionsDone() {
+        log.info("All executions of the Worker " + ImportDataWorker.getName() + " are done." );
+    }
+}
+```
+
+This Worker override four callback functions:
+
+`onFinished(Long executionId)` after an execution is finished.
+
+`onRetry(Long failedExecutionId, Long retryExecutionId)` after an execution has failed and there will be a retry of the failed execution.
+
+`onFailed(Long executionId)` is called after an execution has failed.
+
+`onAllExecutionsDone()` is called after all executions in the queue are done.
 
 ## Configuration
 
