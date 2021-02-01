@@ -292,39 +292,47 @@ public void performPointcalculation(User user, List<Matchday> machtdays) {
 Here the method `createChainedExecutions(machtdays)` is called to execute this job for the matchdays specidied in the list on a specific order. 
 
 ### Delayed jobs
-A delayed job is a job that is executed only once either after a certain time interval or at a given timestamp.
+A delayed job is a job that is executed only once after a certain time interval.
 
 #### How to use
-The time is specified when a new  execution is created. 
+The time interval is specified when an new execution is created. 
 
-You use `createDelayedJobExecution(Long delayValue, ChronoUnit delayUnit)` to create an execution, to be processed after a given delay as `delayValue`.
-
-You use `createPlannedJobExecution(LocalDateTime maturity)` to create an execution to be processed at a given timstamp as `maturity`.
+You just have to call the function  `createDelayedJobExecution(Long delayValue, ChronoUnit delayUnit)` on the worker instance to create an execution, to be processed after a given delay as `delayValue`.
 
 #### Example
+Let us take as example a backup job, that haven't to be executed direct after calling.
 
 ```java
 @Inject
-ExampleJobWoker exampleJobWoker;
+BackupWoker backupWoker;
 
 public void performDelayedJob() {
 
-    exampleJobWoker.createDelayedJobExecution(4,  ChronoUnit.HOURS);
+    backupWoker.createDelayedJobExecution(4,  ChronoUnit.HOURS);
 }
+
+```
+By calling the function `performDelayedJob()`, an execution of the Worker `BackupWoker` is processed once after four hours.
+
+### Planned jobs
+A planned job is a job that is executed only once at a given timestamp.
+
+#### How to use
+You just have to call the function `createPlannedJobExecution(LocalDateTime maturity)` on the worker instance to create an execution to be processed at a given timstamp as `maturity`.
+
+#### Example
+Let us take as example a backup job, that have to be executed at a given timestamp.
+```java
+@Inject
+BackupWoker backupWoker;
 
 public void performPlannedJob() {
 
-    exampleJobWoker.createPlannedJobExecution(LocalDateTime.of(2021, Month.MAY, 1, 3, 30));
+    backupWoker.createPlannedJobExecution(LocalDateTime.of(2021, Month.MAY, 1, 3, 30));
 }
 ```
-By calling the function `performDelayedJob()` of the example above, the job `ExampleJobWoker` will  be processed once after four hours.
-By Calling the function `performPlannedJob()` will trigger an execution of the job `ExampleJobWoker` on 2021.03.01 at 3:30 hours.
 
-### Planned jobs
-
-#### How to use
-
-#### Example
+By Calling the function `performPlannedJob()`, an execution of the Worker `BackupWoker` is processed on 2021.03.01 at 3:30 hours.
 
 ### Priority jobs
 
