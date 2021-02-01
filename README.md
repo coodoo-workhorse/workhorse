@@ -20,7 +20,6 @@
 - [Features](#features)
   - [Unique in Queue](#unique-in-queue)
   - [Throughput control](#throughput-control)
-  - [Multi Queues](#multi-queues)
   - [Execution context](#execution-context)
   - [Retry on failed](#retry-on-failed)
   - [Logging](#logging)
@@ -400,13 +399,6 @@ public class MaxPerMinute extends Worker {
 }
 ```
 Here the Worker `ExampleWorker` can't be executed more than `1000 times per minutes`. Workhorse ensures that, on the one hand, all created executions are processed and, on the other hand, the specified limit is adhered to. 
-
-### Multi Queues
-Each Job has its own queue.
-
-#### How to use
-
-#### Example
 
 ### Execution context
 
