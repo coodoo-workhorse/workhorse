@@ -17,37 +17,35 @@ import io.coodoo.workhorse.core.entity.Job;
 @RequestScoped
 public class JobContext {
 
-    // TODO wieder einführen!
-
     @Inject
-    WorkhorseConfig jobEngineConfig;
+    WorkhorseConfig workhorseConfig;
 
     protected Job job;
 
-    protected Execution jobExecution;
+    protected Execution execution;
 
     private StringBuffer logBuffer;
 
-    public void init(Execution jobExecution) {
+    public void init(Execution execution) {
 
-        this.jobExecution = jobExecution;
-        if (jobExecution != null && jobExecution.getLog() != null) {
-            this.logBuffer = new StringBuffer(jobExecution.getLog());
+        this.execution = execution;
+        if (execution != null && execution.getLog() != null) {
+            this.logBuffer = new StringBuffer(execution.getLog());
         } else {
             this.logBuffer = new StringBuffer();
         }
     }
 
-    public Execution getJobExecution() {
-        return jobExecution;
+    public Execution getExecution() {
+        return execution;
     }
 
     public Long getJobId() {
-        return jobExecution.getJobId();
+        return execution.getJobId();
     }
 
-    public Long getJobExecutionId() {
-        return jobExecution.getId();
+    public Long getExecutionId() {
+        return execution.getId();
     }
 
     public String getLog() {
@@ -182,26 +180,26 @@ public class JobContext {
                 logBuffer.append(System.lineSeparator());
             }
             if (timestamp) {
-                DateTimeFormatter logTimeFormat = DateTimeFormatter.ofPattern(jobEngineConfig.getLogTimeFormat());
-                logBuffer.append(jobEngineConfig.timestamp().format(logTimeFormat));
+                DateTimeFormatter logTimeFormat = DateTimeFormatter.ofPattern(workhorseConfig.getLogTimeFormat());
+                logBuffer.append(workhorseConfig.timestamp().format(logTimeFormat));
                 logBuffer.append(" ");
             }
             switch (mode) {
                 case "i":
-                    if (jobEngineConfig.getLogInfoMarker() != null) {
-                        logBuffer.append(jobEngineConfig.getLogInfoMarker());
+                    if (workhorseConfig.getLogInfoMarker() != null) {
+                        logBuffer.append(workhorseConfig.getLogInfoMarker());
                         logBuffer.append(" ");
                     }
                     break;
                 case "w":
-                    if (jobEngineConfig.getLogWarnMarker() != null) {
-                        logBuffer.append(jobEngineConfig.getLogWarnMarker());
+                    if (workhorseConfig.getLogWarnMarker() != null) {
+                        logBuffer.append(workhorseConfig.getLogWarnMarker());
                         logBuffer.append(" ");
                     }
                     break;
                 case "e":
-                    if (jobEngineConfig.getLogErrorMarker() != null) {
-                        logBuffer.append(jobEngineConfig.getLogErrorMarker());
+                    if (workhorseConfig.getLogErrorMarker() != null) {
+                        logBuffer.append(workhorseConfig.getLogErrorMarker());
                         logBuffer.append(" ");
                     }
                     break;

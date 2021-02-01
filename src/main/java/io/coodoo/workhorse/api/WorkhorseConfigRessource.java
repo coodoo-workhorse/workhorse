@@ -27,7 +27,7 @@ public class WorkhorseConfigRessource {
     @GET
     @Path("/")
     public WorkhorseConfig get() {
-        return workhorseConfigService.getJobEngineConfig();
+        return workhorseConfigService.getWorkhorseConfig();
 
     }
 
@@ -35,7 +35,7 @@ public class WorkhorseConfigRessource {
     @Path("/")
     public WorkhorseConfig update(WorkhorseConfig jobEngineConfig) {
 
-        return workhorseConfigService.updateJobEngineConfig(jobEngineConfig);
+        return workhorseConfigService.updateWorkhorseConfig(jobEngineConfig);
     }
 
     @PUT

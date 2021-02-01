@@ -2,6 +2,7 @@ package io.coodoo.workhorse.core.control;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.locks.ReentrantLock;
+
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.ObservesAsync;
@@ -10,20 +11,20 @@ import javax.inject.Inject;
 import org.jboss.logging.Logger;
 
 import io.coodoo.workhorse.config.entity.WorkhorseConfig;
-import io.coodoo.workhorse.core.entity.Job;
-import io.coodoo.workhorse.core.control.event.AllJobExecutionsDoneEvent;
+import io.coodoo.workhorse.core.control.event.AllExecutionsDoneEvent;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
+import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
-import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.ExecutionQualifier;
+import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
 
 @Dependent
 public class JobThread {
 
     @Inject
-    WorkhorseConfig jobEngineConfig;
+    WorkhorseConfig workhorseConfig;
 
     @Inject
     @ExecutionQualifier
@@ -40,10 +41,10 @@ public class JobThread {
     ExecutionBuffer executionBuffer;
 
     @Inject
-    Event<AllJobExecutionsDoneEvent> allJobExecutionDoneEvent;
+    Event<AllExecutionsDoneEvent> allExecutionsDoneEvent;
 
     private boolean stopMe;
-    private Execution runningJobExecution;
+    private Execution runningExecution;
     private Thread thread;
 
     private static final Logger log = Logger.getLogger(JobThread.class);
@@ -65,10 +66,10 @@ public class JobThread {
                 break;
             }
 
-            Execution jobExecution = pollNextExecutionfromBuffer(job);
+            Execution execution = pollNextExecutionfromBuffer(job);
 
-            if (jobExecution == null) {
-                allJobExecutionDoneEvent.fire(new AllJobExecutionsDoneEvent(job));
+            if (execution == null) {
+                allExecutionsDoneEvent.fire(new AllExecutionsDoneEvent(job));
                 break;
             }
 
@@ -77,21 +78,20 @@ public class JobThread {
                 minMillisPerExecution = 60000 / job.getMaxPerMinute();
             }
 
-            jobExecutionLoop: while (true) {
+            executionLoop: while (true) {
 
-                executionBuffer.addRunningJobExecution(jobId, jobExecution.getId());
+                executionBuffer.addRunningExecution(jobId, execution.getId());
 
                 long millisAtStart = System.currentTimeMillis();
 
-                log.info("On Running Job Execution:" + runningJobExecution);
+                log.info("On Running Job Execution:" + runningExecution);
 
                 try {
 
-                    updateExecutionStatus(jobExecution, ExecutionStatus.RUNNING, jobEngineConfig.timestamp(),
-                            null, null);
+                    updateExecutionStatus(execution, ExecutionStatus.RUNNING, workhorseConfig.timestamp(), null, null);
 
                     // Land of Witch !!
-                    workerInstance.doWork(jobExecution);
+                    workerInstance.doWork(execution);
 
                     long duration = System.currentTimeMillis() - millisAtStart;
 
@@ -101,49 +101,44 @@ public class JobThread {
                         Thread.sleep(minMillisPerExecution - duration);
                     }
 
-                    String jobExecutionLog = workerInstance.getLog();
+                    String executionLog = workerInstance.getLog();
 
-                    updateExecutionStatus(jobExecution, ExecutionStatus.FINISHED, jobEngineConfig.timestamp(),
-                            Long.valueOf(duration), jobExecutionLog);
+                    updateExecutionStatus(execution, ExecutionStatus.FINISHED, workhorseConfig.timestamp(), Long.valueOf(duration), executionLog);
 
-                    log.info("JobExecution " + jobExecution.getId() + ", duration: " + jobExecution.getDuration()
-                            + " was successfull");
-                    executionBuffer.removeRunningJobExecution(jobId, jobExecution.getId());
+                    log.info("Execution " + execution.getId() + ", duration: " + execution.getDuration() + " was successfull");
+                    executionBuffer.removeRunningExecution(jobId, execution.getId());
 
-                    workerInstance.onFinished(jobExecution.getId());
+                    workerInstance.onFinished(execution.getId());
 
-                    if (executionPersistence.isBatchFinished(jobId, jobExecution.getBatchId())) {
-                        workerInstance.onFinishedBatch(jobExecution.getBatchId(), jobExecution.getId());
+                    if (executionPersistence.isBatchFinished(jobId, execution.getBatchId())) {
+                        workerInstance.onFinishedBatch(execution.getBatchId(), execution.getId());
                     }
 
-                    Execution nextInChain = handleChainedJobExecution(jobId, jobExecution, workerInstance);
+                    Execution nextInChain = handleChainedExecution(jobId, execution, workerInstance);
                     if (nextInChain != null) {
-                        jobExecution = nextInChain;
-                        runningJobExecution = jobExecution;
-                        log.info("This execution, Id: " + jobExecution.getId() + " of the chain "
-                                + nextInChain.getChainId() + " will be process as next.");
-                        continue jobExecutionLoop;
+                        execution = nextInChain;
+                        runningExecution = execution;
+                        log.info("This execution, Id: " + execution.getId() + " of the chain " + nextInChain.getChainId() + " will be process as next.");
+                        continue executionLoop;
                     }
 
-                    break jobExecutionLoop;
+                    break executionLoop;
                 } catch (Exception e) {
-                    executionBuffer.removeRunningJobExecution(jobId, jobExecution.getId());
+                    executionBuffer.removeRunningExecution(jobId, execution.getId());
                     long duration = System.currentTimeMillis() - millisAtStart;
 
-                    String jobExecutionLog = workerInstance.getLog();
+                    String executionLog = workerInstance.getLog();
 
                     // create a new Job Execution to retry this fail.
-                    jobExecution = workhorseController.handleFailedJobExecution(job, jobExecution.getId(), e, duration,
-                            workerInstance, jobExecutionLog);
+                    execution = workhorseController.handleFailedExecution(job, execution.getId(), e, duration, workerInstance, executionLog);
 
-                    if (jobExecution == null) {
-                        break jobExecutionLoop; // Do not retry
+                    if (execution == null) {
+                        break executionLoop; // Do not retry
                     }
 
-                    runningJobExecution = jobExecution;
+                    runningExecution = execution;
 
-                    log.info("JobExecution " + jobExecution.getJobId() + " failed. It will be retry in "
-                            + job.getRetryDelay() / 1000 + " seconds. ");
+                    log.info("Execution " + execution.getJobId() + " failed. It will be retry in " + job.getRetryDelay() / 1000 + " seconds. ");
 
                     Thread.sleep(job.getRetryDelay());
                 }
@@ -157,7 +152,7 @@ public class JobThread {
     }
 
     private Execution pollNextExecutionfromBuffer(Job job) {
-        Execution jobExecution = null;
+        Execution execution = null;
         Long jobId = job.getId();
 
         // only the poll-function have to be thread-safe.
@@ -166,24 +161,24 @@ public class JobThread {
             lock.lock();
 
             // Get the next Job Execution Id
-            Long jobExecutionId = executionBuffer.pollPriorityJobExecutionQueue(jobId);
-            if (jobExecutionId != null) {
-                // Get the correspondent JobExecution
-                jobExecution = executionPersistence.getById(jobId, jobExecutionId);
+            Long executionId = executionBuffer.pollPriorityExecutionQueue(jobId);
+            if (executionId != null) {
+                // Get the correspondent Execution
+                execution = executionPersistence.getById(jobId, executionId);
             }
 
-            // If they are no priority JobExecution, get a normal one.
-            if (jobExecution == null) {
-                jobExecutionId = executionBuffer.pollJobExecutionQueue(jobId);
+            // If they are no priority Execution, get a normal one.
+            if (execution == null) {
+                executionId = executionBuffer.pollExecutionQueue(jobId);
 
-                if (jobExecutionId != null) {
-                    jobExecution = executionPersistence.getById(jobId, jobExecutionId);
+                if (executionId != null) {
+                    execution = executionPersistence.getById(jobId, executionId);
 
                 }
             }
 
-            // If they are no more JobExecution, finish the JobThread
-            if (jobExecution == null) {
+            // If they are no more Execution, finish the JobThread
+            if (execution == null) {
                 log.infof("No more executions for the Job: " + job + " to execute");
 
                 executionBuffer.removeJobThread(jobId, this);
@@ -194,23 +189,22 @@ public class JobThread {
 
             }
 
-            runningJobExecution = jobExecution;
+            runningExecution = execution;
 
         } finally {
             lock.unlock();
         }
 
-        return jobExecution;
+        return execution;
     }
 
-    private Execution handleChainedJobExecution(Long jobId, Execution jobExecution,
-            BaseWorker workerInstance) {
-        Long chainId = jobExecution.getChainId();
+    private Execution handleChainedExecution(Long jobId, Execution execution, BaseWorker workerInstance) {
+        Long chainId = execution.getChainId();
         Execution nextInChain = null;
         if (chainId != null) {
-            nextInChain = executionPersistence.getNextQueuedJobExecutionInChain(jobId, chainId, jobExecution);
+            nextInChain = executionPersistence.getNextQueuedExecutionInChain(jobId, chainId, execution);
             if (nextInChain == null) {
-                workerInstance.onFinishedChain(chainId, jobExecution.getId());
+                workerInstance.onFinishedChain(chainId, execution.getId());
             }
         }
 
@@ -218,28 +212,31 @@ public class JobThread {
     }
 
     /**
-     * Set JobExecution on RUNNING status
+     * Set Execution on RUNNING status
      * 
-     * @param jobExecution
+     * @param execution
      * @param timeStamp
      */
-    public void updateExecutionStatusToRunning(Execution jobExecution, LocalDateTime timeStamp) {
-        updateExecutionStatus(jobExecution, ExecutionStatus.RUNNING, timeStamp, null, null);
+    public void updateExecutionStatusToRunning(Execution execution, LocalDateTime timeStamp) {
+        updateExecutionStatus(execution, ExecutionStatus.RUNNING, timeStamp, null, null);
     }
 
-    public void updateExecutionStatus(Execution execution, ExecutionStatus executionStatus,
-            LocalDateTime timeStamp, Long duration, String jobExecutionLog) {
+    public void updateExecutionStatus(Execution execution, ExecutionStatus executionStatus, LocalDateTime timeStamp, Long duration, String executionLog) {
         execution.setStatus(executionStatus);
-        execution.setLog(jobExecutionLog);
+        execution.setLog(executionLog);
 
-        if (executionStatus.equals(ExecutionStatus.RUNNING)) {
-            execution.setStartedAt(timeStamp);
-        } else if (executionStatus.equals(ExecutionStatus.FINISHED)
-                || executionStatus.equals(ExecutionStatus.FAILED)) {
-            execution.setDuration(duration);
-            execution.setEndedAt(timeStamp);
+        switch (executionStatus) {
+            case RUNNING:
+                execution.setStartedAt(timeStamp);
+                break;
+            case FINISHED:
+            case FAILED:
+                execution.setDuration(duration);
+                execution.setEndedAt(timeStamp);
+                break;
+            default:
+                break;
         }
-
         executionPersistence.update(execution.getJobId(), execution.getId(), execution);
     }
 
@@ -248,13 +245,12 @@ public class JobThread {
     }
 
     public Execution getActiveExecution() {
-        return runningJobExecution;
+        return runningExecution;
     }
 
     @Override
     public String toString() {
-        return "JobThread [runningJobExecution=" + runningJobExecution + ", stopMe=" + stopMe + ", thread=" + thread
-                + "]";
+        return "JobThread [runningExecution=" + runningExecution + ", stopMe=" + stopMe + ", thread=" + thread + "]";
     }
 
 }

@@ -61,7 +61,7 @@ public class LogView {
 
     public LogView() {}
 
-    public LogView(WorkhorseLog jobEngineLog, Job job) {
+    public LogView(WorkhorseLog workhorseLog, Job job) {
 
         if (job != null) {
             this.jobName = job.getName();
@@ -71,14 +71,14 @@ public class LogView {
             this.jobThreads = job.getThreads();
         }
 
-        this.message = jobEngineLog.getMessage();
-        this.jobId = jobEngineLog.getJobId();
-        this.byUser = jobEngineLog.isByUser();
-        this.changeParameter = jobEngineLog.getChangeParameter();
-        this.changeOld = jobEngineLog.getChangeOld();
-        this.changeNew = jobEngineLog.getChangeNew();
-        this.hostName = jobEngineLog.getHostName();
-        this.stacktrace = jobEngineLog.getStacktrace() != null && !jobEngineLog.getStacktrace().isEmpty();
+        this.message = workhorseLog.getMessage();
+        this.jobId = workhorseLog.getJobId();
+        this.byUser = workhorseLog.isByUser();
+        this.changeParameter = workhorseLog.getChangeParameter();
+        this.changeOld = workhorseLog.getChangeOld();
+        this.changeNew = workhorseLog.getChangeNew();
+        this.hostName = workhorseLog.getHostName();
+        this.stacktrace = workhorseLog.getStacktrace() != null && !workhorseLog.getStacktrace().isEmpty();
     }
 
 }

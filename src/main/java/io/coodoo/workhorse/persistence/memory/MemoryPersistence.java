@@ -21,7 +21,7 @@ public class MemoryPersistence {
 
     private WorkhorseConfig workhorseConfig;
 
-    public synchronized WorkhorseConfig getJobEngineConfig() {
+    public synchronized WorkhorseConfig getWorkhorseConfig() {
         return workhorseConfig;
     }
 

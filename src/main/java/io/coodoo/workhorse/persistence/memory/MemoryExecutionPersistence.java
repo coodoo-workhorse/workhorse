@@ -28,35 +28,35 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     private static Logger log = Logger.getLogger(MemoryExecutionPersistence.class);
 
     @Inject
-    MemoryPersistence memoryService;
+    MemoryPersistence memoryPersistence;
 
     @Inject
-    WorkhorseConfig jobEngineConfig;
+    WorkhorseConfig workhorseConfig;
 
     @Inject
-    Event<NewExecutionEvent> newJobExecutionEvent;
+    Event<NewExecutionEvent> newExecutionEventEvent;
 
     private AtomicLong incId = new AtomicLong(0);
 
     @Override
     public Execution getById(Long jobId, Long id) {
-        return memoryService.getExecutions().get(id);
+        return memoryPersistence.getExecutions().get(id);
     }
 
     @Override
-    public void persist(Execution jobExecution) {
+    public void persist(Execution execution) {
         Long id = incId.getAndIncrement();
-        jobExecution.setId(id);
-        jobExecution.setCreatedAt(jobEngineConfig.timestamp());
-        memoryService.getExecutions().put(id, jobExecution);
-        
-        newJobExecutionEvent.fireAsync(new NewExecutionEvent(jobExecution.getJobId(), jobExecution.getId()));
+        execution.setId(id);
+        execution.setCreatedAt(workhorseConfig.timestamp());
+        memoryPersistence.getExecutions().put(id, execution);
+
+        newExecutionEventEvent.fireAsync(new NewExecutionEvent(execution.getJobId(), execution.getId()));
 
     }
 
     @Override
     public Long count() {
-        return Long.valueOf(memoryService.getExecutions().size());
+        return Long.valueOf(memoryPersistence.getExecutions().size());
     }
 
     @Override
@@ -66,14 +66,14 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
     @Override
     public List<Execution> getByJobId(Long jobId, Long limit) {
-        List<Execution> jobEx = new ArrayList<>();
 
-        for (Execution jobExecution : memoryService.getExecutions().values()) {
-            if (jobExecution.getJobId().equals(jobId) && jobEx.size() < limit.intValue()) {
-                jobEx.add(jobExecution);
+        List<Execution> executions = new ArrayList<>();
+        for (Execution execution : memoryPersistence.getExecutions().values()) {
+            if (execution.getJobId().equals(jobId) && executions.size() < limit.intValue()) {
+                executions.add(execution);
             }
         }
-        return jobEx;
+        return executions;
     }
 
     @Override
@@ -82,111 +82,102 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     }
 
     @Override
-    public List<Execution> pollNextJobExecutions(Long jobId, Long limit) {
-        List<Execution> jobEx = new ArrayList<>();
+    public List<Execution> pollNextExecutions(Long jobId, Long limit) {
 
-        LocalDateTime currentTimeStamp = LocalDateTime.now(ZoneId.of(jobEngineConfig.getTimeZone()));
+        List<Execution> executions = new ArrayList<>();
+        LocalDateTime currentTimeStamp = LocalDateTime.now(ZoneId.of(workhorseConfig.getTimeZone()));
 
-        for (Execution jobExecution : memoryService.getExecutions().values()) {
+        for (Execution execution : memoryPersistence.getExecutions().values()) {
 
-            if (jobExecution.getJobId().equals(jobId) && jobExecution.getStatus().equals(ExecutionStatus.QUEUED)
-                    && (jobExecution.getMaturity() == null
-                            || jobExecution.getMaturity().compareTo(currentTimeStamp) < 0)
-                    && jobExecution.getChainedPreviousExecutionId() == null && jobEx.size() < limit.intValue()) {
+            if (execution.getJobId().equals(jobId) && execution.getStatus() == ExecutionStatus.QUEUED
+                            && (execution.getMaturity() == null || execution.getMaturity().compareTo(currentTimeStamp) < 0)
+                            && execution.getChainedPreviousExecutionId() == null && executions.size() < limit.intValue()) {
 
-                jobEx.add(jobExecution);
+                executions.add(execution);
             }
         }
 
-        Comparator<Execution> sortByPriority = (Execution jobEx1, Execution jobEx2) -> jobEx1.getPriority()
-                .compareTo(jobEx2.getPriority());
-        Collections.sort(jobEx, sortByPriority);
+        Comparator<Execution> sortByPriority = (Execution e1, Execution e2) -> e1.getPriority().compareTo(e2.getPriority());
+        Collections.sort(executions, sortByPriority);
 
-        return jobEx;
+        return executions;
     }
 
     @Override
-    public Execution update(Long jobId, Long id, Execution jobExecution) {
-        if (memoryService.getExecutions().put(id, jobExecution) == null) {
+    public Execution update(Long jobId, Long id, Execution execution) {
+        if (memoryPersistence.getExecutions().put(id, execution) == null) {
             return null;
         } else {
-            return jobExecution;
+            return execution;
         }
     }
 
     @Override
-    public Execution addJobExecutionAtEndOfChain(Long jobId, Long chainId, Execution jobExecution) {
-        for (Execution jobEx : memoryService.getExecutions().values()) {
-            if (jobEx.getJobId().equals(jobId) && chainId.equals(jobEx.getChainId())
-                    && jobEx.getChainedNextExecutionId() == null) {
-
-                jobEx.setChainedNextExecutionId(jobExecution.getId());
-                return jobExecution;
+    public Execution addExecutionAtEndOfChain(Long jobId, Long chainId, Execution execution) {
+        for (Execution executionFromMemory : memoryPersistence.getExecutions().values()) {
+            if (executionFromMemory.getJobId().equals(jobId) && chainId.equals(executionFromMemory.getChainId())
+                            && executionFromMemory.getChainedNextExecutionId() == null) {
+                executionFromMemory.setChainedNextExecutionId(execution.getId());
+                return execution;
             }
         }
         return null;
     }
 
     @Override
-    public Execution getNextQueuedJobExecutionInChain(Long jobId, Long chainId, Execution jobExecution) {
-        Execution jobEx = getById(jobId, jobExecution.getChainedNextExecutionId());
-        Long previousExecutionId = jobExecution.getId();
-        if (jobEx == null) {
-            for (Execution execution : memoryService.getExecutions().values()) {
-                if (execution != null && chainId.equals(execution.getChainId())
-                        && previousExecutionId.equals(execution.getChainedPreviousExecutionId())
-                        && ExecutionStatus.QUEUED.equals(execution.getStatus())) {
-                    log.info("From Peristennce. Next Job Execution In Chain : " + execution);
-                    return execution;
+    public Execution getNextQueuedExecutionInChain(Long jobId, Long chainId, Execution execution) {
+        Execution chainedNextExecution = getById(jobId, execution.getChainedNextExecutionId());
+        Long previousExecutionId = execution.getId();
+        if (chainedNextExecution == null) {
+            for (Execution executionFromMemory : memoryPersistence.getExecutions().values()) {
+                if (executionFromMemory != null && chainId.equals(executionFromMemory.getChainId())
+                                && previousExecutionId.equals(executionFromMemory.getChainedPreviousExecutionId())
+                                && ExecutionStatus.QUEUED.equals(executionFromMemory.getStatus())) {
+                    log.info("From Peristennce. Next Job Execution In Chain : " + executionFromMemory);
+                    return executionFromMemory;
                 }
             }
         } else {
-            if (jobEx.getStatus().equals(ExecutionStatus.QUEUED)) {
-                return jobEx;
+            if (chainedNextExecution.getStatus() == ExecutionStatus.QUEUED) {
+                return chainedNextExecution;
             }
-        }
-        return null;
-
-    }
-
-    @Override
-    public Execution getQueuedBatchJobExecution(Long jobId, Long batchId) {
-        for (Execution jobExecution : memoryService.getExecutions().values()) {
-            if (jobExecution.getJobId().equals(jobId) && Objects.equals(jobExecution.getBatchId(), batchId)
-                    && jobExecution.getStatus().equals(ExecutionStatus.QUEUED)) {
-
-                return jobExecution;
-            }
-
         }
         return null;
     }
 
     @Override
-    public List<Execution> getFailedBatchJobExecutions(Long jobId, Long batchId) {
-        List<Execution> jobEx = new ArrayList<>();
-        for (Execution jobExecution : memoryService.getExecutions().values()) {
-            if (Objects.equals(jobExecution.getBatchId(), batchId)
-                    && ExecutionStatus.FAILED.equals(jobExecution.getStatus())) {
-                jobEx.add(jobExecution);
+    public Execution getQueuedBatchExecution(Long jobId, Long batchId) {
+        for (Execution execution : memoryPersistence.getExecutions().values()) {
+            if (execution.getJobId().equals(jobId) && Objects.equals(execution.getBatchId(), batchId) && execution.getStatus() == ExecutionStatus.QUEUED) {
+                return execution;
             }
         }
-        return jobEx;
+        return null;
+    }
+
+    @Override
+    public List<Execution> getFailedBatchExecutions(Long jobId, Long batchId) {
+        List<Execution> executions = new ArrayList<>();
+        for (Execution execution : memoryPersistence.getExecutions().values()) {
+            if (Objects.equals(execution.getBatchId(), batchId) && ExecutionStatus.FAILED.equals(execution.getStatus())) {
+                executions.add(execution);
+            }
+        }
+        return executions;
     }
 
     @Override
     public boolean isBatchFinished(Long jobId, Long batchId) {
-        return getQueuedBatchJobExecution(jobId, batchId) == null ? true : false;
+        return getQueuedBatchExecution(jobId, batchId) == null ? true : false;
     }
 
     @Override
     public boolean abortChain(Long jobId, Long chainId) {
-        for (Execution jobExecution : memoryService.getExecutions().values()) {
-            if (jobExecution.getJobId().equals(jobId) && Objects.equals(jobExecution.getChainId(), chainId)
-                    && jobExecution.getStatus().equals(ExecutionStatus.QUEUED)) {
+        for (Execution execution : memoryPersistence.getExecutions().values()) {
+            if (execution.getJobId().equals(jobId) && Objects.equals(execution.getChainId(), chainId) && execution.getStatus() == ExecutionStatus.QUEUED) {
 
-                jobExecution.setStatus(ExecutionStatus.ABORTED);
-                update(jobId, jobExecution.getId(), jobExecution);
+                execution.setStatus(ExecutionStatus.ABORTED);
+                update(jobId, execution.getId(), execution);
             }
         }
         return true;
@@ -195,29 +186,30 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     @Override
     public List<Execution> getBatch(Long jobId, Long batchId) {
 
-        List<Execution> jobEx = new ArrayList<>();
-        for (Execution jobExecution : memoryService.getExecutions().values()) {
-            if (Objects.equals(jobExecution.getBatchId(), batchId)) {
-                jobEx.add(jobExecution);
+        List<Execution> executions = new ArrayList<>();
+        for (Execution execution : memoryPersistence.getExecutions().values()) {
+            if (Objects.equals(execution.getBatchId(), batchId)) {
+                executions.add(execution);
             }
         }
-        return jobEx;
+        return executions;
     }
 
     @Override
     public List<Execution> getChain(Long jobId, Long chainId) {
-        List<Execution> jobEx = new ArrayList<>();
-        for (Execution jobExecution : memoryService.getExecutions().values()) {
-            if (Objects.equals(jobExecution.getChainId(), chainId)) {
-                jobEx.add(jobExecution);
+
+        List<Execution> executions = new ArrayList<>();
+        for (Execution execution : memoryPersistence.getExecutions().values()) {
+            if (Objects.equals(execution.getChainId(), chainId)) {
+                executions.add(execution);
             }
         }
-        return jobEx;
+        return executions;
     }
 
     @Override
     public void delete(Long jobId, Long id) {
-        memoryService.getExecutions().remove(id);
+        memoryPersistence.getExecutions().remove(id);
     }
 
     @Override
@@ -228,11 +220,11 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     @Override
     public int deleteOlderExecutions(Long jobId, LocalDateTime preDate) {
         int count = 0;
-        for (Execution jobExecution : memoryService.getExecutions().values()) {
-            if (jobId.equals(jobExecution.getJobId()) &&  preDate.compareTo(jobExecution.getCreatedAt()) > 0) {
-                log.info("Next JobExecution have to be delete: " + jobExecution );
-               delete(jobId, jobExecution.getId());
-               count++;
+        for (Execution execution : memoryPersistence.getExecutions().values()) {
+            if (jobId.equals(execution.getJobId()) && preDate.compareTo(execution.getCreatedAt()) > 0) {
+                log.info("Next Execution have to be delete: " + execution);
+                delete(jobId, execution.getId());
+                count++;
             }
         }
         return count;

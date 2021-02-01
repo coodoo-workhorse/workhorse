@@ -9,9 +9,6 @@ import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 
 /**
- * Basic configuration<br>
- * <i>There is only one entry in this table and its purpose is to persist the values of {@link JobEngineConfig}!</i>
- * 
  * @author coodoo GmbH (coodoo.io)
  */
 @ApplicationScoped
@@ -90,6 +87,14 @@ public class WorkhorseConfig {
         return LocalDateTime.now(ZoneId.of(timeZone));
     }
 
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
+    }
+
     public Long getJobQueueMax() {
         return jobQueueMax;
     }
@@ -106,14 +111,6 @@ public class WorkhorseConfig {
         this.jobQueueMin = jobQueueMin;
     }
 
-    public PersistenceTyp getPersistenceTyp() {
-        return persistenceTyp;
-    }
-
-    public void setPersistenceTyp(PersistenceTyp persistenceTyp) {
-        this.persistenceTyp = persistenceTyp;
-    }
-
     public int getJobQueuePollerInterval() {
         return jobQueuePollerInterval;
     }
@@ -122,26 +119,36 @@ public class WorkhorseConfig {
         this.jobQueuePollerInterval = jobQueuePollerInterval;
     }
 
-    public String getTimeZone() {
-        return timeZone;
-    }
-
-    public void setTimeZone(String timeZone) {
-        this.timeZone = timeZone;
-    }
-
-    @Override
-    public String toString() {
-        return "JobEngineConfig [jobQueueMax=" + jobQueueMax + ", jobQueueMin=" + jobQueueMin + ", jobQueuePollerInterval=" + jobQueuePollerInterval
-                        + ", jobQueuePusherPoll=" + jobQueuePusherPoll + ", persistenceTyp=" + persistenceTyp + ", timeZone=" + timeZone + "]";
-    }
-
     public int getJobQueuePusherPoll() {
         return jobQueuePusherPoll;
     }
 
-    public void setJobQueuePusherPoll(int jobQueueSafetyPoll) {
-        this.jobQueuePusherPoll = jobQueueSafetyPoll;
+    public void setJobQueuePusherPoll(int jobQueuePusherPoll) {
+        this.jobQueuePusherPoll = jobQueuePusherPoll;
+    }
+
+    public PersistenceTyp getPersistenceTyp() {
+        return persistenceTyp;
+    }
+
+    public void setPersistenceTyp(PersistenceTyp persistenceTyp) {
+        this.persistenceTyp = persistenceTyp;
+    }
+
+    public int getZombieRecognitionTime() {
+        return zombieRecognitionTime;
+    }
+
+    public void setZombieRecognitionTime(int zombieRecognitionTime) {
+        this.zombieRecognitionTime = zombieRecognitionTime;
+    }
+
+    public ExecutionStatus getZombieCureStatus() {
+        return zombieCureStatus;
+    }
+
+    public void setZombieCureStatus(ExecutionStatus zombieCureStatus) {
+        this.zombieCureStatus = zombieCureStatus;
     }
 
     public String getLogChange() {
@@ -182,22 +189,6 @@ public class WorkhorseConfig {
 
     public void setLogErrorMarker(String logErrorMarker) {
         this.logErrorMarker = logErrorMarker;
-    }
-
-    public int getZombieRecognitionTime() {
-        return zombieRecognitionTime;
-    }
-
-    public void setZombieRecognitionTime(int zombieRecognitionTime) {
-        this.zombieRecognitionTime = zombieRecognitionTime;
-    }
-
-    public ExecutionStatus getZombieCureStatus() {
-        return zombieCureStatus;
-    }
-
-    public void setZombieCureStatus(ExecutionStatus zombieCureStatus) {
-        this.zombieCureStatus = zombieCureStatus;
     }
 
 }

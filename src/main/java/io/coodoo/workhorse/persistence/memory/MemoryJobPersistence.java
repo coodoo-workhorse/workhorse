@@ -17,19 +17,19 @@ import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 public class MemoryJobPersistence implements JobPersistence {
 
     @Inject
-    MemoryPersistence memoryService;
+    MemoryPersistence memoryPersistence;
 
     private AtomicLong incId = new AtomicLong(0);
 
     @Override
     public Job get(Long id) {
 
-        return memoryService.getJobs().get(id);
+        return memoryPersistence.getJobs().get(id);
     }
 
     @Override
     public Job getByWorkerClassName(String jobClassName) {
-        for (Job job : memoryService.getJobs().values()) {
+        for (Job job : memoryPersistence.getJobs().values()) {
             if (job.getWorkerClassName().equals(jobClassName)) {
                 return job;
             }
@@ -41,25 +41,25 @@ public class MemoryJobPersistence implements JobPersistence {
     public void persist(Job job) {
         Long id = incId.getAndIncrement();
         job.setId(id);
-        memoryService.getJobs().put(id, job);
+        memoryPersistence.getJobs().put(id, job);
 
     }
 
     @Override
     public void update(Long id, Job job) {
-        memoryService.getJobs().put(id, job);
+        memoryPersistence.getJobs().put(id, job);
     }
 
     @Override
     public List<Job> getAll() {
         List<Job> result = new ArrayList<>();
-        result.addAll(memoryService.getJobs().values());
+        result.addAll(memoryPersistence.getJobs().values());
         return result;
     }
 
     @Override
     public Long count() {
-        return Long.valueOf(memoryService.getJobs().size());
+        return Long.valueOf(memoryPersistence.getJobs().size());
     }
 
     @Override
@@ -69,7 +69,7 @@ public class MemoryJobPersistence implements JobPersistence {
 
     @Override
     public Job getByName(String jobName) {
-        for (Job job : memoryService.getJobs().values()) {
+        for (Job job : memoryPersistence.getJobs().values()) {
             if (Objects.equals(job.getName(), jobName)) {
                 return job;
             }
@@ -81,7 +81,7 @@ public class MemoryJobPersistence implements JobPersistence {
     public List<Job> getAllByStatus(JobStatus jobStatus) {
         List<Job> result = new ArrayList<>();
 
-        for (Job job : memoryService.getJobs().values()) {
+        for (Job job : memoryPersistence.getJobs().values()) {
             if (Objects.equals(job.getStatus(), jobStatus)) {
                 result.add(job);
             }
@@ -94,7 +94,7 @@ public class MemoryJobPersistence implements JobPersistence {
     public List<Job> getAllScheduled() {
         List<Job> result = new ArrayList<>();
 
-        for (Job job : memoryService.getJobs().values()) {
+        for (Job job : memoryPersistence.getJobs().values()) {
             if (job.getSchedule() != null && !job.getSchedule().isEmpty()) {
                 result.add(job);
             }

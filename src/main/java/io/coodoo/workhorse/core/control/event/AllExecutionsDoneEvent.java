@@ -5,11 +5,11 @@ import io.coodoo.workhorse.core.entity.Job;
 /**
  * @author coodoo GmbH (coodoo.io)
  */
-public class AllJobExecutionsDoneEvent {
+public class AllExecutionsDoneEvent {
 
     private Job job;
 
-    public AllJobExecutionsDoneEvent(Job job) {
+    public AllExecutionsDoneEvent(Job job) {
         this.job = job;
     }
 
@@ -24,7 +24,7 @@ public class AllJobExecutionsDoneEvent {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("AllJobExecutionsDoneEvent [job=");
+        builder.append("AllExecutionsDoneEvent [job=");
         builder.append(job);
         builder.append("]");
         return builder.toString();

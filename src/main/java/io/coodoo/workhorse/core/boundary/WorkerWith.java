@@ -17,15 +17,16 @@ public abstract class WorkerWith<T> extends BaseWorker {
     public abstract void doWork(T parameters) throws Exception;
 
     @Override
-    public void doWork(Execution jobExecution) throws Exception {
-        init(jobExecution);
+    public void doWork(Execution execution) throws Exception {
+        init(execution);
 
-        doWork(getParameters(jobExecution));
+        doWork(getParameters(execution));
     }
 
-    public T getParameters(Execution jobExecution) {
+    @SuppressWarnings("unchecked")
+    public T getParameters(Execution execution) {
         getParametersClass();
-        return (T) WorkhorseUtil.jsonToParameters(jobExecution.getParameters(), parametersClass);
+        return (T) WorkhorseUtil.jsonToParameters(execution.getParameters(), parametersClass);
     }
 
     protected Class<?> getParametersClass() {
@@ -34,7 +35,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
             return parametersClass;
         }
         Type type = getParameterWorkerClassType();
-        parametersClass = (Class) type;
+        parametersClass = (Class<?>) type;
 
         return parametersClass;
     }
@@ -55,8 +56,8 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * @param parameters needed parameters to do the job
      * @return job execution ID
      */
-    public Long createJobExecution(T parameters) {
-        return createJobExecution(parameters, false, null);
+    public Long createExecution(T parameters) {
+        return createExecution(parameters, false, null);
     }
 
     /**
@@ -70,8 +71,8 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * @param maturity specified time for the execution
      * @return job execution ID
      */
-    public Long createJobExecution(T parameters, Boolean priority, LocalDateTime maturity) {
-        return createJobExecution(parameters, priority, maturity, null, null, null).getId();
+    public Long createExecution(T parameters, Boolean priority, LocalDateTime maturity) {
+        return createExecution(parameters, priority, maturity, null, null, null).getId();
     }
 
     /**
@@ -86,8 +87,8 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * @param delayUnit what kind of time to wait
      * @return job execution ID
      */
-    public Long createJobExecution(T parameters, Boolean priority, Long delayValue, ChronoUnit delayUnit) {
-        return createJobExecution(parameters, priority, delayToMaturity(delayValue, delayUnit), null, null, null).getId();
+    public Long createExecution(T parameters, Boolean priority, Long delayValue, ChronoUnit delayUnit) {
+        return createExecution(parameters, priority, delayToMaturity(delayValue, delayUnit), null, null, null).getId();
     }
 
     /**
@@ -98,8 +99,8 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * @param parameters needed parameters to do the job
      * @return job execution ID
      */
-    public Long createPriorityJobExecution(T parameters) {
-        return createJobExecution(parameters, true, null);
+    public Long createPriorityExecution(T parameters) {
+        return createExecution(parameters, true, null);
     }
 
     /**
@@ -112,8 +113,8 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * @param delayUnit what kind of time to wait
      * @return job execution ID
      */
-    public Long createDelayedJobExecution(T parameters, Long delayValue, ChronoUnit delayUnit) {
-        return createJobExecution(parameters, false, delayValue, delayUnit);
+    public Long createDelayedExecution(T parameters, Long delayValue, ChronoUnit delayUnit) {
+        return createExecution(parameters, false, delayValue, delayUnit);
     }
 
     /**
@@ -125,8 +126,8 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * @param maturity specified time for the execution
      * @return job execution ID
      */
-    public Long createPlannedJobExecution(T parameters, LocalDateTime maturity) {
-        return createJobExecution(parameters, false, maturity);
+    public Long createPlannedExecution(T parameters, LocalDateTime maturity) {
+        return createExecution(parameters, false, maturity);
     }
 
     /**
@@ -154,14 +155,14 @@ public abstract class WorkerWith<T> extends BaseWorker {
         for (T parameters : parametersList) {
             if (batchId == null) { // start of batch
 
-                Execution jobExecution = createJobExecution(parameters, priority, maturity, -1L, null, null);
+                Execution execution = createExecution(parameters, priority, maturity, -1L, null, null);
                 // Use the Id of the first added job execution in Batch as BatchId.
-                jobExecution.setBatchId(jobExecution.getId());
-                workhorseController.updateJobExecution(jobExecution.getJobId(), jobExecution.getId(), jobExecution);
+                execution.setBatchId(execution.getId());
+                workhorseController.updateExecution(execution.getJobId(), execution.getId(), execution);
 
-                batchId = jobExecution.getId();
+                batchId = execution.getId();
             } else { // now that we have the batch id, all the beloning executions can have it!
-                createJobExecution(parameters, priority, maturity, batchId, null, null);
+                createExecution(parameters, priority, maturity, batchId, null, null);
             }
         }
         return batchId;
@@ -194,18 +195,18 @@ public abstract class WorkerWith<T> extends BaseWorker {
         for (T parameters : parametersList) {
             if (chainId == null) { // start of chain
 
-                Execution jobExecution = createJobExecution(parameters, priority, maturity, null, -1L, null);
-                jobExecution.setChainId(jobExecution.getId());
-                workhorseController.updateJobExecution(jobId, jobExecution.getId(), jobExecution);
+                Execution execution = createExecution(parameters, priority, maturity, null, -1L, null);
+                execution.setChainId(execution.getId());
+                workhorseController.updateExecution(jobId, execution.getId(), execution);
 
-                chainId = jobExecution.getId();
-                chainedPreviousExecutionId = jobExecution.getId();
+                chainId = execution.getId();
+                chainedPreviousExecutionId = execution.getId();
                 continue;
             }
-            Execution jobExecution = createJobExecution(parameters, priority, maturity, null, chainId, chainedPreviousExecutionId);
-            chainedPreviousExecutionId = jobExecution.getId();
+            Execution execution = createExecution(parameters, priority, maturity, null, chainId, chainedPreviousExecutionId);
+            chainedPreviousExecutionId = execution.getId();
 
-            workhorseController.addJobExecutionAtEndOfChain(jobId, chainId, jobExecution);
+            workhorseController.addExecutionAtEndOfChain(jobId, chainId, execution);
 
         }
         return chainId;

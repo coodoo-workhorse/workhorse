@@ -12,17 +12,17 @@ import javax.inject.Inject;
 public class MemoryConfigPersistence implements ConfigPersistence {
 
     @Inject
-    MemoryPersistence memoryService;
+    MemoryPersistence memoryPersistence;
 
     @Override
     public WorkhorseConfig get() {
-        return memoryService.getJobEngineConfig();
+        return memoryPersistence.getWorkhorseConfig();
     }
 
     @Override
-    public WorkhorseConfig update(WorkhorseConfig jobEngineConfig) {
-        memoryService.setWorkhorseConfig(jobEngineConfig);
-        return jobEngineConfig;
+    public WorkhorseConfig update(WorkhorseConfig workhorseConfig) {
+        memoryPersistence.setWorkhorseConfig(workhorseConfig);
+        return workhorseConfig;
     }
 
     @Override

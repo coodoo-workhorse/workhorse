@@ -32,14 +32,14 @@ public class WorkhorseLogService {
     WorkhorseController workhorseController;
 
     @Inject
-    WorkhorseConfig jobEngineConfig;
+    WorkhorseConfig workhorseConfig;
 
     @Inject
     @LogQualifier
     LogPersistence logPersistence;
 
     @Inject
-    WorkhorseLogService jobLogService;
+    WorkhorseLogService workhorseLogService;
 
     public WorkhorseLog getLog(Long id) {
         return logPersistence.get(id);
@@ -66,9 +66,9 @@ public class WorkhorseLogService {
         String cn = changeNew == null ? "" : changeNew.toString();
 
         if (message == null) {
-            message = String.format(jobEngineConfig.getLogChange(), changeParameter, co, cn);
+            message = String.format(workhorseConfig.getLogChange(), changeParameter, co, cn);
         }
-        return createJobEngineLog(message, jobId, jobStatus, true, changeParameter, co, cn, null);
+        return createLog(message, jobId, jobStatus, true, changeParameter, co, cn, null);
     }
 
     /**
@@ -84,23 +84,23 @@ public class WorkhorseLogService {
      * @param stacktrace
      * @return
      */
-    public WorkhorseLog createJobEngineLog(String message, Long jobId, JobStatus jobStatus, boolean byUser, String changeParameter, String changeOld,
-                    String changeNew, String stacktrace) {
+    public WorkhorseLog createLog(String message, Long jobId, JobStatus jobStatus, boolean byUser, String changeParameter, String changeOld, String changeNew,
+                    String stacktrace) {
 
-        WorkhorseLog jobEngineLog = new WorkhorseLog();
-        jobEngineLog.setMessage(message);
-        jobEngineLog.setJobId(jobId);
-        jobEngineLog.setJobStatus(jobStatus);
-        jobEngineLog.setByUser(byUser);
-        jobEngineLog.setChangeParameter(changeParameter);
-        jobEngineLog.setChangeOld(changeOld);
-        jobEngineLog.setChangeNew(changeNew);
-        jobEngineLog.setHostName(WorkhorseUtil.getHostName());
-        jobEngineLog.setStacktrace(stacktrace);
+        WorkhorseLog workhorseLog = new WorkhorseLog();
+        workhorseLog.setMessage(message);
+        workhorseLog.setJobId(jobId);
+        workhorseLog.setJobStatus(jobStatus);
+        workhorseLog.setByUser(byUser);
+        workhorseLog.setChangeParameter(changeParameter);
+        workhorseLog.setChangeOld(changeOld);
+        workhorseLog.setChangeNew(changeNew);
+        workhorseLog.setHostName(WorkhorseUtil.getHostName());
+        workhorseLog.setStacktrace(stacktrace);
 
-        logPersistence.persist(jobEngineLog);
-        log.info("Created JobEngineLog : " + log);
-        return jobEngineLog;
+        logPersistence.persist(workhorseLog);
+        log.info("Created log : " + log);
+        return workhorseLog;
     }
 
     /**
@@ -123,7 +123,7 @@ public class WorkhorseLogService {
         String message = jobErrorPayload.getMessage() != null ? jobErrorPayload.getMessage()
                         : WorkhorseUtil.getMessagesFromException(jobErrorPayload.getThrowable());
 
-        createJobEngineLog(message, jobErrorPayload.getJobId(), jobErrorPayload.getJobStatus(), false, null, null, null,
+        createLog(message, jobErrorPayload.getJobId(), jobErrorPayload.getJobStatus(), false, null, null, null,
                         WorkhorseUtil.stacktraceToString(jobErrorPayload.getThrowable()));
     }
 
@@ -144,7 +144,7 @@ public class WorkhorseLogService {
                 jobStatus = job.getStatus();
             }
         }
-        return createJobEngineLog(message, jobId, jobStatus, byUser, null, null, null, null);
+        return createLog(message, jobId, jobStatus, byUser, null, null, null, null);
     }
 
 }

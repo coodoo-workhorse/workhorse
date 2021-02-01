@@ -33,7 +33,7 @@ public class ExecutionBuffer {
     WorkhorseController workhorseController;
 
     @Inject
-    WorkhorseConfig jobEngineConfig;
+    WorkhorseConfig workhorseConfig;
 
     private Map<Long, Queue<Long>> executions = new HashMap<>();
     private Map<Long, Queue<Long>> priorityExecutions = new HashMap<>();
@@ -97,8 +97,8 @@ public class ExecutionBuffer {
 
         if (sizeMemoryQueue > 0 || sizePriorityMemoryQueue > 0) {
 
-            log.info("Clearing job execution queue with " + executions.get(job.getId()).size() + " elements and "
-                    + priorityExecutions.get(job.getId()).size() + " priority elements for job: " + job.getName());
+            log.info("Clearing job execution queue with " + executions.get(job.getId()).size() + " elements and " + priorityExecutions.get(job.getId()).size()
+                            + " priority elements for job: " + job.getName());
 
             executions.get(job.getId()).clear();
             priorityExecutions.get(job.getId()).clear();
@@ -142,22 +142,23 @@ public class ExecutionBuffer {
         completionStages.get(job.getId()).clear();
     }
 
-    public void removeFromBuffer(Execution jobExecution) {
+    public void removeFromBuffer(Execution execution) {
 
-        Long jobId = jobExecution.getJobId();
+        Long jobId = execution.getJobId();
+        Long executionId = execution.getId();
 
-        if (runningExecutions.containsKey(jobId) && runningExecutions.get(jobId).contains(jobExecution)) {
-            log.warn("Can't remove running job execution from memory queue: " + jobExecution);
+        if (runningExecutions.containsKey(jobId) && runningExecutions.get(jobId).contains(executionId)) {
+            log.warn("Can't remove running job execution from memory queue: " + execution);
 
-        } else if (executions.containsKey(jobId) && executions.get(jobId).remove(jobExecution)) {
-            log.info("Removed from memory queue: " + jobExecution);
+        } else if (executions.containsKey(jobId) && executions.get(jobId).remove(executionId)) {
+            log.info("Removed from memory queue: " + execution);
 
-        } else if (priorityExecutions.containsKey(jobId) && priorityExecutions.get(jobId).remove(jobExecution)) {
-            log.info("Removed from priority memory queue: " + jobExecution);
+        } else if (priorityExecutions.containsKey(jobId) && priorityExecutions.get(jobId).remove(executionId)) {
+            log.info("Removed from priority memory queue: " + execution);
         }
     }
 
-    public int getNumberOfJobExecution(Long jobId) {
+    public int getNumberOfExecution(Long jobId) {
         return executions.get(jobId).size() + runningExecutions.get(jobId).size();
     }
 
@@ -179,67 +180,61 @@ public class ExecutionBuffer {
         return keyLock;
     }
 
-    public Map<Long, Queue<Long>> getJobExecutions() {
+    public Map<Long, Queue<Long>> getExecutions() {
         return executions;
     }
 
-    public void addJobExecution(Long jobId, Long jobExecution) {
-        executions.get(jobId).add(jobExecution);
+    public void addExecution(Long jobId, Long execution) {
+        executions.get(jobId).add(execution);
     }
 
-    public Long pollJobExecutionQueue(Long jobId) {
+    public Long pollExecutionQueue(Long jobId) {
         return executions.get(jobId).poll();
     }
 
-    public Map<Long, Queue<Long>> getPriorityJobExecutions() {
+    public Map<Long, Queue<Long>> getPriorityExecutions() {
         return priorityExecutions;
     }
 
-    public void addPriorityJobExecution(Long jobId, Long jobExecution) {
-        priorityExecutions.get(jobId).add(jobExecution);
+    public void addPriorityExecution(Long jobId, Long execution) {
+        priorityExecutions.get(jobId).add(execution);
     }
 
-    public Long pollPriorityJobExecutionQueue(Long jobId) {
+    public Long pollPriorityExecutionQueue(Long jobId) {
         return priorityExecutions.get(jobId).poll();
     }
 
-    public Map<Long, Set<Long>> getRunningJobExecutions() {
+    public Map<Long, Set<Long>> getRunningExecutions() {
         return runningExecutions;
     }
 
     /**
-     * This function check, if a job execution can be process. The existence of a
-     * JobExecutionQueueBuffer for the given <code>jobId</code> is checked. It will
-     * be check, if the JobExecutionQueueBuffer do not contain the given
-     * <code>jobExecutionId</code>
+     * This function check, if a job execution can be process. The existence of a ExecutionQueueBuffer for the given <code>jobId</code> is checked. It will be
+     * check, if the ExecutionQueueBuffer do not contain the given <code>executionId</code>
      * 
      * @param jobId
-     * @param jobExecutionId
+     * @param executionId
      * @return
      */
-    public boolean canTheJobExecutionBeAdd(Long jobId, Long jobExecutionId) {
+    public boolean isAddable(Long jobId, Long executionId) {
 
-        if (runningExecutions.get(jobId) == null || executions.get(jobId) == null
-                || priorityExecutions.get(jobId) == null) {
-            log.error("They are not JobExecutionQueue for the job with Id  " + jobId);
+        if (runningExecutions.get(jobId) == null || executions.get(jobId) == null || priorityExecutions.get(jobId) == null) {
+            log.error("They are not ExecutionQueue for the job with Id  " + jobId);
             return false;
         }
-
-        if (runningExecutions.get(jobId).contains(jobExecutionId) || executions.get(jobId).contains(jobExecutionId)
-                || priorityExecutions.get(jobId).contains(jobExecutionId)) {
+        if (runningExecutions.get(jobId).contains(executionId) || executions.get(jobId).contains(executionId)
+                        || priorityExecutions.get(jobId).contains(executionId)) {
             return false;
         }
-
         return true;
-
     }
 
-    public void addRunningJobExecution(Long jobId, Long jobExecution) {
-        runningExecutions.get(jobId).add(jobExecution);
+    public void addRunningExecution(Long jobId, Long execution) {
+        runningExecutions.get(jobId).add(execution);
     }
 
-    public void removeRunningJobExecution(Long jobId, Long jobExecution) {
-        runningExecutions.get(jobId).remove(jobExecution);
+    public void removeRunningExecution(Long jobId, Long execution) {
+        runningExecutions.get(jobId).remove(execution);
     }
 
     public void addJobStartTimes(Long jobId, Long startTime) {
@@ -259,14 +254,14 @@ public class ExecutionBuffer {
         return jobThreads.get(jobId);
     }
 
-    public void addJobThreads(Long jobId, JobThread jobExecutor) {
-        log.info("Add JobThread in Queue: " + jobExecutor);
-        jobThreads.get(jobId).add(jobExecutor);
+    public void addJobThreads(Long jobId, JobThread jobThread) {
+        log.info("Add JobThread in Queue: " + jobThread);
+        jobThreads.get(jobId).add(jobThread);
     }
 
-    public void removeJobThread(Long jobId, JobThread jobExecutor) {
-        log.info("Remove Thread: " + jobExecutor);
-        jobThreads.get(jobId).remove(jobExecutor);
+    public void removeJobThread(Long jobId, JobThread jobThread) {
+        log.info("Remove Thread: " + jobThread);
+        jobThreads.get(jobId).remove(jobThread);
     }
 
     public int getRunningJobThreadCounts(Long jobId) {
@@ -308,10 +303,10 @@ public class ExecutionBuffer {
     }
 
     /**
-     * Retrieves all info about the JobExecutionQueue of a job
+     * Retrieves all info about the ExecutionQueue of a job
      * 
      * @param jobId Id of the Job
-     * @return JobEngineInfo
+     * @return WorkhorseInfo
      */
     public WorkhorseInfo getInfo(Long jobId) {
 
@@ -325,16 +320,15 @@ public class ExecutionBuffer {
             info.setQueuedPriorityExecutions(priorityExecutions.get(jobId).size());
         }
         if (runningExecutions != null && runningExecutions.get(jobId) != null) {
-            for (Long jobExecutionId : runningExecutions.get(jobId)) {
-                info.getRunningExecutions().add(workhorseController.getJobExecutionById(jobId, jobExecutionId));
+            for (Long executionId : runningExecutions.get(jobId)) {
+                info.getRunningExecutions().add(workhorseController.getExecutionById(jobId, executionId));
             }
         }
         if (jobThreadCounts != null && jobThreadCounts.get(jobId) != null) {
             info.setThreadCount(jobThreadCounts.get(jobId));
         }
         if (jobStartTimes != null && jobStartTimes.get(jobId) != null) {
-            info.setThreadStartTime(LocalDateTime.ofInstant(Instant.ofEpochMilli(jobStartTimes.get(jobId)),
-                    ZoneId.of(jobEngineConfig.getTimeZone())));
+            info.setThreadStartTime(LocalDateTime.ofInstant(Instant.ofEpochMilli(jobStartTimes.get(jobId)), ZoneId.of(workhorseConfig.getTimeZone())));
         }
         // if (pausedJobs != null && pausedJobs.get(jobId) != null) {
         // info.setPaused(pausedJobs.get(jobId));

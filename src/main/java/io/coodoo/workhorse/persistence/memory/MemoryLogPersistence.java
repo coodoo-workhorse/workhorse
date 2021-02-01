@@ -16,65 +16,66 @@ import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 public class MemoryLogPersistence implements LogPersistence {
 
     @Inject
-    MemoryPersistence memoryService;
+    MemoryPersistence memoryPersistence;
 
     @Inject
-    WorkhorseConfig jobEngineConfig;
+    WorkhorseConfig workhorseConfig;
 
     private AtomicLong incId = new AtomicLong(0);
 
     @Override
     public WorkhorseLog get(Long id) {
-        return memoryService.getWorkhorseLog().get(id);
+        return memoryPersistence.getWorkhorseLog().get(id);
     }
 
     @Override
-    public WorkhorseLog update(Long id, WorkhorseLog jobEngineLog) {
-        memoryService.getWorkhorseLog().put(id, jobEngineLog);
-        return jobEngineLog;
+    public WorkhorseLog update(Long id, WorkhorseLog workhorseLog) {
+        memoryPersistence.getWorkhorseLog().put(id, workhorseLog);
+        return workhorseLog;
     }
 
     @Override
     public WorkhorseLog delete(Long id) {
-        return memoryService.getWorkhorseLog().remove(id);
+        return memoryPersistence.getWorkhorseLog().remove(id);
     }
 
     @Override
-    public WorkhorseLog persist(WorkhorseLog jobEngineLog) {
+    public WorkhorseLog persist(WorkhorseLog workhorseLog) {
         Long id = incId.getAndIncrement();
-        jobEngineLog.setId(id);
-        jobEngineLog.setCreatedAt(jobEngineConfig.timestamp());
-        memoryService.getWorkhorseLog().put(id, jobEngineLog);
-        return jobEngineLog;
+        workhorseLog.setId(id);
+        workhorseLog.setCreatedAt(workhorseConfig.timestamp());
+        memoryPersistence.getWorkhorseLog().put(id, workhorseLog);
+        return workhorseLog;
     }
 
+    // FIXME
     @Override
     public List<WorkhorseLog> getAll(int limit) {
         List<WorkhorseLog> result = new ArrayList<>();
-        List<WorkhorseLog> jobEngineLogs = new ArrayList<>();
-        jobEngineLogs.addAll(memoryService.getWorkhorseLog().values());
+        List<WorkhorseLog> workhorseLogs = new ArrayList<>();
+        workhorseLogs.addAll(memoryPersistence.getWorkhorseLog().values());
         // Long index = incId.get();
         // int count = 0;
 
-        // JobEngineLog jobEngineLog = memoryService.jobEngineLog.get(index);
-        // while (jobEngineLog != null && count <= limit) {
+        // JobEngineLog workhorseLog = memoryService.workhorseLog.get(index);
+        // while (workhorseLog != null && count <= limit) {
 
-        // result.add(jobEngineLog);
+        // result.add(workhorseLog);
         // count++;
         // index--;
-        // jobEngineLog = memoryService.jobEngineLog.get(index);
+        // workhorseLog = memoryService.workhorseLog.get(index);
         // }
 
-        return jobEngineLogs;
+        return workhorseLogs;
 
     }
 
     @Override
     public int deleteByJobId(Long jobId) {
         int count = 0;
-        for (WorkhorseLog jobEngineLog : memoryService.getWorkhorseLog().values()) {
-            if (jobEngineLog.getJobId() != null && jobEngineLog.getJobId().equals(jobId)) {
-                memoryService.getWorkhorseLog().remove(jobEngineLog.getId(), jobEngineLog);
+        for (WorkhorseLog workhorseLog : memoryPersistence.getWorkhorseLog().values()) {
+            if (workhorseLog.getJobId() != null && workhorseLog.getJobId().equals(jobId)) {
+                memoryPersistence.getWorkhorseLog().remove(workhorseLog.getId(), workhorseLog);
                 count++;
             }
         }

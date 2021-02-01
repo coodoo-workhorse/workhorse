@@ -8,34 +8,39 @@ public interface LogPersistence {
 
     /**
      * Get the log with given Id
+     * 
      * @param id Id of the log to retrieve
-     * @return JobEngineLog
+     * @return WorkhorseLog
      */
     WorkhorseLog get(Long id);
 
     /**
-     * Update a log 
+     * Update a log
+     * 
      * @param id Id of the log to retrieve
-     * @param jobEngineLog log 
+     * @param workhorseLog log
      * @return the updated log
      */
-    WorkhorseLog update(Long id, WorkhorseLog jobEngineLog);
+    WorkhorseLog update(Long id, WorkhorseLog workhorseLog);
 
     /**
      * Delete a log
+     * 
      * @param id Id of the log to delete
      */
     WorkhorseLog delete(Long id);
 
     /**
-     * Create a new log 
-     * @param jobEngineLog log to persit
-     * @return new persisted JobEngineLog
+     * Create a new log
+     * 
+     * @param workhorseLog log to persit
+     * @return new persisted WorkhorseLog
      */
-    WorkhorseLog persist(WorkhorseLog jobEngineLog);
+    WorkhorseLog persist(WorkhorseLog workhorseLog);
 
     /**
      * Retrieves a limited number of logs
+     * 
      * @param limit number of logs to get
      * @return List of logs
      */
@@ -43,14 +48,16 @@ public interface LogPersistence {
 
     /**
      * Delete all log of the given job
-     * @param jobId Id of the job 
+     * 
+     * @param jobId Id of the job
      * @return Number of log, that have been deleted
      */
     int deleteByJobId(Long jobId);
 
     /**
      * retrieve the type of the persistence to initialize
-     * @return 
+     * 
+     * @return
      */
     PersistenceTyp getPersistenceTyp();
 

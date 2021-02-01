@@ -63,12 +63,12 @@ public class Execution extends BaseEntity {
     private Long chainId;
 
     /**
-     * Id to the previous execution to process, if the execution belong to a chained JobExecution.
+     * Id to the previous execution to process, if the execution belong to a chained Execution.
      */
     private Long chainedPreviousExecutionId;
 
     /**
-     * Id to the next execution to process, if the execution belong to a chained JobExecution.
+     * Id to the next execution to process, if the execution belong to a chained Execution.
      */
     private Long chainedNextExecutionId;
 
@@ -98,9 +98,9 @@ public class Execution extends BaseEntity {
     private int failRetry;
 
     /**
-     * Id of the failed JobExecution that should be retry
+     * Id of the failed Execution that should be retry
      */
-    private Long failRetryJobExecutionId;
+    private Long failRetryExecutionId;
 
     /**
      * The exception message, if the job execution ends in an exception.
@@ -256,17 +256,17 @@ public class Execution extends BaseEntity {
         this.failRetry = failRetry;
     }
 
-    public Long getFailRetryJobExecutionId() {
-        return failRetryJobExecutionId;
+    public Long getFailRetryExecutionId() {
+        return failRetryExecutionId;
     }
 
-    public void setFailRetryJobExecutionId(Long failRetryJobExecutionId) {
-        this.failRetryJobExecutionId = failRetryJobExecutionId;
+    public void setFailRetryExecutionId(Long failRetryExecutionId) {
+        this.failRetryExecutionId = failRetryExecutionId;
     }
 
     @Override
     public String toString() {
-        return "JobExecution [Id=" + id + ", batchId=" + batchId + ", chainId=" + chainId + ", jobId=" + jobId + ", maturity=" + maturity + ", parameters="
+        return "Execution [Id=" + id + ", batchId=" + batchId + ", chainId=" + chainId + ", jobId=" + jobId + ", maturity=" + maturity + ", parameters="
                         + parameters + ", priority=" + priority + ", status=" + status + "]";
     }
 

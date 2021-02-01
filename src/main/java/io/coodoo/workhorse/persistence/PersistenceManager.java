@@ -10,14 +10,14 @@ import org.jboss.logging.Logger;
 
 import io.coodoo.workhorse.config.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.interfaces.ConfigPersistence;
-import io.coodoo.workhorse.persistence.interfaces.LogPersistence;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
+import io.coodoo.workhorse.persistence.interfaces.LogPersistence;
 import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
-import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.ConfigQualifier;
-import io.coodoo.workhorse.persistence.interfaces.qualifier.LogQualifier;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.ExecutionQualifier;
+import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
+import io.coodoo.workhorse.persistence.interfaces.qualifier.LogQualifier;
 
 @ApplicationScoped
 public class PersistenceManager {
@@ -30,18 +30,18 @@ public class PersistenceManager {
 
     @Inject
     @Any
-    Instance<ExecutionPersistence> jobExecutionPersistenceInstances;
+    Instance<ExecutionPersistence> executionPersistenceInstances;
 
     @Inject
     @Any
-    Instance<ConfigPersistence> jobEngineConfigPersistenceInstances;
+    Instance<ConfigPersistence> configPersistenceInstances;
 
     @Inject
     @Any
-    Instance<LogPersistence> jobEngineLogPersistenceInstances;
+    Instance<LogPersistence> logPersistenceInstances;
 
     @Inject
-    WorkhorseConfig jobEngineConfig;
+    WorkhorseConfig workhorseConfig;
 
     @Produces
     @JobQualifier
@@ -60,22 +60,19 @@ public class PersistenceManager {
     private LogPersistence logPersistence;
 
     public void initializeStorage() {
-        initializePersistence(jobEngineConfig.getPersistenceTyp(), null);
+        initializePersistence(workhorseConfig.getPersistenceTyp(), null);
     }
 
     public void initializePersistence(PersistenceTyp persistenceTyp, Object persistenceConfiguration) {
 
         if (persistenceTyp == null) {
-            persistenceTyp = jobEngineConfig.getPersistenceTyp();
+            persistenceTyp = workhorseConfig.getPersistenceTyp();
             log.warn("persistenceTyp can not be null. The default persistence " + persistenceTyp + " will be use");
         }
 
         initializeJobEngineConfigPersistence(persistenceTyp, persistenceConfiguration);
-
         initializeJobPersistence(persistenceTyp);
-
-        initializeJobExecutionPersistence(persistenceTyp);
-
+        initializeExecutionPersistence(persistenceTyp);
         initializeJobEnigneLogPersistence(persistenceTyp);
 
         if (jobPersistence == null || executionPersistence == null || configPersistence == null || logPersistence == null) {
@@ -93,9 +90,9 @@ public class PersistenceManager {
 
     public JobPersistence initializeJobPersistence(PersistenceTyp persistenceTyp) {
         log.info("Start of JobPersistence initialization");
-        for (JobPersistence persistence : jobPersistenceInstances) {
-            if (persistence != null && persistence.getPersistenceTyp().equals(persistenceTyp)) {
-                jobPersistence = persistence;
+        for (JobPersistence jobPersistenceInstance : jobPersistenceInstances) {
+            if (jobPersistenceInstance != null && jobPersistenceInstance.getPersistenceTyp().equals(persistenceTyp)) {
+                jobPersistence = jobPersistenceInstance;
                 log.info("JobPersistence: " + jobPersistence);
 
                 log.info("End of JobPersistence initialization");
@@ -106,11 +103,11 @@ public class PersistenceManager {
         return null;
     }
 
-    public ExecutionPersistence initializeJobExecutionPersistence(PersistenceTyp persistenceTyp) {
+    public ExecutionPersistence initializeExecutionPersistence(PersistenceTyp persistenceTyp) {
         log.info("Start of ExecutionPersistence initialization");
-        for (ExecutionPersistence persistenceJobExecution : jobExecutionPersistenceInstances) {
-            if (persistenceJobExecution != null && persistenceJobExecution.getPersistenceTyp().equals(persistenceTyp)) {
-                executionPersistence = persistenceJobExecution;
+        for (ExecutionPersistence executionPersistenceInstance : executionPersistenceInstances) {
+            if (executionPersistenceInstance != null && executionPersistenceInstance.getPersistenceTyp().equals(persistenceTyp)) {
+                executionPersistence = executionPersistenceInstance;
                 log.info("ExecutionPersistence: " + executionPersistence);
                 log.info("End of ExecutionPersistence initialization");
                 executionPersistence.connect();
@@ -122,9 +119,9 @@ public class PersistenceManager {
 
     public ConfigPersistence initializeJobEngineConfigPersistence(PersistenceTyp persistenceTyp, Object persistenceConfiguration) {
         log.info("Start of ExecutionPersistence initialization");
-        for (ConfigPersistence persistenceJobEngineConfig : jobEngineConfigPersistenceInstances) {
-            if (persistenceJobEngineConfig != null && persistenceJobEngineConfig.getPersistenceTyp().equals(persistenceTyp)) {
-                configPersistence = persistenceJobEngineConfig;
+        for (ConfigPersistence configPersistenceInstance : configPersistenceInstances) {
+            if (configPersistenceInstance != null && configPersistenceInstance.getPersistenceTyp().equals(persistenceTyp)) {
+                configPersistence = configPersistenceInstance;
                 log.info("configPersistence: " + configPersistence);
                 log.info("End of configPersistence initialization");
                 configPersistence.connect(persistenceConfiguration);
@@ -136,9 +133,9 @@ public class PersistenceManager {
 
     public LogPersistence initializeJobEnigneLogPersistence(PersistenceTyp persistenceTyp) {
         log.info("Start of LogPersistence initialization");
-        for (LogPersistence persistenceJobEngineLog : jobEngineLogPersistenceInstances) {
-            if (persistenceJobEngineLog != null && persistenceJobEngineLog.getPersistenceTyp().equals(persistenceTyp)) {
-                logPersistence = persistenceJobEngineLog;
+        for (LogPersistence logPersistenceInstance : logPersistenceInstances) {
+            if (logPersistenceInstance != null && logPersistenceInstance.getPersistenceTyp().equals(persistenceTyp)) {
+                logPersistence = logPersistenceInstance;
                 log.info("LogPersistence: " + logPersistence);
                 log.info("End of LogPersistence initialization");
                 logPersistence.connect();

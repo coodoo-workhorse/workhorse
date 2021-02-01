@@ -10,7 +10,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
@@ -19,8 +18,8 @@ import org.jboss.logging.Logger;
 
 import io.coodoo.workhorse.config.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.control.event.JobErrorEvent;
-import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.ErrorType;
+import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.util.CronExpression;
 
@@ -30,7 +29,7 @@ public class JobScheduler {
     private static final Logger log = Logger.getLogger(JobScheduler.class);
 
     @Inject
-    WorkhorseConfig jobEngineConfig;
+    WorkhorseConfig workhorseConfig;
 
     @Inject
     WorkhorseController workhorseController;
@@ -38,7 +37,6 @@ public class JobScheduler {
     @Inject
     Event<JobErrorEvent> jobErrorEvent;
 
-    
     private ScheduledExecutorService scheduledExecutorService;
 
     private Map<Long, ScheduledFuture<?>> scheduledJobFutures = new HashMap<>();
@@ -73,14 +71,14 @@ public class JobScheduler {
             try {
 
                 CronExpression cron = new CronExpression(job.getSchedule());
-                LocalDateTime nextTime = cron.nextTimeAfter(jobEngineConfig.timestamp());
+                LocalDateTime nextTime = cron.nextTimeAfter(workhorseConfig.timestamp());
                 log.info("next execution of Job: " + job + " on : " + nextTime);
-                long initialDelay = ChronoUnit.SECONDS.between(jobEngineConfig.timestamp(), nextTime);
+                long initialDelay = ChronoUnit.SECONDS.between(workhorseConfig.timestamp(), nextTime);
                 long period = ChronoUnit.SECONDS.between(nextTime, cron.nextTimeAfter(nextTime));
                 log.info("period: " + period + " seconds");
 
                 ScheduledFuture<?> scheduledJobFuture = scheduledExecutorService.scheduleAtFixedRate(() -> {
-                    triggerScheduledJobExecutionCreation(job);
+                    triggerScheduledExecutionCreation(job);
                 }, initialDelay, period, TimeUnit.SECONDS);
 
                 scheduledJobFutures.put(job.getId(), scheduledJobFuture);
@@ -111,10 +109,10 @@ public class JobScheduler {
     /**
      * Start an execution after timeout
      */
-    public void triggerScheduledJobExecutionCreation(Job job) {
+    public void triggerScheduledExecutionCreation(Job job) {
         log.info("TimeOut with Job: " + job);
         try {
-            workhorseController.triggerScheduledJobExecutionCreation(job);
+            workhorseController.triggerScheduledExecutionCreation(job);
         } catch (Exception e) {
             log.error("Timeout failed for job " + job.getName() + ". Exception : " + e);
             e.printStackTrace();

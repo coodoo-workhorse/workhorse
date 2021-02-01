@@ -11,8 +11,8 @@ public abstract class Worker extends BaseWorker {
     public abstract void doWork() throws Exception;
 
     @Override
-    public void doWork(Execution jobExecution) throws Exception {
-        init(jobExecution);
+    public void doWork(Execution execution) throws Exception {
+        init(execution);
         doWork();
     }
 
@@ -26,8 +26,8 @@ public abstract class Worker extends BaseWorker {
      * @param maturity specified time for the execution
      * @return job execution ID
      */
-    public Long createJobExecution(Boolean priority, LocalDateTime maturity) {
-        return createJobExecution(null, priority, maturity, null, null, null).getId();
+    public Long createExecution(Boolean priority, LocalDateTime maturity) {
+        return createExecution(null, priority, maturity, null, null, null).getId();
   
     }
 
@@ -42,13 +42,13 @@ public abstract class Worker extends BaseWorker {
      * @param delayUnit what kind of time to wait
      * @return job execution ID
      */
-    public Long createJobExecution(Boolean priority, Long delayValue, ChronoUnit delayUnit) {
-        return createJobExecution(null, priority, delayToMaturity(delayValue, delayUnit), null, null, null).getId();
+    public Long createExecution(Boolean priority, Long delayValue, ChronoUnit delayUnit) {
+        return createExecution(null, priority, delayToMaturity(delayValue, delayUnit), null, null, null).getId();
 
     }
 
-    public Long createPriorityJobExecution() {
-        return createJobExecution(null, true, null, null, null, null).getId();
+    public Long createPriorityExecution() {
+        return createExecution(null, true, null, null, null, null).getId();
     }
 
      /**
@@ -60,8 +60,8 @@ public abstract class Worker extends BaseWorker {
      * @param delayUnit what kind of time to wait
      * @return job execution ID
      */
-    public Long createDelayedJobExecution(Long delayValue, ChronoUnit delayUnit) {
-        return createJobExecution(null, false, delayToMaturity(delayValue, delayUnit), null, null, null).getId();
+    public Long createDelayedExecution(Long delayValue, ChronoUnit delayUnit) {
+        return createExecution(null, false, delayToMaturity(delayValue, delayUnit), null, null, null).getId();
     }
 
     /**
@@ -72,7 +72,7 @@ public abstract class Worker extends BaseWorker {
      * @param maturity specified time for the execution
      * @return job execution ID
      */
-    public Long createPlannedJobExecution(LocalDateTime maturity) {
-        return createJobExecution(null, false, maturity, null, null, null).getId();
+    public Long createPlannedExecution(LocalDateTime maturity) {
+        return createExecution(null, false, maturity, null, null, null).getId();
     }
 }

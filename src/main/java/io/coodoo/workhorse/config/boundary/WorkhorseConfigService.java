@@ -26,24 +26,24 @@ public class WorkhorseConfigService {
      * 
      * @param persistenceTyp
      */
-    public void initializeJobEngineConfig() {
+    public void initializeConfig() {
 
-        WorkhorseConfig newJobEngineConfig = workhorseConfigControl.getJobEngineConfig();
+        WorkhorseConfig config = workhorseConfigControl.getWorkhorseConfig();
 
-        workhorseConfig.setJobQueueMax(newJobEngineConfig.getJobQueueMax());
-        workhorseConfig.setJobQueueMin(newJobEngineConfig.getJobQueueMin());
-        workhorseConfig.setJobQueuePollerInterval(newJobEngineConfig.getJobQueuePollerInterval());
-        workhorseConfig.setJobQueuePusherPoll(newJobEngineConfig.getJobQueuePusherPoll());
-        workhorseConfig.setTimeZone(newJobEngineConfig.getTimeZone());
-        workhorseConfig.setLogChange(newJobEngineConfig.getLogChange());
-        workhorseConfig.setPersistenceTyp(newJobEngineConfig.getPersistenceTyp());
-        workhorseConfig.setLogWarnMarker(newJobEngineConfig.getLogWarnMarker());
-        workhorseConfig.setLogInfoMarker(newJobEngineConfig.getLogInfoMarker());
-        workhorseConfig.setLogTimeFormat(newJobEngineConfig.getLogTimeFormat());
-        workhorseConfig.setZombieCureStatus(newJobEngineConfig.getZombieCureStatus());
-        workhorseConfig.setZombieRecognitionTime(newJobEngineConfig.getZombieRecognitionTime());
+        workhorseConfig.setJobQueueMax(config.getJobQueueMax());
+        workhorseConfig.setJobQueueMin(config.getJobQueueMin());
+        workhorseConfig.setJobQueuePollerInterval(config.getJobQueuePollerInterval());
+        workhorseConfig.setJobQueuePusherPoll(config.getJobQueuePusherPoll());
+        workhorseConfig.setTimeZone(config.getTimeZone());
+        workhorseConfig.setLogChange(config.getLogChange());
+        workhorseConfig.setPersistenceTyp(config.getPersistenceTyp());
+        workhorseConfig.setLogWarnMarker(config.getLogWarnMarker());
+        workhorseConfig.setLogInfoMarker(config.getLogInfoMarker());
+        workhorseConfig.setLogTimeFormat(config.getLogTimeFormat());
+        workhorseConfig.setZombieCureStatus(config.getZombieCureStatus());
+        workhorseConfig.setZombieRecognitionTime(config.getZombieRecognitionTime());
 
-        workhorseConfigControl.updateJobEngineConfig(workhorseConfig);
+        workhorseConfigControl.updateWorkhorseConfig(workhorseConfig);
 
 
     }
@@ -58,96 +58,96 @@ public class WorkhorseConfigService {
      * @param jobQueueMin
      * @param persistenceTyp
      */
-    public void initializeJobEngineConfig(String timeZone, int jobQueuePollerInterval, int jobQueuePusherPoll,
+    public void initializeConfig(String timeZone, int jobQueuePollerInterval, int jobQueuePusherPoll,
             Long jobQueueMax, int jobQueueMin, PersistenceTyp persistenceTyp) {
 
-        WorkhorseConfig newJobEngineConfig = workhorseConfigControl.getJobEngineConfig();
+        WorkhorseConfig newWorkhorseConfig = workhorseConfigControl.getWorkhorseConfig();
 
         if (jobQueueMax > 0L) {
             workhorseConfig.setJobQueueMax(jobQueueMax);
         } else {
-            workhorseConfig.setJobQueueMax(newJobEngineConfig.getJobQueueMax());
+            workhorseConfig.setJobQueueMax(newWorkhorseConfig.getJobQueueMax());
         }
 
         if (jobQueueMin > 0) {
             workhorseConfig.setJobQueueMin(jobQueueMin);
 
         } else {
-            workhorseConfig.setJobQueueMin(newJobEngineConfig.getJobQueueMin());
+            workhorseConfig.setJobQueueMin(newWorkhorseConfig.getJobQueueMin());
         }
 
         if (jobQueuePollerInterval > 0) {
             workhorseConfig.setJobQueuePollerInterval(jobQueuePollerInterval);
 
         } else {
-            workhorseConfig.setJobQueuePollerInterval(newJobEngineConfig.getJobQueuePollerInterval());
+            workhorseConfig.setJobQueuePollerInterval(newWorkhorseConfig.getJobQueuePollerInterval());
         }
 
         if (jobQueuePusherPoll > 0) {
             workhorseConfig.setJobQueuePusherPoll(jobQueuePusherPoll);
 
         } else {
-            workhorseConfig.setJobQueuePusherPoll(newJobEngineConfig.getJobQueuePusherPoll());
+            workhorseConfig.setJobQueuePusherPoll(newWorkhorseConfig.getJobQueuePusherPoll());
         }
         if (timeZone != null) {
             workhorseConfig.setTimeZone(timeZone);
 
         } else {
-            workhorseConfig.setTimeZone(newJobEngineConfig.getTimeZone());
+            workhorseConfig.setTimeZone(newWorkhorseConfig.getTimeZone());
         }
 
         if (persistenceTyp != null) {
             workhorseConfig.setPersistenceTyp(persistenceTyp);
 
         } else {
-            workhorseConfig.setPersistenceTyp(newJobEngineConfig.getPersistenceTyp());
+            workhorseConfig.setPersistenceTyp(newWorkhorseConfig.getPersistenceTyp());
         }
 
-        workhorseConfig.setLogChange(newJobEngineConfig.getLogChange());
-        workhorseConfig.setLogWarnMarker(newJobEngineConfig.getLogWarnMarker());
-        workhorseConfig.setLogInfoMarker(newJobEngineConfig.getLogInfoMarker());
-        workhorseConfig.setLogTimeFormat(newJobEngineConfig.getLogTimeFormat());
-        workhorseConfig.setZombieCureStatus(newJobEngineConfig.getZombieCureStatus());
-        workhorseConfig.setZombieRecognitionTime(newJobEngineConfig.getZombieRecognitionTime());
+        workhorseConfig.setLogChange(newWorkhorseConfig.getLogChange());
+        workhorseConfig.setLogWarnMarker(newWorkhorseConfig.getLogWarnMarker());
+        workhorseConfig.setLogInfoMarker(newWorkhorseConfig.getLogInfoMarker());
+        workhorseConfig.setLogTimeFormat(newWorkhorseConfig.getLogTimeFormat());
+        workhorseConfig.setZombieCureStatus(newWorkhorseConfig.getZombieCureStatus());
+        workhorseConfig.setZombieRecognitionTime(newWorkhorseConfig.getZombieRecognitionTime());
 
-        workhorseConfigControl.updateJobEngineConfig(workhorseConfig);
+        workhorseConfigControl.updateWorkhorseConfig(workhorseConfig);
     }
 
     /**
      * Update the configuration of the job engine
-     * @param newJobEngineConfig
+     * @param newWorkhorseConfig
      * @return
      */
-    public WorkhorseConfig updateJobEngineConfig(WorkhorseConfig newJobEngineConfig) {
+    public WorkhorseConfig updateWorkhorseConfig(WorkhorseConfig newWorkhorseConfig) {
 
-        workhorseConfigControl.updateJobQueuePollerInterval(newJobEngineConfig.getJobQueuePollerInterval());
-        workhorseConfigControl.updateJobQueuePusherPoll(newJobEngineConfig.getJobQueuePusherPoll());
-        workhorseConfigControl.updateJobQueueMax(newJobEngineConfig.getJobQueueMax());
-        workhorseConfigControl.updateJobQueueMin(newJobEngineConfig.getJobQueueMin());
-        workhorseConfigControl.updateLogChange(newJobEngineConfig.getLogChange());
-        workhorseConfigControl.updateLogTimeFormatter(newJobEngineConfig.getLogTimeFormat());
-        workhorseConfigControl.updateTimeZone(newJobEngineConfig.getTimeZone());
-        workhorseConfigControl.updateLogInfoMarker(newJobEngineConfig.getLogInfoMarker());
-        workhorseConfigControl.updateLogWarnMarker(newJobEngineConfig.getLogWarnMarker());
-        workhorseConfigControl.updateLogErrorMarker(newJobEngineConfig.getLogErrorMarker());
+        workhorseConfigControl.updateJobQueuePollerInterval(newWorkhorseConfig.getJobQueuePollerInterval());
+        workhorseConfigControl.updateJobQueuePusherPoll(newWorkhorseConfig.getJobQueuePusherPoll());
+        workhorseConfigControl.updateJobQueueMax(newWorkhorseConfig.getJobQueueMax());
+        workhorseConfigControl.updateJobQueueMin(newWorkhorseConfig.getJobQueueMin());
+        workhorseConfigControl.updateLogChange(newWorkhorseConfig.getLogChange());
+        workhorseConfigControl.updateLogTimeFormatter(newWorkhorseConfig.getLogTimeFormat());
+        workhorseConfigControl.updateTimeZone(newWorkhorseConfig.getTimeZone());
+        workhorseConfigControl.updateLogInfoMarker(newWorkhorseConfig.getLogInfoMarker());
+        workhorseConfigControl.updateLogWarnMarker(newWorkhorseConfig.getLogWarnMarker());
+        workhorseConfigControl.updateLogErrorMarker(newWorkhorseConfig.getLogErrorMarker());
 
-        workhorseConfigControl.updateJobEngineConfig(workhorseConfig);
+        workhorseConfigControl.updateWorkhorseConfig(workhorseConfig);
 
         // have to be the last update to start
-        workhorseConfigControl.updatePersistenceTyp(newJobEngineConfig.getPersistenceTyp());
+        workhorseConfigControl.updatePersistenceTyp(newWorkhorseConfig.getPersistenceTyp());
 
-        return newJobEngineConfig;
+        return newWorkhorseConfig;
     }
 
-    public void updatePersistenceTyp(WorkhorseConfig jobEngineConfig) {
+    public void updatePersistenceTyp(WorkhorseConfig workhorseConfig) {
 
-        workhorseConfigControl.updatePersistenceTyp(jobEngineConfig.getPersistenceTyp());
+        workhorseConfigControl.updatePersistenceTyp(workhorseConfig.getPersistenceTyp());
 
-        restartEvent.fire(new RestartWorkhorseEvent(null, jobEngineConfig));
+        restartEvent.fire(new RestartWorkhorseEvent(null, workhorseConfig));
     }
 
-    public WorkhorseConfig getJobEngineConfig() {
-        return workhorseConfigControl.getJobEngineConfig();
+    public WorkhorseConfig getWorkhorseConfig() {
+        return workhorseConfigControl.getWorkhorseConfig();
     }
 
 }

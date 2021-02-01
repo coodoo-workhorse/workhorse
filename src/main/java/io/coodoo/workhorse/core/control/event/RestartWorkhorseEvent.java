@@ -13,9 +13,10 @@ public class RestartWorkhorseEvent {
 
     public RestartWorkhorseEvent() {}
 
-    public RestartWorkhorseEvent(Object persistenceParams, WorkhorseConfig jobEngine) {
+    public RestartWorkhorseEvent(Object persistenceParams, WorkhorseConfig workhorseConfig) {
+        super();
         this.persistenceParams = persistenceParams;
-        this.workhorseConfig = jobEngine;
+        this.workhorseConfig = workhorseConfig;
     }
 
     public Object getPersistenceParams() {
@@ -26,23 +27,12 @@ public class RestartWorkhorseEvent {
         this.persistenceParams = persistenceParams;
     }
 
-    public WorkhorseConfig getJobEngine() {
+    public WorkhorseConfig getWorkhorseConfig() {
         return workhorseConfig;
     }
 
-    public void setJobEngine(WorkhorseConfig jobEngine) {
-        this.workhorseConfig = jobEngine;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("RestartWorkhorseEvent [persistenceParams=");
-        builder.append(persistenceParams);
-        builder.append(", workhorseConfig=");
-        builder.append(workhorseConfig);
-        builder.append("]");
-        return builder.toString();
+    public void setWorkhorseConfig(WorkhorseConfig workhorseConfig) {
+        this.workhorseConfig = workhorseConfig;
     }
 
 }

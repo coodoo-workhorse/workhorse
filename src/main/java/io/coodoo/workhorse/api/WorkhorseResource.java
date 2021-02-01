@@ -54,13 +54,13 @@ public class WorkhorseResource {
     @GET
     @Path("/infos")
     public List<WorkhorseInfo> getJobEngineInfos() {
-        return workhorseService.getAllJobs().stream().map(job -> workhorseService.getJobEngineInfo(job.getId())).collect(Collectors.toList());
+        return workhorseService.getAllJobs().stream().map(job -> workhorseService.getWorkhorseInfo(job.getId())).collect(Collectors.toList());
     }
 
     @GET
     @Path("/infos/{jobId}")
     public WorkhorseInfo getJobEngineInfo(@PathParam("jobId") Long jobId) {
-        return workhorseService.getJobEngineInfo(jobId);
+        return workhorseService.getWorkhorseInfo(jobId);
     }
 
     @GET
@@ -113,27 +113,27 @@ public class WorkhorseResource {
     @GET
     @Path("/executions/{jobExecutionId}")
     public Execution getJobExecution(@PathParam("jobExecutionId") Long jobExecutionId) {
-        return workhorseService.getJobExecutionById(null, jobExecutionId);
+        return workhorseService.getExecutionById(null, jobExecutionId);
     }
 
     @POST
     @Path("/jobs/{jobId}/executions")
     public Execution createJobExecution(@PathParam("jobId") Long jobId, Execution jobExecution) {
-        return workhorseService.createJobExecution(jobId, jobExecution.getParameters(), jobExecution.getPriority(), jobExecution.getMaturity(),
+        return workhorseService.createExecution(jobId, jobExecution.getParameters(), jobExecution.getPriority(), jobExecution.getMaturity(),
                         jobExecution.getBatchId(), jobExecution.getChainId(), jobExecution.getChainedPreviousExecutionId(), false);
     }
 
     @PUT
     @Path("/jobs/{jobId}/executions/{jobExecutionId}")
     public Execution updateJobExecution(@PathParam("jobId") Long jobId, @PathParam("jobExecutionId") Long jobExecutionId, Execution jobExecution) {
-        return workhorseService.updateJobExecution(jobId, jobExecutionId, jobExecution.getStatus(), jobExecution.getParameters(), jobExecution.getPriority(),
+        return workhorseService.updateExecution(jobId, jobExecutionId, jobExecution.getStatus(), jobExecution.getParameters(), jobExecution.getPriority(),
                         jobExecution.getMaturity(), jobExecution.getFailRetry());
     }
 
     @DELETE
     @Path("/jobs/{jobId}/executions/{jobExecutionId}")
     public void deleteJobExecution(@PathParam("jobId") Long jobId, @PathParam("jobExecutionId") Long jobExecutionId) {
-        workhorseService.deleteJobExecution(jobId, jobExecutionId);
+        workhorseService.deleteExecution(jobId, jobExecutionId);
     }
 
     @GET
@@ -176,38 +176,38 @@ public class WorkhorseResource {
     @GET
     @Path("/jobs/{jobId}/executions/{jobExecutionId}")
     public Execution getJobExecution(@PathParam("jobId") Long jobId, @PathParam("jobExecutionId") Long jobExecutionId) {
-        return workhorseService.getJobExecutionById(jobId, jobExecutionId);
+        return workhorseService.getExecutionById(jobId, jobExecutionId);
     }
 
     @GET
     @Path("/jobs/{jobId}/batch/{batchId}")
     public GroupInfo getBatchInfo(@PathParam("jobId") Long jobId, @PathParam("batchId") Long batchId) {
-        return workhorseService.getJobExecutionBatchInfo(jobId, batchId);
+        return workhorseService.getExecutionBatchInfo(jobId, batchId);
     }
 
     @GET
     @Path("/jobs/{jobId}/batch/{batchId}/executions")
     public List<Execution> getBatchExecutions(@PathParam("jobId") Long jobId, @PathParam("batchId") Long batchId) {
-        return workhorseService.getJobExecutionBatch(jobId, batchId);
+        return workhorseService.getExecutionBatch(jobId, batchId);
     }
 
     @GET
     @Path("/jobs/{jobId}/chain/{chainId}")
     public GroupInfo getChainInfo(@PathParam("jobId") Long jobId, @PathParam("chainId") Long chainId) {
-        return workhorseService.getJobExecutionChainInfo(jobId, chainId);
+        return workhorseService.getExecutionChainInfo(jobId, chainId);
     }
 
     @GET
     @Path("/jobs/{jobId}/chain/{chainId}/executions")
     public List<Execution> getChainJobExecutions(@PathParam("jobId") Long jobId, @PathParam("chainId") Long chainId) {
-        return workhorseService.getJobExecutionChain(jobId, chainId);
+        return workhorseService.getExecutionChain(jobId, chainId);
     }
 
     @POST
     @Path("/jobs/{jobId}/scheduled-job-execution")
     public Job scheduledJobExecutionCreation(@PathParam("jobId") Long jobId, Job job) throws Exception {
 
-        workhorseService.triggerScheduledJobExecutionCreation(workhorseService.getJobById(jobId));
+        workhorseService.triggerScheduledExecutionCreation(workhorseService.getJobById(jobId));
         return job;
     }
 

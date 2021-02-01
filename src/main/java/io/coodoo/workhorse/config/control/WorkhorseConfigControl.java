@@ -29,27 +29,24 @@ public class WorkhorseConfigControl {
     WorkhorseLogService workhorseLogService;
 
     @Inject
-    WorkhorseConfig jobEngineConfig;
+    WorkhorseConfig workhorseConfig;
 
     @Inject
     Event<RestartWorkhorseEvent> restartEvent;
 
-    public WorkhorseConfig getJobEngineConfig() {
+    public WorkhorseConfig getWorkhorseConfig() {
         WorkhorseConfig config = configPersistence.get();
 
         if (config == null) {
             config = new WorkhorseConfig();
         }
-
         return config;
     }
 
-    public WorkhorseConfig updateJobEngineConfig(WorkhorseConfig jobEngineConfig) {
-
-        if (jobEngineConfig != null) {
-            return configPersistence.update(jobEngineConfig);
+    public WorkhorseConfig updateWorkhorseConfig(WorkhorseConfig workhorseConfig) {
+        if (workhorseConfig != null) {
+            return configPersistence.update(workhorseConfig);
         }
-
         return null;
     }
 
@@ -58,19 +55,19 @@ public class WorkhorseConfigControl {
         if (jobQueuePollerInterval < 1 || jobQueuePollerInterval > 60) {
             throw new RuntimeException("The job queue poller interval must be between 1 and 60!");
         }
-        if (jobEngineConfig.getJobQueuePollerInterval() != jobQueuePollerInterval) {
+        if (workhorseConfig.getJobQueuePollerInterval() != jobQueuePollerInterval) {
 
-            workhorseLogService.logChange(null, null, "Job queue poller interval", jobEngineConfig.getJobQueuePollerInterval(), jobQueuePollerInterval, null);
-            jobEngineConfig.setJobQueuePollerInterval(jobQueuePollerInterval);
+            workhorseLogService.logChange(null, null, "Job queue poller interval", workhorseConfig.getJobQueuePollerInterval(), jobQueuePollerInterval, null);
+            workhorseConfig.setJobQueuePollerInterval(jobQueuePollerInterval);
         }
     }
 
     public void updateJobQueuePusherPoll(int jobQueuePusherPoll) {
 
-        if (jobEngineConfig.getJobQueuePusherPoll() != jobQueuePusherPoll) {
+        if (workhorseConfig.getJobQueuePusherPoll() != jobQueuePusherPoll) {
 
-            workhorseLogService.logChange(null, null, "Job queue PusherPoll interval", jobEngineConfig.getJobQueuePusherPoll(), jobQueuePusherPoll, null);
-            jobEngineConfig.setJobQueuePusherPoll(jobQueuePusherPoll);
+            workhorseLogService.logChange(null, null, "Job queue PusherPoll interval", workhorseConfig.getJobQueuePusherPoll(), jobQueuePusherPoll, null);
+            workhorseConfig.setJobQueuePusherPoll(jobQueuePusherPoll);
         }
 
     }
@@ -79,13 +76,13 @@ public class WorkhorseConfigControl {
         if (persistenceTyp == null) {
             throw new RuntimeException("The persistenceTyp can't be null");
         }
-        if (!jobEngineConfig.getPersistenceTyp().equals(persistenceTyp)) {
+        if (!workhorseConfig.getPersistenceTyp().equals(persistenceTyp)) {
 
-            workhorseLogService.logChange(null, null, "Persistence typ", jobEngineConfig.getPersistenceTyp(), persistenceTyp, null);
-            jobEngineConfig.setPersistenceTyp(persistenceTyp);
+            workhorseLogService.logChange(null, null, "Persistence typ", workhorseConfig.getPersistenceTyp(), persistenceTyp, null);
+            workhorseConfig.setPersistenceTyp(persistenceTyp);
             log.info(" The persistence have been changed. The event will be propagate ");
 
-            restartEvent.fireAsync(new RestartWorkhorseEvent(null, jobEngineConfig));
+            restartEvent.fireAsync(new RestartWorkhorseEvent(null, workhorseConfig));
         }
 
     }
@@ -95,11 +92,11 @@ public class WorkhorseConfigControl {
         if (jobQueueMax < 1) {
             throw new RuntimeException("The max amount of executions to load into the memory queue per job must be higher than 0!");
         }
-        if (jobEngineConfig.getJobQueueMax() != jobQueueMax) {
+        if (workhorseConfig.getJobQueueMax() != jobQueueMax) {
 
-            workhorseLogService.logChange(null, null, "Max amount of executions to load into the memory queue per job", jobEngineConfig.getJobQueueMax(),
+            workhorseLogService.logChange(null, null, "Max amount of executions to load into the memory queue per job", workhorseConfig.getJobQueueMax(),
                             jobQueueMax, null);
-            jobEngineConfig.setJobQueueMax(jobQueueMax);
+            workhorseConfig.setJobQueueMax(jobQueueMax);
         }
     }
 
@@ -108,11 +105,11 @@ public class WorkhorseConfigControl {
         if (jobQueueMin < 1) {
             throw new RuntimeException("The min amount of executions in memory queue before the poller gets to add more must be higher than 0!");
         }
-        if (jobEngineConfig.getJobQueueMin() != jobQueueMin) {
+        if (workhorseConfig.getJobQueueMin() != jobQueueMin) {
 
             workhorseLogService.logChange(null, null, "Min amount of executions in memory queue before the poller gets to add more",
-                            jobEngineConfig.getJobQueueMin(), jobQueueMin, null);
-            jobEngineConfig.setJobQueueMin(jobQueueMin);
+                            workhorseConfig.getJobQueueMin(), jobQueueMin, null);
+            workhorseConfig.setJobQueueMin(jobQueueMin);
         }
     }
 
@@ -124,10 +121,10 @@ public class WorkhorseConfigControl {
         if (("_" + logChange + "_").split("%s", -1).length - 1 != 3) {
             throw new RuntimeException("The log change pattern needs the placeholder '%s' three times!");
         }
-        if (!Objects.equals(jobEngineConfig.getLogChange(), logChange)) {
+        if (!Objects.equals(workhorseConfig.getLogChange(), logChange)) {
 
-            workhorseLogService.logChange(null, null, "Log change pattern", jobEngineConfig.getLogChange(), logChange, null);
-            jobEngineConfig.setLogChange(logChange);
+            workhorseLogService.logChange(null, null, "Log change pattern", workhorseConfig.getLogChange(), logChange, null);
+            workhorseConfig.setLogChange(logChange);
         }
     }
 
@@ -135,10 +132,10 @@ public class WorkhorseConfigControl {
         if (logTimeFormatter == null) {
             throw new RuntimeException("The execution log timestamp pattern is needed!");
         }
-        if (!Objects.equals(jobEngineConfig.getLogTimeFormat(), logTimeFormatter)) {
+        if (!Objects.equals(workhorseConfig.getLogTimeFormat(), logTimeFormatter)) {
 
-            workhorseLogService.logChange(null, null, "Execution log timestamp pattern", jobEngineConfig.getLogTimeFormat(), logTimeFormatter, null);
-            jobEngineConfig.setLogTimeFormat(logTimeFormatter);
+            workhorseLogService.logChange(null, null, "Execution log timestamp pattern", workhorseConfig.getLogTimeFormat(), logTimeFormatter, null);
+            workhorseConfig.setLogTimeFormat(logTimeFormatter);
         }
     }
 
@@ -147,43 +144,43 @@ public class WorkhorseConfigControl {
         if (timeZone != null && !ZoneId.getAvailableZoneIds().contains(timeZone)) {
             throw new RuntimeException("Time zone '" + timeZone + "' is not available!");
         }
-        if (!Objects.equals(jobEngineConfig.getTimeZone(), timeZone)) {
+        if (!Objects.equals(workhorseConfig.getTimeZone(), timeZone)) {
             ZoneId systemDefault = ZoneId.systemDefault();
             if (timeZone == null || systemDefault.getId().equals(timeZone)) {
 
-                workhorseLogService.logChange(null, null, "Time zone", jobEngineConfig.getTimeZone(), systemDefault.getId(),
+                workhorseLogService.logChange(null, null, "Time zone", workhorseConfig.getTimeZone(), systemDefault.getId(),
                                 "System default time-zone is used: " + systemDefault);
-                jobEngineConfig.setTimeZone(systemDefault.getId());
+                workhorseConfig.setTimeZone(systemDefault.getId());
             } else {
 
-                workhorseLogService.logChange(null, null, "Time zone", jobEngineConfig.getTimeZone(), timeZone, null);
-                jobEngineConfig.setTimeZone(timeZone);
+                workhorseLogService.logChange(null, null, "Time zone", workhorseConfig.getTimeZone(), timeZone, null);
+                workhorseConfig.setTimeZone(timeZone);
             }
 
         }
     }
 
     public void updateLogInfoMarker(String logInfoMarker) {
-        if (!Objects.equals(jobEngineConfig.getLogInfoMarker(), logInfoMarker)) {
+        if (!Objects.equals(workhorseConfig.getLogInfoMarker(), logInfoMarker)) {
 
-            workhorseLogService.logChange(null, null, "Execution log info marker", jobEngineConfig.getLogInfoMarker(), logInfoMarker, null);
-            jobEngineConfig.setLogInfoMarker(logInfoMarker);
+            workhorseLogService.logChange(null, null, "Execution log info marker", workhorseConfig.getLogInfoMarker(), logInfoMarker, null);
+            workhorseConfig.setLogInfoMarker(logInfoMarker);
         }
     }
 
     public void updateLogWarnMarker(String logWarnMarker) {
-        if (!Objects.equals(jobEngineConfig.getLogWarnMarker(), logWarnMarker)) {
+        if (!Objects.equals(workhorseConfig.getLogWarnMarker(), logWarnMarker)) {
 
-            workhorseLogService.logChange(null, null, "Execution log warn marker", jobEngineConfig.getLogWarnMarker(), logWarnMarker, null);
-            jobEngineConfig.setLogWarnMarker(logWarnMarker);
+            workhorseLogService.logChange(null, null, "Execution log warn marker", workhorseConfig.getLogWarnMarker(), logWarnMarker, null);
+            workhorseConfig.setLogWarnMarker(logWarnMarker);
         }
     }
 
     public void updateLogErrorMarker(String logErrorMarker) {
-        if (!Objects.equals(jobEngineConfig.getLogErrorMarker(), logErrorMarker)) {
+        if (!Objects.equals(workhorseConfig.getLogErrorMarker(), logErrorMarker)) {
 
-            workhorseLogService.logChange(null, null, "Execution log error marker", jobEngineConfig.getLogErrorMarker(), logErrorMarker, null);
-            jobEngineConfig.setLogErrorMarker(logErrorMarker);
+            workhorseLogService.logChange(null, null, "Execution log error marker", workhorseConfig.getLogErrorMarker(), logErrorMarker, null);
+            workhorseConfig.setLogErrorMarker(logErrorMarker);
         }
     }
 

@@ -1,3 +1,6 @@
+
+
+
 [logo]: https://gitlab.coodoo.io/workhorse/workhorse/-/raw/master/logo.png "Workhorse: Extendable Java Job Engine for background jobs and business critical tasks"
 
 # Workhorse ![alt text][logo]
@@ -53,15 +56,15 @@ Add the following dependency to your project ([published on Maven Central](http:
    
 Depending on your environment there may be additional steps necessary. Have a look into our example projects: 
 
-- [Java SE](https://gitlab.coodoo.io/workhorse/workhorse-example-java-se)
-- [Tomcat](https://gitlab.coodoo.io/workhorse/workhorse-example-tomcat)
-- [Wildfly](https://gitlab.coodoo.io/workhorse/workhorse-example-wildfly)
 - [Quarkus](https://gitlab.coodoo.io/workhorse/workhorse-example-quarkus)
+- [Wildfly](https://gitlab.coodoo.io/workhorse/workhorse-example-wildfly)
+- [Tomcat](https://gitlab.coodoo.io/workhorse/workhorse-example-tomcat)
+- [Java SE](https://gitlab.coodoo.io/workhorse/workhorse-example-java-se)
 
 
 ## Getting started
 
-Lets create a backup job. Therefore you just need to extend the `Worker` class that provides you the `doWork` method. And this method is where the magic happens!
+Lets create a job to do some backups. Therefore you just need to extend the `Worker` class that provides you the `doWork` method. And this method is where the magic happens!
 
 ```java
 @Dependent
@@ -71,7 +74,6 @@ public class BackupJob extends Worker {
 
     @Override
     public void doWork() {
-
         log.info("Performing some fine backup!");
     }
 }
@@ -85,28 +87,11 @@ BackupJob backupJob;
 
 public void performBackup() {
 
-    backupJob.createJobExecution();
+    backupJob.createExecution();
 }
 ```
 
-Lets add some parameters to this job! Therefore we need just a POJO with the wanted attributes.
-The service can pass the parameters object to the `createJobExecution` method.
-
-```java
-@Inject
-BackupJob backupJob;
-
-public void performBackup() {
-
-    BackupJobParameters parameters = new BackupJobParameters();
-    parameters.setEvironment("STAGE-2");
-    parameters.setReplaceOldBackup(false);
-
-    backupJob.createJobExecution(parameters);
-}
-```
-
-You can access the parameters by changing the `Worker` to `WorkerWith` and using the parameters object as type.
+Let's add some parameters to this job! You can access the parameters by changing the `Worker` to `WorkerWith` and using a type or an object as parameters.
 
 ```java
 @Dependent
@@ -115,106 +100,91 @@ public class BackupJob extends WorkerWith<String> {
     private final Logger log = LoggerFactory.getLogger(BackupJob.class);
 
     @Override
-    public void doWork(String parameters) {
-
-        log.info("Performing some fine backup on " + parameters);
+    public void doWork(String environment) {
+        log.info("Performing some fine backup on " + environment);
     }
 }
 ```
 
-Everybody knows backups should be made on a regular basis, so lets tell this job to run every night half past three by initially adding `@InitialJobConfig` annotation. Many other job configuration can initially defined by this annotation, have a [look](https://github.com/coodoo-io/workhorse/blob/master/src/main/java/io/coodoo/workhorse/jobengine/boundary/annotation/InitialJobConfig.java "@InitialJobConfig")!
+Everybody knows backups should be made on a regular basis, so lets tell this job to run every night half past three by adding `@InitialJobConfig` annotation. Many other configuration on this job can initially defined by this annotation, have a [look](https://github.com/coodoo-io/workhorse/blob/master/src/main/java/io/coodoo/workhorse/core/boundary/annotation/InitialJobConfig.java "@InitialJobConfig")!
 In this case we overwrite the method `onSchedule()` witch triggers the job to add some parameters.
 
 ```java
 @Dependent
-@InitialJobConfig(schedule = "0 30 3 0 0 0")
+@InitialJobConfig(schedule = "0 30 3 0 0 0", description = "Runs a nightly backup of Stage2")
 public class BackupJob extends WorkerWith<String> {
 
     private final Logger log = LoggerFactory.getLogger(BackupJob.class);
 
     @Override
     public void onSchedule() {
-
         createExecution("STAGE-2");
     }
 
     @Override
-    public void doWork(String parameters) {
-
-        log.info("Performing some fine backup on " + parameters);
+    public void doWork(String environment) {
+        log.info("Performing some fine backup on " + environment);
     }
 }
 ```
 
-Doesn't work? That is because you have to start the jobEngine using the method `start()` of the `JobEngineService` somewhere in your application. It takes the job queue polling interval in seconds as a parameter and there is also a `stop()` method to halt the job engine.
+Doesn't work? That is because you have to start up Workhorse first using the method `start()` of the `WorkhorseService` somewhere in your application. There is also a `stop()` method to halt that beast.
 
 ```java
 @Inject
 WorkhorseService workhorseService;
 
-public void start() {
-
+public void init() {
     workhorseService.start();
 }
 ```
 
 ## Jobs
 
-### On-Demand jobs
+### On demand jobs
 This is the default job, that is executed based on the position in the queue.
 
-#### How to use
-You just have to call the function `createExecution()` on your worker instance. It returns the ID of the resulting execution so you can log or track it afterwards.
+You just have to call `createExecution()` on your job worker instance. It returns the `ID` of the resulting execution so you can log or track it afterwards.
 
-#### Example
 ```java
 @Inject
-OnDemandWorker onDemandWorker
+SomeNiceJobWorker someNiceJobWorker;
 
-public void performOnDemandWorker {
-
-  Long executionId = onDemandWorker.createExecution();
+public void foo() {
+  Long executionId = someNiceJobWorker.createExecution();
+  log.info("Some nice job will execute with ID " + executionId);
 }
 ```
 
 ### Scheduled jobs
-Also known as CRON-Jobs, they are recurring jobs that are configured with a cron syntax.
+Also known as CRON jobs are recurring jobs that are configured with a cron syntax.
 
-#### How to use
-You just have to register your jobs with a schedule as cron-syntax during Worker's definition. Workhorse will fire off the corresponding execution on that schedule.
+Just provide a schedule in cron-syntax to your job and it will fire off the corresponding execution on that schedule.
+To register your scheduled job, use the `@InitialJobConfig` annotation with the `schedule` attribute.
 
-To register your Scheduled-job, just enter your `schedule` with the annotation `@InitialJobConfig`.
-
-#### Example
 ```java
 @Dependent
-@InitialJobConfig(schedule = "30 * * * * *")
-public class ScheduledWorker extends Worker {
-
-    private static Logger log = Logger.getLogger(ScheduledWorker.class);
+@InitialJobConfig(schedule = "0 */20 * * * *")
+public class SomeNiceJobWorker extends Worker {
 
     @Override
     public void doWork() throws Exception {
-
-        log.info(" Process a scheduled job");
+        log.info("This log will appear every 20 minutes");
     }
 }
 ```
-With the schedule above, an execution of a job `ScheduledWorker` is created at second 30 of every minute.
+With the schedule above, an execution of `SomeNiceJobWorker` is created every 20 minutes using the workers callback method `onSchedule()`.
 
-#### Time Zones
-The cron expression above use the Time Zone defined in `WorkhorseConfig`. The default Time Zone is for example `UTC`. 
-You can update it to correspond it to your Local Time. 
+The cron expression above use the time tone defined in `WorkhorseConfig` (default is `UTC`). 
+You can update it to correspond it to the time zone you operate in. 
 
 ### Batch jobs
-A Batch-Job is a group of executions of a single Worker that is created atomically and considered as a single entity. The Batch-Job is finished if all these executions are finished. Futhermore the executions within a Batch-Job can be executed parallel .
+A batch job is a group of executions of a Job that is created atomically and considered as a single entity. The batch job is finished if all these belonging executions are finished (of failed). Furthermore the executions within a batch job can also be executed parallel.
 
-#### How to use
-To create a Batch-Job, just call the function `createBatchExecutions(List<T> parameterList)`on your worker instance. It takes as argument the list of parameter for which Executions have to be created.
+To create a batch job, just call the method `createBatchExecutions(List<T> parameterList)`on your worker instance. It takes as argument the list of parameter for which executions have to be created.
 
-#### Example
 Let's take as example a list of users as Excel spreadsheet to load into our database. This spreadsheet has thousand of rows and each row requires a few seconds of processing. 
-In this case rather than process this spreadsheet as one normal job, we can break up the Excel spreadsheet into one job per row and get the benefit of parallelism offer by `Batch-Jobs` to significantly speed up the data load. 
+In this case rather than process this spreadsheet as one normal job, we can break up the Excel spreadsheet into one job per row and get the benefit of parallelism to significantly speed up the data load. 
 In the following source code we suppose, we have created a Worker `LoadDataWorker` that takes one row of a spreadsheet as parameter to load the content into our database.
 
 ```java
@@ -222,15 +192,14 @@ In the following source code we suppose, we have created a Worker `LoadDataWorke
 LoadDataWorker loadDataWorker;
 
 public void performLoadToDataBase(List<User> rows) {
-
-    loadDataWorker.createBatchExecutions(rows);
+    Long batchId = loadDataWorker.createBatchExecutions(rows);
+    log.info("Will import " + rows.size() + " user with Batch-ID " + batchId);
 }
 ```
-Here we have created a Batch-Job, that will create for each row an execution to perform the load of user's data into the database.
-The Batch-Job is finished when all executions have been processed successfully. 
+Here we have created a batch job, that will create for each row an execution to perform the load of user's data into the database.
+The batch job is finished when all executions have been processed successfully. 
 
-Futhermore Workhorse provides a callback Function that is called at the end of the Batch-Job. This function can be overridden to add a custom reaction, if  all executions of the Batch-Job have been processed. Just override in the worker's class the function `onFinishedBatch(Long batchId, Long jobExecutionId)`.
-The following source code shows an example of usage of this function.
+Workhorse provides a callback method that is called at the end of the batch job. This method can be overridden to add a custom reaction, if  all executions of the batch job have been processed. Just override the worker's `onFinishedBatch(Long batchId, Long jobExecutionId)` method.
 
 ```java
 @Dependent
@@ -240,122 +209,107 @@ public class LoadDataWorker extends WorkerWith<User> {
 
     @Override
     public void doWork(User user) throws Exception {
-
-        log.info(" Process a job with paramter: " + user);
-
-        // Process of the job ...
+        log.info("Doing some serious loading with user: " + user);
     }
 
     @Override
     public void onFinishedBatch(Long batchId, Long jobExecutionId) {
-    
-        log.info(" End of the Batch-Job with Id: " + batchId);
+        log.info("Completed Batch with ID: " + batchId);
     }
 }
 ```
 
 
 ### Chained jobs
-A Chained-Job is a list of executions of a single type of job, that are two by two linked.
+A chained job is a linked list of executions of a single type of job, that are processed one after another.
 
-The first execution of a Chained-Job is linked with an execution named child-execution. This child-execution is an execution, that get processed only if the first one has been successfully processed. The last execution of a Chained-Job is linked with an execution named parent-execution. This parent-execution is the contrapose of an child-execution. All other executions between these two have both, a parent- and a child-execution. 
+The first execution of a chained job is linked with an execution named child-execution. This child-execution is an execution, that get processed only if the first one has been successfully processed. The last execution of a chained job is linked with an execution named parent-execution. This parent-execution is the contrapose of an child-execution. All other executions between these two have both, a parent- and a child-execution. 
 
 The relation between this members is: An child execution can only be processed, if the process of the parent execution was successful.
 
-#### How to use
-To create a chained-Job, you just have to call the function `createChainedExecutions(List<T> parametersList)` on a Worker's instance. 
+To create a chained-Job, you just have to call the method `createChainedExecutions(List<T> parametersList)` on a Worker's instance. For each element of this list an execution with the given element as parameter is created to perform the task. 
 
-For each element of this list an execution with the given element as parameter is created to perform the task. 
+Workhorse will process the chained job with the order of the elements  specified in this list. It ensure that the element at `position = n` can't be processed before the successfully execution of a job with the element at `position = n+1`.
 
-Workhorse will process the Chained-Job with the order of the elements  specified in this list. It ensure that the element at `position = n` can't be processed before the successfully execution of a job with the element at `position = n+1`.
 
-#### Example
-Let's suppose we have a Betcommunity-application, that allows users to bet on the outcome of football matches. At the end of the season the application has to calcute how many points a lamda user has achieved. A obvious point here is: the global score achieved at the end of a given matchday also depends on the amount of point obtained on the last one. 
-In this case rather than sequentially create a job for each matchday we can use the Chained-Job as follow.
+Let's suppose we have a Betcommunity-application, that allows users to bet on the outcome of football matches. At the end of the season the application has to calculate how many points and rank a user has achieved. A obvious point here is: the global score achieved at the end of a given matchday also depends on the amount of point obtained on the last one. 
+In this case rather than sequentially create a job for each matchday we can use the chained job as follow assuming that a Worker `PointcalculationWorker` already exists. This Worker takes informations about a given matchdays as parameter and perform the calculation of points. 
 
-In the following example we suppose that a Worker `PointcalculationWorker` already exists. This Worker takes informations about a given matchdays as parameter and perform the calculation of points. 
 ```java
 @Inject
 PointcalculationWorker pointcalculationWorker;
 
-public void performPointcalculation(User user, List<Matchday> machtdays) {
+public void performPointcalculation(List<Matchday> machtdays) {
    
     pointcalculationWorker.createChainedExecutions(machtdays);
 }
 ```
 
-Here the method `createChainedExecutions(machtdays)` is called to execute this job for the matchdays specidied in the list on a specific order. 
+The method `createChainedExecutions(machtdays)` is called to execute this job for the matchdays specified in the list on a specific order. 
+
+As for the batch jobs, Workhorse provides callback methods `onFinishedChain(Long chainId, Long jobExecutionId)` and `onFailedChain(Long chainId, Long executionId)` that can be overwritten in the worker. The parameter `executionId` indicates the last execution processed in this chain.
 
 ### Delayed jobs
-A delayed job is a job that is executed only once after a certain time interval.
+A delayed job is executed once after a certain time interval.
 
-#### How to use
-The time interval is specified when an new execution is created. 
-
-You just have to call the function  `createDelayedJobExecution(Long delayValue, ChronoUnit delayUnit)` on the worker instance to create an execution, to be processed after a given delay as `delayValue`.
-
-#### Example
-Let's take as example a backup job, that haven't to be executed direct after calling.
+Call the method  `createDelayedJobExecution(Long delayValue, ChronoUnit delayUnit)` on the worker instance to create an execution, that will be processed after a given delay.
 
 ```java
 @Inject
 BackupWoker backupWoker;
 
 public void performDelayedJob() {
-
-    backupWoker.createDelayedJobExecution(4,  ChronoUnit.HOURS);
+    Long executionId = backupWoker.createDelayedJobExecution(4,  ChronoUnit.HOURS);
+    log.info("Backup starts 4 hours from now with execution-ID " + executionId);
 }
-
 ```
-By calling the function `performDelayedJob()`, an execution of the Worker `BackupWoker` is processed once after four hours.
 
 ### Planned jobs
-A planned job is a job that is executed only once at a given timestamp.
+A planned job is executed once at a given moment.
 
-#### How to use
-You just have to call the function `createPlannedJobExecution(LocalDateTime maturity)` on the worker instance to create an execution to be processed at a given timstamp as `maturity`.
+Call the method `createPlannedJobExecution(LocalDateTime maturity)` on the worker instance to create an execution to be processed at a given time in the future.
 
-#### Example
 Let us take as example a backup job, that have to be executed at a given timestamp.
 ```java
 @Inject
 BackupWoker backupWoker;
 
 public void performPlannedJob() {
-
-    backupWoker.createPlannedJobExecution(LocalDateTime.of(2021, Month.MAY, 1, 3, 30));
+    LocalDateTime maturity = LocalDateTime.of(Year.now().getValue(), Month.OCTOBER, 4, 13, 37);
+    Long executionId = backupWoker.createPlannedJobExecution(maturity);
+    log.info("Backup starts at " + maturity + " with execution-ID " + executionId);
 }
 ```
 
-By Calling the function `performPlannedJob()`, an execution of the Worker `BackupWoker` is processed on 2021.03.01 at 3:30 hours.
-
 ### Priority jobs
-An execution can be prioritized over other executions of the queue of the corresponding job.
+Executions can be prioritised over other executions of the queue of the corresponding job.
 
-#### How to use
-To prioritize an execution just call the function `createPriorityExecution()` instead of `createExecution()` or the function `createPriorityExecution(T parameters)` instead of `createExecution(T parameters)`  on the instance of your Worker.
+To prioritize an execution just call the method `createPriorityExecution()` instead of `createExecution()` on the instance of your Worker.
 
-#### Example
-Let's take the example of the Worker `SendEmailWorker`. This worker send an e-mail to to user specidied as paramater. In this example we created a function `sendEmailToAdmin`, that send an e-mail to an adminitrator. In order to priotirize sending an e-mail to a administrator over other users, an prioritized execution is created with the function `createPriorityExecution(EmailData parameters)`.
+Let's take the example of the Worker `SendEmailWorker`. This worker sends an e-mail to the user specified as parameter. We send an e-mail to an administrator and in order to prioritise this e-mail over others, a prioritised execution is created with the method `createPriorityExecution(EmailData parameters)`.
 
 ```java
 @Inject
 SendEmailWorker sendEmailWorker;
 
-public void sendEmailToAdmin(EmailData admin) {
-
-    sendEmailWorker.createPriorityExecution(admin);
+public void sendEmail(EmailData emailData) {
+    if(emailData.isAdmin()) {
+	    sendEmailWorker.createPriorityExecution(emailData);
+	} else {
+	    sendEmailWorker.createExecution(emailData);
+	}
 }
 ```
+
 ## Features
 
 ### Unique in Queue
 If an execution with some parameters already exists in the queue and a new execution is created with the same parameters, it can be configured whether workhorse accepts or discards the creation of this new execution.
 
-#### How to use
+
 You can configure this feature at the definition of your Worker. Under the annotation `@InitialJobConfig` you can activate or deactive the `Unique in Queue` with the paramater `uniqueInQueue`.
 
-#### Example
+
 Let's suppose we have a worker `SendEmailWorker`, which job is to send e-mails. In this case we don't want to send the same e-mail to an user two times. To avoid this, we just have to use the feature `uniqueInQueue` at the definition of the Worker `SendEmailWorker`.
 
 ```java
@@ -378,11 +332,11 @@ With the argument `uniqueInQueue` setted up to `true`, Workhorse ensure that the
 ### Throughput control
 The throughput of executions of a job can be limited.
 
-#### How to use
+
 You can configure this feature at the definition of your Worker. Through the annotation `@InitialJobConfig` you can configure the `Throughput` with the paramater `maxPerMinute`.
 `maxPerMinute` allow you to set the limit of executions to processed in a minute.
 
-#### Example
+
 
 ```java
 @Dependent
@@ -405,10 +359,10 @@ Here the Worker `ExampleWorker` can't be executed more than `1000 times per minu
 The contextual Information about an execution can be obtained also outside the corresponding worker's class.
 If the instructions to process a job aren't written in the worker's class under the `doWork()`-method, the context of the running execution is not lost.
 
-#### How to use
+
 To get the execution context you just have to inject the class `JobContext`. Through this class the running execution and the corresponding job can be retrieved and messages can be added to the execution as logs.
 
-#### Example
+
 Let's define a Worker `SendEmailWorker`.
 
 ```java
@@ -429,7 +383,7 @@ public class SendEmailWorker extends WorkerWith<EmailData> {
     }
 }
 ```
-The `doWork(EmailData emailData)`-method of this Worker don't contain the instructions to execute the job. Instead, the function `send(EmailData emailData)` of the class `EmailService` is called to process the job. To keep the context of the current execution in the class `EmailService`, we just have to inject `JobContext`. 
+The `doWork(EmailData emailData)`-method of this Worker don't contain the instructions to execute the job. Instead, the method `send(EmailData emailData)` of the class `EmailService` is called to process the job. To keep the context of the current execution in the class `EmailService`, we just have to inject `JobContext`. 
 
 ```java
 public class EmailService {
@@ -453,10 +407,10 @@ In this example the `Execution` and `Job` are retrieved through the injected ins
 ### Retry on failed
 If your job encounters a transient exception, it can be retried automatically after a given delay.
 
-#### How to use
+
 You can configure this feature at the definition of your Worker. Through the annotation `@InitialJobConfig` you can configure the number of retries by setting a value to the parameter `failRetries`. The delay before retrying the job can be setted using the parameter `retryDelay`.
 
-#### Example
+
 In this example a Worker `GenerateStatisticsWorker` is created to generate statistics data from the database.
 ```java
 @Dependent
@@ -477,17 +431,17 @@ With the config `failRetries = 3` an execution is retried until three times afte
 
 ### Logging
 
-An Execution can hold an own log. Workhorse provides functions to add log to an execution during the processing of a job. 
+An Execution can hold an own log. Workhorse provides methods to add log to an execution during the processing of a job. 
 
 So the logs can be getted afterward.
 
-#### How to use
+
 
 These logs can be created in the context of the `doWork()` method of any Worker. 
 
-Just call for example the function `logInfo(String message)` to add information's messages or `logError(String message)` to add error's messages.
+Just call for example the method `logInfo(String message)` to add information's messages or `logError(String message)` to add error's messages.
 
-#### Example
+
 In this example a Worker `GenerateStatisticsWorker` is created to generate statistics data from the database.
 
 ```java
@@ -515,11 +469,11 @@ public class GenerateStatisticsWorker extends Worker {
 In this example the messages `Begin of the job` and `End of the job` are included in all executions of the job `GenerateStatisticsWorker`. If an execution encounters an exception, the message `Generate the statistics encounters an exception.` is included in the execution.
 
 ### Error Handling
-Executions of jobs can throw different types of exceptions. Workhorse provides some mechanism to handle them. Exceptions are automatically logged and trigger callback functions. These callback functions can be overridden, to provide the most suitable reaction depending on the type of job. 
+Executions of jobs can throw different types of exceptions. Workhorse provides some mechanism to handle them. Exceptions are automatically logged and trigger callback methods. These callback methods can be overridden, to provide the most suitable reaction depending on the type of job. 
 
-#### How to use
-To provide a custom callback function for error handling, you just have to override the function `onFailed(Long executionId)` in your worker's class. 
-#### Example
+
+To provide a custom callback method for error handling, you just have to override the method `onFailed(Long executionId)` in your worker's class. 
+
 
 ```java
 @Dependent
@@ -543,15 +497,15 @@ public class ErrorHandlingWorker extends Worker {
     }
 }
 ```
-If an execution of the Worker `ErrorHandlingWorker` throws an exception, the function `onFailed(Long executionId)` is automatically called by Workhorse.
+If an execution of the Worker `ErrorHandlingWorker` throws an exception, the method `onFailed(Long executionId)` is automatically called by Workhorse.
 
 ### Callbacks
-Workhorse provides a set of callback functions that are called after certain event. These functions can be overridden to get the most appropriate reaction on a given event.
+Workhorse provides a set of callback methods that are called after certain event. These methods can be overridden to get the most appropriate reaction on a given event.
 
-#### How to use
-You just have to override the callback functions in a Worker's class.
 
-#### Example
+You just have to override the callback methods in a Worker's class.
+
+
 In this example a Worker `ImportDataWorker` was created. 
 ```java
 @Dependent
@@ -589,7 +543,7 @@ public class ImportDataWorker extends Worker {
 }
 ```
 
-This Worker override four callback functions:
+This Worker override four callback methods:
 
 `onFinished(Long executionId)` after an execution is finished.
 
@@ -621,4 +575,3 @@ Pull requests and [issues](https://github.com/coodoo-io/workhorse/issues) are we
 [Apache-2.0 © coodoo GmbH](./LICENSE)
 
 Logo: [Martin Bérubé](http://www.how-to-draw-funny-cartoons.com)
-

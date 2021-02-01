@@ -76,7 +76,7 @@ public class JobExecutionView {
        this.duration = jobExecution.getDuration();
        this.parameters = jobExecution.getParameters();
        this.failRetry = jobExecution.getFailRetry();
-       this.failRetryExecutionId = jobExecution.getFailRetryJobExecutionId();
+       this.failRetryExecutionId = jobExecution.getFailRetryExecutionId();
        this.failMessage = jobExecution.getFailMessage();
    }
    

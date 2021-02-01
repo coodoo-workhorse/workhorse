@@ -44,7 +44,7 @@ public class WorkhorseController {
     JobPersistence jobPersistence;
 
     @Inject
-    WorkhorseConfig jobEngineConfig;
+    WorkhorseConfig workhorseConfig;
 
     @Inject
     @ExecutionQualifier
@@ -231,9 +231,9 @@ public class WorkhorseController {
      * @param job job to execute
      * @throws ClassNotFoundException
      */
-    public void triggerScheduledJobExecutionCreation(Job job) throws ClassNotFoundException {
+    public void triggerScheduledExecutionCreation(Job job) throws ClassNotFoundException {
         BaseWorker worker = getWorker(job);
-        worker.createJobExecution();
+        worker.createExecution();
     }
 
     /**
@@ -257,61 +257,61 @@ public class WorkhorseController {
      * @param maturity If a maturity is given, the job execution will not be executed before this time.
      * @param batchId Id to refer to a group of executions to handle as a single entity.
      * @param chainId Id to refer to a group of executions to process by an order.
-     * @param chainedPreviousExecutionId Id to the previous execution to process, if the execution belong to a chained JobExecution.
+     * @param chainedPreviousExecutionId Id to the previous execution to process, if the execution belong to a chained Execution.
      * @param uniqueInQueue
      * @return the created Job Execution
      */
-    public Execution createJobExecution(Long jobId, String parameters, Boolean priority, LocalDateTime maturity, Long batchId, Long chainId,
+    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime maturity, Long batchId, Long chainId,
                     Long chainedPreviousExecutionId, boolean uniqueInQueue) {
 
         if (uniqueInQueue) {
             // To Do: Look for an Execution with the given parameterHash and return it
         }
-        Execution jobExecution = new Execution();
-        jobExecution.setJobId(jobId);
-        jobExecution.setStatus(ExecutionStatus.QUEUED);
-        jobExecution.setParameters(parameters);
-        jobExecution.setPriority(priority != null ? priority : false);
-        jobExecution.setMaturity(maturity);
-        jobExecution.setBatchId(batchId);
-        jobExecution.setChainId(chainId);
-        jobExecution.setChainedPreviousExecutionId(chainedPreviousExecutionId);
+        Execution execution = new Execution();
+        execution.setJobId(jobId);
+        execution.setStatus(ExecutionStatus.QUEUED);
+        execution.setParameters(parameters);
+        execution.setPriority(priority != null ? priority : false);
+        execution.setMaturity(maturity);
+        execution.setBatchId(batchId);
+        execution.setChainId(chainId);
+        execution.setChainedPreviousExecutionId(chainedPreviousExecutionId);
 
         // Temporar add. Have to be replace as soon as possible.
         if (chainId != null) {
-            jobExecution.setChainedNextExecutionId(-1L);
+            execution.setChainedNextExecutionId(-1L);
         }
 
-        executionPersistence.persist(jobExecution);
-        log.info("JobExecution successfully created: " + jobExecution);
-        return jobExecution;
+        executionPersistence.persist(execution);
+        log.info("Execution successfully created: " + execution);
+        return execution;
 
     }
 
     /**
      * Create a new job execution to retry an execution
      * 
-     * @param failedJobExecution job execution to retry
+     * @param failedExecution job execution to retry
      * @return the created job execution
      */
-    public Execution createRetryExecution(Execution failedJobExecution) {
+    public Execution createRetryExecution(Execution failedExecution) {
 
         Execution retryExecution = new Execution();
-        retryExecution.setJobId(failedJobExecution.getJobId());
-        retryExecution.setStatus(failedJobExecution.getStatus());
-        retryExecution.setStartedAt(LocalDateTime.now(ZoneId.of(jobEngineConfig.getTimeZone())));
-        retryExecution.setPriority(failedJobExecution.getPriority());
-        retryExecution.setMaturity(failedJobExecution.getMaturity());
-        retryExecution.setChainId(failedJobExecution.getChainId());
-        retryExecution.setChainedNextExecutionId(failedJobExecution.getChainedNextExecutionId());
-        retryExecution.setChainedPreviousExecutionId(failedJobExecution.getChainedPreviousExecutionId());
-        retryExecution.setParameters(failedJobExecution.getParameters());
-        retryExecution.setParametersHash(failedJobExecution.getParametersHash());
+        retryExecution.setJobId(failedExecution.getJobId());
+        retryExecution.setStatus(failedExecution.getStatus());
+        retryExecution.setStartedAt(LocalDateTime.now(ZoneId.of(workhorseConfig.getTimeZone())));
+        retryExecution.setPriority(failedExecution.getPriority());
+        retryExecution.setMaturity(failedExecution.getMaturity());
+        retryExecution.setChainId(failedExecution.getChainId());
+        retryExecution.setChainedNextExecutionId(failedExecution.getChainedNextExecutionId());
+        retryExecution.setChainedPreviousExecutionId(failedExecution.getChainedPreviousExecutionId());
+        retryExecution.setParameters(failedExecution.getParameters());
+        retryExecution.setParametersHash(failedExecution.getParametersHash());
 
         // increase failure number
-        retryExecution.setFailRetry(failedJobExecution.getFailRetry() + 1);
-        if (retryExecution.getFailRetryJobExecutionId() == null) {
-            retryExecution.setFailRetryJobExecutionId(failedJobExecution.getId());
+        retryExecution.setFailRetry(failedExecution.getFailRetry() + 1);
+        if (retryExecution.getFailRetryExecutionId() == null) {
+            retryExecution.setFailRetryExecutionId(failedExecution.getId());
         }
 
         executionPersistence.persist(retryExecution);
@@ -319,42 +319,41 @@ public class WorkhorseController {
 
     }
 
-    public synchronized Execution handleFailedJobExecution(Job job, Long jobExecutionId, Exception exception, Long duration, BaseWorker worker,
-                    String jobExecutionLog) {
-        Execution failedJobExecution = executionPersistence.getById(job.getId(), jobExecutionId);
-        Execution retryJobExecution = null;
+    public synchronized Execution handleFailedExecution(Job job, Long executionId, Exception exception, Long duration, BaseWorker worker, String executionLog) {
+        Execution failedExecution = executionPersistence.getById(job.getId(), executionId);
+        Execution retryExecution = null;
 
-        if (failedJobExecution.getFailRetry() < job.getFailRetries()) {
-            retryJobExecution = createRetryExecution(failedJobExecution);
-        } else if (failedJobExecution.getChainId() != null) {
+        if (failedExecution.getFailRetry() < job.getFailRetries()) {
+            retryExecution = createRetryExecution(failedExecution);
+        } else if (failedExecution.getChainId() != null) {
 
-            executionPersistence.abortChain(job.getId(), failedJobExecution.getChainId());
+            executionPersistence.abortChain(job.getId(), failedExecution.getChainId());
         }
 
-        failedJobExecution.setStatus(ExecutionStatus.FAILED);
-        failedJobExecution.setEndedAt(LocalDateTime.now(ZoneId.of(jobEngineConfig.getTimeZone())));
-        failedJobExecution.setDuration(duration);
+        failedExecution.setStatus(ExecutionStatus.FAILED);
+        failedExecution.setEndedAt(LocalDateTime.now(ZoneId.of(workhorseConfig.getTimeZone())));
+        failedExecution.setDuration(duration);
 
-        failedJobExecution.setLog(jobExecutionLog);
-        failedJobExecution.setFailMessage(WorkhorseUtil.getMessagesFromException(exception));
-        failedJobExecution.setFailStacktrace(WorkhorseUtil.stacktraceToString(exception));
+        failedExecution.setLog(executionLog);
+        failedExecution.setFailMessage(WorkhorseUtil.getMessagesFromException(exception));
+        failedExecution.setFailStacktrace(WorkhorseUtil.stacktraceToString(exception));
 
-        if (retryJobExecution == null) {
-            worker.onFailed(jobExecutionId);
-            if (failedJobExecution.getChainId() != null) {
-                worker.onFailedChain(failedJobExecution.getChainId(), jobExecutionId);
+        if (retryExecution == null) {
+            worker.onFailed(executionId);
+            if (failedExecution.getChainId() != null) {
+                worker.onFailedChain(failedExecution.getChainId(), executionId);
             }
         } else {
-            worker.onRetry(jobExecutionId, retryJobExecution.getId());
+            worker.onRetry(executionId, retryExecution.getId());
         }
 
-        executionPersistence.update(job.getId(), failedJobExecution.getId(), failedJobExecution);
+        executionPersistence.update(job.getId(), failedExecution.getId(), failedExecution);
 
-        return retryJobExecution;
+        return retryExecution;
     }
 
     public int deleteOlderExecutions(Long jobId, int minDaysOld) {
-        return executionPersistence.deleteOlderExecutions(jobId, LocalDateTime.now(ZoneId.of(jobEngineConfig.getTimeZone())).minusMinutes(minDaysOld));
+        return executionPersistence.deleteOlderExecutions(jobId, LocalDateTime.now(ZoneId.of(workhorseConfig.getTimeZone())).minusMinutes(minDaysOld));
     }
 
     public List<Job> getAllJobs() {
@@ -365,12 +364,12 @@ public class WorkhorseController {
         return jobPersistence.getAllByStatus(jobStatus);
     }
 
-    public Execution getJobExecutionById(Long jobExecutionId) {
-        return getJobExecutionById(null, jobExecutionId);
+    public Execution getExecutionById(Long executionId) {
+        return getExecutionById(null, executionId);
     }
 
-    public Execution getJobExecutionById(Long jobId, Long jobExecutionId) {
-        return executionPersistence.getById(jobId, jobExecutionId);
+    public Execution getExecutionById(Long jobId, Long executionId) {
+        return executionPersistence.getById(jobId, executionId);
     }
 
     public Job getJobById(Long jobId) {
@@ -451,16 +450,16 @@ public class WorkhorseController {
         return executionPersistence.getByJobId(jobId, 100L);
     }
 
-    public Execution updateJobExecution(Long jobId, Long jobExecutionId, Execution jobExecution) {
-        return executionPersistence.update(jobId, jobExecutionId, jobExecution);
+    public Execution updateExecution(Long jobId, Long executionId, Execution execution) {
+        return executionPersistence.update(jobId, executionId, execution);
     }
 
-    public void deleteJobExecution(Long jobId, Long jobExecutionId) {
-        executionPersistence.delete(jobId, jobExecutionId);
+    public void deleteExecution(Long jobId, Long executionId) {
+        executionPersistence.delete(jobId, executionId);
     }
 
-    public void addJobExecutionAtEndOfChain(Long jobId, Long chainId, Execution jobExecution) {
-        executionPersistence.addJobExecutionAtEndOfChain(jobId, chainId, jobExecution);
+    public void addExecutionAtEndOfChain(Long jobId, Long chainId, Execution execution) {
+        executionPersistence.addExecutionAtEndOfChain(jobId, chainId, execution);
     }
 
 }
