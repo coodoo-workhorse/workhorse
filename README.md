@@ -1,5 +1,4 @@
 
-
 [logo]: https://gitlab.coodoo.io/workhorse/workhorse/-/raw/master/logo.png "Workhorse: Extendable Java Job Engine for background jobs and business critical tasks"
 
 # Workhorse ![alt text][logo]
@@ -12,7 +11,7 @@
 - [Install](#install)
 - [Getting started](#getting-started)
 - [Jobs](#jobs)
-  - [On-Demand jobs](#on-demand-jobs)
+  - [On demand jobs](#on-demand-jobs)
   - [Scheduled jobs](#scheduled-jobs)
   - [Batch jobs](#batch-jobs)
   - [Chained jobs](#chained-jobs)
@@ -90,6 +89,17 @@ public void performBackup() {
 }
 ```
 
+Now you have to start up Workhorse using the method `start()` of the `WorkhorseService` somewhere in your application. There is also a `stop()` method to halt that beast.
+
+```java
+@Inject
+WorkhorseService workhorseService;
+
+public void init() {
+    workhorseService.start();
+}
+```
+
 Let's add some parameters to this job! You can access the parameters by changing the `Worker` to `WorkerWith` and using a type or an object as parameters.
 
 ```java
@@ -124,17 +134,6 @@ public class BackupJob extends WorkerWith<String> {
     public void doWork(String environment) {
         log.info("Performing some fine backup on " + environment);
     }
-}
-```
-
-Doesn't work? That is because you have to start up Workhorse first using the method `start()` of the `WorkhorseService` somewhere in your application. There is also a `stop()` method to halt that beast.
-
-```java
-@Inject
-WorkhorseService workhorseService;
-
-public void init() {
-    workhorseService.start();
 }
 ```
 
