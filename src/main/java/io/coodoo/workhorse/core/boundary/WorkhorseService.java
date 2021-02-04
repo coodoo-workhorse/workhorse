@@ -70,7 +70,7 @@ public class WorkhorseService {
      * @param persistenceConfiguration Config data to connect the persistence
      */
     @Deprecated
-    public void startTheEngine(PersistenceTyp persistenceTyp, Object persistenceConfiguration) {
+    public void start(PersistenceTyp persistenceTyp, Object persistenceConfiguration) {
 
         persistenceManager.initializePersistence(persistenceTyp, persistenceConfiguration);
         workhorseConfigService.initializeConfig();
@@ -93,8 +93,8 @@ public class WorkhorseService {
      * @param jobQueueMin Min amount of executions in memory queue before the poller gets to add more
      */
     @Deprecated
-    public void startTheEngine(PersistenceTyp persistenceTyp, Object persistenceConfiguration, String timeZone, int jobQueuePollerInterval,
-                    int jobQueuePusherPoll, Long jobQueueMax, int jobQueueMin) {
+    public void start(PersistenceTyp persistenceTyp, Object persistenceConfiguration, String timeZone, int jobQueuePollerInterval, int jobQueuePusherPoll,
+                    Long jobQueueMax, int jobQueueMin) {
 
         persistenceManager.initializePersistence(persistenceTyp, persistenceConfiguration);
 
@@ -112,7 +112,7 @@ public class WorkhorseService {
      * @param restartWorkhorseEvent
      */
     @Deprecated
-    public void startTheEngine(@ObservesAsync RestartWorkhorseEvent restartWorkhorseEvent) {
+    public void reStart(@ObservesAsync RestartWorkhorseEvent restartWorkhorseEvent) {
 
         workhorse.stop();
         jobScheduler.stopScheduler();
@@ -122,7 +122,7 @@ public class WorkhorseService {
         log.info("The job engine will be restart.");
 
         WorkhorseConfig config = restartWorkhorseEvent.getWorkhorseConfig();
-        startTheEngine(config.getPersistenceTyp(), restartWorkhorseEvent.getPersistenceParams(), config.getTimeZone(), config.getJobQueuePollerInterval(),
+        start(config.getPersistenceTyp(), restartWorkhorseEvent.getPersistenceParams(), config.getTimeZone(), config.getJobQueuePollerInterval(),
                         config.getJobQueuePusherPoll(), config.getJobQueueMax(), config.getJobQueueMin());
         log.info("End of the restart of the job engine.");
     }
@@ -131,16 +131,16 @@ public class WorkhorseService {
      * Start the Job Engine
      */
     @Deprecated
-    public void startTheEngine() {
+    public void start() {
 
-        startTheEngine(workhorseConfig.getPersistenceTyp(), null);
+        start(workhorseConfig.getPersistenceTyp(), null);
     }
 
     /**
      * Stop the Workhorse
      */
     @Deprecated
-    public void stopTheEngine() {
+    public void stop() {
         workhorse.stop();
         for (Job job : getAllScheduledJobs()) {
             jobScheduler.stop(job);
@@ -150,25 +150,25 @@ public class WorkhorseService {
         executionBuffer.destroyQueue();
     }
 
-    public void start() {
-
-        if (workhorse.isRunning()) {
-            return;
-        }
-        // TODO oder
-        if (workhorse.isRunning()) {
-            stopTheEngine();
-        }
-        // TODO start
-    }
-
-    public void stop() {
-
-        if (!workhorse.isRunning()) {
-            return;
-        }
-        // TODO stopp
-    }
+    // public void start() {
+    //
+    // if (workhorse.isRunning()) {
+    // return;
+    // }
+    // // TODO oder
+    // if (workhorse.isRunning()) {
+    // stopTheEngine();
+    // }
+    // // TODO start
+    // }
+    //
+    // public void stop() {
+    //
+    // if (!workhorse.isRunning()) {
+    // return;
+    // }
+    // // TODO stopp
+    // }
 
     public WorkhorseConfig getWorkhorseConfig() {
         // TODO

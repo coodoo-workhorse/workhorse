@@ -70,14 +70,14 @@ public class WorkhorseResource {
         // if (interval != null) {
         // JobEngineConfig.JOB_QUEUE_POLLER_INTERVAL = interval;
         // }
-        workhorseService.startTheEngine();
+        workhorseService.start();
         return Response.ok().build();
     }
 
     @GET
     @Path("/stop")
     public Response stop() {
-        workhorseService.stopTheEngine();
+        workhorseService.stop();
         return Response.ok().build();
     }
 
