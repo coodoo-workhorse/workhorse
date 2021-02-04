@@ -62,30 +62,30 @@ Depending on your environment there may be additional steps necessary. Have a lo
 
 ## Getting started
 
-Lets create a job to do some backups. Therefore you just need to extend the `Worker` class that provides you the `doWork` method. And this method is where the magic happens!
+Lets create a hello world job . Therefore you just need to extend the `Worker` class that provides you the `doWork` method. And this method is where the magic happens!
 
 ```java
 @Dependent
-public class BackupJob extends Worker {
+public class HelloWorldWorker extends Worker {
 
-    private final Logger log = LoggerFactory.getLogger(BackupJob.class);
+    private final Logger log = LoggerFactory.getLogger(HelloWorldWorker.class);
 
     @Override
     public void doWork() {
-        log.info("Performing some fine backup!");
+        log.info("Hello World!");
     }
 }
 ```
 
-Now we are able to inject this backup job to a service and trigger a job execution. After calling `createJobExecution` the job gets pushed into the job queue and the job engine will take care from this point.
+Now we are able to inject this `HelloWorldWorker` to a service and trigger an execution. After calling `createExecution` the job gets pushed into the job queue and the job engine will take care from this point.
 
 ```java
 @Inject
-BackupJob backupJob;
+HelloWorldWorker helloWorldWorker;
 
-public void performBackup() {
+public void performHelloWorld() {
 
-    backupJob.createExecution();
+    helloWorldWorker.createExecution();
 }
 ```
 
@@ -104,35 +104,35 @@ Let's add some parameters to this job! You can access the parameters by changing
 
 ```java
 @Dependent
-public class BackupJob extends WorkerWith<String> {
+public class HelloWorldWorker extends WorkerWith<String> {
 
-    private final Logger log = LoggerFactory.getLogger(BackupJob.class);
+    private final Logger log = LoggerFactory.getLogger(HelloWorldWorker.class);
 
     @Override
     public void doWork(String environment) {
-        log.info("Performing some fine backup on " + environment);
+        log.info("Hello World to: " + environment);
     }
 }
 ```
 
-Everybody knows backups should be made on a regular basis, so lets tell this job to run every night half past three by adding `@InitialJobConfig` annotation. Many other configuration on this job can initially defined by this annotation, have a [look](https://github.com/coodoo-io/workhorse/blob/master/src/main/java/io/coodoo/workhorse/core/boundary/annotation/InitialJobConfig.java "@InitialJobConfig")!
-In this case we overwrite the method `onSchedule()` witch triggers the job to add some parameters.
+We can process the `HelloWorldWorker` on a regular basis, so lets tell this worker to run every night half past three by adding `@InitialJobConfig` annotation. Many other configuration on this worker can initially defined by this annotation, have a [look](src/main/java/io/coodoo/workhorse/core/boundary/annotation/InitialJobConfig.java "@InitialJobConfig")!
+In this case we overwrite the method `onSchedule()` witch triggers an execution to add some parameters.
 
 ```java
 @Dependent
-@InitialJobConfig(schedule = "0 30 3 0 0 0", description = "Runs a nightly backup of Stage2")
-public class BackupJob extends WorkerWith<String> {
+@InitialJobConfig(schedule = "0 30 3 0 0 0", description = "Log nightly")
+public class HelloWorldWorker extends WorkerWith<String> {
 
-    private final Logger log = LoggerFactory.getLogger(BackupJob.class);
+    private final Logger log = LoggerFactory.getLogger(HelloWorldWorker.class);
 
     @Override
     public void onSchedule() {
-        createExecution("STAGE-2");
+        createExecution("Workhorse");
     }
 
     @Override
     public void doWork(String environment) {
-        log.info("Performing some fine backup on " + environment);
+        log.info("Hello World to: " + environment);
     }
 }
 ```
