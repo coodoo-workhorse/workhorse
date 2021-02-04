@@ -9,6 +9,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.ObservesAsync;
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 
 import io.coodoo.workhorse.api.DTO.ExecutionInfo;
@@ -66,7 +67,7 @@ public class WorkhorseService {
     /**
      * Start the Job Engine with a peristence
      * 
-     * @param persistenceTyp Type of the persistence to use
+     * @param persistenceTyp           Type of the persistence to use
      * @param persistenceConfiguration Config data to connect the persistence
      */
     @Deprecated
@@ -84,21 +85,26 @@ public class WorkhorseService {
     /**
      * Start the Job Engine with given config and persistence params
      * 
-     * @param persistenceTyp Typ of the choosen persistence
+     * @param persistenceTyp           Typ of the choosen persistence
      * @param persistenceConfiguration config parameter for the choosen persistence
-     * @param timeZone ZoneId Object time zone for LocalDateTime instance creation. Default is UTC
-     * @param jobQueuePollerInterval Job queue poller interval in seconds
-     * @param jobQueuePusherPoll poll interval to use when using Pushable persistence
-     * @param jobQueueMax Max amount of executions to load into the memory queue per job
-     * @param jobQueueMin Min amount of executions in memory queue before the poller gets to add more
+     * @param timeZone                 ZoneId Object time zone for LocalDateTime
+     *                                 instance creation. Default is UTC
+     * @param jobQueuePollerInterval   Job queue poller interval in seconds
+     * @param jobQueuePusherPoll       poll interval to use when using Pushable
+     *                                 persistence
+     * @param jobQueueMax              Max amount of executions to load into the
+     *                                 memory queue per job
+     * @param jobQueueMin              Min amount of executions in memory queue
+     *                                 before the poller gets to add more
      */
     @Deprecated
-    public void start(PersistenceTyp persistenceTyp, Object persistenceConfiguration, String timeZone, int jobQueuePollerInterval, int jobQueuePusherPoll,
-                    Long jobQueueMax, int jobQueueMin) {
+    public void start(PersistenceTyp persistenceTyp, Object persistenceConfiguration, String timeZone,
+            int jobQueuePollerInterval, int jobQueuePusherPoll, Long jobQueueMax, int jobQueueMin) {
 
         persistenceManager.initializePersistence(persistenceTyp, persistenceConfiguration);
 
-        workhorseConfigService.initializeConfig(timeZone, jobQueuePollerInterval, jobQueuePusherPoll, jobQueueMax, jobQueueMin, persistenceTyp);
+        workhorseConfigService.initializeConfig(timeZone, jobQueuePollerInterval, jobQueuePusherPoll, jobQueueMax,
+                jobQueueMin, persistenceTyp);
 
         workhorseController.loadWorkers();
         executionBuffer.initializeBuffer();
@@ -122,8 +128,9 @@ public class WorkhorseService {
         log.info("The job engine will be restart.");
 
         WorkhorseConfig config = restartWorkhorseEvent.getWorkhorseConfig();
-        start(config.getPersistenceTyp(), restartWorkhorseEvent.getPersistenceParams(), config.getTimeZone(), config.getJobQueuePollerInterval(),
-                        config.getJobQueuePusherPoll(), config.getJobQueueMax(), config.getJobQueueMin());
+        start(config.getPersistenceTyp(), restartWorkhorseEvent.getPersistenceParams(), config.getTimeZone(),
+                config.getJobQueuePollerInterval(), config.getJobQueuePusherPoll(), config.getJobQueueMax(),
+                config.getJobQueueMin());
         log.info("End of the restart of the job engine.");
     }
 
@@ -225,8 +232,9 @@ public class WorkhorseService {
      * 
      * @return Job
      */
-    public Job updateJob(Long jobId, String name, String description, String workerClassName, String schedule, JobStatus status, int threads,
-                    Integer maxPerMinute, int failRetries, int retryDelay, int daysUntilCleanUp, boolean uniqueInQueue) {
+    public Job updateJob(Long jobId, String name, String description, String workerClassName, String schedule,
+            JobStatus status, int threads, Integer maxPerMinute, int failRetries, int retryDelay, int daysUntilCleanUp,
+            boolean uniqueInQueue) {
 
         Job job = getJobById(jobId);
 
@@ -234,8 +242,8 @@ public class WorkhorseService {
         // workhorse.stop(); maybe we don t need. To proove
         executionBuffer.cancelProcess(job);
 
-        workhorseController.updateJob(jobId, name, description, workerClassName, schedule, status, threads, maxPerMinute, failRetries, retryDelay,
-                        daysUntilCleanUp, uniqueInQueue);
+        workhorseController.updateJob(jobId, name, description, workerClassName, schedule, status, threads,
+                maxPerMinute, failRetries, retryDelay, daysUntilCleanUp, uniqueInQueue);
 
         executionBuffer.initializeBuffer(job);
         // workhorse.start();
@@ -247,13 +255,14 @@ public class WorkhorseService {
     /**
      * Update a {@link Execution}
      */
-    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime maturity, Long batchId, Long chainId,
-                    Long chainedPreviousExecutionId, boolean uniqueInQueue) {
-        return workhorseController.createExecution(jobId, parameters, priority, maturity, batchId, chainId, chainedPreviousExecutionId, uniqueInQueue);
+    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime maturity,
+            Long batchId, Long chainId, Long chainedPreviousExecutionId, boolean uniqueInQueue) {
+        return workhorseController.createExecution(jobId, parameters, priority, maturity, batchId, chainId,
+                chainedPreviousExecutionId, uniqueInQueue);
     }
 
-    public Execution updateExecution(Long jobId, Long executionId, ExecutionStatus status, String parameters, boolean priority, LocalDateTime maturity,
-                    int fails) {
+    public Execution updateExecution(Long jobId, Long executionId, ExecutionStatus status, String parameters,
+            boolean priority, LocalDateTime maturity, int fails) {
 
         Execution execution = getExecutionById(jobId, executionId);
 
@@ -314,15 +323,31 @@ public class WorkhorseService {
         }
     }
 
+    /**
+     * Get a Job by the classname of his worker.
+     * 
+     * @param className
+     * @return
+     */
+    public Job getJobByClassName(String className) {
+
+        Job job = null;
+        if (StringUtils.trimToNull(className) != null) {
+
+            job = workhorseController.getJobByClassName(className);
+
+        }
+        return job;
+    }
+
     public GroupInfo getExecutionBatchInfo(Long jobId, Long batchId) {
 
         List<Execution> batchExecutions = workhorseController.getBatch(jobId, batchId);
 
-        List<ExecutionInfo> batchInfo =
-                        batchExecutions.stream()
-                                        .map(execution -> new ExecutionInfo(execution.getId(), execution.getStatus(), execution.getStartedAt(),
-                                                        execution.getEndedAt(), execution.getDuration(), execution.getFailRetryExecutionId()))
-                                        .collect(Collectors.toList());
+        List<ExecutionInfo> batchInfo = batchExecutions.stream()
+                .map(execution -> new ExecutionInfo(execution.getId(), execution.getStatus(), execution.getStartedAt(),
+                        execution.getEndedAt(), execution.getDuration(), execution.getFailRetryExecutionId()))
+                .collect(Collectors.toList());
 
         return new GroupInfo(batchId, batchInfo);
     }
@@ -333,11 +358,10 @@ public class WorkhorseService {
 
     public GroupInfo getExecutionChainInfo(Long jobId, Long chainId) {
         List<Execution> chainExecutions = workhorseController.getchain(jobId, chainId);
-        List<ExecutionInfo> batchInfo =
-                        chainExecutions.stream()
-                                        .map(execution -> new ExecutionInfo(execution.getId(), execution.getStatus(), execution.getStartedAt(),
-                                                        execution.getEndedAt(), execution.getDuration(), execution.getFailRetryExecutionId()))
-                                        .collect(Collectors.toList());
+        List<ExecutionInfo> batchInfo = chainExecutions.stream()
+                .map(execution -> new ExecutionInfo(execution.getId(), execution.getStatus(), execution.getStartedAt(),
+                        execution.getEndedAt(), execution.getDuration(), execution.getFailRetryExecutionId()))
+                .collect(Collectors.toList());
         return new GroupInfo(chainId, batchInfo);
     }
 
@@ -368,10 +392,13 @@ public class WorkhorseService {
     /**
      * Get the execution times defined by {@link Job#getSchedule()}
      * 
-     * @param schedule CRON Expression
-     * @param startTime start time for this request (if <tt>null</tt> then current time is used)
-     * @param endTime end time for this request (if <tt>null</tt> then current time plus 1 day is used)
-     * @return List of {@link LocalDateTime} representing the execution times of a scheduled job between the <tt>startTime</tt> and <tt>endTime</tt>
+     * @param schedule  CRON Expression
+     * @param startTime start time for this request (if <tt>null</tt> then current
+     *                  time is used)
+     * @param endTime   end time for this request (if <tt>null</tt> then current
+     *                  time plus 1 day is used)
+     * @return List of {@link LocalDateTime} representing the execution times of a
+     *         scheduled job between the <tt>startTime</tt> and <tt>endTime</tt>
      */
     public List<LocalDateTime> getScheduledTimes(String schedule, LocalDateTime startTime, LocalDateTime endTime) {
 
