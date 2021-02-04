@@ -1,11 +1,10 @@
 
 
-
 [logo]: https://gitlab.coodoo.io/workhorse/workhorse/-/raw/master/logo.png "Workhorse: Extendable Java Job Engine for background jobs and business critical tasks"
 
 # Workhorse ![alt text][logo]
 
-> Extendable Java Job Engine for background jobs and business critical tasks
+> Extendable Java CDI Job Engine for background jobs and business critical tasks
 
 ## Table of Contents
 
@@ -37,7 +36,7 @@
 
 ## Who is this Workhorse?
 
-The coodoo Workhorse is a Java Job Engine for mostly all kind of tasks and background jobs as it is a combination of task scheduler and an event system. It can help you to send out thousands of e-mails or perform long running imports.
+The coodoo Workhorse is a Java CDI Job Engine for mostly all kind of tasks and background jobs as it is a combination of task scheduler and an event system. It can help you to send out thousands of e-mails or perform long running imports.
 
 Just fire jobs on demand when ever from where ever in your code and Workhorse will take care of it. You can also define an interval or specific time the job has to be started by using the cron syntax. There are also many options like prioritizing, delaying, chaining, multithreading, uniquifying and retrying the jobs. 
 
