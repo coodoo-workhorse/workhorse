@@ -264,13 +264,27 @@ public class WorkhorseController {
     public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime maturity, Long batchId, Long chainId,
                     Long chainedPreviousExecutionId, boolean uniqueInQueue) {
 
+        Integer parametersHash = null;
+        if (parameters != null) {
+            parametersHash = parameters.hashCode();
+            if (parameters.trim().isEmpty() || parameters.isEmpty()) {
+                parameters = null;
+                parametersHash = null;
+            }
+        }
+
         if (uniqueInQueue) {
-            // To Do: Look for an Execution with the given parameterHash and return it
+            // Prüfen ob es bereits eine Job Excecution mit diesn Parametern existiert und im Status QUEUED ist. Wenn ja diese zurückgeben.
+            Execution equalQueuedJobExcecution = executionPersistence.getFirstCreatedByJobIdAndParametersHash(jobId, parametersHash);
+            if (equalQueuedJobExcecution != null) {
+                return equalQueuedJobExcecution;
+            }
         }
         Execution execution = new Execution();
         execution.setJobId(jobId);
         execution.setStatus(ExecutionStatus.QUEUED);
         execution.setParameters(parameters);
+        execution.setParametersHash(parametersHash);
         execution.setPriority(priority != null ? priority : false);
         execution.setMaturity(maturity);
         execution.setBatchId(batchId);

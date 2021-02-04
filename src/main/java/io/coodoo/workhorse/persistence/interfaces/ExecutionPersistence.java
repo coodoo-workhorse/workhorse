@@ -11,7 +11,7 @@ public interface ExecutionPersistence {
      * Retrieves the job execution by given Id of a job and id of job execution
      * 
      * @param jobId Id of the job
-     * @param id Id of the job execution
+     * @param id    Id of the job execution
      * @return A job execution
      */
     Execution getById(Long jobId, Long id);
@@ -26,11 +26,13 @@ public interface ExecutionPersistence {
     List<Execution> getByJobId(Long jobId, Long limit);
 
     /**
-     * Retrieves the next queued job executions with given JobId, order by priority and createdAt. Job executions with existent value
+     * Retrieves the next queued job executions with given JobId, order by priority
+     * and createdAt. Job executions with existent value
      * <code>ChainedPreviousExecutionId</code> do not have to be retrieve.
      * 
      * @param jobId Id of th job
-     * @return List of job execution order by job executions parameters <code>priority</code> and <code>createdAt</code>
+     * @return List of job execution order by job executions parameters
+     *         <code>priority</code> and <code>createdAt</code>
      */
     List<Execution> pollNextExecutions(Long jobId, Long limit);
 
@@ -49,25 +51,27 @@ public interface ExecutionPersistence {
     void persist(Execution execution);
 
     /**
-     * Delete a job execution by <code>jobId</code> and <code>id</code> of the execution
+     * Delete a job execution by <code>jobId</code> and <code>id</code> of the
+     * execution
      * 
      * @param jobId Id of the job
-     * @param id Id of the job execution
+     * @param id    Id of the job execution
      */
     void delete(Long jobId, Long id);
 
     /**
      * Update a job execution
      * 
-     * @param jobId Id of the correspondent job
-     * @param id Id of the job execution to update
+     * @param jobId     Id of the correspondent job
+     * @param id        Id of the job execution to update
      * @param execution New value of the job execution
      * @return the updated job execution
      */
     Execution update(Long jobId, Long id, Execution execution);
 
     /**
-     * Given the Id of the corresponent job <code>jobId</code> and the limit date <code>preDate</code>, delete all job executions where
+     * Given the Id of the corresponent job <code>jobId</code> and the limit date
+     * <code>preDate</code>, delete all job executions where
      * <code>Execution.createdAt < preDate</code>
      * 
      * @param jobId
@@ -79,7 +83,7 @@ public interface ExecutionPersistence {
     /**
      * Retrieve all job executions of a batchExecution
      * 
-     * @param jobId Id of the correspondent job
+     * @param jobId   Id of the correspondent job
      * @param batchId Id of the batchExecution
      * @return List of all job executions of the batchExecution
      */
@@ -88,7 +92,7 @@ public interface ExecutionPersistence {
     /**
      * Retrieve all job execution of a chainedExecution
      * 
-     * @param jobId Id of the correspondent job
+     * @param jobId   Id of the correspondent job
      * @param chainId Id of the chainedExecution
      * @return List of all job executions of the chainedExecution
      */
@@ -97,7 +101,7 @@ public interface ExecutionPersistence {
     /**
      * Get the first found job execution of the Batch.
      * 
-     * @param jobId Id of the correspondent job
+     * @param jobId   Id of the correspondent job
      * @param BatchId Id of the batchExecution
      * @return the found job executon
      */
@@ -106,34 +110,45 @@ public interface ExecutionPersistence {
     /**
      * Get all Failed job executions of a batchExecution
      * 
-     * @param jobId Id of the correspondent job
+     * @param jobId   Id of the correspondent job
      * @param BatchId Id of the batchExecution
      * @return
      */
     List<Execution> getFailedBatchExecutions(Long jobId, Long batchId);
 
     /**
-     * Optional. Set the Id the given job execution <code>execution</code> at end of the chained Execution with Id <code>chainId</code> .
+     * Optional. Set the Id the given job execution <code>execution</code> at end of
+     * the chained Execution with Id <code>chainId</code> .
      * 
-     * @param jobId Id of the correspondent job
-     * @param chainId Id of the chainedExecution
+     * @param jobId     Id of the correspondent job
+     * @param chainId   Id of the chainedExecution
      * @param execution Job execution to set at end of the chain.
      * @return Last job execution of the chain.
      */
     Execution addExecutionAtEndOfChain(Long jobId, Long chainId, Execution execution);
 
     /**
-     * @param jobId Id of the correspondent job
-     * @param chainId Id of the chainedExecution
+     * @param jobId     Id of the correspondent job
+     * @param chainId   Id of the chainedExecution
      * @param execution Job execution whose next execution have to be found.
      * @return Next job execution of the chain
      */
     Execution getNextQueuedExecutionInChain(Long jobId, Long chainId, Execution execution);
 
     /**
+     * Check whether there is already an execution with these parameters and whether
+     * it has the status QUEUED. If so, return this.
+     * 
+     * @param jobId          the jobId
+     * @param parametersHash the parameterHash
+     * @return List of Execution
+     */
+    Execution getFirstCreatedByJobIdAndParametersHash(Long jobId, Integer parameterHash);
+
+    /**
      * Check if they are other QUEUED job execution of the given batchExecution
      * 
-     * @param jobId Id of the correspondent job
+     * @param jobId   Id of the correspondent job
      * @param batchId Id of the batchExecution
      * @return
      */
