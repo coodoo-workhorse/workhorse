@@ -18,7 +18,6 @@ import javax.inject.Inject;
 
 import org.jboss.logging.Logger;
 
-import io.coodoo.workhorse.config.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.control.event.AllExecutionsDoneEvent;
 import io.coodoo.workhorse.core.control.event.JobErrorEvent;
 import io.coodoo.workhorse.core.control.event.NewExecutionEvent;
@@ -27,6 +26,7 @@ import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.PersistenceManager;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
@@ -126,14 +126,14 @@ public class Workhorse {
         if (!executionPersistence.isPusherAvailable() || scheduledFuture == null) {
             return;
         }
-        log.info("New Job Execution pushed: " + newExecutionEvent);
+        // log.info("New Job Execution pushed: " + newExecutionEvent);
         if (executionBuffer.getNumberOfExecution(newExecutionEvent.jobId) < workhorseConfig.getJobQueueMax()) {
             Execution execution = executionPersistence.getById(newExecutionEvent.jobId, newExecutionEvent.executionId);
             if (execution != null) {
                 if (execution.getMaturity() != null) {
                     long delayInSeconds = ChronoUnit.SECONDS.between(workhorseConfig.timestamp(), execution.getMaturity());
 
-                    log.info("Job Execution : " + execution + " will be process in " + delayInSeconds + " seconds");
+                    // log.info("Job Execution : " + execution + " will be process in " + delayInSeconds + " seconds");
                     scheduledExecutorService.schedule(() -> {
                         executionDistributor(execution);
                     }, delayInSeconds, TimeUnit.SECONDS);

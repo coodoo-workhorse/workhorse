@@ -1,15 +1,16 @@
-package io.coodoo.workhorse.config.boundary;
+package io.coodoo.workhorse.core.control;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
-import io.coodoo.workhorse.config.control.WorkhorseConfigControl;
-import io.coodoo.workhorse.config.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.control.event.RestartWorkhorseEvent;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 
+// TODO alle methoden in controll migrien, prüfen ob noch notwendig
 @ApplicationScoped
+@Deprecated
 public class WorkhorseConfigService {
 
     @Inject
@@ -45,7 +46,6 @@ public class WorkhorseConfigService {
 
         workhorseConfigControl.updateWorkhorseConfig(workhorseConfig);
 
-
     }
 
     /**
@@ -58,8 +58,8 @@ public class WorkhorseConfigService {
      * @param jobQueueMin
      * @param persistenceTyp
      */
-    public void initializeConfig(String timeZone, int jobQueuePollerInterval, int jobQueuePusherPoll,
-            Long jobQueueMax, int jobQueueMin, PersistenceTyp persistenceTyp) {
+    public void initializeConfig(String timeZone, int jobQueuePollerInterval, int jobQueuePusherPoll, Long jobQueueMax, int jobQueueMin,
+                    PersistenceTyp persistenceTyp) {
 
         WorkhorseConfig newWorkhorseConfig = workhorseConfigControl.getWorkhorseConfig();
 
@@ -115,6 +115,7 @@ public class WorkhorseConfigService {
 
     /**
      * Update the configuration of the job engine
+     * 
      * @param newWorkhorseConfig
      * @return
      */

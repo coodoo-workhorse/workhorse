@@ -1,6 +1,6 @@
 package io.coodoo.workhorse.persistence.interfaces;
 
-import io.coodoo.workhorse.config.entity.WorkhorseConfig;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 
 public interface ConfigPersistence {
 

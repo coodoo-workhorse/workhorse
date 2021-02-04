@@ -1,7 +1,7 @@
 package io.coodoo.workhorse.persistence.memory;
 
 
-import io.coodoo.workhorse.config.entity.WorkhorseConfig;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.interfaces.ConfigPersistence;
 import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 

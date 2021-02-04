@@ -1,6 +1,6 @@
 package io.coodoo.workhorse.core.control.event;
 
-import io.coodoo.workhorse.config.entity.WorkhorseConfig;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 
 /**
  * @author coodoo GmbH (coodoo.io)

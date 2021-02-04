@@ -1,58 +1,66 @@
-package io.coodoo.workhorse.config.entity;
+package io.coodoo.workhorse.core.entity;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 
 /**
  * @author coodoo GmbH (coodoo.io)
  */
+
+// TODO zentrale config.
+// Probieren: BuilderPattern
+
 @ApplicationScoped
 public class WorkhorseConfig {
 
     /**
      * ZoneId Object time zone for LocalDateTime instance creation. Default is UTC
      */
-    private String timeZone = "UTC+1";
+    private String timeZone = "UTC";
 
     /**
      * Max amount of executions to load into the memory queue per job
      */
-    private Long jobQueueMax = 10000L;
+    private Long bufferMax = 10000L;
 
     /**
      * Min amount of executions in memory queue before the poller gets to add more
      */
-    private int jobQueueMin = 1;
+    private int bufferMin = 1;
 
     /**
      * Job queue poller interval in seconds
      */
-    private int jobQueuePollerInterval = 5; // In second
+    private int bufferPollInterval = 5;
 
     /**
-     * Job queue poller interval in seconds by Push
+     * TODO
      */
-    private int jobQueuePusherPoll = 120; // In second
+    private int bufferPushFallbackPollInterval = 120;
 
     /**
      * Type of the peristence
      */
+    // TODO wird ein STring mit dem namen "persistenceName"
     private PersistenceTyp persistenceTyp = PersistenceTyp.MEMORY;
 
     /**
+     * TODO implement me!
+     * 
      * A zombie is an execution that is stuck in status {@link ExecutionStatus#RUNNING} for this amount of minutes (if set to 0 there the hunt is off)
      */
-    private int zombieRecognitionTime = 120;
+    private int executionTimeout = 120;
 
     /**
+     * TODO implement me!
+     * 
      * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and doesn't change, it has became a zombie! Once found we have a cure!
      */
-    private ExecutionStatus zombieCureStatus = ExecutionStatus.ABORTED;
+    private ExecutionStatus executionTimeoutStatus = ExecutionStatus.ABORTED;
 
     /**
      * Log change pattern. Placeholder <code>%s</code> for changeParameter, changeOld and changeNew in this order <br>
@@ -68,7 +76,7 @@ public class WorkhorseConfig {
     /**
      * Execution log info marker. Default is none
      */
-    private String logInfoMarker = "[INFO]";
+    private String logInfoMarker = "";
 
     /**
      * Execution log warn marker. Default is <code>[WARN]</code>
@@ -96,35 +104,35 @@ public class WorkhorseConfig {
     }
 
     public Long getJobQueueMax() {
-        return jobQueueMax;
+        return bufferMax;
     }
 
     public void setJobQueueMax(Long jobQueueMax) {
-        this.jobQueueMax = jobQueueMax;
+        this.bufferMax = jobQueueMax;
     }
 
     public int getJobQueueMin() {
-        return jobQueueMin;
+        return bufferMin;
     }
 
     public void setJobQueueMin(int jobQueueMin) {
-        this.jobQueueMin = jobQueueMin;
+        this.bufferMin = jobQueueMin;
     }
 
     public int getJobQueuePollerInterval() {
-        return jobQueuePollerInterval;
+        return bufferPollInterval;
     }
 
     public void setJobQueuePollerInterval(int jobQueuePollerInterval) {
-        this.jobQueuePollerInterval = jobQueuePollerInterval;
+        this.bufferPollInterval = jobQueuePollerInterval;
     }
 
     public int getJobQueuePusherPoll() {
-        return jobQueuePusherPoll;
+        return bufferPushFallbackPollInterval;
     }
 
     public void setJobQueuePusherPoll(int jobQueuePusherPoll) {
-        this.jobQueuePusherPoll = jobQueuePusherPoll;
+        this.bufferPushFallbackPollInterval = jobQueuePusherPoll;
     }
 
     public PersistenceTyp getPersistenceTyp() {
@@ -136,19 +144,19 @@ public class WorkhorseConfig {
     }
 
     public int getZombieRecognitionTime() {
-        return zombieRecognitionTime;
+        return executionTimeout;
     }
 
     public void setZombieRecognitionTime(int zombieRecognitionTime) {
-        this.zombieRecognitionTime = zombieRecognitionTime;
+        this.executionTimeout = zombieRecognitionTime;
     }
 
     public ExecutionStatus getZombieCureStatus() {
-        return zombieCureStatus;
+        return executionTimeoutStatus;
     }
 
     public void setZombieCureStatus(ExecutionStatus zombieCureStatus) {
-        this.zombieCureStatus = zombieCureStatus;
+        this.executionTimeoutStatus = zombieCureStatus;
     }
 
     public String getLogChange() {

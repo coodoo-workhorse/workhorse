@@ -41,6 +41,8 @@ public class Execution extends BaseEntity {
      */
     private Long duration;
 
+    // TODO Execution Outomce als teil eines info-features: status zeit outcome
+
     /**
      * If a job exectution has the priority set to <code>true</code> it will be executed before all jobs with priority <code>false</code>.
      */

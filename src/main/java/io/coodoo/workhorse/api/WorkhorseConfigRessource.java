@@ -8,8 +8,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import io.coodoo.workhorse.config.boundary.WorkhorseConfigService;
-import io.coodoo.workhorse.config.entity.WorkhorseConfig;
+import io.coodoo.workhorse.core.control.WorkhorseConfigService;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 
 /**
  * @deprecated gehört nicht in den core, wird erstmal gelassen, zwecks test

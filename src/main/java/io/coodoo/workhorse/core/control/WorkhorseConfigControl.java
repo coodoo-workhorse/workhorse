@@ -1,4 +1,4 @@
-package io.coodoo.workhorse.config.control;
+package io.coodoo.workhorse.core.control;
 
 import java.time.ZoneId;
 import java.util.Objects;
@@ -9,9 +9,9 @@ import javax.inject.Inject;
 
 import org.jboss.logging.Logger;
 
-import io.coodoo.workhorse.config.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
 import io.coodoo.workhorse.core.control.event.RestartWorkhorseEvent;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.interfaces.ConfigPersistence;
 import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.ConfigQualifier;

@@ -13,22 +13,27 @@ import org.jboss.logging.Logger;
 
 import io.coodoo.workhorse.api.DTO.ExecutionInfo;
 import io.coodoo.workhorse.api.DTO.GroupInfo;
-import io.coodoo.workhorse.config.boundary.WorkhorseConfigService;
-import io.coodoo.workhorse.config.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.control.ExecutionBuffer;
 import io.coodoo.workhorse.core.control.JobScheduler;
 import io.coodoo.workhorse.core.control.Workhorse;
+import io.coodoo.workhorse.core.control.WorkhorseConfigService;
 import io.coodoo.workhorse.core.control.WorkhorseController;
 import io.coodoo.workhorse.core.control.event.RestartWorkhorseEvent;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
 import io.coodoo.workhorse.persistence.PersistenceManager;
 import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 import io.coodoo.workhorse.util.CronExpression;
 
+/**
+ * Central Workhorse API-Service
+ * 
+ * @author coodoo GmbH (coodoo.io)
+ */
 @ApplicationScoped
 public class WorkhorseService {
 
@@ -163,6 +168,15 @@ public class WorkhorseService {
             return;
         }
         // TODO stopp
+    }
+
+    public WorkhorseConfig getWorkhorseConfig() {
+        // TODO
+        return null;
+    }
+
+    public void updateWorkhorseConfig(WorkhorseConfig workhorseConfig) {
+        // TODO
     }
 
     /**

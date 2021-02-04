@@ -8,7 +8,7 @@ import javax.inject.Inject;
 
 import org.jboss.logging.Logger;
 
-import io.coodoo.workhorse.config.entity.WorkhorseConfig;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.interfaces.ConfigPersistence;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
@@ -73,7 +73,7 @@ public class PersistenceManager {
         initializeJobEngineConfigPersistence(persistenceTyp, persistenceConfiguration);
         initializeJobPersistence(persistenceTyp);
         initializeExecutionPersistence(persistenceTyp);
-        initializeJobEnigneLogPersistence(persistenceTyp);
+        initializeLogPersistence(persistenceTyp);
 
         if (jobPersistence == null || executionPersistence == null || configPersistence == null || logPersistence == null) {
             throw new RuntimeException("The Persistence could not be load!!");
@@ -131,7 +131,7 @@ public class PersistenceManager {
         return null;
     }
 
-    public LogPersistence initializeJobEnigneLogPersistence(PersistenceTyp persistenceTyp) {
+    public LogPersistence initializeLogPersistence(PersistenceTyp persistenceTyp) {
         log.info("Start of LogPersistence initialization");
         for (LogPersistence logPersistenceInstance : logPersistenceInstances) {
             if (logPersistenceInstance != null && logPersistenceInstance.getPersistenceTyp().equals(persistenceTyp)) {

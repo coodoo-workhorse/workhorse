@@ -1,6 +1,6 @@
 package io.coodoo.workhorse.api.DTO;
 
-import io.coodoo.workhorse.config.entity.WorkhorseConfig;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 
 public class ConfigDTO {
