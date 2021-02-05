@@ -68,7 +68,7 @@ public class PersistenceManager {
 
         if (persistenceTyp == null) {
             persistenceTyp = workhorseConfig.getPersistenceTyp();
-            log.warn("persistenceTyp can not be null. The default persistence " + persistenceTyp + " will be use");
+            log.warn("persistenceTyp can not be null. The default persistence {} will be use", persistenceTyp);
         }
 
         initializeJobEngineConfigPersistence(persistenceTyp, persistenceConfiguration);
@@ -95,7 +95,7 @@ public class PersistenceManager {
         for (JobPersistence jobPersistenceInstance : jobPersistenceInstances) {
             if (jobPersistenceInstance != null && jobPersistenceInstance.getPersistenceTyp().equals(persistenceTyp)) {
                 jobPersistence = jobPersistenceInstance;
-                log.info("JobPersistence: " + jobPersistence);
+                log.info("JobPersistence: {}", jobPersistence);
 
                 log.trace("End of JobPersistence initialization");
                 jobPersistence.connect();
@@ -111,7 +111,7 @@ public class PersistenceManager {
             if (executionPersistenceInstance != null
                     && executionPersistenceInstance.getPersistenceTyp().equals(persistenceTyp)) {
                 executionPersistence = executionPersistenceInstance;
-                log.info("ExecutionPersistence: " + executionPersistence);
+                log.info("ExecutionPersistence: {}", executionPersistence);
                 log.trace("End of ExecutionPersistence initialization");
                 executionPersistence.connect();
                 return executionPersistence;
@@ -127,7 +127,7 @@ public class PersistenceManager {
             if (configPersistenceInstance != null
                     && configPersistenceInstance.getPersistenceTyp().equals(persistenceTyp)) {
                 configPersistence = configPersistenceInstance;
-                log.info("configPersistence: " + configPersistence);
+                log.info("configPersistence: {}", configPersistence);
                 log.trace("End of configPersistence initialization");
                 configPersistence.connect(persistenceConfiguration);
                 return configPersistence;
@@ -141,7 +141,7 @@ public class PersistenceManager {
         for (LogPersistence logPersistenceInstance : logPersistenceInstances) {
             if (logPersistenceInstance != null && logPersistenceInstance.getPersistenceTyp().equals(persistenceTyp)) {
                 logPersistence = logPersistenceInstance;
-                log.info("LogPersistence: " + logPersistence);
+                log.info("LogPersistence: {}", logPersistence);
                 log.trace("End of LogPersistence initialization");
                 logPersistence.connect();
                 return logPersistence;

@@ -86,10 +86,10 @@ public class ExecutionBuffer {
      * @param job to cancel
      */
     public void cancelProcess(Job job) {
-        log.trace("The Processing of the job " + job + " will be cancel");
+        log.trace("The Processing of the job {} will be cancel", job);
 
         if (!executions.containsKey(job.getId()) || !priorityExecutions.containsKey(job.getId())) {
-            log.warn("MemoryPersistence queue is missing for job: " + job);
+            log.warn("MemoryPersistence queue is missing for job: {} ", job);
             return;
         }
 
@@ -98,8 +98,8 @@ public class ExecutionBuffer {
 
         if (sizeMemoryQueue > 0 || sizePriorityMemoryQueue > 0) {
 
-            log.trace("Clearing job execution queue with " + executions.get(job.getId()).size() + " elements and "
-                    + priorityExecutions.get(job.getId()).size() + " priority elements for job: " + job.getName());
+            log.trace("Clearing job execution queue with {} elements and {} priority elements for job: {}",
+                    executions.get(job.getId()).size(), priorityExecutions.get(job.getId()).size(), job.getName());
 
             executions.get(job.getId()).clear();
             priorityExecutions.get(job.getId()).clear();
@@ -149,13 +149,13 @@ public class ExecutionBuffer {
         Long executionId = execution.getId();
 
         if (runningExecutions.containsKey(jobId) && runningExecutions.get(jobId).contains(executionId)) {
-            log.warn("Can't remove running job execution from memory queue: " + execution);
+            log.warn("Can't remove running job execution from memory queue: {} ", execution);
 
         } else if (executions.containsKey(jobId) && executions.get(jobId).remove(executionId)) {
-            log.trace("Removed from memory queue: " + execution);
+            log.trace("Removed from memory queue: {} ", execution);
 
         } else if (priorityExecutions.containsKey(jobId) && priorityExecutions.get(jobId).remove(executionId)) {
-            log.trace("Removed from priority memory queue: " + execution);
+            log.trace("Removed from priority memory queue: {}", execution);
         }
     }
 
@@ -223,7 +223,7 @@ public class ExecutionBuffer {
 
         if (runningExecutions.get(jobId) == null || executions.get(jobId) == null
                 || priorityExecutions.get(jobId) == null) {
-            log.error("They are not ExecutionQueue for the job with Id  " + jobId);
+            log.error("They are not ExecutionQueue for the job with Id {} ", jobId);
             return false;
         }
         if (runningExecutions.get(jobId).contains(executionId) || executions.get(jobId).contains(executionId)
@@ -254,17 +254,17 @@ public class ExecutionBuffer {
     }
 
     public Set<JobThread> getJobThreads(Long jobId) {
-        log.trace("Number of Threads: " + jobThreads.get(jobId).size());
+        log.trace("Number of Threads: {} ", jobThreads.get(jobId).size());
         return jobThreads.get(jobId);
     }
 
     public void addJobThreads(Long jobId, JobThread jobThread) {
-        log.trace("Add JobThread in Queue: " + jobThread);
+        log.trace("Add JobThread in Queue: {} ", jobThread);
         jobThreads.get(jobId).add(jobThread);
     }
 
     public void removeJobThread(Long jobId, JobThread jobThread) {
-        log.trace("Remove Thread: " + jobThread);
+        log.trace("Remove Thread: {}", jobThread);
         jobThreads.get(jobId).remove(jobThread);
     }
 

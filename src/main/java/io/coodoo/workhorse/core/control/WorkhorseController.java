@@ -79,11 +79,10 @@ public class WorkhorseController {
             try {
                 Class<?> workerClass = getWorker(job).getWorkerClass();
                 if (!workers.contains(workerClass)) {
+                    log.trace("JobStatus of Job {} updated from {} to {}", job, job.getStatus(), JobStatus.NO_WORKER);
                     job.setStatus(JobStatus.NO_WORKER);
                     jobPersistence.update(job.getId(), job);
-                    log.error("No Worker Class found for Job: " + job);
-                    log.trace("JobStatus of Job " + job + " updated from " + JobStatus.NO_WORKER + " to "
-                            + JobStatus.NO_WORKER);
+                    log.error("No Worker Class found for Job: {}", job);
                     jobErrorEvent.fire(new JobErrorEvent(new Throwable(ErrorType.NO_JOB_WORKER_FOUND.getMessage()),
                             ErrorType.NO_JOB_WORKER_FOUND.getMessage(), job.getId(), job.getStatus()));
                     continue;
@@ -91,8 +90,8 @@ public class WorkhorseController {
                 if (job.getStatus().equals(JobStatus.NO_WORKER)) {
                     job.setStatus(JobStatus.INACTIVE);
                     jobPersistence.update(job.getId(), job);
-                    log.trace("JobStatus of Job " + job + "updated from " + JobStatus.NO_WORKER + " to "
-                            + JobStatus.INACTIVE);
+                    log.trace("JobStatus of Job {} updated from {} to {}", job, JobStatus.NO_WORKER,
+                            JobStatus.INACTIVE);
                     workhorseLogService.logChange(job.getId(), job.getStatus(), " Status ", JobStatus.NO_WORKER,
                             JobStatus.INACTIVE, " Worker class found. ");
 
@@ -103,8 +102,8 @@ public class WorkhorseController {
                     // The Objects-Class is null-safe and can handle Worker-classes without
                     // Parameters
                     if (!Objects.equals(parametersClassName, job.getParametersClassName())) {
-                        log.warn("Parameters class name of " + job.getWorkerClassName() + " changed from "
-                                + job.getParametersClassName() + " to " + parametersClassName);
+                        log.warn("Parameters class name of {} changed from {} to {}", job.getWorkerClassName(),
+                                job.getParametersClassName(), parametersClassName);
                         workhorseLogService.logChange(job.getId(), job.getStatus(), " Parameters class ",
                                 job.getParametersClassName(), parametersClassName, null);
 
@@ -112,12 +111,12 @@ public class WorkhorseController {
                         jobPersistence.update(job.getId(), job);
                     }
                 }
-            } catch (Exception e) {
+            } catch (Exception exception) {
 
                 job.setStatus(JobStatus.ERROR);
-                log.error("Can't handle Worker class found for job: " + job + " Exception " + e);
-                jobErrorEvent.fire(new JobErrorEvent(e, ErrorType.ERROR_BY_FOUND_JOB_WORKER.getMessage(), job.getId(),
-                        job.getStatus()));
+                log.error("Can't handle Worker class found for job: {} Exception {}", job, exception);
+                jobErrorEvent.fire(new JobErrorEvent(exception, ErrorType.ERROR_BY_FOUND_JOB_WORKER.getMessage(),
+                        job.getId(), job.getStatus()));
             }
         }
     }
@@ -163,12 +162,12 @@ public class WorkhorseController {
             job.setParametersClassName(parameterClassName);
 
         } catch (Exception e) {
-            log.error("Could not read parameters class name of job " + job.getName());
+            log.error("Could not read parameters class name of job {}", job.getName());
         }
 
         jobPersistence.persist(job);
 
-        log.trace("Job created:" + job);
+        log.trace("Job created: {}", job);
     }
 
     /**
@@ -203,7 +202,7 @@ public class WorkhorseController {
             }
         }
 
-        log.error("No Worker class found for " + job);
+        log.error("No Worker class found for {}", job);
         workhorseLogService.logChange(job.getId(), JobStatus.NO_WORKER, "Status", job.getStatus(), JobStatus.NO_WORKER,
                 null);
 
@@ -314,7 +313,7 @@ public class WorkhorseController {
         }
 
         executionPersistence.persist(execution);
-        log.trace("Execution successfully created: " + execution);
+        log.trace("Execution successfully created: {}", execution);
         return execution;
 
     }
@@ -472,7 +471,7 @@ public class WorkhorseController {
             job.setUniqueInQueue(uniqueInQueue);
         }
 
-        log.trace("Job updated: " + job);
+        log.trace("Job updated: {}", job);
 
         jobPersistence.update(jobId, job);
 

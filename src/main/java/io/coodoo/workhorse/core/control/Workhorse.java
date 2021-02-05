@@ -88,14 +88,13 @@ public class Workhorse {
             scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0,
                     workhorseConfig.getJobQueuePusherPoll(), TimeUnit.SECONDS);
 
-            log.trace(
-                    "Job queue pusher started with a " + workhorseConfig.getJobQueuePusherPoll() + " seconds interval");
+            log.trace("Job queue pusher started with a {} seconds interval", workhorseConfig.getJobQueuePusherPoll());
 
         } else {
             scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0,
                     workhorseConfig.getJobQueuePollerInterval(), TimeUnit.SECONDS);
-            log.trace("Job queue poller started with a " + workhorseConfig.getJobQueuePollerInterval()
-                    + " seconds interval");
+            log.trace("Job queue poller started with a {} seconds interval",
+                    workhorseConfig.getJobQueuePollerInterval());
         }
 
     }
@@ -118,7 +117,7 @@ public class Workhorse {
                     }
                 }
             }
-            log.trace("Number of job execution in buffer:" + executionBuffer.getNumberOfExecution(job.getId()));
+            log.trace("Number of job execution in buffer: {}", executionBuffer.getNumberOfExecution(job.getId()));
         }
 
     }
@@ -140,8 +139,7 @@ public class Workhorse {
                     long delayInSeconds = ChronoUnit.SECONDS.between(workhorseConfig.timestamp(),
                             execution.getMaturity());
 
-                    // log.trace("Job Execution : " + execution + " will be process in " +
-                    // delayInSeconds + " seconds");
+                    log.trace("Job Execution : {} will be process in {} seconds", execution, delayInSeconds);
                     scheduledExecutorService.schedule(() -> {
                         executionDistributor(execution);
                     }, delayInSeconds, TimeUnit.SECONDS);
@@ -150,7 +148,7 @@ public class Workhorse {
                     executionDistributor(execution);
                 }
             } else {
-                log.error("No job execution found for executionId: " + newExecutionEvent.jobId);
+                log.error("No job execution found for executionId: {} ", newExecutionEvent.jobId);
             }
         }
     }
@@ -221,13 +219,12 @@ public class Workhorse {
                 executionBuffer.addExecution(jobId, execution.getId());
             }
 
-            log.trace(
-                    "New Execution: " + execution + " in Queue. Number of Executions in Queue: " + numberOfExecutions);
+            log.trace("New Execution: {} in Queue. Number of Executions in Queue: {} ", execution, numberOfExecutions);
         } finally {
             lock.unlock();
         }
 
-        log.trace(executionBuffer.getRunningJobThreadCounts(jobId) + "");
+        log.trace(" Numbers of running's jobThreads : {}", executionBuffer.getRunningJobThreadCounts(jobId));
         if (executionBuffer.getJobThreadCounts(jobId) > executionBuffer.getRunningJobThreadCounts(jobId)) {
             // lock = executionQueue.getLock(jobId);
             try {
@@ -252,7 +249,7 @@ public class Workhorse {
         Job job = jobPersistence.get(jobId);
 
         if (!JobStatus.ACTIVE.equals(job.getStatus())) {
-            log.error("The job " + job + " is not ACTIVE ");
+            log.error("The job {} is not ACTIVE ", job);
             return;
         }
 
@@ -278,7 +275,7 @@ public class Workhorse {
 
         completion.thenApply(fn -> {
             executionBuffer.removeCompletionStage(jobId, completion);
-            log.trace("Thread is really over: " + fn);
+            log.trace("Thread is really over: {} ", fn);
             return this;
         });
 

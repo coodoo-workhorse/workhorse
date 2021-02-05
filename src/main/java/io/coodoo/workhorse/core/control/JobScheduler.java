@@ -73,10 +73,10 @@ public class JobScheduler {
 
                 CronExpression cron = new CronExpression(job.getSchedule());
                 LocalDateTime nextTime = cron.nextTimeAfter(workhorseConfig.timestamp());
-                log.trace("next execution of Job: " + job + " on : " + nextTime);
+                log.trace("next execution of Job: {} on : {} ", job, nextTime);
                 long initialDelay = ChronoUnit.SECONDS.between(workhorseConfig.timestamp(), nextTime);
                 long period = ChronoUnit.SECONDS.between(nextTime, cron.nextTimeAfter(nextTime));
-                log.trace("period: " + period + " seconds");
+                log.trace("period: {} seconds", period);
 
                 ScheduledFuture<?> scheduledJobFuture = scheduledExecutorService.scheduleAtFixedRate(() -> {
                     triggerScheduledExecutionCreation(job);
@@ -100,10 +100,10 @@ public class JobScheduler {
         ScheduledFuture<?> scheduledFuture = scheduledJobFutures.get(job.getId());
         if (scheduledFuture != null) {
             scheduledFuture.cancel(false);
-            scheduledFuture = null;
-            log.trace("Schedule stopped for Job " + job);
+
+            log.trace("Schedule stopped for Job {} ", job);
         } else {
-            log.trace("No scheduled execution found for the given job " + job);
+            log.trace("No scheduled execution found for the given job {} ", job);
         }
 
     }
@@ -112,12 +112,12 @@ public class JobScheduler {
      * Start an execution after timeout
      */
     public void triggerScheduledExecutionCreation(Job job) {
-        log.trace("TimeOut with Job: " + job);
+        log.trace("TimeOut with Job: {} ", job);
         try {
             workhorseController.triggerScheduledExecutionCreation(job);
-        } catch (Exception e) {
-            log.error("Timeout failed for job " + job.getName() + ". Exception : " + e);
-            e.printStackTrace();
+        } catch (Exception exception) {
+            log.error("Timeout failed for job {}. Exception : {}", job.getName(), exception);
+            exception.printStackTrace();
         }
     }
 
