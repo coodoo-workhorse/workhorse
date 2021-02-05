@@ -91,13 +91,13 @@ public class PersistenceManager {
     }
 
     public JobPersistence initializeJobPersistence(PersistenceTyp persistenceTyp) {
-        log.info("Start of JobPersistence initialization");
+        log.trace("Start of JobPersistence initialization");
         for (JobPersistence jobPersistenceInstance : jobPersistenceInstances) {
             if (jobPersistenceInstance != null && jobPersistenceInstance.getPersistenceTyp().equals(persistenceTyp)) {
                 jobPersistence = jobPersistenceInstance;
                 log.info("JobPersistence: " + jobPersistence);
 
-                log.info("End of JobPersistence initialization");
+                log.trace("End of JobPersistence initialization");
                 jobPersistence.connect();
                 return jobPersistence;
             }
@@ -106,13 +106,13 @@ public class PersistenceManager {
     }
 
     public ExecutionPersistence initializeExecutionPersistence(PersistenceTyp persistenceTyp) {
-        log.info("Start of ExecutionPersistence initialization");
+        log.trace("Start of ExecutionPersistence initialization");
         for (ExecutionPersistence executionPersistenceInstance : executionPersistenceInstances) {
             if (executionPersistenceInstance != null
                     && executionPersistenceInstance.getPersistenceTyp().equals(persistenceTyp)) {
                 executionPersistence = executionPersistenceInstance;
                 log.info("ExecutionPersistence: " + executionPersistence);
-                log.info("End of ExecutionPersistence initialization");
+                log.trace("End of ExecutionPersistence initialization");
                 executionPersistence.connect();
                 return executionPersistence;
             }
@@ -122,13 +122,13 @@ public class PersistenceManager {
 
     public ConfigPersistence initializeJobEngineConfigPersistence(PersistenceTyp persistenceTyp,
             Object persistenceConfiguration) {
-        log.info("Start of ExecutionPersistence initialization");
+        log.trace("Start of ExecutionPersistence initialization");
         for (ConfigPersistence configPersistenceInstance : configPersistenceInstances) {
             if (configPersistenceInstance != null
                     && configPersistenceInstance.getPersistenceTyp().equals(persistenceTyp)) {
                 configPersistence = configPersistenceInstance;
                 log.info("configPersistence: " + configPersistence);
-                log.info("End of configPersistence initialization");
+                log.trace("End of configPersistence initialization");
                 configPersistence.connect(persistenceConfiguration);
                 return configPersistence;
             }
@@ -137,12 +137,12 @@ public class PersistenceManager {
     }
 
     public LogPersistence initializeLogPersistence(PersistenceTyp persistenceTyp) {
-        log.info("Start of LogPersistence initialization");
+        log.trace("Start of LogPersistence initialization");
         for (LogPersistence logPersistenceInstance : logPersistenceInstances) {
             if (logPersistenceInstance != null && logPersistenceInstance.getPersistenceTyp().equals(persistenceTyp)) {
                 logPersistence = logPersistenceInstance;
                 log.info("LogPersistence: " + logPersistence);
-                log.info("End of LogPersistence initialization");
+                log.trace("End of LogPersistence initialization");
                 logPersistence.connect();
                 return logPersistence;
             }
@@ -150,29 +150,5 @@ public class PersistenceManager {
         return null;
 
     }
-
-    // @Produces
-    // @JobQualifier
-    // public JobPersistence getJobPersistence() {
-    // return jobPersistence;
-    // }
-
-    // @Produces
-    // @ExecutionQualifier
-    // public ExecutionPersistence getJobExecutionPersistence() {
-    // return executionPersistence;
-    // }
-
-    // @Produces
-    // @ConfigQualifier
-    // public ConfigPersistence getJobEngineConfigPersistence() {
-    // return configPersistence;
-    // }
-
-    // @Produces
-    // @LogQualifier
-    // public LogPersistence getJobEngineLogPersistence() {
-    // return logPersistence;
-    // }
 
 }

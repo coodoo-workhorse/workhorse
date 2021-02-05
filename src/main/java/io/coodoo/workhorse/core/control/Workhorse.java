@@ -88,13 +88,13 @@ public class Workhorse {
             scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0,
                     workhorseConfig.getJobQueuePusherPoll(), TimeUnit.SECONDS);
 
-            log.info(
+            log.trace(
                     "Job queue pusher started with a " + workhorseConfig.getJobQueuePusherPoll() + " seconds interval");
 
         } else {
             scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0,
                     workhorseConfig.getJobQueuePollerInterval(), TimeUnit.SECONDS);
-            log.info("Job queue poller started with a " + workhorseConfig.getJobQueuePollerInterval()
+            log.trace("Job queue poller started with a " + workhorseConfig.getJobQueuePollerInterval()
                     + " seconds interval");
         }
 
@@ -118,7 +118,7 @@ public class Workhorse {
                     }
                 }
             }
-            log.info("Number of job execution in buffer:" + executionBuffer.getNumberOfExecution(job.getId()));
+            log.trace("Number of job execution in buffer:" + executionBuffer.getNumberOfExecution(job.getId()));
         }
 
     }
@@ -132,7 +132,7 @@ public class Workhorse {
         if (!executionPersistence.isPusherAvailable() || scheduledFuture == null) {
             return;
         }
-        // log.info("New Job Execution pushed: " + newExecutionEvent);
+        // log.trace("New Job Execution pushed: " + newExecutionEvent);
         if (executionBuffer.getNumberOfExecution(newExecutionEvent.jobId) < workhorseConfig.getJobQueueMax()) {
             Execution execution = executionPersistence.getById(newExecutionEvent.jobId, newExecutionEvent.executionId);
             if (execution != null) {
@@ -140,7 +140,7 @@ public class Workhorse {
                     long delayInSeconds = ChronoUnit.SECONDS.between(workhorseConfig.timestamp(),
                             execution.getMaturity());
 
-                    // log.info("Job Execution : " + execution + " will be process in " +
+                    // log.trace("Job Execution : " + execution + " will be process in " +
                     // delayInSeconds + " seconds");
                     scheduledExecutorService.schedule(() -> {
                         executionDistributor(execution);
@@ -164,16 +164,16 @@ public class Workhorse {
             scheduledFuture = null;
 
             if (executionPersistence.isPusherAvailable()) {
-                log.info("Job queue pusher stopped");
+                log.trace("Job queue pusher stopped");
             } else {
-                log.info("Job queue poller stopped");
+                log.trace("Job queue poller stopped");
             }
 
         } else {
             if (executionPersistence.isPusherAvailable()) {
-                log.info("Job queue pusher cann't be stopped because it's not currently running!");
+                log.trace("Job queue pusher cann't be stopped because it's not currently running!");
             } else {
-                log.info("Job queue poller cann't be stopped because it's not currently running!");
+                log.trace("Job queue poller cann't be stopped because it's not currently running!");
             }
         }
     }
@@ -221,12 +221,13 @@ public class Workhorse {
                 executionBuffer.addExecution(jobId, execution.getId());
             }
 
-            log.info("New Execution: " + execution + " in Queue. Number of Executions in Queue: " + numberOfExecutions);
+            log.trace(
+                    "New Execution: " + execution + " in Queue. Number of Executions in Queue: " + numberOfExecutions);
         } finally {
             lock.unlock();
         }
 
-        log.info(executionBuffer.getRunningJobThreadCounts(jobId) + "");
+        log.trace(executionBuffer.getRunningJobThreadCounts(jobId) + "");
         if (executionBuffer.getJobThreadCounts(jobId) > executionBuffer.getRunningJobThreadCounts(jobId)) {
             // lock = executionQueue.getLock(jobId);
             try {
@@ -277,7 +278,7 @@ public class Workhorse {
 
         completion.thenApply(fn -> {
             executionBuffer.removeCompletionStage(jobId, completion);
-            log.info("Thread is really over: " + fn);
+            log.trace("Thread is really over: " + fn);
             return this;
         });
 
@@ -295,7 +296,7 @@ public class Workhorse {
                             - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(durationMillis)));
             final String message = "Duration of all " + job.getName() + " job executions: " + durationText;
 
-            log.info(message + durationMillis);
+            log.trace(message + durationMillis);
 
             executionBuffer.removeJobStartTimes(job.getId());
         }

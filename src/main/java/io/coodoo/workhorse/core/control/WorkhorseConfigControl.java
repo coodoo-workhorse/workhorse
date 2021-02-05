@@ -84,7 +84,7 @@ public class WorkhorseConfigControl {
             workhorseLogService.logChange(null, null, "Persistence typ", workhorseConfig.getPersistenceTyp(),
                     persistenceTyp, null);
             workhorseConfig.setPersistenceTyp(persistenceTyp);
-            log.info(" The persistence have been changed. The event will be propagate ");
+            log.trace(" The persistence have been changed. The event will be propagate ");
 
             restartEvent.fireAsync(new RestartWorkhorseEvent(null, workhorseConfig));
         }

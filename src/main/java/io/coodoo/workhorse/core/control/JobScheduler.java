@@ -73,10 +73,10 @@ public class JobScheduler {
 
                 CronExpression cron = new CronExpression(job.getSchedule());
                 LocalDateTime nextTime = cron.nextTimeAfter(workhorseConfig.timestamp());
-                log.info("next execution of Job: " + job + " on : " + nextTime);
+                log.trace("next execution of Job: " + job + " on : " + nextTime);
                 long initialDelay = ChronoUnit.SECONDS.between(workhorseConfig.timestamp(), nextTime);
                 long period = ChronoUnit.SECONDS.between(nextTime, cron.nextTimeAfter(nextTime));
-                log.info("period: " + period + " seconds");
+                log.trace("period: " + period + " seconds");
 
                 ScheduledFuture<?> scheduledJobFuture = scheduledExecutorService.scheduleAtFixedRate(() -> {
                     triggerScheduledExecutionCreation(job);
@@ -101,9 +101,9 @@ public class JobScheduler {
         if (scheduledFuture != null) {
             scheduledFuture.cancel(false);
             scheduledFuture = null;
-            log.info("Schedule stopped for Job " + job);
+            log.trace("Schedule stopped for Job " + job);
         } else {
-            log.info("No scheduled execution found for the given job " + job);
+            log.trace("No scheduled execution found for the given job " + job);
         }
 
     }
@@ -112,7 +112,7 @@ public class JobScheduler {
      * Start an execution after timeout
      */
     public void triggerScheduledExecutionCreation(Job job) {
-        log.info("TimeOut with Job: " + job);
+        log.trace("TimeOut with Job: " + job);
         try {
             workhorseController.triggerScheduledExecutionCreation(job);
         } catch (Exception e) {

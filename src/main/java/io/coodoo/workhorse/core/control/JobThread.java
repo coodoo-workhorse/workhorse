@@ -54,7 +54,7 @@ public class JobThread {
 
         long t1 = System.currentTimeMillis();
         thread = Thread.currentThread();
-        log.info("start of the Thread: " + thread);
+        log.trace("start of the Thread: " + thread);
 
         Long jobId = job.getId();
 
@@ -85,7 +85,7 @@ public class JobThread {
 
                 long millisAtStart = System.currentTimeMillis();
 
-                log.info("On Running Job Execution:" + runningExecution);
+                log.trace("On Running Job Execution:" + runningExecution);
 
                 try {
 
@@ -107,7 +107,7 @@ public class JobThread {
                     updateExecutionStatus(execution, ExecutionStatus.FINISHED, workhorseConfig.timestamp(),
                             Long.valueOf(duration), executionLog);
 
-                    log.info("Execution " + execution.getId() + ", duration: " + execution.getDuration()
+                    log.trace("Execution " + execution.getId() + ", duration: " + execution.getDuration()
                             + " was successfull");
                     executionBuffer.removeRunningExecution(jobId, execution.getId());
 
@@ -121,7 +121,7 @@ public class JobThread {
                     if (nextInChain != null) {
                         execution = nextInChain;
                         runningExecution = execution;
-                        log.info("This execution, Id: " + execution.getId() + " of the chain "
+                        log.trace("This execution, Id: " + execution.getId() + " of the chain "
                                 + nextInChain.getChainId() + " will be process as next.");
                         continue executionLoop;
                     }
@@ -143,7 +143,7 @@ public class JobThread {
 
                     runningExecution = execution;
 
-                    log.info("Execution " + execution.getJobId() + " failed. It will be retry in "
+                    log.trace("Execution " + execution.getJobId() + " failed. It will be retry in "
                             + job.getRetryDelay() / 1000 + " seconds. ");
 
                     Thread.sleep(job.getRetryDelay());
@@ -152,7 +152,7 @@ public class JobThread {
         }
 
         long t2 = System.currentTimeMillis();
-        log.info("End of the Thread in " + (t2 - t1) + " milli .");
+        log.trace("End of the Thread in " + (t2 - t1) + " milli .");
 
         return Long.valueOf(t2 - t1);
     }
@@ -185,12 +185,12 @@ public class JobThread {
 
             // If they are no more Execution, finish the JobThread
             if (execution == null) {
-                log.info("No more executions for the Job: " + job + " to execute");
+                log.trace("No more executions for the Job: " + job + " to execute");
 
                 executionBuffer.removeJobThread(jobId, this);
                 executionBuffer.removeRunningJobThreadCounts(jobId);
                 if (executionBuffer.getJobThreads(jobId).isEmpty()) {
-                    log.info("All job executions done for job " + job);
+                    log.trace("All job executions done for job " + job);
                 }
 
             }

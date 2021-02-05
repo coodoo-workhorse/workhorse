@@ -135,7 +135,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
                 if (executionFromMemory != null && chainId.equals(executionFromMemory.getChainId())
                         && previousExecutionId.equals(executionFromMemory.getChainedPreviousExecutionId())
                         && ExecutionStatus.QUEUED.equals(executionFromMemory.getStatus())) {
-                    log.info("From Peristennce. Next Job Execution In Chain : " + executionFromMemory);
+                    log.trace("From Peristennce. Next Job Execution In Chain : " + executionFromMemory);
                     return executionFromMemory;
                 }
             }
@@ -227,7 +227,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
         int count = 0;
         for (Execution execution : memoryPersistence.getExecutions().values()) {
             if (jobId.equals(execution.getJobId()) && preDate.compareTo(execution.getCreatedAt()) > 0) {
-                log.info("Next Execution have to be delete: " + execution);
+                log.trace("Next Execution have to be delete: " + execution);
                 delete(jobId, execution.getId());
                 count++;
             }

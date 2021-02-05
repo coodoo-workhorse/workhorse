@@ -82,7 +82,7 @@ public class WorkhorseController {
                     job.setStatus(JobStatus.NO_WORKER);
                     jobPersistence.update(job.getId(), job);
                     log.error("No Worker Class found for Job: " + job);
-                    log.info("JobStatus of Job " + job + " updated from " + JobStatus.NO_WORKER + " to "
+                    log.trace("JobStatus of Job " + job + " updated from " + JobStatus.NO_WORKER + " to "
                             + JobStatus.NO_WORKER);
                     jobErrorEvent.fire(new JobErrorEvent(new Throwable(ErrorType.NO_JOB_WORKER_FOUND.getMessage()),
                             ErrorType.NO_JOB_WORKER_FOUND.getMessage(), job.getId(), job.getStatus()));
@@ -91,7 +91,7 @@ public class WorkhorseController {
                 if (job.getStatus().equals(JobStatus.NO_WORKER)) {
                     job.setStatus(JobStatus.INACTIVE);
                     jobPersistence.update(job.getId(), job);
-                    log.info("JobStatus of Job " + job + "updated from " + JobStatus.NO_WORKER + " to "
+                    log.trace("JobStatus of Job " + job + "updated from " + JobStatus.NO_WORKER + " to "
                             + JobStatus.INACTIVE);
                     workhorseLogService.logChange(job.getId(), job.getStatus(), " Status ", JobStatus.NO_WORKER,
                             JobStatus.INACTIVE, " Worker class found. ");
@@ -168,7 +168,7 @@ public class WorkhorseController {
 
         jobPersistence.persist(job);
 
-        log.info("Job created:" + job);
+        log.trace("Job created:" + job);
     }
 
     /**
@@ -314,7 +314,7 @@ public class WorkhorseController {
         }
 
         executionPersistence.persist(execution);
-        log.info("Execution successfully created: " + execution);
+        log.trace("Execution successfully created: " + execution);
         return execution;
 
     }
@@ -472,7 +472,7 @@ public class WorkhorseController {
             job.setUniqueInQueue(uniqueInQueue);
         }
 
-        log.info("Job updated: " + job);
+        log.trace("Job updated: " + job);
 
         jobPersistence.update(jobId, job);
 
