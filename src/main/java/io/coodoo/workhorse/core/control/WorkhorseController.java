@@ -12,7 +12,8 @@ import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
-import org.jboss.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.coodoo.workhorse.core.boundary.WorkerWith;
 import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
@@ -33,7 +34,7 @@ import io.coodoo.workhorse.util.WorkhorseUtil;
 @ApplicationScoped
 public class WorkhorseController {
 
-    private static final Logger log = Logger.getLogger(WorkhorseController.class);
+    private static final Logger log = LoggerFactory.getLogger(WorkhorseController.class);
 
     @Inject
     @Any

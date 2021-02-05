@@ -6,7 +6,8 @@ import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
-import org.jboss.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.interfaces.ConfigPersistence;
@@ -22,7 +23,7 @@ import io.coodoo.workhorse.persistence.interfaces.qualifier.LogQualifier;
 @ApplicationScoped
 public class PersistenceManager {
 
-    private static final Logger log = Logger.getLogger(PersistenceManager.class);
+    private static final Logger log = LoggerFactory.getLogger(PersistenceManager.class);
 
     @Inject
     @Any
@@ -75,7 +76,8 @@ public class PersistenceManager {
         initializeExecutionPersistence(persistenceTyp);
         initializeLogPersistence(persistenceTyp);
 
-        if (jobPersistence == null || executionPersistence == null || configPersistence == null || logPersistence == null) {
+        if (jobPersistence == null || executionPersistence == null || configPersistence == null
+                || logPersistence == null) {
             throw new RuntimeException("The Persistence could not be load!!");
         }
     }
@@ -106,7 +108,8 @@ public class PersistenceManager {
     public ExecutionPersistence initializeExecutionPersistence(PersistenceTyp persistenceTyp) {
         log.info("Start of ExecutionPersistence initialization");
         for (ExecutionPersistence executionPersistenceInstance : executionPersistenceInstances) {
-            if (executionPersistenceInstance != null && executionPersistenceInstance.getPersistenceTyp().equals(persistenceTyp)) {
+            if (executionPersistenceInstance != null
+                    && executionPersistenceInstance.getPersistenceTyp().equals(persistenceTyp)) {
                 executionPersistence = executionPersistenceInstance;
                 log.info("ExecutionPersistence: " + executionPersistence);
                 log.info("End of ExecutionPersistence initialization");
@@ -117,10 +120,12 @@ public class PersistenceManager {
         return null;
     }
 
-    public ConfigPersistence initializeJobEngineConfigPersistence(PersistenceTyp persistenceTyp, Object persistenceConfiguration) {
+    public ConfigPersistence initializeJobEngineConfigPersistence(PersistenceTyp persistenceTyp,
+            Object persistenceConfiguration) {
         log.info("Start of ExecutionPersistence initialization");
         for (ConfigPersistence configPersistenceInstance : configPersistenceInstances) {
-            if (configPersistenceInstance != null && configPersistenceInstance.getPersistenceTyp().equals(persistenceTyp)) {
+            if (configPersistenceInstance != null
+                    && configPersistenceInstance.getPersistenceTyp().equals(persistenceTyp)) {
                 configPersistence = configPersistenceInstance;
                 log.info("configPersistence: " + configPersistence);
                 log.info("End of configPersistence initialization");

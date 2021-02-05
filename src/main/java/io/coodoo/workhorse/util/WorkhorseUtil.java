@@ -11,11 +11,12 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import org.jboss.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WorkhorseUtil {
 
-    private static Logger logger = Logger.getLogger(WorkhorseUtil.class);
+    private static Logger logger = LoggerFactory.getLogger(WorkhorseUtil.class);
 
     private static ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 

@@ -10,7 +10,8 @@ import javax.enterprise.event.ObservesAsync;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jboss.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.coodoo.workhorse.api.DTO.ExecutionInfo;
 import io.coodoo.workhorse.api.DTO.GroupInfo;
@@ -38,7 +39,7 @@ import io.coodoo.workhorse.util.CronExpression;
 @ApplicationScoped
 public class WorkhorseService {
 
-    private static final Logger log = Logger.getLogger(WorkhorseService.class);
+    private static final Logger log = LoggerFactory.getLogger(WorkhorseService.class);
 
     @Inject
     Workhorse workhorse;

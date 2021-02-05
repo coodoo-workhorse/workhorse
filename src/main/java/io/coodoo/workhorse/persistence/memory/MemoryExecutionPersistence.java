@@ -13,7 +13,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
-import org.jboss.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.coodoo.workhorse.core.control.event.NewExecutionEvent;
 import io.coodoo.workhorse.core.entity.Execution;
@@ -25,7 +26,7 @@ import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 @ApplicationScoped
 public class MemoryExecutionPersistence implements ExecutionPersistence {
 
-    private static Logger log = Logger.getLogger(MemoryExecutionPersistence.class);
+    private static Logger log = LoggerFactory.getLogger(MemoryExecutionPersistence.class);
 
     @Inject
     MemoryPersistence memoryPersistence;

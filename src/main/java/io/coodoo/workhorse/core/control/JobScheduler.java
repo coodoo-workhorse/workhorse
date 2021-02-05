@@ -14,7 +14,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
-import org.jboss.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.coodoo.workhorse.core.control.event.JobErrorEvent;
 import io.coodoo.workhorse.core.entity.ErrorType;
@@ -26,7 +27,7 @@ import io.coodoo.workhorse.util.CronExpression;
 @ApplicationScoped
 public class JobScheduler {
 
-    private static final Logger log = Logger.getLogger(JobScheduler.class);
+    private static final Logger log = LoggerFactory.getLogger(JobScheduler.class);
 
     @Inject
     WorkhorseConfig workhorseConfig;
@@ -86,7 +87,8 @@ public class JobScheduler {
             } catch (Exception e) {
                 job.setStatus(JobStatus.ERROR);
                 workhorseController.update(job.getId(), job);
-                jobErrorEvent.fire(new JobErrorEvent(e, ErrorType.INVALID_SCHEDULE.getMessage(), job.getId(), JobStatus.ERROR));
+                jobErrorEvent.fire(
+                        new JobErrorEvent(e, ErrorType.INVALID_SCHEDULE.getMessage(), job.getId(), JobStatus.ERROR));
             }
         }
     }

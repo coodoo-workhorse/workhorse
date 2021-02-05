@@ -92,7 +92,7 @@
 // public void testLogInfo() throws Exception {
 //
 // given(jobExecution.getLog()).willReturn(null);
-// Logger logger = mock(Logger.class);
+// Logger logger = mock(LoggerFactory.class);
 // String message = "xxx";
 //
 // jobContext.init(jobExecution);
@@ -112,7 +112,7 @@
 // public void testLogWarn() throws Exception {
 //
 // given(jobExecution.getLog()).willReturn(null);
-// Logger logger = mock(Logger.class);
+// Logger logger = mock(LoggerFactory.class);
 // String message = "xxx";
 //
 // jobContext.init(jobExecution);
@@ -132,7 +132,7 @@
 // public void testLogWarn_2lines() throws Exception {
 //
 // given(jobExecution.getLog()).willReturn(null);
-// Logger logger = mock(Logger.class);
+// Logger logger = mock(LoggerFactory.class);
 // String message = "xxx";
 //
 // jobContext.init(jobExecution);
@@ -154,7 +154,7 @@
 // public void testLogError() throws Exception {
 //
 // given(jobExecution.getLog()).willReturn(null);
-// Logger logger = mock(Logger.class);
+// Logger logger = mock(LoggerFactory.class);
 // String message = "xxx";
 //
 // jobContext.init(jobExecution);
@@ -174,7 +174,7 @@
 // public void testLogError_2lines() throws Exception {
 //
 // given(jobExecution.getLog()).willReturn(null);
-// Logger logger = mock(Logger.class);
+// Logger logger = mock(LoggerFactory.class);
 // String message = "xxx";
 //
 // jobContext.init(jobExecution);

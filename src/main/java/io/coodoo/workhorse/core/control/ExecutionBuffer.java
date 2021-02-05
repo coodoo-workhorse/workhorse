@@ -16,7 +16,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.jboss.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.Job;
@@ -27,7 +28,7 @@ import io.coodoo.workhorse.core.entity.WorkhorseInfo;
 @ApplicationScoped
 public class ExecutionBuffer {
 
-    private static final Logger log = Logger.getLogger(ExecutionBuffer.class);
+    private static final Logger log = LoggerFactory.getLogger(ExecutionBuffer.class);
 
     @Inject
     WorkhorseController workhorseController;
@@ -97,8 +98,8 @@ public class ExecutionBuffer {
 
         if (sizeMemoryQueue > 0 || sizePriorityMemoryQueue > 0) {
 
-            log.info("Clearing job execution queue with " + executions.get(job.getId()).size() + " elements and " + priorityExecutions.get(job.getId()).size()
-                            + " priority elements for job: " + job.getName());
+            log.info("Clearing job execution queue with " + executions.get(job.getId()).size() + " elements and "
+                    + priorityExecutions.get(job.getId()).size() + " priority elements for job: " + job.getName());
 
             executions.get(job.getId()).clear();
             priorityExecutions.get(job.getId()).clear();
@@ -209,8 +210,10 @@ public class ExecutionBuffer {
     }
 
     /**
-     * This function check, if a job execution can be process. The existence of a ExecutionQueueBuffer for the given <code>jobId</code> is checked. It will be
-     * check, if the ExecutionQueueBuffer do not contain the given <code>executionId</code>
+     * This function check, if a job execution can be process. The existence of a
+     * ExecutionQueueBuffer for the given <code>jobId</code> is checked. It will be
+     * check, if the ExecutionQueueBuffer do not contain the given
+     * <code>executionId</code>
      * 
      * @param jobId
      * @param executionId
@@ -218,12 +221,13 @@ public class ExecutionBuffer {
      */
     public boolean isAddable(Long jobId, Long executionId) {
 
-        if (runningExecutions.get(jobId) == null || executions.get(jobId) == null || priorityExecutions.get(jobId) == null) {
+        if (runningExecutions.get(jobId) == null || executions.get(jobId) == null
+                || priorityExecutions.get(jobId) == null) {
             log.error("They are not ExecutionQueue for the job with Id  " + jobId);
             return false;
         }
         if (runningExecutions.get(jobId).contains(executionId) || executions.get(jobId).contains(executionId)
-                        || priorityExecutions.get(jobId).contains(executionId)) {
+                || priorityExecutions.get(jobId).contains(executionId)) {
             return false;
         }
         return true;
@@ -328,7 +332,8 @@ public class ExecutionBuffer {
             info.setThreadCount(jobThreadCounts.get(jobId));
         }
         if (jobStartTimes != null && jobStartTimes.get(jobId) != null) {
-            info.setThreadStartTime(LocalDateTime.ofInstant(Instant.ofEpochMilli(jobStartTimes.get(jobId)), ZoneId.of(workhorseConfig.getTimeZone())));
+            info.setThreadStartTime(LocalDateTime.ofInstant(Instant.ofEpochMilli(jobStartTimes.get(jobId)),
+                    ZoneId.of(workhorseConfig.getTimeZone())));
         }
         // if (pausedJobs != null && pausedJobs.get(jobId) != null) {
         // info.setPaused(pausedJobs.get(jobId));

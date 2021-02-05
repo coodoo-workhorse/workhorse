@@ -8,7 +8,8 @@ import javax.enterprise.event.Event;
 import javax.enterprise.event.ObservesAsync;
 import javax.inject.Inject;
 
-import org.jboss.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.coodoo.workhorse.core.control.event.AllExecutionsDoneEvent;
 import io.coodoo.workhorse.core.entity.Execution;
@@ -47,7 +48,7 @@ public class JobThread {
     private Execution runningExecution;
     private Thread thread;
 
-    private static final Logger log = Logger.getLogger(JobThread.class);
+    private static final Logger log = LoggerFactory.getLogger(JobThread.class);
 
     public Long execute(@ObservesAsync Job job) throws Exception {
 
@@ -103,9 +104,11 @@ public class JobThread {
 
                     String executionLog = workerInstance.getLog();
 
-                    updateExecutionStatus(execution, ExecutionStatus.FINISHED, workhorseConfig.timestamp(), Long.valueOf(duration), executionLog);
+                    updateExecutionStatus(execution, ExecutionStatus.FINISHED, workhorseConfig.timestamp(),
+                            Long.valueOf(duration), executionLog);
 
-                    log.info("Execution " + execution.getId() + ", duration: " + execution.getDuration() + " was successfull");
+                    log.info("Execution " + execution.getId() + ", duration: " + execution.getDuration()
+                            + " was successfull");
                     executionBuffer.removeRunningExecution(jobId, execution.getId());
 
                     workerInstance.onFinished(execution.getId());
@@ -118,7 +121,8 @@ public class JobThread {
                     if (nextInChain != null) {
                         execution = nextInChain;
                         runningExecution = execution;
-                        log.info("This execution, Id: " + execution.getId() + " of the chain " + nextInChain.getChainId() + " will be process as next.");
+                        log.info("This execution, Id: " + execution.getId() + " of the chain "
+                                + nextInChain.getChainId() + " will be process as next.");
                         continue executionLoop;
                     }
 
@@ -130,7 +134,8 @@ public class JobThread {
                     String executionLog = workerInstance.getLog();
 
                     // create a new Job Execution to retry this fail.
-                    execution = workhorseController.handleFailedExecution(job, execution.getId(), e, duration, workerInstance, executionLog);
+                    execution = workhorseController.handleFailedExecution(job, execution.getId(), e, duration,
+                            workerInstance, executionLog);
 
                     if (execution == null) {
                         break executionLoop; // Do not retry
@@ -138,7 +143,8 @@ public class JobThread {
 
                     runningExecution = execution;
 
-                    log.info("Execution " + execution.getJobId() + " failed. It will be retry in " + job.getRetryDelay() / 1000 + " seconds. ");
+                    log.info("Execution " + execution.getJobId() + " failed. It will be retry in "
+                            + job.getRetryDelay() / 1000 + " seconds. ");
 
                     Thread.sleep(job.getRetryDelay());
                 }
@@ -179,7 +185,7 @@ public class JobThread {
 
             // If they are no more Execution, finish the JobThread
             if (execution == null) {
-                log.infof("No more executions for the Job: " + job + " to execute");
+                log.info("No more executions for the Job: " + job + " to execute");
 
                 executionBuffer.removeJobThread(jobId, this);
                 executionBuffer.removeRunningJobThreadCounts(jobId);
@@ -221,7 +227,8 @@ public class JobThread {
         updateExecutionStatus(execution, ExecutionStatus.RUNNING, timeStamp, null, null);
     }
 
-    public void updateExecutionStatus(Execution execution, ExecutionStatus executionStatus, LocalDateTime timeStamp, Long duration, String executionLog) {
+    public void updateExecutionStatus(Execution execution, ExecutionStatus executionStatus, LocalDateTime timeStamp,
+            Long duration, String executionLog) {
         execution.setStatus(executionStatus);
         execution.setLog(executionLog);
 

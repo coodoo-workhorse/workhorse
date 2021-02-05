@@ -16,7 +16,8 @@ import javax.enterprise.event.Observes;
 import javax.enterprise.event.ObservesAsync;
 import javax.inject.Inject;
 
-import org.jboss.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.coodoo.workhorse.core.control.event.AllExecutionsDoneEvent;
 import io.coodoo.workhorse.core.control.event.JobErrorEvent;
@@ -36,7 +37,7 @@ import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
 @ApplicationScoped
 public class Workhorse {
 
-    private static final Logger log = Logger.getLogger(Workhorse.class);
+    private static final Logger log = LoggerFactory.getLogger(Workhorse.class);
 
     @Inject
     @JobQualifier
@@ -84,13 +85,17 @@ public class Workhorse {
         }
 
         if (executionPersistence.isPusherAvailable()) {
-            scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0, workhorseConfig.getJobQueuePusherPoll(), TimeUnit.SECONDS);
+            scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0,
+                    workhorseConfig.getJobQueuePusherPoll(), TimeUnit.SECONDS);
 
-            log.info("Job queue pusher started with a " + workhorseConfig.getJobQueuePusherPoll() + " seconds interval");
+            log.info(
+                    "Job queue pusher started with a " + workhorseConfig.getJobQueuePusherPoll() + " seconds interval");
 
         } else {
-            scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0, workhorseConfig.getJobQueuePollerInterval(), TimeUnit.SECONDS);
-            log.info("Job queue poller started with a " + workhorseConfig.getJobQueuePollerInterval() + " seconds interval");
+            scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0,
+                    workhorseConfig.getJobQueuePollerInterval(), TimeUnit.SECONDS);
+            log.info("Job queue poller started with a " + workhorseConfig.getJobQueuePollerInterval()
+                    + " seconds interval");
         }
 
     }
@@ -102,7 +107,8 @@ public class Workhorse {
         for (Job job : jobPersistence.getAllByStatus(JobStatus.ACTIVE)) {
 
             if (executionBuffer.getNumberOfExecution(job.getId()) < workhorseConfig.getJobQueueMin()) {
-                List<Execution> executions = executionPersistence.pollNextExecutions(job.getId(), workhorseConfig.getJobQueueMax());
+                List<Execution> executions = executionPersistence.pollNextExecutions(job.getId(),
+                        workhorseConfig.getJobQueueMax());
                 for (Execution execution : executions) {
                     if (execution == null) {
                         continue;
@@ -131,9 +137,11 @@ public class Workhorse {
             Execution execution = executionPersistence.getById(newExecutionEvent.jobId, newExecutionEvent.executionId);
             if (execution != null) {
                 if (execution.getMaturity() != null) {
-                    long delayInSeconds = ChronoUnit.SECONDS.between(workhorseConfig.timestamp(), execution.getMaturity());
+                    long delayInSeconds = ChronoUnit.SECONDS.between(workhorseConfig.timestamp(),
+                            execution.getMaturity());
 
-                    // log.info("Job Execution : " + execution + " will be process in " + delayInSeconds + " seconds");
+                    // log.info("Job Execution : " + execution + " will be process in " +
+                    // delayInSeconds + " seconds");
                     scheduledExecutorService.schedule(() -> {
                         executionDistributor(execution);
                     }, delayInSeconds, TimeUnit.SECONDS);
@@ -213,17 +221,18 @@ public class Workhorse {
                 executionBuffer.addExecution(jobId, execution.getId());
             }
 
-            log.infof("New Execution: " + execution + " in Queue. Number of Executions in Queue: " + numberOfExecutions);
+            log.info("New Execution: " + execution + " in Queue. Number of Executions in Queue: " + numberOfExecutions);
         } finally {
             lock.unlock();
         }
 
-        log.info(executionBuffer.getRunningJobThreadCounts(jobId));
+        log.info(executionBuffer.getRunningJobThreadCounts(jobId) + "");
         if (executionBuffer.getJobThreadCounts(jobId) > executionBuffer.getRunningJobThreadCounts(jobId)) {
             // lock = executionQueue.getLock(jobId);
             try {
                 lock.lock();
-                for (int i = executionBuffer.getRunningJobThreadCounts(jobId); i < executionBuffer.getJobThreadCounts(jobId); i++) {
+                for (int i = executionBuffer.getRunningJobThreadCounts(jobId); i < executionBuffer
+                        .getJobThreadCounts(jobId); i++) {
                     startJobThread(jobId);
                 }
             } finally {
@@ -261,7 +270,8 @@ public class Workhorse {
 
             executionBuffer.cancelProcess(job);
 
-            jobErrorEvent.fire(new JobErrorEvent(exception, ErrorType.JOB_THREAD_ERROR.getMessage(), job.getId(), JobStatus.ERROR));
+            jobErrorEvent.fire(new JobErrorEvent(exception, ErrorType.JOB_THREAD_ERROR.getMessage(), job.getId(),
+                    JobStatus.ERROR));
             return job;
         });
 
@@ -281,7 +291,8 @@ public class Workhorse {
             long durationMillis = System.currentTimeMillis() - startTime;
 
             final String durationText = String.format("%d min, %d sec", TimeUnit.MILLISECONDS.toMinutes(durationMillis),
-                            TimeUnit.MILLISECONDS.toSeconds(durationMillis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(durationMillis)));
+                    TimeUnit.MILLISECONDS.toSeconds(durationMillis)
+                            - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(durationMillis)));
             final String message = "Duration of all " + job.getName() + " job executions: " + durationText;
 
             log.info(message + durationMillis);

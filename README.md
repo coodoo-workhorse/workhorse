@@ -203,7 +203,7 @@ Workhorse provides a callback method that is called at the end of the batch job.
 @Dependent
 public class LoadDataWorker extends WorkerWith<User> {
 
-    private static Logger log = Logger.getLogger(LoadDataWorker.class);
+    private static Logger log = LoggerFactory.getLogger(LoadDataWorker.class);
 
     @Override
     public void doWork(User user) throws Exception {
@@ -315,7 +315,7 @@ Let's suppose we have a worker `SendEmailWorker`, which job is to send e-mails. 
 @InitialJobConfig(uniqueInQueue = true)
 public class SendEmailWorker extends WorkerWith<EmailData> {
 
-    private static Logger log = Logger.getLogger(SendEmailWorker.class);
+    private static Logger log = LoggerFactory.getLogger(SendEmailWorker.class);
 
     @Override
     public void doWork(EmailData emailData) throws Exception {
@@ -341,7 +341,7 @@ You can configure this feature at the definition of your Worker. Through the ann
 @InitialJobConfig(maxPerMinute = 1000)
 public class MaxPerMinute extends Worker {
 
-    private static Logger log = Logger.getLogger(MaxPerMinute.class);
+    private static Logger log = LoggerFactory.getLogger(MaxPerMinute.class);
 
     @Override
     public void doWork() throws Exception {
@@ -368,7 +368,7 @@ Let's define a Worker `SendEmailWorker`.
 @InitialJobConfig(uniqueInQueue = true)
 public class SendEmailWorker extends WorkerWith<EmailData> {
 
-    private static Logger log = Logger.getLogger(SendEmailWorker.class);
+    private static Logger log = LoggerFactory.getLogger(SendEmailWorker.class);
 
     @Inject
     EmailService emailService;
@@ -415,7 +415,7 @@ In this example a Worker `GenerateStatisticsWorker` is created to generate stati
 @InitialJobConfig(failRetries = 3, retryDelay = 2000)
 public class GenerateStatisticsWorker extends Worker {
 
-    private static Logger log = Logger.getLogger(GenerateStatisticsWorker.class);
+    private static Logger log = LoggerFactory.getLogger(GenerateStatisticsWorker.class);
 
     @Override
     public void doWork() throws Exception {
@@ -446,7 +446,7 @@ In this example a Worker `GenerateStatisticsWorker` is created to generate stati
 @Dependent
 public class GenerateStatisticsWorker extends Worker {
 
-    private static Logger log = Logger.getLogger(GenerateStatisticsWorker.class);
+    private static Logger log = LoggerFactory.getLogger(GenerateStatisticsWorker.class);
 
     @Override
     public void doWork() throws Exception {
@@ -477,7 +477,7 @@ To provide a custom callback method for error handling, you just have to overrid
 @Dependent
 public class ErrorHandlingWorker extends Worker {
 
-    private static Logger log = Logger.getLogger(ErrorHandlingWorker.class);
+    private static Logger log = LoggerFactory.getLogger(ErrorHandlingWorker.class);
 
     @Override
     public void doWork() throws Exception {
@@ -509,7 +509,7 @@ In this example a Worker `ImportDataWorker` was created.
 @Dependent
 public class ImportDataWorker extends Worker {
 
-    private static Logger log = Logger.getLogger(ImportDataWorker.class);
+    private static Logger log = LoggerFactory.getLogger(ImportDataWorker.class);
 
     @Override
     public void doWork() throws Exception {
