@@ -12,6 +12,12 @@
 		<name>coodoo GmbH</name>
 		<url>https://coodoo.io</url>
 	</organization>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<failOnMissingWebXml>false</failOnMissingWebXml>
+	</properties>
 	<developers>
 		<developer>
 			<name>Markus Kühle</name>
@@ -45,15 +51,12 @@
 			<artifactId>jboss-logging</artifactId>
 			<version>3.4.1.Final</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.7.30</version>
 			<scope>provided</scope>
 		</dependency>
-
-
 		<dependency>
 			<groupId>javax.enterprise</groupId>
 			<artifactId>cdi-api</artifactId>
@@ -64,11 +67,6 @@
 			<groupId>javax.json.bind</groupId>
 			<artifactId>javax.json.bind-api</artifactId>
 			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.resteasy</groupId>
-			<artifactId>resteasy-jaxrs</artifactId>
-			<version>3.14.0.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -89,11 +87,6 @@
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
 			<version>2.12.1</version>
-		</dependency>
-		<dependency>
-			<groupId>io.coodoo</groupId>
-			<artifactId>coodoo-listing</artifactId>
-			<version>1.6.0</version>
 		</dependency>
 		<!-- Testing -->
 		<dependency>
@@ -239,12 +232,6 @@
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<failOnMissingWebXml>false</failOnMissingWebXml>
-	</properties>
 	<scm>
 		<connection>scm:git:git@github.com/coodoo-io/workhorse.git</connection>
 		<url>scm:git:git@github.com:coodoo-io/workhorse.git</url>
