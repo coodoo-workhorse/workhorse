@@ -1,11 +1,10 @@
-
-[logo]: https://gitlab.coodoo.io/workhorse/workhorse/-/raw/master/logo.png "Workhorse: Extendable Java Job Engine for background jobs and business critical tasks"
-
-# Workhorse ![alt text][logo]
+# Workhorse 
 
 > Extendable Java CDI Job Engine for background jobs and business critical tasks
 
+
 ## Table of Contents
+<img align="right" height="200px" src="logo.png">
 
 - [Who is this Workhorse?](#who-is-this-workhorse)
 - [Install](#install)
