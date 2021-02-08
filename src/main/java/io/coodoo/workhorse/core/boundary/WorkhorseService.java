@@ -56,6 +56,11 @@ public class WorkhorseService {
     @Inject
     JobScheduler jobScheduler;
 
+    /**
+     * Start Workhorse with configuration
+     * 
+     * @param workhorseConfig Golbal configuration of Workhorse
+     */
     public void start(WorkhorseConfig workhorseConfig) {
 
         persistenceManager.initializePersistence(workhorseConfig.getPersistenceName(),
@@ -68,6 +73,9 @@ public class WorkhorseService {
 
     }
 
+    /**
+     * Start Workhorse
+     */
     public void start() {
         start(new WorkhorseConfig());
     }
