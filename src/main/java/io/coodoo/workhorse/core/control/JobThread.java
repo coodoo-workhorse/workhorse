@@ -15,17 +15,14 @@ import io.coodoo.workhorse.core.control.event.AllExecutionsDoneEvent;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
-import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.ExecutionQualifier;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
+import io.coodoo.workhorse.util.WorkhorseUtil;
 
 @Dependent
 public class JobThread {
-
-    @Inject
-    WorkhorseConfig workhorseConfig;
 
     @Inject
     @ExecutionQualifier
@@ -89,7 +86,7 @@ public class JobThread {
 
                 try {
 
-                    updateExecutionStatus(execution, ExecutionStatus.RUNNING, workhorseConfig.timestamp(), null, null);
+                    updateExecutionStatus(execution, ExecutionStatus.RUNNING, WorkhorseUtil.timestamp(), null, null);
 
                     // Land of Witch !!
                     workerInstance.doWork(execution);
@@ -104,7 +101,7 @@ public class JobThread {
 
                     String executionLog = workerInstance.getLog();
 
-                    updateExecutionStatus(execution, ExecutionStatus.FINISHED, workhorseConfig.timestamp(),
+                    updateExecutionStatus(execution, ExecutionStatus.FINISHED, WorkhorseUtil.timestamp(),
                             Long.valueOf(duration), executionLog);
 
                     log.trace("Execution {}, duration: {} was successfull", execution.getId(), execution.getDuration());

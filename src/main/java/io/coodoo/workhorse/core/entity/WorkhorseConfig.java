@@ -3,18 +3,12 @@ package io.coodoo.workhorse.core.entity;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-import javax.enterprise.context.ApplicationScoped;
-
 import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 
 /**
  * @author coodoo GmbH (coodoo.io)
  */
 
-// TODO zentrale config.
-// Probieren: BuilderPattern
-
-@ApplicationScoped
 public class WorkhorseConfig {
 
     /**
@@ -49,21 +43,30 @@ public class WorkhorseConfig {
     private PersistenceTyp persistenceTyp = PersistenceTyp.MEMORY;
 
     /**
+     * Configuration for the choosen persistence.
+     */
+    private Object persistenceConfig = null;
+
+    /**
      * TODO implement me!
      * 
-     * A zombie is an execution that is stuck in status {@link ExecutionStatus#RUNNING} for this amount of minutes (if set to 0 there the hunt is off)
+     * A zombie is an execution that is stuck in status
+     * {@link ExecutionStatus#RUNNING} for this amount of minutes (if set to 0 there
+     * the hunt is off)
      */
     private int executionTimeout = 120;
 
     /**
      * TODO implement me!
      * 
-     * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and doesn't change, it has became a zombie! Once found we have a cure!
+     * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and
+     * doesn't change, it has became a zombie! Once found we have a cure!
      */
     private ExecutionStatus executionTimeoutStatus = ExecutionStatus.ABORTED;
 
     /**
-     * Log change pattern. Placeholder <code>%s</code> for changeParameter, changeOld and changeNew in this order <br>
+     * Log change pattern. Placeholder <code>%s</code> for changeParameter,
+     * changeOld and changeNew in this order <br>
      * Default is <code>Changed %s from '%s' to '%s'</code>
      */
     private String logChange = "%s changed from '%s' to '%s'";
@@ -88,115 +91,148 @@ public class WorkhorseConfig {
      */
     private String logErrorMarker = "[ERROR]";
 
-    /**
-     * @return Current Time by zone defined in {@link WorkhorseConfig#TIME_ZONE}
-     */
-    public LocalDateTime timestamp() {
-        return LocalDateTime.now(ZoneId.of(timeZone));
+    public WorkhorseConfig() {
+    }
+
+    public WorkhorseConfig(String timeZone, Long bufferMax, int bufferMin, int bufferPollInterval,
+            int bufferPushFallbackPollInterval, PersistenceTyp persistenceTyp, int executionTimeout,
+            ExecutionStatus executionTimeoutStatus, String logChange, String logTimeFormat, String logInfoMarker,
+            String logWarnMarker, String logErrorMarker) {
+        this.timeZone = timeZone;
+        this.bufferMax = bufferMax;
+        this.bufferMin = bufferMin;
+        this.bufferPollInterval = bufferPollInterval;
+        this.bufferPushFallbackPollInterval = bufferPushFallbackPollInterval;
+        this.persistenceTyp = persistenceTyp;
+        this.executionTimeout = executionTimeout;
+        this.executionTimeoutStatus = executionTimeoutStatus;
+        this.logChange = logChange;
+        this.logTimeFormat = logTimeFormat;
+        this.logInfoMarker = logInfoMarker;
+        this.logWarnMarker = logWarnMarker;
+        this.logErrorMarker = logErrorMarker;
     }
 
     public String getTimeZone() {
         return timeZone;
     }
 
-    public void setTimeZone(String timeZone) {
+    public WorkhorseConfig setTimeZone(String timeZone) {
         this.timeZone = timeZone;
+        return this;
     }
 
     public Long getJobQueueMax() {
         return bufferMax;
     }
 
-    public void setJobQueueMax(Long jobQueueMax) {
+    public WorkhorseConfig setJobQueueMax(Long jobQueueMax) {
         this.bufferMax = jobQueueMax;
+        return this;
     }
 
     public int getJobQueueMin() {
         return bufferMin;
     }
 
-    public void setJobQueueMin(int jobQueueMin) {
+    public WorkhorseConfig setJobQueueMin(int jobQueueMin) {
         this.bufferMin = jobQueueMin;
+        return this;
     }
 
     public int getJobQueuePollerInterval() {
         return bufferPollInterval;
     }
 
-    public void setJobQueuePollerInterval(int jobQueuePollerInterval) {
+    public WorkhorseConfig setJobQueuePollerInterval(int jobQueuePollerInterval) {
         this.bufferPollInterval = jobQueuePollerInterval;
+        return this;
     }
 
     public int getJobQueuePusherPoll() {
         return bufferPushFallbackPollInterval;
     }
 
-    public void setJobQueuePusherPoll(int jobQueuePusherPoll) {
+    public WorkhorseConfig setJobQueuePusherPoll(int jobQueuePusherPoll) {
         this.bufferPushFallbackPollInterval = jobQueuePusherPoll;
+        return this;
     }
 
     public PersistenceTyp getPersistenceTyp() {
         return persistenceTyp;
     }
 
-    public void setPersistenceTyp(PersistenceTyp persistenceTyp) {
+    public Object getPersistenceConfig() {
+        return persistenceConfig;
+    }
+
+    public WorkhorseConfig setPersistenceTyp(PersistenceTyp persistenceTyp, Object persistenceConfig) {
         this.persistenceTyp = persistenceTyp;
+        this.persistenceConfig = persistenceConfig;
+        return this;
     }
 
     public int getZombieRecognitionTime() {
         return executionTimeout;
     }
 
-    public void setZombieRecognitionTime(int zombieRecognitionTime) {
+    public WorkhorseConfig setZombieRecognitionTime(int zombieRecognitionTime) {
         this.executionTimeout = zombieRecognitionTime;
+        return this;
     }
 
     public ExecutionStatus getZombieCureStatus() {
         return executionTimeoutStatus;
     }
 
-    public void setZombieCureStatus(ExecutionStatus zombieCureStatus) {
+    public WorkhorseConfig setZombieCureStatus(ExecutionStatus zombieCureStatus) {
         this.executionTimeoutStatus = zombieCureStatus;
+        return this;
     }
 
     public String getLogChange() {
         return logChange;
     }
 
-    public void setLogChange(String logChange) {
+    public WorkhorseConfig setLogChange(String logChange) {
         this.logChange = logChange;
+        return this;
     }
 
     public String getLogTimeFormat() {
         return logTimeFormat;
     }
 
-    public void setLogTimeFormat(String logTimeFormat) {
+    public WorkhorseConfig setLogTimeFormat(String logTimeFormat) {
         this.logTimeFormat = logTimeFormat;
+        return this;
     }
 
     public String getLogInfoMarker() {
         return logInfoMarker;
     }
 
-    public void setLogInfoMarker(String logInfoMarker) {
+    public WorkhorseConfig setLogInfoMarker(String logInfoMarker) {
         this.logInfoMarker = logInfoMarker;
+        return this;
     }
 
     public String getLogWarnMarker() {
         return logWarnMarker;
     }
 
-    public void setLogWarnMarker(String logWarnMarker) {
+    public WorkhorseConfig setLogWarnMarker(String logWarnMarker) {
         this.logWarnMarker = logWarnMarker;
+        return this;
     }
 
     public String getLogErrorMarker() {
         return logErrorMarker;
     }
 
-    public void setLogErrorMarker(String logErrorMarker) {
+    public WorkhorseConfig setLogErrorMarker(String logErrorMarker) {
         this.logErrorMarker = logErrorMarker;
+        return this;
     }
 
 }

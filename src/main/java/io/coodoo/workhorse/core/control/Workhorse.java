@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.coodoo.workhorse.core.boundary.Config;
 import io.coodoo.workhorse.core.control.event.AllExecutionsDoneEvent;
 import io.coodoo.workhorse.core.control.event.JobErrorEvent;
 import io.coodoo.workhorse.core.control.event.NewExecutionEvent;
@@ -27,12 +28,12 @@ import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
-import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.PersistenceManager;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.ExecutionQualifier;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
+import io.coodoo.workhorse.util.WorkhorseUtil;
 
 @ApplicationScoped
 public class Workhorse {
@@ -52,9 +53,6 @@ public class Workhorse {
 
     @Inject
     ExecutionBuffer executionBuffer;
-
-    @Inject
-    WorkhorseConfig workhorseConfig;
 
     @Inject
     Event<Job> jobThreadManager;
@@ -86,15 +84,15 @@ public class Workhorse {
 
         if (executionPersistence.isPusherAvailable()) {
             scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0,
-                    workhorseConfig.getJobQueuePusherPoll(), TimeUnit.SECONDS);
+                    Config.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL, TimeUnit.SECONDS);
 
-            log.trace("Job queue pusher started with a {} seconds interval", workhorseConfig.getJobQueuePusherPoll());
+            log.trace("Job queue pusher started with a {} seconds interval",
+                    Config.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL);
 
         } else {
-            scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0,
-                    workhorseConfig.getJobQueuePollerInterval(), TimeUnit.SECONDS);
-            log.trace("Job queue poller started with a {} seconds interval",
-                    workhorseConfig.getJobQueuePollerInterval());
+            scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0, Config.BUFFER_POLL_INTERVAL,
+                    TimeUnit.SECONDS);
+            log.trace("Job queue poller started with a {} seconds interval", Config.BUFFER_POLL_INTERVAL);
         }
 
     }
@@ -105,9 +103,8 @@ public class Workhorse {
     void poll() {
         for (Job job : jobPersistence.getAllByStatus(JobStatus.ACTIVE)) {
 
-            if (executionBuffer.getNumberOfExecution(job.getId()) < workhorseConfig.getJobQueueMin()) {
-                List<Execution> executions = executionPersistence.pollNextExecutions(job.getId(),
-                        workhorseConfig.getJobQueueMax());
+            if (executionBuffer.getNumberOfExecution(job.getId()) < Config.BUFFER_MIN) {
+                List<Execution> executions = executionPersistence.pollNextExecutions(job.getId(), Config.BUFFER_MAX);
                 for (Execution execution : executions) {
                     if (execution == null) {
                         continue;
@@ -131,12 +128,12 @@ public class Workhorse {
         if (!executionPersistence.isPusherAvailable() || scheduledFuture == null) {
             return;
         }
-        // log.trace("New Job Execution pushed: " + newExecutionEvent);
-        if (executionBuffer.getNumberOfExecution(newExecutionEvent.jobId) < workhorseConfig.getJobQueueMax()) {
+        log.trace("New Job Execution pushed: " + newExecutionEvent);
+        if (executionBuffer.getNumberOfExecution(newExecutionEvent.jobId) < Config.BUFFER_MAX) {
             Execution execution = executionPersistence.getById(newExecutionEvent.jobId, newExecutionEvent.executionId);
             if (execution != null) {
                 if (execution.getMaturity() != null) {
-                    long delayInSeconds = ChronoUnit.SECONDS.between(workhorseConfig.timestamp(),
+                    long delayInSeconds = ChronoUnit.SECONDS.between(WorkhorseUtil.timestamp(),
                             execution.getMaturity());
 
                     log.trace("Job Execution : {} will be process in {} seconds", execution, delayInSeconds);

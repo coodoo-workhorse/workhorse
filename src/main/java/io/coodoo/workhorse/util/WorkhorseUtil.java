@@ -5,6 +5,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +15,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.coodoo.workhorse.core.boundary.Config;
 
 public class WorkhorseUtil {
 
@@ -57,6 +61,13 @@ public class WorkhorseUtil {
         } catch (IOException e) {
             throw new RuntimeException("Parameter object could not be mapped to json", e);
         }
+    }
+
+    /**
+     * @return Current Time by zone defined in {@link JobEngineConfig#TIME_ZONE}
+     */
+    public static LocalDateTime timestamp() {
+        return LocalDateTime.now(ZoneId.of(Config.TIME_ZONE));
     }
 
     /**

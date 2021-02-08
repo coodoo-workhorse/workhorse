@@ -3,22 +3,19 @@ package io.coodoo.workhorse.core.boundary;
 import java.time.format.DateTimeFormatter;
 
 import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
+import io.coodoo.workhorse.util.WorkhorseUtil;
 
 /**
  * @author coodoo GmbH (coodoo.io)
  */
 @RequestScoped
 public class JobContext {
-
-    @Inject
-    WorkhorseConfig workhorseConfig;
 
     protected Job job;
 
@@ -201,26 +198,26 @@ public class JobContext {
                 logBuffer.append(System.lineSeparator());
             }
             if (timestamp) {
-                DateTimeFormatter logTimeFormat = DateTimeFormatter.ofPattern(workhorseConfig.getLogTimeFormat());
-                logBuffer.append(workhorseConfig.timestamp().format(logTimeFormat));
+                DateTimeFormatter logTimeFormat = DateTimeFormatter.ofPattern(Config.LOG_TIME_FORMATTER);
+                logBuffer.append(WorkhorseUtil.timestamp().format(logTimeFormat));
                 logBuffer.append(" ");
             }
             switch (mode) {
                 case "i":
-                    if (workhorseConfig.getLogInfoMarker() != null) {
-                        logBuffer.append(workhorseConfig.getLogInfoMarker());
+                    if (Config.LOG_INFO_MARKER != null) {
+                        logBuffer.append(Config.LOG_INFO_MARKER);
                         logBuffer.append(" ");
                     }
                     break;
                 case "w":
-                    if (workhorseConfig.getLogWarnMarker() != null) {
-                        logBuffer.append(workhorseConfig.getLogWarnMarker());
+                    if (Config.LOG_WARN_MARKER != null) {
+                        logBuffer.append(Config.LOG_WARN_MARKER);
                         logBuffer.append(" ");
                     }
                     break;
                 case "e":
-                    if (workhorseConfig.getLogErrorMarker() != null) {
-                        logBuffer.append(workhorseConfig.getLogErrorMarker());
+                    if (Config.LOG_ERROR_MARKER != null) {
+                        logBuffer.append(Config.LOG_ERROR_MARKER);
                         logBuffer.append(" ");
                     }
                     break;

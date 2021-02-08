@@ -19,10 +19,10 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.coodoo.workhorse.core.boundary.Config;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
-import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
 
 @ApplicationScoped
@@ -32,9 +32,6 @@ public class ExecutionBuffer {
 
     @Inject
     WorkhorseController workhorseController;
-
-    @Inject
-    WorkhorseConfig workhorseConfig;
 
     private Map<Long, Queue<Long>> executions = new HashMap<>();
     private Map<Long, Queue<Long>> priorityExecutions = new HashMap<>();
@@ -333,7 +330,7 @@ public class ExecutionBuffer {
         }
         if (jobStartTimes != null && jobStartTimes.get(jobId) != null) {
             info.setThreadStartTime(LocalDateTime.ofInstant(Instant.ofEpochMilli(jobStartTimes.get(jobId)),
-                    ZoneId.of(workhorseConfig.getTimeZone())));
+                    ZoneId.of(Config.TIME_ZONE)));
         }
         // if (pausedJobs != null && pausedJobs.get(jobId) != null) {
         // info.setPaused(pausedJobs.get(jobId));

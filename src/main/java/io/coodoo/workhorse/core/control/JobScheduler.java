@@ -21,16 +21,13 @@ import io.coodoo.workhorse.core.control.event.JobErrorEvent;
 import io.coodoo.workhorse.core.entity.ErrorType;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
-import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.util.CronExpression;
+import io.coodoo.workhorse.util.WorkhorseUtil;
 
 @ApplicationScoped
 public class JobScheduler {
 
     private static final Logger log = LoggerFactory.getLogger(JobScheduler.class);
-
-    @Inject
-    WorkhorseConfig workhorseConfig;
 
     @Inject
     WorkhorseController workhorseController;
@@ -72,9 +69,9 @@ public class JobScheduler {
             try {
 
                 CronExpression cron = new CronExpression(job.getSchedule());
-                LocalDateTime nextTime = cron.nextTimeAfter(workhorseConfig.timestamp());
+                LocalDateTime nextTime = cron.nextTimeAfter(WorkhorseUtil.timestamp());
                 log.trace("next execution of Job: {} on : {} ", job, nextTime);
-                long initialDelay = ChronoUnit.SECONDS.between(workhorseConfig.timestamp(), nextTime);
+                long initialDelay = ChronoUnit.SECONDS.between(WorkhorseUtil.timestamp(), nextTime);
                 long period = ChronoUnit.SECONDS.between(nextTime, cron.nextTimeAfter(nextTime));
                 log.trace("period: {} seconds", period);
 

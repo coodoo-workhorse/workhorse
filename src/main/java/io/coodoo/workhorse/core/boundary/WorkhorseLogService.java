@@ -13,7 +13,6 @@ import io.coodoo.workhorse.core.control.WorkhorseController;
 import io.coodoo.workhorse.core.control.event.JobErrorEvent;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
-import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.entity.WorkhorseLog;
 import io.coodoo.workhorse.persistence.interfaces.LogPersistence;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.LogQualifier;
@@ -31,9 +30,6 @@ public class WorkhorseLogService {
 
     @Inject
     WorkhorseController workhorseController;
-
-    @Inject
-    WorkhorseConfig workhorseConfig;
 
     @Inject
     @LogQualifier
@@ -68,7 +64,7 @@ public class WorkhorseLogService {
         String cn = changeNew == null ? "" : changeNew.toString();
 
         if (message == null) {
-            message = String.format(workhorseConfig.getLogChange(), changeParameter, co, cn);
+            message = String.format(Config.LOG_CHANGE, changeParameter, co, cn);
         }
         return createLog(message, jobId, jobStatus, true, changeParameter, co, cn, null);
     }

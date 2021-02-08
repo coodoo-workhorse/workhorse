@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.coodoo.workhorse.core.entity.WorkhorseConfig;
+import io.coodoo.workhorse.core.boundary.Config;
 import io.coodoo.workhorse.persistence.interfaces.ConfigPersistence;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
@@ -41,9 +41,6 @@ public class PersistenceManager {
     @Any
     Instance<LogPersistence> logPersistenceInstances;
 
-    @Inject
-    WorkhorseConfig workhorseConfig;
-
     @Produces
     @JobQualifier
     private JobPersistence jobPersistence;
@@ -61,13 +58,13 @@ public class PersistenceManager {
     private LogPersistence logPersistence;
 
     public void initializeStorage() {
-        initializePersistence(workhorseConfig.getPersistenceTyp(), null);
+        initializePersistence(Config.persistenceTyp, null);
     }
 
     public void initializePersistence(PersistenceTyp persistenceTyp, Object persistenceConfiguration) {
 
         if (persistenceTyp == null) {
-            persistenceTyp = workhorseConfig.getPersistenceTyp();
+            persistenceTyp = Config.persistenceTyp;
             log.warn("persistenceTyp can not be null. The default persistence {} will be use", persistenceTyp);
         }
 

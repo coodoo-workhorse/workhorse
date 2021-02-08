@@ -16,12 +16,13 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.coodoo.workhorse.core.boundary.Config;
 import io.coodoo.workhorse.core.control.event.NewExecutionEvent;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
-import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
+import io.coodoo.workhorse.util.WorkhorseUtil;
 
 @ApplicationScoped
 public class MemoryExecutionPersistence implements ExecutionPersistence {
@@ -30,9 +31,6 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
     @Inject
     MemoryPersistence memoryPersistence;
-
-    @Inject
-    WorkhorseConfig workhorseConfig;
 
     @Inject
     Event<NewExecutionEvent> newExecutionEventEvent;
@@ -48,7 +46,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     public void persist(Execution execution) {
         Long id = incId.getAndIncrement();
         execution.setId(id);
-        execution.setCreatedAt(workhorseConfig.timestamp());
+        execution.setCreatedAt(WorkhorseUtil.timestamp());
         memoryPersistence.getExecutions().put(id, execution);
 
         newExecutionEventEvent.fireAsync(new NewExecutionEvent(execution.getJobId(), execution.getId()));
@@ -86,7 +84,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     public List<Execution> pollNextExecutions(Long jobId, Long limit) {
 
         List<Execution> executions = new ArrayList<>();
-        LocalDateTime currentTimeStamp = LocalDateTime.now(ZoneId.of(workhorseConfig.getTimeZone()));
+        LocalDateTime currentTimeStamp = LocalDateTime.now(ZoneId.of(Config.TIME_ZONE));
 
         for (Execution execution : memoryPersistence.getExecutions().values()) {
 

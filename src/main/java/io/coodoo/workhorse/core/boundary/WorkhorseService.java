@@ -5,18 +5,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.ObservesAsync;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.coodoo.workhorse.core.control.ConfigBuilder;
 import io.coodoo.workhorse.core.control.ExecutionBuffer;
+import io.coodoo.workhorse.core.control.GlobalConfig;
 import io.coodoo.workhorse.core.control.JobScheduler;
 import io.coodoo.workhorse.core.control.Workhorse;
-import io.coodoo.workhorse.core.control.WorkhorseConfigService;
+import io.coodoo.workhorse.core.control.WorkhorseConfigControl;
 import io.coodoo.workhorse.core.control.WorkhorseController;
-import io.coodoo.workhorse.core.control.event.RestartWorkhorseEvent;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
@@ -24,8 +24,8 @@ import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
 import io.coodoo.workhorse.persistence.PersistenceManager;
-import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 import io.coodoo.workhorse.util.CronExpression;
+import io.coodoo.workhorse.util.WorkhorseUtil;
 
 /**
  * Central Workhorse API-Service
@@ -53,25 +53,16 @@ public class WorkhorseService {
     WorkhorseController workhorseController;
 
     @Inject
-    WorkhorseConfigService workhorseConfigService;
-
-    @Inject
-    WorkhorseConfig workhorseConfig;
+    WorkhorseConfigControl workhorseConfigControl;
 
     @Inject
     JobScheduler jobScheduler;
 
-    /**
-     * Start the Job Engine with a peristence
-     * 
-     * @param persistenceTyp Type of the persistence to use
-     * @param persistenceConfiguration Config data to connect the persistence
-     */
-    @Deprecated
-    public void start(PersistenceTyp persistenceTyp, Object persistenceConfiguration) {
+    public void start(WorkhorseConfig workhorseConfig) {
 
-        persistenceManager.initializePersistence(persistenceTyp, persistenceConfiguration);
-        workhorseConfigService.initializeConfig();
+        persistenceManager.initializePersistence(workhorseConfig.getPersistenceTyp(),
+                workhorseConfig.getPersistenceConfig());
+        workhorseConfigControl.initialize(workhorseConfig);
         workhorseController.loadWorkers();
         executionBuffer.initializeBuffer();
         workhorse.start();
@@ -79,59 +70,8 @@ public class WorkhorseService {
 
     }
 
-    /**
-     * Start the Job Engine with given config and persistence params
-     * 
-     * @param persistenceTyp Typ of the choosen persistence
-     * @param persistenceConfiguration config parameter for the choosen persistence
-     * @param timeZone ZoneId Object time zone for LocalDateTime instance creation. Default is UTC
-     * @param jobQueuePollerInterval Job queue poller interval in seconds
-     * @param jobQueuePusherPoll poll interval to use when using Pushable persistence
-     * @param jobQueueMax Max amount of executions to load into the memory queue per job
-     * @param jobQueueMin Min amount of executions in memory queue before the poller gets to add more
-     */
-    @Deprecated
-    public void start(PersistenceTyp persistenceTyp, Object persistenceConfiguration, String timeZone, int jobQueuePollerInterval, int jobQueuePusherPoll,
-                    Long jobQueueMax, int jobQueueMin) {
-
-        persistenceManager.initializePersistence(persistenceTyp, persistenceConfiguration);
-
-        workhorseConfigService.initializeConfig(timeZone, jobQueuePollerInterval, jobQueuePusherPoll, jobQueueMax, jobQueueMin, persistenceTyp);
-
-        workhorseController.loadWorkers();
-        executionBuffer.initializeBuffer();
-        workhorse.start();
-        jobScheduler.startScheduler();
-    }
-
-    /**
-     * Restart the Workhorse on an event
-     * 
-     * @param restartWorkhorseEvent
-     */
-    @Deprecated
-    public void reStart(@ObservesAsync RestartWorkhorseEvent restartWorkhorseEvent) {
-
-        workhorse.stop();
-        jobScheduler.stopScheduler();
-        executionBuffer.destroyQueue();
-        persistenceManager.destroyStorage();
-
-        log.info("The job engine will be restart.");
-
-        WorkhorseConfig config = restartWorkhorseEvent.getWorkhorseConfig();
-        start(config.getPersistenceTyp(), restartWorkhorseEvent.getPersistenceParams(), config.getTimeZone(), config.getJobQueuePollerInterval(),
-                        config.getJobQueuePusherPoll(), config.getJobQueueMax(), config.getJobQueueMin());
-        log.info("End of the restart of the job engine.");
-    }
-
-    /**
-     * Start the Job Engine
-     */
-    @Deprecated
     public void start() {
-
-        start(workhorseConfig.getPersistenceTyp(), null);
+        start(new WorkhorseConfig());
     }
 
     /**
@@ -148,33 +88,13 @@ public class WorkhorseService {
         executionBuffer.destroyQueue();
     }
 
-    // public void start() {
-    //
-    // if (workhorse.isRunning()) {
-    // return;
-    // }
-    // // TODO oder
-    // if (workhorse.isRunning()) {
-    // stopTheEngine();
-    // }
-    // // TODO start
-    // }
-    //
-    // public void stop() {
-    //
-    // if (!workhorse.isRunning()) {
-    // return;
-    // }
-    // // TODO stopp
-    // }
-
     public WorkhorseConfig getWorkhorseConfig() {
-        // TODO
-        return null;
+
+        return workhorseConfigControl.getWorkhorseConfig();
     }
 
     public void updateWorkhorseConfig(WorkhorseConfig workhorseConfig) {
-        // TODO
+        workhorseConfigControl.update(workhorseConfig);
     }
 
     /**
@@ -223,8 +143,9 @@ public class WorkhorseService {
      * 
      * @return Job
      */
-    public Job updateJob(Long jobId, String name, String description, String workerClassName, String schedule, JobStatus status, int threads,
-                    Integer maxPerMinute, int failRetries, int retryDelay, int daysUntilCleanUp, boolean uniqueInQueue) {
+    public Job updateJob(Long jobId, String name, String description, String workerClassName, String schedule,
+            JobStatus status, int threads, Integer maxPerMinute, int failRetries, int retryDelay, int daysUntilCleanUp,
+            boolean uniqueInQueue) {
 
         Job job = getJobById(jobId);
 
@@ -232,8 +153,8 @@ public class WorkhorseService {
         // workhorse.stop(); maybe we don t need. To proove
         executionBuffer.cancelProcess(job);
 
-        workhorseController.updateJob(jobId, name, description, workerClassName, schedule, status, threads, maxPerMinute, failRetries, retryDelay,
-                        daysUntilCleanUp, uniqueInQueue);
+        workhorseController.updateJob(jobId, name, description, workerClassName, schedule, status, threads,
+                maxPerMinute, failRetries, retryDelay, daysUntilCleanUp, uniqueInQueue);
 
         executionBuffer.initializeBuffer(job);
         // workhorse.start();
@@ -245,13 +166,14 @@ public class WorkhorseService {
     /**
      * Update a {@link Execution}
      */
-    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime maturity, Long batchId, Long chainId,
-                    Long chainedPreviousExecutionId, boolean uniqueInQueue) {
-        return workhorseController.createExecution(jobId, parameters, priority, maturity, batchId, chainId, chainedPreviousExecutionId, uniqueInQueue);
+    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime maturity,
+            Long batchId, Long chainId, Long chainedPreviousExecutionId, boolean uniqueInQueue) {
+        return workhorseController.createExecution(jobId, parameters, priority, maturity, batchId, chainId,
+                chainedPreviousExecutionId, uniqueInQueue);
     }
 
-    public Execution updateExecution(Long jobId, Long executionId, ExecutionStatus status, String parameters, boolean priority, LocalDateTime maturity,
-                    int fails) {
+    public Execution updateExecution(Long jobId, Long executionId, ExecutionStatus status, String parameters,
+            boolean priority, LocalDateTime maturity, int fails) {
 
         Execution execution = getExecutionById(jobId, executionId);
 
@@ -342,7 +264,7 @@ public class WorkhorseService {
         }
 
         CronExpression cronExpression = new CronExpression(schedule);
-        LocalDateTime nextScheduledTime = startTime != null ? startTime : workhorseConfig.timestamp();
+        LocalDateTime nextScheduledTime = startTime != null ? startTime : WorkhorseUtil.timestamp();
 
         for (int i = 0; i < times; i++) {
             nextScheduledTime = cronExpression.nextTimeAfter(nextScheduledTime);
@@ -358,10 +280,13 @@ public class WorkhorseService {
     /**
      * Get the execution times defined by {@link Job#getSchedule()}
      * 
-     * @param schedule CRON Expression
-     * @param startTime start time for this request (if <tt>null</tt> then current time is used)
-     * @param endTime end time for this request (if <tt>null</tt> then current time plus 1 day is used)
-     * @return List of {@link LocalDateTime} representing the execution times of a scheduled job between the <tt>startTime</tt> and <tt>endTime</tt>
+     * @param schedule  CRON Expression
+     * @param startTime start time for this request (if <tt>null</tt> then current
+     *                  time is used)
+     * @param endTime   end time for this request (if <tt>null</tt> then current
+     *                  time plus 1 day is used)
+     * @return List of {@link LocalDateTime} representing the execution times of a
+     *         scheduled job between the <tt>startTime</tt> and <tt>endTime</tt>
      */
     public List<LocalDateTime> getScheduledTimes(String schedule, LocalDateTime startTime, LocalDateTime endTime) {
 
@@ -371,7 +296,7 @@ public class WorkhorseService {
         }
 
         CronExpression cronExpression = new CronExpression(schedule);
-        LocalDateTime scheduledTime = startTime != null ? startTime : workhorseConfig.timestamp();
+        LocalDateTime scheduledTime = startTime != null ? startTime : WorkhorseUtil.timestamp();
         LocalDateTime endOfTimes = endTime != null ? endTime : scheduledTime.plusDays(1);
 
         while (scheduledTime.isBefore(endOfTimes)) {

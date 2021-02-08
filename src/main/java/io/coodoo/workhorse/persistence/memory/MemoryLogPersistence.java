@@ -7,19 +7,16 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.entity.WorkhorseLog;
 import io.coodoo.workhorse.persistence.interfaces.LogPersistence;
 import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
+import io.coodoo.workhorse.util.WorkhorseUtil;
 
 @ApplicationScoped
 public class MemoryLogPersistence implements LogPersistence {
 
     @Inject
     MemoryPersistence memoryPersistence;
-
-    @Inject
-    WorkhorseConfig workhorseConfig;
 
     private AtomicLong incId = new AtomicLong(0);
 
@@ -43,7 +40,7 @@ public class MemoryLogPersistence implements LogPersistence {
     public WorkhorseLog persist(WorkhorseLog workhorseLog) {
         Long id = incId.getAndIncrement();
         workhorseLog.setId(id);
-        workhorseLog.setCreatedAt(workhorseConfig.timestamp());
+        workhorseLog.setCreatedAt(WorkhorseUtil.timestamp());
         memoryPersistence.getWorkhorseLog().put(id, workhorseLog);
         return workhorseLog;
     }
