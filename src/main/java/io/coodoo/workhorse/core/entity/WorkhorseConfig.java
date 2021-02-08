@@ -3,8 +3,11 @@ package io.coodoo.workhorse.core.entity;
 /**
  * @author coodoo GmbH (coodoo.io)
  */
-
 public class WorkhorseConfig {
+
+    /**
+     * TODO getter/setter entsprechend der attribut namen umbenennen
+     */
 
     /**
      * ZoneId Object time zone for LocalDateTime instance creation. Default is UTC
@@ -27,40 +30,26 @@ public class WorkhorseConfig {
     private int bufferPollInterval = 5;
 
     /**
-     * TODO
+     * TODO kommentieren
      */
     private int bufferPushFallbackPollInterval = 120;
 
     /**
-     * Name of the persistence
-     */
-    private String persistenceName = "MEMORY";
-
-    /**
-     * Configuration for the choosen persistence.
-     */
-    private Object persistenceConfig = null;
-
-    /**
      * TODO implement me!
      * 
-     * A zombie is an execution that is stuck in status
-     * {@link ExecutionStatus#RUNNING} for this amount of minutes (if set to 0 there
-     * the hunt is off)
+     * A zombie is an execution that is stuck in status {@link ExecutionStatus#RUNNING} for this amount of minutes (if set to 0 there the hunt is off)
      */
     private int executionTimeout = 120;
 
     /**
      * TODO implement me!
      * 
-     * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and
-     * doesn't change, it has became a zombie! Once found we have a cure!
+     * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and doesn't change, it has became a zombie! Once found we have a cure!
      */
     private ExecutionStatus executionTimeoutStatus = ExecutionStatus.ABORTED;
 
     /**
-     * Log change pattern. Placeholder <code>%s</code> for changeParameter,
-     * changeOld and changeNew in this order <br>
+     * Log change pattern. Placeholder <code>%s</code> for changeParameter, changeOld and changeNew in this order <br>
      * Default is <code>Changed %s from '%s' to '%s'</code>
      */
     private String logChange = "%s changed from '%s' to '%s'";
@@ -85,19 +74,16 @@ public class WorkhorseConfig {
      */
     private String logErrorMarker = "[ERROR]";
 
-    public WorkhorseConfig() {
-    }
+    public WorkhorseConfig() {}
 
-    public WorkhorseConfig(String timeZone, Long bufferMax, int bufferMin, int bufferPollInterval,
-            int bufferPushFallbackPollInterval, String persistenceName, int executionTimeout,
-            ExecutionStatus executionTimeoutStatus, String logChange, String logTimeFormat, String logInfoMarker,
-            String logWarnMarker, String logErrorMarker) {
+    public WorkhorseConfig(String timeZone, Long bufferMax, int bufferMin, int bufferPollInterval, int bufferPushFallbackPollInterval, int executionTimeout,
+                    ExecutionStatus executionTimeoutStatus, String logChange, String logTimeFormat, String logInfoMarker, String logWarnMarker,
+                    String logErrorMarker) {
         this.timeZone = timeZone;
         this.bufferMax = bufferMax;
         this.bufferMin = bufferMin;
         this.bufferPollInterval = bufferPollInterval;
         this.bufferPushFallbackPollInterval = bufferPushFallbackPollInterval;
-        this.persistenceName = persistenceName;
         this.executionTimeout = executionTimeout;
         this.executionTimeoutStatus = executionTimeoutStatus;
         this.logChange = logChange;
@@ -149,20 +135,6 @@ public class WorkhorseConfig {
 
     public WorkhorseConfig setJobQueuePusherPoll(int jobQueuePusherPoll) {
         this.bufferPushFallbackPollInterval = jobQueuePusherPoll;
-        return this;
-    }
-
-    public String getPersistenceName() {
-        return persistenceName;
-    }
-
-    public Object getPersistenceConfig() {
-        return persistenceConfig;
-    }
-
-    public WorkhorseConfig setPersistence(String persistenceName, Object persistenceConfig) {
-        this.persistenceName = persistenceName;
-        this.persistenceConfig = persistenceConfig;
         return this;
     }
 

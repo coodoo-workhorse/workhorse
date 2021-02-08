@@ -9,7 +9,6 @@ import javax.inject.Inject;
 
 import io.coodoo.workhorse.core.entity.WorkhorseLog;
 import io.coodoo.workhorse.persistence.interfaces.LogPersistence;
-
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
 @ApplicationScoped
@@ -81,8 +80,7 @@ public class MemoryLogPersistence implements LogPersistence {
 
     @Override
     public String getPersistenceName() {
-        // TODO Auto-generated method stub
-        return "MEMORY";
+        return MemoryPersistence.NAME;
     }
 
     @Override

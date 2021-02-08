@@ -15,7 +15,6 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.coodoo.workhorse.core.boundary.Config;
 import io.coodoo.workhorse.core.boundary.WorkerWith;
 import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
 import io.coodoo.workhorse.core.boundary.annotation.InitialJobConfig;
@@ -326,7 +325,7 @@ public class WorkhorseController {
         Execution retryExecution = new Execution();
         retryExecution.setJobId(failedExecution.getJobId());
         retryExecution.setStatus(failedExecution.getStatus());
-        retryExecution.setStartedAt(LocalDateTime.now(ZoneId.of(Config.TIME_ZONE)));
+        retryExecution.setStartedAt(LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)));
         retryExecution.setPriority(failedExecution.getPriority());
         retryExecution.setMaturity(failedExecution.getMaturity());
         retryExecution.setChainId(failedExecution.getChainId());
@@ -359,7 +358,7 @@ public class WorkhorseController {
         }
 
         failedExecution.setStatus(ExecutionStatus.FAILED);
-        failedExecution.setEndedAt(LocalDateTime.now(ZoneId.of(Config.TIME_ZONE)));
+        failedExecution.setEndedAt(LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)));
         failedExecution.setDuration(duration);
 
         failedExecution.setLog(executionLog);
@@ -382,7 +381,7 @@ public class WorkhorseController {
 
     public int deleteOlderExecutions(Long jobId, int minDaysOld) {
         return executionPersistence.deleteOlderExecutions(jobId,
-                LocalDateTime.now(ZoneId.of(Config.TIME_ZONE)).minusMinutes(minDaysOld));
+                LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)).minusMinutes(minDaysOld));
     }
 
     public List<Job> getAllJobs() {

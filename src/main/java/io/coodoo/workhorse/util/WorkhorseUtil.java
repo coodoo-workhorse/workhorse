@@ -13,10 +13,10 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import io.coodoo.workhorse.core.control.StaticConfig;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.coodoo.workhorse.core.boundary.Config;
 
 public class WorkhorseUtil {
 
@@ -67,7 +67,7 @@ public class WorkhorseUtil {
      * @return Current Time by zone defined in {@link JobEngineConfig#TIME_ZONE}
      */
     public static LocalDateTime timestamp() {
-        return LocalDateTime.now(ZoneId.of(Config.TIME_ZONE));
+        return LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE));
     }
 
     /**

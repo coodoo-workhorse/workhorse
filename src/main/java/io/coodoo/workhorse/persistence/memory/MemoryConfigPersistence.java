@@ -1,10 +1,10 @@
 package io.coodoo.workhorse.persistence.memory;
 
-import io.coodoo.workhorse.core.entity.WorkhorseConfig;
-import io.coodoo.workhorse.persistence.interfaces.ConfigPersistence;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
+import io.coodoo.workhorse.persistence.interfaces.ConfigPersistence;
 
 @ApplicationScoped
 public class MemoryConfigPersistence implements ConfigPersistence {
@@ -30,7 +30,7 @@ public class MemoryConfigPersistence implements ConfigPersistence {
 
     @Override
     public String getPersistenceName() {
-        return "MEMORY";
+        return MemoryPersistence.NAME;
     }
 
 }

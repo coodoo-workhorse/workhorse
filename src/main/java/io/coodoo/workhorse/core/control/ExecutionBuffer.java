@@ -19,7 +19,6 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.coodoo.workhorse.core.boundary.Config;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
@@ -44,18 +43,17 @@ public class ExecutionBuffer {
     private Map<Long, ReentrantLock> jobLocks = new ConcurrentHashMap<>();
     private ReentrantLock myLock = new ReentrantLock();
 
-    public void initializeBuffer() {
+    public void initialize() {
 
-        destroyQueue();
+        clear();
 
         for (Job job : workhorseController.getAllJobsByStatus(JobStatus.ACTIVE)) {
-            initializeBuffer(job);
+            initialize(job);
         }
-
         log.trace("Queue initialize !");
     }
 
-    public void initializeBuffer(Job job) {
+    public void initialize(Job job) {
 
         jobThreads.put(job.getId(), new HashSet<>());
         executions.put(job.getId(), new ConcurrentLinkedQueue<>());
@@ -66,12 +64,12 @@ public class ExecutionBuffer {
         completionStages.put(job.getId(), new HashSet<>());
     }
 
-    public void destroyQueue() {
+    public void clear() {
 
+        jobThreads.clear();
         executions.clear();
         priorityExecutions.clear();
         runningExecutions.clear();
-        jobThreads.clear();
         jobThreadCounts.clear();
         runningJobThreadCounts.clear();
         completionStages.clear();
@@ -95,8 +93,8 @@ public class ExecutionBuffer {
 
         if (sizeMemoryQueue > 0 || sizePriorityMemoryQueue > 0) {
 
-            log.trace("Clearing job execution queue with {} elements and {} priority elements for job: {}",
-                    executions.get(job.getId()).size(), priorityExecutions.get(job.getId()).size(), job.getName());
+            log.trace("Clearing job execution queue with {} elements and {} priority elements for job: {}", executions.get(job.getId()).size(),
+                            priorityExecutions.get(job.getId()).size(), job.getName());
 
             executions.get(job.getId()).clear();
             priorityExecutions.get(job.getId()).clear();
@@ -207,10 +205,8 @@ public class ExecutionBuffer {
     }
 
     /**
-     * This function check, if a job execution can be process. The existence of a
-     * ExecutionQueueBuffer for the given <code>jobId</code> is checked. It will be
-     * check, if the ExecutionQueueBuffer do not contain the given
-     * <code>executionId</code>
+     * This function check, if a job execution can be process. The existence of a ExecutionQueueBuffer for the given <code>jobId</code> is checked. It will be
+     * check, if the ExecutionQueueBuffer do not contain the given <code>executionId</code>
      * 
      * @param jobId
      * @param executionId
@@ -218,13 +214,12 @@ public class ExecutionBuffer {
      */
     public boolean isAddable(Long jobId, Long executionId) {
 
-        if (runningExecutions.get(jobId) == null || executions.get(jobId) == null
-                || priorityExecutions.get(jobId) == null) {
+        if (runningExecutions.get(jobId) == null || executions.get(jobId) == null || priorityExecutions.get(jobId) == null) {
             log.error("They are not ExecutionQueue for the job with Id {} ", jobId);
             return false;
         }
         if (runningExecutions.get(jobId).contains(executionId) || executions.get(jobId).contains(executionId)
-                || priorityExecutions.get(jobId).contains(executionId)) {
+                        || priorityExecutions.get(jobId).contains(executionId)) {
             return false;
         }
         return true;
@@ -329,8 +324,7 @@ public class ExecutionBuffer {
             info.setThreadCount(jobThreadCounts.get(jobId));
         }
         if (jobStartTimes != null && jobStartTimes.get(jobId) != null) {
-            info.setThreadStartTime(LocalDateTime.ofInstant(Instant.ofEpochMilli(jobStartTimes.get(jobId)),
-                    ZoneId.of(Config.TIME_ZONE)));
+            info.setThreadStartTime(LocalDateTime.ofInstant(Instant.ofEpochMilli(jobStartTimes.get(jobId)), ZoneId.of(StaticConfig.TIME_ZONE)));
         }
         // if (pausedJobs != null && pausedJobs.get(jobId) != null) {
         // info.setPaused(pausedJobs.get(jobId));

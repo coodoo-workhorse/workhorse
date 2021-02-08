@@ -63,7 +63,7 @@ public class MemoryJobPersistence implements JobPersistence {
 
     @Override
     public String getPersistenceName() {
-        return "MEMORY";
+        return MemoryPersistence.NAME;
     }
 
     @Override

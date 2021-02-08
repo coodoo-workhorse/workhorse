@@ -6,6 +6,7 @@ import javax.enterprise.context.RequestScoped;
 
 import org.slf4j.Logger;
 
+import io.coodoo.workhorse.core.control.StaticConfig;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
@@ -198,26 +199,26 @@ public class JobContext {
                 logBuffer.append(System.lineSeparator());
             }
             if (timestamp) {
-                DateTimeFormatter logTimeFormat = DateTimeFormatter.ofPattern(Config.LOG_TIME_FORMATTER);
+                DateTimeFormatter logTimeFormat = DateTimeFormatter.ofPattern(StaticConfig.LOG_TIME_FORMATTER);
                 logBuffer.append(WorkhorseUtil.timestamp().format(logTimeFormat));
                 logBuffer.append(" ");
             }
             switch (mode) {
                 case "i":
-                    if (Config.LOG_INFO_MARKER != null) {
-                        logBuffer.append(Config.LOG_INFO_MARKER);
+                    if (StaticConfig.LOG_INFO_MARKER != null) {
+                        logBuffer.append(StaticConfig.LOG_INFO_MARKER);
                         logBuffer.append(" ");
                     }
                     break;
                 case "w":
-                    if (Config.LOG_WARN_MARKER != null) {
-                        logBuffer.append(Config.LOG_WARN_MARKER);
+                    if (StaticConfig.LOG_WARN_MARKER != null) {
+                        logBuffer.append(StaticConfig.LOG_WARN_MARKER);
                         logBuffer.append(" ");
                     }
                     break;
                 case "e":
-                    if (Config.LOG_ERROR_MARKER != null) {
-                        logBuffer.append(Config.LOG_ERROR_MARKER);
+                    if (StaticConfig.LOG_ERROR_MARKER != null) {
+                        logBuffer.append(StaticConfig.LOG_ERROR_MARKER);
                         logBuffer.append(" ");
                     }
                     break;

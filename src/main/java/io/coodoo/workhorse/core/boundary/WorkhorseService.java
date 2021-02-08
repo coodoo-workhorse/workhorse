@@ -12,8 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import io.coodoo.workhorse.core.control.ExecutionBuffer;
 import io.coodoo.workhorse.core.control.JobScheduler;
+import io.coodoo.workhorse.core.control.StaticConfig;
 import io.coodoo.workhorse.core.control.Workhorse;
-import io.coodoo.workhorse.core.control.WorkhorseConfigControl;
+import io.coodoo.workhorse.core.control.WorkhorseConfigController;
 import io.coodoo.workhorse.core.control.WorkhorseController;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
@@ -51,56 +52,48 @@ public class WorkhorseService {
     WorkhorseController workhorseController;
 
     @Inject
-    WorkhorseConfigControl workhorseConfigControl;
+    WorkhorseConfigController workhorseConfigController;
 
     @Inject
     JobScheduler jobScheduler;
 
     /**
-     * Start Workhorse with configuration
-     * 
-     * @param workhorseConfig Golbal configuration of Workhorse
+     * Start Workhorse
      */
-    public void start(WorkhorseConfig workhorseConfig) {
-
-        persistenceManager.initializePersistence(workhorseConfig.getPersistenceName(),
-                workhorseConfig.getPersistenceConfig());
-        workhorseConfigControl.initialize(workhorseConfig);
-        workhorseController.loadWorkers();
-        executionBuffer.initializeBuffer();
-        workhorse.start();
-        jobScheduler.startScheduler();
-
+    public void start() {
+        start(StaticConfig.PERSISTENCE_NAME);
     }
 
     /**
      * Start Workhorse
      */
-    public void start() {
-        start(new WorkhorseConfig());
+    public void start(String persistenceName) {
+        persistenceManager.initializePersistence(persistenceName, "TODO");
+        workhorseConfigController.initializeStaticConfig();
+        workhorseController.loadWorkers();
+        executionBuffer.initialize();
+        workhorse.start();
+        jobScheduler.startScheduler();
     }
 
     /**
      * Stop the Workhorse
      */
-    @Deprecated
     public void stop() {
         workhorse.stop();
         for (Job job : getAllScheduledJobs()) {
             jobScheduler.stop(job);
             executionBuffer.cancelProcess(job);
         }
-
-        executionBuffer.destroyQueue();
+        executionBuffer.clear();
     }
 
     public WorkhorseConfig getWorkhorseConfig() {
-
-        return workhorseConfigControl.getWorkhorseConfig();
+        return workhorseConfigController.getWorkhorseConfig();
     }
 
     public void updateWorkhorseConfig(WorkhorseConfig workhorseConfig) {
-        workhorseConfigControl.update(workhorseConfig);
+        workhorseConfigController.updateWorkhorseConfig(workhorseConfig);
     }
 
     /**
@@ -149,9 +142,8 @@ public class WorkhorseService {
      * 
      * @return Job
      */
-    public Job updateJob(Long jobId, String name, String description, String workerClassName, String schedule,
-            JobStatus status, int threads, Integer maxPerMinute, int failRetries, int retryDelay, int daysUntilCleanUp,
-            boolean uniqueInQueue) {
+    public Job updateJob(Long jobId, String name, String description, String workerClassName, String schedule, JobStatus status, int threads,
+                    Integer maxPerMinute, int failRetries, int retryDelay, int daysUntilCleanUp, boolean uniqueInQueue) {
 
         Job job = getJobById(jobId);
 
@@ -159,10 +151,10 @@ public class WorkhorseService {
         // workhorse.stop(); maybe we don t need. To proove
         executionBuffer.cancelProcess(job);
 
-        workhorseController.updateJob(jobId, name, description, workerClassName, schedule, status, threads,
-                maxPerMinute, failRetries, retryDelay, daysUntilCleanUp, uniqueInQueue);
+        workhorseController.updateJob(jobId, name, description, workerClassName, schedule, status, threads, maxPerMinute, failRetries, retryDelay,
+                        daysUntilCleanUp, uniqueInQueue);
 
-        executionBuffer.initializeBuffer(job);
+        executionBuffer.initialize(job);
         // workhorse.start();
         jobScheduler.start(job);
         return job;
@@ -172,14 +164,13 @@ public class WorkhorseService {
     /**
      * Update a {@link Execution}
      */
-    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime maturity,
-            Long batchId, Long chainId, Long chainedPreviousExecutionId, boolean uniqueInQueue) {
-        return workhorseController.createExecution(jobId, parameters, priority, maturity, batchId, chainId,
-                chainedPreviousExecutionId, uniqueInQueue);
+    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime maturity, Long batchId, Long chainId,
+                    Long chainedPreviousExecutionId, boolean uniqueInQueue) {
+        return workhorseController.createExecution(jobId, parameters, priority, maturity, batchId, chainId, chainedPreviousExecutionId, uniqueInQueue);
     }
 
-    public Execution updateExecution(Long jobId, Long executionId, ExecutionStatus status, String parameters,
-            boolean priority, LocalDateTime maturity, int fails) {
+    public Execution updateExecution(Long jobId, Long executionId, ExecutionStatus status, String parameters, boolean priority, LocalDateTime maturity,
+                    int fails) {
 
         Execution execution = getExecutionById(jobId, executionId);
 
@@ -286,13 +277,10 @@ public class WorkhorseService {
     /**
      * Get the execution times defined by {@link Job#getSchedule()}
      * 
-     * @param schedule  CRON Expression
-     * @param startTime start time for this request (if <tt>null</tt> then current
-     *                  time is used)
-     * @param endTime   end time for this request (if <tt>null</tt> then current
-     *                  time plus 1 day is used)
-     * @return List of {@link LocalDateTime} representing the execution times of a
-     *         scheduled job between the <tt>startTime</tt> and <tt>endTime</tt>
+     * @param schedule CRON Expression
+     * @param startTime start time for this request (if <tt>null</tt> then current time is used)
+     * @param endTime end time for this request (if <tt>null</tt> then current time plus 1 day is used)
+     * @return List of {@link LocalDateTime} representing the execution times of a scheduled job between the <tt>startTime</tt> and <tt>endTime</tt>
      */
     public List<LocalDateTime> getScheduledTimes(String schedule, LocalDateTime startTime, LocalDateTime endTime) {
 

@@ -19,7 +19,6 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.coodoo.workhorse.core.boundary.Config;
 import io.coodoo.workhorse.core.control.event.AllExecutionsDoneEvent;
 import io.coodoo.workhorse.core.control.event.JobErrorEvent;
 import io.coodoo.workhorse.core.control.event.NewExecutionEvent;
@@ -84,15 +83,15 @@ public class Workhorse {
 
         if (executionPersistence.isPusherAvailable()) {
             scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0,
-                    Config.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL, TimeUnit.SECONDS);
+                    StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL, TimeUnit.SECONDS);
 
             log.trace("Job queue pusher started with a {} seconds interval",
-                    Config.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL);
+                    StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL);
 
         } else {
-            scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0, Config.BUFFER_POLL_INTERVAL,
+            scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0, StaticConfig.BUFFER_POLL_INTERVAL,
                     TimeUnit.SECONDS);
-            log.trace("Job queue poller started with a {} seconds interval", Config.BUFFER_POLL_INTERVAL);
+            log.trace("Job queue poller started with a {} seconds interval", StaticConfig.BUFFER_POLL_INTERVAL);
         }
 
     }
@@ -103,8 +102,8 @@ public class Workhorse {
     void poll() {
         for (Job job : jobPersistence.getAllByStatus(JobStatus.ACTIVE)) {
 
-            if (executionBuffer.getNumberOfExecution(job.getId()) < Config.BUFFER_MIN) {
-                List<Execution> executions = executionPersistence.pollNextExecutions(job.getId(), Config.BUFFER_MAX);
+            if (executionBuffer.getNumberOfExecution(job.getId()) < StaticConfig.BUFFER_MIN) {
+                List<Execution> executions = executionPersistence.pollNextExecutions(job.getId(), StaticConfig.BUFFER_MAX);
                 for (Execution execution : executions) {
                     if (execution == null) {
                         continue;
@@ -129,7 +128,7 @@ public class Workhorse {
             return;
         }
         log.trace("New Job Execution pushed: " + newExecutionEvent);
-        if (executionBuffer.getNumberOfExecution(newExecutionEvent.jobId) < Config.BUFFER_MAX) {
+        if (executionBuffer.getNumberOfExecution(newExecutionEvent.jobId) < StaticConfig.BUFFER_MAX) {
             Execution execution = executionPersistence.getById(newExecutionEvent.jobId, newExecutionEvent.executionId);
             if (execution != null) {
                 if (execution.getMaturity() != null) {

@@ -16,12 +16,11 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.coodoo.workhorse.core.boundary.Config;
+import io.coodoo.workhorse.core.control.StaticConfig;
 import io.coodoo.workhorse.core.control.event.NewExecutionEvent;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
-
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
 @ApplicationScoped
@@ -60,7 +59,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
     @Override
     public String getPersistenceName() {
-        return "MEMORY";
+        return MemoryPersistence.NAME;
     }
 
     @Override
@@ -84,20 +83,19 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     public List<Execution> pollNextExecutions(Long jobId, Long limit) {
 
         List<Execution> executions = new ArrayList<>();
-        LocalDateTime currentTimeStamp = LocalDateTime.now(ZoneId.of(Config.TIME_ZONE));
+        LocalDateTime currentTimeStamp = LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE));
 
         for (Execution execution : memoryPersistence.getExecutions().values()) {
 
             if (execution.getJobId().equals(jobId) && execution.getStatus() == ExecutionStatus.QUEUED
-                    && (execution.getMaturity() == null || execution.getMaturity().compareTo(currentTimeStamp) < 0)
-                    && execution.getChainedPreviousExecutionId() == null && executions.size() < limit.intValue()) {
+                            && (execution.getMaturity() == null || execution.getMaturity().compareTo(currentTimeStamp) < 0)
+                            && execution.getChainedPreviousExecutionId() == null && executions.size() < limit.intValue()) {
 
                 executions.add(execution);
             }
         }
 
-        Comparator<Execution> sortByPriority = (Execution e1, Execution e2) -> e1.getPriority()
-                .compareTo(e2.getPriority());
+        Comparator<Execution> sortByPriority = (Execution e1, Execution e2) -> e1.getPriority().compareTo(e2.getPriority());
         Collections.sort(executions, sortByPriority);
 
         return executions;
@@ -116,7 +114,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     public Execution addExecutionAtEndOfChain(Long jobId, Long chainId, Execution execution) {
         for (Execution executionFromMemory : memoryPersistence.getExecutions().values()) {
             if (executionFromMemory.getJobId().equals(jobId) && chainId.equals(executionFromMemory.getChainId())
-                    && executionFromMemory.getChainedNextExecutionId() == null) {
+                            && executionFromMemory.getChainedNextExecutionId() == null) {
                 executionFromMemory.setChainedNextExecutionId(execution.getId());
                 return execution;
             }
@@ -131,8 +129,8 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
         if (chainedNextExecution == null) {
             for (Execution executionFromMemory : memoryPersistence.getExecutions().values()) {
                 if (executionFromMemory != null && chainId.equals(executionFromMemory.getChainId())
-                        && previousExecutionId.equals(executionFromMemory.getChainedPreviousExecutionId())
-                        && ExecutionStatus.QUEUED.equals(executionFromMemory.getStatus())) {
+                                && previousExecutionId.equals(executionFromMemory.getChainedPreviousExecutionId())
+                                && ExecutionStatus.QUEUED.equals(executionFromMemory.getStatus())) {
                     log.trace("From Peristennce. Next Job Execution In Chain : {}", executionFromMemory);
                     return executionFromMemory;
                 }
@@ -148,8 +146,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     @Override
     public Execution getQueuedBatchExecution(Long jobId, Long batchId) {
         for (Execution execution : memoryPersistence.getExecutions().values()) {
-            if (execution.getJobId().equals(jobId) && Objects.equals(execution.getBatchId(), batchId)
-                    && execution.getStatus() == ExecutionStatus.QUEUED) {
+            if (execution.getJobId().equals(jobId) && Objects.equals(execution.getBatchId(), batchId) && execution.getStatus() == ExecutionStatus.QUEUED) {
                 return execution;
             }
         }
@@ -160,8 +157,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     public List<Execution> getFailedBatchExecutions(Long jobId, Long batchId) {
         List<Execution> executions = new ArrayList<>();
         for (Execution execution : memoryPersistence.getExecutions().values()) {
-            if (Objects.equals(execution.getBatchId(), batchId)
-                    && ExecutionStatus.FAILED.equals(execution.getStatus())) {
+            if (Objects.equals(execution.getBatchId(), batchId) && ExecutionStatus.FAILED.equals(execution.getStatus())) {
                 executions.add(execution);
             }
         }
@@ -176,8 +172,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     @Override
     public boolean abortChain(Long jobId, Long chainId) {
         for (Execution execution : memoryPersistence.getExecutions().values()) {
-            if (execution.getJobId().equals(jobId) && Objects.equals(execution.getChainId(), chainId)
-                    && execution.getStatus() == ExecutionStatus.QUEUED) {
+            if (execution.getJobId().equals(jobId) && Objects.equals(execution.getChainId(), chainId) && execution.getStatus() == ExecutionStatus.QUEUED) {
 
                 execution.setStatus(ExecutionStatus.ABORTED);
                 update(jobId, execution.getId(), execution);
@@ -238,7 +233,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
         for (Execution execution : memoryPersistence.getExecutions().values()) {
             if (jobId.equals(execution.getJobId()) && ExecutionStatus.QUEUED.equals(execution.getStatus())
-                    && parameterHash.equals(execution.getParametersHash())) {
+                            && parameterHash.equals(execution.getParametersHash())) {
                 return execution;
             }
         }
