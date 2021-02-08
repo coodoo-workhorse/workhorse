@@ -1,15 +1,14 @@
 package io.coodoo.workhorse.core.control;
 
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
-import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 
 public class GlobalConfig {
 
     private WorkhorseConfig workhorseConfig;
-    private PersistenceTyp persistenceTyp;
+    private String persistenceTyp;
     private Object persistenceConfig;
 
-    public GlobalConfig(WorkhorseConfig workhorseConfig, PersistenceTyp persistenceTyp, Object persistenceObject) {
+    public GlobalConfig(WorkhorseConfig workhorseConfig, String persistenceTyp, Object persistenceObject) {
         this.workhorseConfig = workhorseConfig;
         this.persistenceTyp = persistenceTyp;
         this.persistenceConfig = persistenceObject;
@@ -19,7 +18,7 @@ public class GlobalConfig {
         return workhorseConfig;
     }
 
-    public PersistenceTyp getPersistenceTyp() {
+    public String getPersistenceTyp() {
         return persistenceTyp;
     }
 

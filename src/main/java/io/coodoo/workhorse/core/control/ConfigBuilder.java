@@ -2,7 +2,6 @@ package io.coodoo.workhorse.core.control;
 
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
-import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 
 public class ConfigBuilder {
 
@@ -32,10 +31,10 @@ public class ConfigBuilder {
     private int bufferPushFallbackPollInterval = 120;
 
     /**
-     * Type of the peristence
+     * name of the persistenceistence
      */
     // TODO wird ein STring mit dem namen "persistenceName"
-    private PersistenceTyp persistenceTyp = PersistenceTyp.MEMORY;
+    private String persistenceTyp = "MEMORY";
 
     /**
      * Configuration for the choosen persistence
@@ -113,7 +112,7 @@ public class ConfigBuilder {
         return this;
     }
 
-    public ConfigBuilder setPersistenceTyp(PersistenceTyp persistenceTyp) {
+    public ConfigBuilder setPersistenceTyp(String persistenceTyp) {
         this.persistenceTyp = persistenceTyp;
         return this;
     }
@@ -153,7 +152,7 @@ public class ConfigBuilder {
         return this;
     }
 
-    public ConfigBuilder setPersistence(PersistenceTyp persistenceTyp, Object persistenceConfig) {
+    public ConfigBuilder setPersistence(String persistenceTyp, Object persistenceConfig) {
         this.persistenceTyp = persistenceTyp;
         this.persistenceConfig = persistenceConfig;
         return this;

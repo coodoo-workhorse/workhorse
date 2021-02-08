@@ -1,7 +1,6 @@
 package io.coodoo.workhorse.core.boundary;
 
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
-import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 
 public final class Config {
 
@@ -34,10 +33,9 @@ public final class Config {
     public static int BUFFER_PUSH_FALL_BACK_POLL_INTERVAL = 120;
 
     /**
-     * Type of the peristence
+     * Name of the peristence
      */
-    // TODO wird ein STring mit dem namen "persistenceName"
-    public static PersistenceTyp persistenceTyp = PersistenceTyp.MEMORY;
+    public static String PERSISTENCE_NAME = "MEMORY";
 
     /**
      * TODO implement me!

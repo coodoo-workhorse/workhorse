@@ -9,6 +9,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
+import io.coodoo.workhorse.core.boundary.Config;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
@@ -24,9 +25,6 @@ public abstract class BaseWorker {
 
     @Inject
     protected WorkhorseController workhorseController;
-
-    @Inject
-    protected WorkhorseConfig workhorseConfig;
 
     private Job job;
 
@@ -148,7 +146,7 @@ public abstract class BaseWorker {
      * @return Current Time by zone defined in {@link WorkhorseConfig#TIME_ZONE}
      */
     public LocalDateTime timestamp() {
-        return LocalDateTime.now(ZoneId.of(workhorseConfig.getTimeZone()));
+        return LocalDateTime.now(ZoneId.of(Config.TIME_ZONE));
     }
 
     /**
@@ -183,11 +181,11 @@ public abstract class BaseWorker {
                 logBuffer.append(System.lineSeparator());
             }
 
-            logBuffer.append(timestamp().format(DateTimeFormatter.ofPattern(workhorseConfig.getLogTimeFormat())));
+            logBuffer.append(timestamp().format(DateTimeFormatter.ofPattern(Config.LOG_TIME_FORMATTER)));
             logBuffer.append(" ");
 
-            if (workhorseConfig.getLogInfoMarker() != null) {
-                logBuffer.append(workhorseConfig.getLogInfoMarker());
+            if (Config.LOG_INFO_MARKER != null) {
+                logBuffer.append(Config.LOG_INFO_MARKER);
                 logBuffer.append(" ");
             }
 

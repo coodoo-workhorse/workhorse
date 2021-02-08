@@ -17,7 +17,7 @@ public interface LogPersistence {
     /**
      * Update a log
      * 
-     * @param id Id of the log to retrieve
+     * @param id           Id of the log to retrieve
      * @param workhorseLog log
      * @return the updated log
      */
@@ -55,11 +55,11 @@ public interface LogPersistence {
     int deleteByJobId(Long jobId);
 
     /**
-     * retrieve the type of the persistence to initialize
+     * retrieve the name of the persistence to initialize
      * 
      * @return
      */
-    PersistenceTyp getPersistenceTyp();
+    String getPersistenceName();
 
     /**
      * Callback fonction to initialize the connection with the persistence

@@ -1,10 +1,5 @@
 package io.coodoo.workhorse.core.entity;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-
-import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
-
 /**
  * @author coodoo GmbH (coodoo.io)
  */
@@ -37,10 +32,9 @@ public class WorkhorseConfig {
     private int bufferPushFallbackPollInterval = 120;
 
     /**
-     * Type of the peristence
+     * Name of the persistence
      */
-    // TODO wird ein STring mit dem namen "persistenceName"
-    private PersistenceTyp persistenceTyp = PersistenceTyp.MEMORY;
+    private String persistenceName = "MEMORY";
 
     /**
      * Configuration for the choosen persistence.
@@ -95,7 +89,7 @@ public class WorkhorseConfig {
     }
 
     public WorkhorseConfig(String timeZone, Long bufferMax, int bufferMin, int bufferPollInterval,
-            int bufferPushFallbackPollInterval, PersistenceTyp persistenceTyp, int executionTimeout,
+            int bufferPushFallbackPollInterval, String persistenceName, int executionTimeout,
             ExecutionStatus executionTimeoutStatus, String logChange, String logTimeFormat, String logInfoMarker,
             String logWarnMarker, String logErrorMarker) {
         this.timeZone = timeZone;
@@ -103,7 +97,7 @@ public class WorkhorseConfig {
         this.bufferMin = bufferMin;
         this.bufferPollInterval = bufferPollInterval;
         this.bufferPushFallbackPollInterval = bufferPushFallbackPollInterval;
-        this.persistenceTyp = persistenceTyp;
+        this.persistenceName = persistenceName;
         this.executionTimeout = executionTimeout;
         this.executionTimeoutStatus = executionTimeoutStatus;
         this.logChange = logChange;
@@ -158,16 +152,16 @@ public class WorkhorseConfig {
         return this;
     }
 
-    public PersistenceTyp getPersistenceTyp() {
-        return persistenceTyp;
+    public String getPersistenceName() {
+        return persistenceName;
     }
 
     public Object getPersistenceConfig() {
         return persistenceConfig;
     }
 
-    public WorkhorseConfig setPersistenceTyp(PersistenceTyp persistenceTyp, Object persistenceConfig) {
-        this.persistenceTyp = persistenceTyp;
+    public WorkhorseConfig setPersistence(String persistenceName, Object persistenceConfig) {
+        this.persistenceName = persistenceName;
         this.persistenceConfig = persistenceConfig;
         return this;
     }

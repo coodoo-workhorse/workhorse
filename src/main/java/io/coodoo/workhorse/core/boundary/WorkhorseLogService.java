@@ -97,7 +97,7 @@ public class WorkhorseLogService {
         workhorseLog.setStacktrace(stacktrace);
 
         logPersistence.persist(workhorseLog);
-        log.info("Created log : " + log);
+        log.info("Created log : {} ", workhorseLog);
         return workhorseLog;
     }
 

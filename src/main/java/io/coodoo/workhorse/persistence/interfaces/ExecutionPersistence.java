@@ -171,9 +171,9 @@ public interface ExecutionPersistence {
 
     /**
      * 
-     * @return retrieve the type of the persistence to initialize
+     * @return retrieve the name of the persistence to initialize
      */
-    PersistenceTyp getPersistenceTyp();
+    String getPersistenceName();
 
     /**
      * can the implemented persistence emit event by new created job execution

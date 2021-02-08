@@ -11,7 +11,6 @@ import javax.inject.Inject;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
-import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 
 @ApplicationScoped
 public class MemoryJobPersistence implements JobPersistence {
@@ -63,8 +62,8 @@ public class MemoryJobPersistence implements JobPersistence {
     }
 
     @Override
-    public PersistenceTyp getPersistenceTyp() {
-        return PersistenceTyp.MEMORY;
+    public String getPersistenceName() {
+        return "MEMORY";
     }
 
     @Override

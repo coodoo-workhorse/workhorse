@@ -9,7 +9,7 @@ import javax.inject.Inject;
 
 import io.coodoo.workhorse.core.entity.WorkhorseLog;
 import io.coodoo.workhorse.persistence.interfaces.LogPersistence;
-import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
+
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
 @ApplicationScoped
@@ -80,9 +80,9 @@ public class MemoryLogPersistence implements LogPersistence {
     }
 
     @Override
-    public PersistenceTyp getPersistenceTyp() {
+    public String getPersistenceName() {
         // TODO Auto-generated method stub
-        return PersistenceTyp.MEMORY;
+        return "MEMORY";
     }
 
     @Override

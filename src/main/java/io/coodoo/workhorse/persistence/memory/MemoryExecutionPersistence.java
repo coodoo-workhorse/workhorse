@@ -21,7 +21,7 @@ import io.coodoo.workhorse.core.control.event.NewExecutionEvent;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
-import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
+
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
 @ApplicationScoped
@@ -59,8 +59,8 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     }
 
     @Override
-    public PersistenceTyp getPersistenceTyp() {
-        return PersistenceTyp.MEMORY;
+    public String getPersistenceName() {
+        return "MEMORY";
     }
 
     @Override

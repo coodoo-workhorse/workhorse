@@ -10,9 +10,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.coodoo.workhorse.core.control.ConfigBuilder;
 import io.coodoo.workhorse.core.control.ExecutionBuffer;
-import io.coodoo.workhorse.core.control.GlobalConfig;
 import io.coodoo.workhorse.core.control.JobScheduler;
 import io.coodoo.workhorse.core.control.Workhorse;
 import io.coodoo.workhorse.core.control.WorkhorseConfigControl;
@@ -60,7 +58,7 @@ public class WorkhorseService {
 
     public void start(WorkhorseConfig workhorseConfig) {
 
-        persistenceManager.initializePersistence(workhorseConfig.getPersistenceTyp(),
+        persistenceManager.initializePersistence(workhorseConfig.getPersistenceName(),
                 workhorseConfig.getPersistenceConfig());
         workhorseConfigControl.initialize(workhorseConfig);
         workhorseController.loadWorkers();

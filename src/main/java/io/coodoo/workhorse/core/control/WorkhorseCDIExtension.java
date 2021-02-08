@@ -25,7 +25,6 @@ public class WorkhorseCDIExtension {
     public void register(@Observes BeforeBeanDiscovery bbdEvent) {
         bbdEvent.addAnnotatedType(WorkhorseService.class, WorkhorseService.class.getName());
         bbdEvent.addAnnotatedType(Workhorse.class, Workhorse.class.getName());
-        bbdEvent.addAnnotatedType(WorkhorseConfig.class, WorkhorseConfig.class.getName());
         bbdEvent.addAnnotatedType(WorkhorseConfigControl.class, WorkhorseConfigControl.class.getName());
         bbdEvent.addAnnotatedType(ExecutionBuffer.class, ExecutionBuffer.class.getName());
         bbdEvent.addAnnotatedType(ExecutionBuffer.class, ExecutionBuffer.class.getName());
