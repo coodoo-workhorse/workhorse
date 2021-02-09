@@ -6,7 +6,6 @@ import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
 import io.coodoo.workhorse.core.boundary.WorkhorseService;
 import io.coodoo.workhorse.core.boundary.job.ExecutionCleanupWorker;
-import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.PersistenceManager;
 import io.coodoo.workhorse.persistence.interfaces.ConfigPersistence;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;

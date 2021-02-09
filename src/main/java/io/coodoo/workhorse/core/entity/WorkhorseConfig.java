@@ -6,10 +6,6 @@ package io.coodoo.workhorse.core.entity;
 public class WorkhorseConfig {
 
     /**
-     * TODO getter/setter entsprechend der attribut namen umbenennen
-     */
-
-    /**
      * ZoneId Object time zone for LocalDateTime instance creation. Default is UTC
      */
     private String timeZone = "UTC";
@@ -37,19 +33,23 @@ public class WorkhorseConfig {
     /**
      * TODO implement me!
      * 
-     * A zombie is an execution that is stuck in status {@link ExecutionStatus#RUNNING} for this amount of minutes (if set to 0 there the hunt is off)
+     * A zombie is an execution that is stuck in status
+     * {@link ExecutionStatus#RUNNING} for this amount of minutes (if set to 0 there
+     * the hunt is off)
      */
     private int executionTimeout = 120;
 
     /**
      * TODO implement me!
      * 
-     * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and doesn't change, it has became a zombie! Once found we have a cure!
+     * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and
+     * doesn't change, it has became a zombie! Once found we have a cure!
      */
     private ExecutionStatus executionTimeoutStatus = ExecutionStatus.ABORTED;
 
     /**
-     * Log change pattern. Placeholder <code>%s</code> for changeParameter, changeOld and changeNew in this order <br>
+     * Log change pattern. Placeholder <code>%s</code> for changeParameter,
+     * changeOld and changeNew in this order <br>
      * Default is <code>Changed %s from '%s' to '%s'</code>
      */
     private String logChange = "%s changed from '%s' to '%s'";
@@ -74,11 +74,12 @@ public class WorkhorseConfig {
      */
     private String logErrorMarker = "[ERROR]";
 
-    public WorkhorseConfig() {}
+    public WorkhorseConfig() {
+    }
 
-    public WorkhorseConfig(String timeZone, Long bufferMax, int bufferMin, int bufferPollInterval, int bufferPushFallbackPollInterval, int executionTimeout,
-                    ExecutionStatus executionTimeoutStatus, String logChange, String logTimeFormat, String logInfoMarker, String logWarnMarker,
-                    String logErrorMarker) {
+    public WorkhorseConfig(String timeZone, Long bufferMax, int bufferMin, int bufferPollInterval,
+            int bufferPushFallbackPollInterval, int executionTimeout, ExecutionStatus executionTimeoutStatus,
+            String logChange, String logTimeFormat, String logInfoMarker, String logWarnMarker, String logErrorMarker) {
         this.timeZone = timeZone;
         this.bufferMax = bufferMax;
         this.bufferMin = bufferMin;
@@ -102,57 +103,57 @@ public class WorkhorseConfig {
         return this;
     }
 
-    public Long getJobQueueMax() {
+    public Long getBufferMax() {
         return bufferMax;
     }
 
-    public WorkhorseConfig setJobQueueMax(Long jobQueueMax) {
-        this.bufferMax = jobQueueMax;
+    public WorkhorseConfig setBufferMax(Long bufferMax) {
+        this.bufferMax = bufferMax;
         return this;
     }
 
-    public int getJobQueueMin() {
+    public int getBufferMin() {
         return bufferMin;
     }
 
-    public WorkhorseConfig setJobQueueMin(int jobQueueMin) {
-        this.bufferMin = jobQueueMin;
+    public WorkhorseConfig setBufferMin(int bufferMin) {
+        this.bufferMin = bufferMin;
         return this;
     }
 
-    public int getJobQueuePollerInterval() {
+    public int getBufferPollInterval() {
         return bufferPollInterval;
     }
 
-    public WorkhorseConfig setJobQueuePollerInterval(int jobQueuePollerInterval) {
-        this.bufferPollInterval = jobQueuePollerInterval;
+    public WorkhorseConfig setBufferPollInterval(int bufferPollInterval) {
+        this.bufferPollInterval = bufferPollInterval;
         return this;
     }
 
-    public int getJobQueuePusherPoll() {
+    public int getBufferPushFallbackPollInterval() {
         return bufferPushFallbackPollInterval;
     }
 
-    public WorkhorseConfig setJobQueuePusherPoll(int jobQueuePusherPoll) {
-        this.bufferPushFallbackPollInterval = jobQueuePusherPoll;
+    public WorkhorseConfig setBufferPushFallbackPollInterval(int bufferPushFallbackPollInterval) {
+        this.bufferPushFallbackPollInterval = bufferPushFallbackPollInterval;
         return this;
     }
 
-    public int getZombieRecognitionTime() {
+    public int getExecutionTimeout() {
         return executionTimeout;
     }
 
-    public WorkhorseConfig setZombieRecognitionTime(int zombieRecognitionTime) {
-        this.executionTimeout = zombieRecognitionTime;
+    public WorkhorseConfig setExecutionTimeout(int executionTimeout) {
+        this.executionTimeout = executionTimeout;
         return this;
     }
 
-    public ExecutionStatus getZombieCureStatus() {
+    public ExecutionStatus getExecutionTimeoutStatus() {
         return executionTimeoutStatus;
     }
 
-    public WorkhorseConfig setZombieCureStatus(ExecutionStatus zombieCureStatus) {
-        this.executionTimeoutStatus = zombieCureStatus;
+    public WorkhorseConfig setExecutionTimeoutStatus(ExecutionStatus executionTimeoutStatus) {
+        this.executionTimeoutStatus = executionTimeoutStatus;
         return this;
     }
 
