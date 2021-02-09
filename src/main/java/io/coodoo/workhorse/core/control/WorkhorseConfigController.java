@@ -29,6 +29,11 @@ public class WorkhorseConfigController {
     @Inject
     Workhorse workhorse;
 
+    /**
+     * Get the WorkhorseConfig
+     * 
+     * @return WorkhorseConfig
+     */
     public WorkhorseConfig getWorkhorseConfig() {
 
         WorkhorseConfig workhorseConfig = configPersistence.get();
@@ -99,13 +104,13 @@ public class WorkhorseConfigController {
     protected void updateBufferPollInterval(WorkhorseConfig workhorseConfig, int bufferPollInterval) {
 
         if (bufferPollInterval < 1 || bufferPollInterval > 60) {
-            throw new RuntimeException("The job queue poller interval must be between 1 and 60!");
+            throw new RuntimeException("The buffer poller interval must be between 1 and 60!");
         }
         if (workhorseConfig.getBufferPollInterval() != bufferPollInterval) {
 
             StaticConfig.BUFFER_POLL_INTERVAL = bufferPollInterval;
-            workhorseLogService.logChange(null, null, "Job queue poller interval",
-                    workhorseConfig.getBufferPollInterval(), bufferPollInterval, null);
+            workhorseLogService.logChange(null, null, "buffer poller interval", workhorseConfig.getBufferPollInterval(),
+                    bufferPollInterval, null);
             workhorseConfig.setBufferPollInterval(bufferPollInterval);
 
             if (workhorse.isRunning()) {
@@ -118,10 +123,14 @@ public class WorkhorseConfigController {
     protected void updateBufferPushFallbackPollInterval(WorkhorseConfig workhorseConfig,
             int bufferPushFallbackPollInterval) {
 
+        if (bufferPushFallbackPollInterval < 1) {
+            throw new RuntimeException("The buffer push fallback poller interval must be higher than 0!");
+        }
+
         if (workhorseConfig.getBufferPushFallbackPollInterval() != bufferPushFallbackPollInterval) {
 
             StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL = bufferPushFallbackPollInterval;
-            workhorseLogService.logChange(null, null, "Job queue PusherPoll interval",
+            workhorseLogService.logChange(null, null, "buffer PusherPoll interval",
                     workhorseConfig.getBufferPushFallbackPollInterval(), bufferPushFallbackPollInterval, null);
             workhorseConfig.setBufferPushFallbackPollInterval(bufferPushFallbackPollInterval);
 
@@ -136,12 +145,12 @@ public class WorkhorseConfigController {
 
         if (bufferMax < 1) {
             throw new RuntimeException(
-                    "The max amount of executions to load into the memory queue per job must be higher than 0!");
+                    "The max amount of executions to load into the memory buffer per job must be higher than 0!");
         }
         if (workhorseConfig.getBufferMax() != bufferMax) {
 
             StaticConfig.BUFFER_MAX = bufferMax;
-            workhorseLogService.logChange(null, null, "Max amount of executions to load into the memory queue per job",
+            workhorseLogService.logChange(null, null, "Max amount of executions to load into the memory buffer per job",
                     workhorseConfig.getBufferMax(), bufferMax, null);
             workhorseConfig.setBufferMax(bufferMax);
         }
@@ -151,13 +160,13 @@ public class WorkhorseConfigController {
 
         if (bufferMin < 1) {
             throw new RuntimeException(
-                    "The min amount of executions in memory queue before the poller gets to add more must be higher than 0!");
+                    "The min amount of executions in memory buffer before the poller gets to add more must be higher than 0!");
         }
         if (workhorseConfig.getBufferMin() != bufferMin) {
 
             StaticConfig.BUFFER_MIN = bufferMin;
             workhorseLogService.logChange(null, null,
-                    "Min amount of executions in memory queue before the poller gets to add more",
+                    "Min amount of executions in memory buffer before the poller gets to add more",
                     workhorseConfig.getBufferMin(), bufferMin, null);
             workhorseConfig.setBufferMin(bufferMin);
         }
