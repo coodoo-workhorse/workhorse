@@ -6,13 +6,15 @@ import io.coodoo.workhorse.persistence.memory.MemoryPersistence;
 /**
  * FOR INTERNAL USAGE ONLY!
  * 
- * The static members get updated by {@link WorkhorseConfigController#initializeStaticConfig()}
+ * The static members get updated by
+ * {@link WorkhorseConfigController#initializeStaticConfig()}
  * 
  * @author coodoo GmbH (coodoo.io)
  */
 public final class StaticConfig {
 
-    private StaticConfig() {}
+    private StaticConfig() {
+    }
 
     /**
      * Name of the peristence (Default is {@link MemoryPersistence})
@@ -25,41 +27,46 @@ public final class StaticConfig {
     public static String TIME_ZONE;
 
     /**
-     * Max amount of executions to load into the memory queue per job
+     * Max amount of executions to load into the memory buffer per job
      */
     public static Long BUFFER_MAX;
 
     /**
-     * Min amount of executions in memory queue before the poller gets to add more
+     * Min amount of executions in memory buffer before the poller gets to add more
      */
     public static int BUFFER_MIN;
 
     /**
-     * Job queue poller interval in seconds
+     * Buffer poller interval in seconds
      */
     public static int BUFFER_POLL_INTERVAL;
 
     /**
-     * TODO
+     * Buffer poller interval in seconds to use as fallback when the persistence can
+     * push.
      */
     public static int BUFFER_PUSH_FALL_BACK_POLL_INTERVAL;
 
     /**
      * TODO implement me!
      * 
-     * A zombie is an execution that is stuck in status {@link ExecutionStatus#RUNNING} for this amount of minutes (if set to 0 there the hunt is off)
+     * A zombie is an execution that is stuck in status
+     * {@link ExecutionStatus#RUNNING} for this amount of minutes (if set to 0 there
+     * the hunt is off)
      */
     public static int EXECUTION_TIMEOUT;
 
     /**
      * TODO implement me!
      * 
-     * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and doesn't change, it has became a zombie! Once found we have a cure!
+     * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and
+     * doesn't change, it has became a zombie! Once found we have a cure!
      */
     public static ExecutionStatus EXECUTION_TIMEOUT_STATUS;
 
     /**
-     * Log change pattern. Placeholder <code>%s</code> for changeParameter, changeOld and changeNew in this order <br>
+     * Log change pattern. Placeholder <code>%s</code> for changeParameter,
+     * changeOld and changeNew in this order <br>
      * Default is <code>Changed %s from '%s' to '%s'</code>
      */
     public static String LOG_CHANGE;

@@ -11,22 +11,23 @@ public class WorkhorseConfig {
     private String timeZone = "UTC";
 
     /**
-     * Max amount of executions to load into the memory queue per job
+     * Max amount of executions to load into the memory buffer per job
      */
-    private Long bufferMax = 10000L;
+    private Long bufferMax = 1000L;
 
     /**
-     * Min amount of executions in memory queue before the poller gets to add more
+     * Min amount of executions in memory buffer before the poller gets to add more
      */
     private int bufferMin = 1;
 
     /**
-     * Job queue poller interval in seconds
+     * Buffer poller interval in seconds
      */
     private int bufferPollInterval = 5;
 
     /**
-     * TODO kommentieren
+     * Buffer poller interval in seconds to use as fallback when the persistence can
+     * push.
      */
     private int bufferPushFallbackPollInterval = 120;
 
