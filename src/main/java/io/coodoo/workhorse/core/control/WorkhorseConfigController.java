@@ -127,7 +127,7 @@ public class WorkhorseConfigController {
         if (workhorseConfig.getBufferPushFallbackPollInterval() != bufferPushFallbackPollInterval) {
 
             StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL = bufferPushFallbackPollInterval;
-            workhorseLogService.logChange(null, null, "buffer PusherPoll interval", workhorseConfig.getBufferPushFallbackPollInterval(),
+            workhorseLogService.logChange(null, null, "Buffer PusherPoll interval", workhorseConfig.getBufferPushFallbackPollInterval(),
                             bufferPushFallbackPollInterval, null);
             workhorseConfig.setBufferPushFallbackPollInterval(bufferPushFallbackPollInterval);
 
@@ -183,6 +183,7 @@ public class WorkhorseConfigController {
     }
 
     protected void updateLogTimeFormatter(WorkhorseConfig workhorseConfig, String logTimeFormatter) {
+
         if (logTimeFormatter == null) {
             throw new RuntimeException("The execution log timestamp pattern is needed!");
         }
@@ -217,6 +218,7 @@ public class WorkhorseConfigController {
     }
 
     protected void updateLogInfoMarker(WorkhorseConfig workhorseConfig, String logInfoMarker) {
+
         if (!Objects.equals(workhorseConfig.getLogInfoMarker(), logInfoMarker)) {
 
             StaticConfig.LOG_INFO_MARKER = logInfoMarker;
@@ -226,6 +228,7 @@ public class WorkhorseConfigController {
     }
 
     protected void updateLogWarnMarker(WorkhorseConfig workhorseConfig, String logWarnMarker) {
+
         if (!Objects.equals(workhorseConfig.getLogWarnMarker(), logWarnMarker)) {
 
             StaticConfig.LOG_WARN_MARKER = logWarnMarker;
@@ -235,6 +238,7 @@ public class WorkhorseConfigController {
     }
 
     protected void updateLogErrorMarker(WorkhorseConfig workhorseConfig, String logErrorMarker) {
+
         if (!Objects.equals(workhorseConfig.getLogErrorMarker(), logErrorMarker)) {
 
             StaticConfig.LOG_ERROR_MARKER = logErrorMarker;

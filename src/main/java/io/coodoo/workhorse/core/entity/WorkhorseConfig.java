@@ -203,4 +203,14 @@ public class WorkhorseConfig {
         return this;
     }
 
+    @Override
+    public String toString() {
+        return "WorkhorseConfig [timeZone=" + timeZone + ", bufferMax=" + bufferMax + ", bufferMin=" + bufferMin
+                + ", bufferPollInterval=" + bufferPollInterval + ", bufferPushFallbackPollInterval="
+                + bufferPushFallbackPollInterval + ", executionTimeout=" + executionTimeout
+                + ", executionTimeoutStatus=" + executionTimeoutStatus + ", logChange=" + logChange + ", logTimeFormat="
+                + logTimeFormat + ", logInfoMarker=" + logInfoMarker + ", logWarnMarker=" + logWarnMarker
+                + ", logErrorMarker=" + logErrorMarker + "]";
+    }
+
 }
