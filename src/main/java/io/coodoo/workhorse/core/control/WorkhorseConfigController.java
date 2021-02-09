@@ -55,7 +55,7 @@ public class WorkhorseConfigController {
      * @param newWorkhorseConfig New configuration to set
      * @return WorkhorseConfig
      */
-    public WorkhorseConfig updateWorkhorseConfig(WorkhorseConfig newWorkhorseConfig) {
+    public WorkhorseConfig updateWorkhorseConfig(WorkhorseConfig newWorkhorseConfig) throws Exception {
 
         WorkhorseConfig workhorseConfig = getWorkhorseConfig();
 
@@ -70,9 +70,9 @@ public class WorkhorseConfigController {
         updateLogWarnMarker(workhorseConfig, newWorkhorseConfig.getLogWarnMarker());
         updateLogErrorMarker(workhorseConfig, newWorkhorseConfig.getLogErrorMarker());
 
-        configPersistence.update(newWorkhorseConfig);
-        log.info("Updated: {}", newWorkhorseConfig);
-        return newWorkhorseConfig;
+        configPersistence.update(workhorseConfig);
+        log.info("Updated: {}", workhorseConfig);
+        return workhorseConfig;
     }
 
     /**
@@ -87,8 +87,8 @@ public class WorkhorseConfigController {
         StaticConfig.TIME_ZONE = workhorseConfig.getTimeZone();
         StaticConfig.BUFFER_MAX = workhorseConfig.getBufferMax();
         StaticConfig.BUFFER_MIN = workhorseConfig.getBufferMin();
-        StaticConfig.BUFFER_POLL_INTERVAL = workhorseConfig.getBufferPushFallbackPollInterval();
-        StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL = workhorseConfig.getBufferPollInterval();
+        StaticConfig.BUFFER_POLL_INTERVAL = workhorseConfig.getBufferPollInterval();
+        StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL = workhorseConfig.getBufferPushFallbackPollInterval();
         StaticConfig.EXECUTION_TIMEOUT = workhorseConfig.getExecutionTimeout();
         StaticConfig.EXECUTION_TIMEOUT_STATUS = workhorseConfig.getExecutionTimeoutStatus();
         StaticConfig.LOG_CHANGE = workhorseConfig.getLogChange();

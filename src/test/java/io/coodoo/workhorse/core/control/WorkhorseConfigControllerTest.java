@@ -652,4 +652,72 @@ public class WorkhorseConfigControllerTest {
         verify(workhorseLogService, times(1)).logMessage("Initial config set: " + workhorseConfig, null, false);
     }
 
+    @Test
+    public void testUpdateWorkhorseConfig() throws Exception {
+
+        WorkhorseConfig workhorseConfigDefaults = new WorkhorseConfig();
+
+        WorkhorseConfig workhorseConfig = new WorkhorseConfig();
+        Long bufferMax = 100L;
+        int bufferMix = 3;
+        int bufferPollInterval = 4;
+        int bufferPushFallbackPollInterval = 60;
+        workhorseConfig.setBufferMax(bufferMax).setBufferMin(bufferMix).setBufferPollInterval(bufferPollInterval)
+                        .setBufferPushFallbackPollInterval(bufferPushFallbackPollInterval);
+
+        when(configPersistence.get()).thenReturn(workhorseConfigDefaults);
+
+        WorkhorseConfig newWorkhorseConfig = classUnderTest.updateWorkhorseConfig(workhorseConfig);
+
+        assertEquals(newWorkhorseConfig.toString(), workhorseConfig.toString());
+
+    }
+
+    @Test
+    public void testUpdateWorkhorseConfig_withNonValidBufferMax() throws Exception {
+
+        WorkhorseConfig workhorseConfigDefaults = new WorkhorseConfig();
+
+        WorkhorseConfig workhorseConfig = new WorkhorseConfig();
+        Long bufferMax = 0L;
+        int bufferMix = 3;
+        int bufferPollInterval = 4;
+        int bufferPushFallbackPollInterval = 60;
+        workhorseConfig.setBufferMax(bufferMax).setBufferMin(bufferMix).setBufferPollInterval(bufferPollInterval)
+                        .setBufferPushFallbackPollInterval(bufferPushFallbackPollInterval);
+
+        when(configPersistence.get()).thenReturn(workhorseConfigDefaults);
+
+        exceptionRule.expect(RuntimeException.class);
+        exceptionRule.expectMessage("The max amount of executions to load into the memory buffer per job must be higher than 0!");
+
+        classUnderTest.updateWorkhorseConfig(workhorseConfig);
+
+    }
+
+    @Test
+    public void testInitializeStaticConfig() throws Exception {
+
+        WorkhorseConfig workhorseConfig = new WorkhorseConfig();
+        Long bufferMax = 100L;
+        int bufferMix = 3;
+        int bufferPollInterval = 4;
+        int bufferPushFallbackPollInterval = 60;
+        int executionTimeout = 1000;
+        String timeZone = "UTC";
+        workhorseConfig.setBufferMax(bufferMax).setBufferMin(bufferMix).setBufferPollInterval(bufferPollInterval)
+                        .setBufferPushFallbackPollInterval(bufferPushFallbackPollInterval).setExecutionTimeout(executionTimeout).setTimeZone(timeZone);
+
+        when(configPersistence.get()).thenReturn(workhorseConfig);
+        classUnderTest.initializeStaticConfig();
+
+        assertEquals(StaticConfig.BUFFER_MAX, bufferMax);
+        assertEquals(StaticConfig.BUFFER_MIN, bufferMix);
+        assertEquals(StaticConfig.BUFFER_POLL_INTERVAL, bufferPollInterval);
+        assertEquals(StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL, bufferPushFallbackPollInterval);
+        assertEquals(StaticConfig.EXECUTION_TIMEOUT, executionTimeout);
+        assertEquals(StaticConfig.TIME_ZONE, timeZone);
+
+    }
+
 }
