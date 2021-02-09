@@ -28,11 +28,12 @@ public class WorkhorseConfigControllerTest {
     @Rule
     public ExpectedException exceptionRule = ExpectedException.none();
 
-    WorkhorseConfig workhorseConfig = new WorkhorseConfig();
+    WorkhorseConfig workhorseConfig;
 
     @Test
     public void TestUpdateBufferMax() {
 
+        workhorseConfig = new WorkhorseConfig();
         Long bufferMax = 10L;
 
         classUnderTest.updateBufferMax(workhorseConfig, bufferMax);
@@ -45,6 +46,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void TestUpdateBufferMax_with_too_small_value() {
 
+        workhorseConfig = new WorkhorseConfig();
         Long bufferMax = 0L;
 
         exceptionRule.expect(RuntimeException.class);
@@ -58,6 +60,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void TestUpdateBufferMin() {
 
+        workhorseConfig = new WorkhorseConfig();
         int bufferMin = 7;
 
         classUnderTest.updateBufferMin(workhorseConfig, bufferMin);
@@ -69,6 +72,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void TestUpdateBufferMin_with_too_small_value() {
 
+        workhorseConfig = new WorkhorseConfig();
         int bufferMin = 0;
 
         exceptionRule.expect(RuntimeException.class);
@@ -81,6 +85,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void TestUpdateBufferPollInterval() {
 
+        workhorseConfig = new WorkhorseConfig();
         int bufferPollInterval = 3;
 
         classUnderTest.updateBufferPollInterval(workhorseConfig, bufferPollInterval);
@@ -92,6 +97,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void TestUpdateBufferPollInterval_with_too_high_bufferPollInterval() {
 
+        workhorseConfig = new WorkhorseConfig();
         int bufferPollInterval = 61;
 
         exceptionRule.expect(RuntimeException.class);
@@ -104,6 +110,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void TestUpdateBufferPollInterval_with_too_small_bufferPollInterval() {
 
+        workhorseConfig = new WorkhorseConfig();
         int bufferPollInterval = 0;
 
         exceptionRule.expect(RuntimeException.class);
@@ -116,6 +123,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void TestUpdateBufferPushFallbackPollInterval() {
 
+        workhorseConfig = new WorkhorseConfig();
         int bufferPushFallbackPollInterval = 60;
 
         classUnderTest.updateBufferPushFallbackPollInterval(workhorseConfig, bufferPushFallbackPollInterval);
@@ -127,6 +135,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void TestUpdateBufferPushFallbackPollInterval_with_too_small_value() {
 
+        workhorseConfig = new WorkhorseConfig();
         int bufferPushFallbackPollInterval = -2;
 
         exceptionRule.expect(RuntimeException.class);
