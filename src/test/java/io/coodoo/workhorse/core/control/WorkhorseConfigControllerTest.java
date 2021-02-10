@@ -641,15 +641,6 @@ public class WorkhorseConfigControllerTest {
 
         assertEquals(workhorseConfig.toString(), new WorkhorseConfig().toString());
 
-        verify(workhorseLogService, times(1)).logMessage("Initial config set: " + workhorseConfig, null, false);
-    }
-
-    @Test
-    public void testGetWorkhorseConfig_withNulValue_logChange() throws Exception {
-
-        WorkhorseConfig workhorseConfig = classUnderTest.getWorkhorseConfig();
-
-        verify(workhorseLogService, times(1)).logMessage("Initial config set: " + workhorseConfig, null, false);
     }
 
     @Test

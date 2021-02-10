@@ -155,13 +155,21 @@ public interface ExecutionPersistence {
     boolean isBatchFinished(Long jobId, Long batchId);
 
     /**
-     * Abort all chained Job Execution of the given chainedExecution
+     * Abort all chained Execution of the given chainedExecution
      * 
      * @param jobId
      * @param chainId
      * @return <code>true</code> if successful and <code>false</code> otherwise
      */
     boolean abortChain(Long jobId, Long chainId);
+
+    /**
+     * Find all Executions, that have started sooner as the given time.
+     * 
+     * @param time
+     * @return list of Executions to abort
+     */
+    List<Execution> findExpiredExecutions(LocalDateTime time);
 
     /**
      * 

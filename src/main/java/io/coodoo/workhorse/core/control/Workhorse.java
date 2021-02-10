@@ -34,6 +34,9 @@ import io.coodoo.workhorse.persistence.interfaces.qualifier.ExecutionQualifier;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
+/**
+ * @author coodoo GmbH (coodoo.io)
+ */
 @ApplicationScoped
 public class Workhorse {
 
@@ -52,6 +55,9 @@ public class Workhorse {
 
     @Inject
     ExecutionBuffer executionBuffer;
+
+    @Inject
+    WorkhorseController workhorseController;
 
     @Inject
     Event<Job> jobThreadManager;
@@ -89,8 +95,8 @@ public class Workhorse {
                     StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL);
 
         } else {
-            scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0, StaticConfig.BUFFER_POLL_INTERVAL,
-                    TimeUnit.SECONDS);
+            scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0,
+                    StaticConfig.BUFFER_POLL_INTERVAL, TimeUnit.SECONDS);
             log.trace("Job queue poller started with a {} seconds interval", StaticConfig.BUFFER_POLL_INTERVAL);
         }
 
@@ -103,7 +109,8 @@ public class Workhorse {
         for (Job job : jobPersistence.getAllByStatus(JobStatus.ACTIVE)) {
 
             if (executionBuffer.getNumberOfExecution(job.getId()) < StaticConfig.BUFFER_MIN) {
-                List<Execution> executions = executionPersistence.pollNextExecutions(job.getId(), StaticConfig.BUFFER_MAX);
+                List<Execution> executions = executionPersistence.pollNextExecutions(job.getId(),
+                        StaticConfig.BUFFER_MAX);
                 for (Execution execution : executions) {
                     if (execution == null) {
                         continue;

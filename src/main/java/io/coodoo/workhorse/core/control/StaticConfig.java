@@ -37,30 +37,31 @@ public final class StaticConfig {
     public static int BUFFER_MIN;
 
     /**
-     * Buffer poller interval in seconds
+     * Polling interval in seconds at which the intern buffer is loaded
      */
     public static int BUFFER_POLL_INTERVAL;
 
     /**
-     * Buffer poller interval in seconds to use as fallback when the persistence can
-     * push.
+     * Polling interval in seconds at which the intern buffer is loaded, that is
+     * used as fallback mechanism when new Executions are pushed by the persistence
      */
     public static int BUFFER_PUSH_FALL_BACK_POLL_INTERVAL;
 
     /**
-     * TODO implement me!
-     * 
-     * A zombie is an execution that is stuck in status
-     * {@link ExecutionStatus#RUNNING} for this amount of minutes (if set to 0 there
-     * the hunt is off)
+     * Duration in seconds after which an EXECUTION in status
+     * {@link ExecutionStatus#RUNNING} is consider as zombie oder expired.(if set to
+     * 0 the value is ignored)
      */
     public static int EXECUTION_TIMEOUT;
 
     /**
-     * TODO implement me!
      * 
      * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and
-     * doesn't change, it has became a zombie! Once found we have a cure!
+     * doesn't change for {@link WorkhorseConfig#executionTimeout} seconds, it is
+     * expired!
+     * 
+     * <code>executionTimeoutStatus</code> defines which status this expired
+     * Execution have to get.
      */
     public static ExecutionStatus EXECUTION_TIMEOUT_STATUS;
 

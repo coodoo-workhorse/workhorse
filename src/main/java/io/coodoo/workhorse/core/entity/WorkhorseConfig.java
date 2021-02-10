@@ -6,45 +6,46 @@ package io.coodoo.workhorse.core.entity;
 public class WorkhorseConfig {
 
     /**
-     * ZoneId Object time zone for LocalDateTime instance creation. Default is UTC
+     * ZoneId for LocalDateTime instance creation. Default is UTC
      */
     private String timeZone = "UTC";
 
     /**
-     * Max amount of executions to load into the memory buffer per job
+     * Max amount of executions to load into the intern buffer per job
      */
     private Long bufferMax = 1000L;
 
     /**
-     * Min amount of executions in memory buffer before the poller gets to add more
+     * Min amount of executions in intern buffer before the procesing begins
      */
     private int bufferMin = 1;
 
     /**
-     * Buffer poller interval in seconds
+     * Polling interval in seconds at which the intern buffer is loaded
      */
     private int bufferPollInterval = 5;
 
     /**
-     * Buffer poller interval in seconds to use as fallback when the persistence can
-     * push.
+     * Polling interval in seconds at which the intern buffer is loaded, that is
+     * used as fallback mechanism when new Executions are pushed by the persistence
      */
     private int bufferPushFallbackPollInterval = 120;
 
     /**
-     * TODO implement me!
-     * 
-     * A zombie is an execution that is stuck in status
-     * {@link ExecutionStatus#RUNNING} for this amount of minutes (if set to 0 there
-     * the hunt is off)
+     * Duration in seconds after which an EXECUTION in status
+     * {@link ExecutionStatus#RUNNING} is consider as zombie oder expired.(if set to
+     * 0 the value is ignored)
      */
     private int executionTimeout = 120;
 
     /**
-     * TODO implement me!
      * 
      * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and
-     * doesn't change, it has became a zombie! Once found we have a cure!
+     * doesn't change for {@link WorkhorseConfig#executionTimeout} seconds, it is
+     * expired!
+     * 
+     * <code>executionTimeoutStatus</code> defines which status this expired
+     * Execution have to get.
      */
     private ExecutionStatus executionTimeoutStatus = ExecutionStatus.ABORTED;
 

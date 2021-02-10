@@ -30,6 +30,9 @@ import io.coodoo.workhorse.persistence.interfaces.qualifier.ExecutionQualifier;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
+/**
+ * @author coodoo GmbH (coodoo.io)
+ */
 @ApplicationScoped
 public class WorkhorseController {
 
@@ -496,6 +499,52 @@ public class WorkhorseController {
 
     public void addExecutionAtEndOfChain(Long jobId, Long chainId, Execution execution) {
         executionPersistence.addExecutionAtEndOfChain(jobId, chainId, execution);
+    }
+
+    /**
+     * Hunt expired Executions and cure them
+     */
+    public void huntExpiredExecutions() {
+
+        if (StaticConfig.EXECUTION_TIMEOUT <= 0) {
+            return;
+        }
+
+        LocalDateTime time = WorkhorseUtil.timestamp().minusSeconds(StaticConfig.EXECUTION_TIMEOUT);
+        List<Execution> zombies = executionPersistence.findExpiredExecutions(time);
+
+        if (zombies.isEmpty()) {
+            return;
+        }
+
+        for (Execution zombie : zombies) {
+            log.warn("Zombie found! {}", zombie);
+
+            ExecutionStatus cure = StaticConfig.EXECUTION_TIMEOUT_STATUS;
+            String logMessage = "Zombie execution found (ID: " + zombie.getId() + "): ";
+
+            switch (cure) {
+                case QUEUED:
+                    Execution retryExecution = createRetryExecution(zombie);
+                    zombie.setStatus(ExecutionStatus.FAILED);
+                    log.info("Zombie killed and risen from the death! Now it is {}", retryExecution);
+                    workhorseLogService.logMessage(logMessage + "Marked as failed and queued a clone",
+                            zombie.getJobId(), false);
+                    break;
+                case RUNNING:
+                    log.warn("Zombie will still walk free with status {}", cure);
+                    workhorseLogService.logMessage(logMessage + "No action is taken", zombie.getJobId(), false);
+                    break;
+                default:
+                    zombie.setStatus(cure);
+                    log.info("Zombie is cured with status {}", cure);
+                    workhorseLogService.logMessage(logMessage + "Put in status " + cure, zombie.getJobId(), false);
+                    break;
+            }
+
+            executionPersistence.update(zombie.getJobId(), zombie.getId(), zombie);
+
+        }
     }
 
 }
