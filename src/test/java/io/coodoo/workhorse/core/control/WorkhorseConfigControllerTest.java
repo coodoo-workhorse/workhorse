@@ -59,7 +59,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateBufferMax_tooLow() {
+    public void testUpdateBufferMax_tooLow() throws Exception {
 
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
         Long bufferMax = 0L;
@@ -72,7 +72,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateBufferMax_dontUpdateIfEquals() {
+    public void testUpdateBufferMax_dontUpdateIfEquals() throws Exception {
 
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
         Long bufferMax = 50L;
@@ -85,7 +85,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateBufferMax_logMessage() {
+    public void testUpdateBufferMax_logMessage() throws Exception {
 
         WorkhorseConfig workhorseConfigDefaults = new WorkhorseConfig();
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
@@ -98,7 +98,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateBufferMin() {
+    public void testUpdateBufferMin() throws Exception {
 
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
         int bufferMin = 2;
@@ -110,7 +110,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateBufferMin_tooLow() {
+    public void testUpdateBufferMin_tooLow() throws Exception {
 
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
         int bufferMin = 0;
@@ -122,7 +122,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateBufferMin_logMessage() {
+    public void testUpdateBufferMin_logMessage() throws Exception {
 
         // Default is 1
         WorkhorseConfig workhorseConfigDefaults = new WorkhorseConfig();
@@ -136,7 +136,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateBufferMin_dontUpdateIfEquals() {
+    public void testUpdateBufferMin_dontUpdateIfEquals() throws Exception {
 
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
         int bufferMin = 50;
@@ -149,7 +149,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateBufferPollInterval() {
+    public void testUpdateBufferPollInterval() throws Exception {
 
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
         int bufferPollInterval = 1;
@@ -163,7 +163,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateBufferPollInterval_staticConfigIsChanged() {
+    public void testUpdateBufferPollInterval_staticConfigIsChanged() throws Exception {
 
         StaticConfig.BUFFER_POLL_INTERVAL = 33;
 
@@ -176,7 +176,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateBufferPollInterval_dontUpdateIfEquals() {
+    public void testUpdateBufferPollInterval_dontUpdateIfEquals() throws Exception {
 
         int bufferPollInterval = 3;
 
@@ -191,12 +191,12 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void testUpdateBufferPollInterval_toLow() {
+    public void testUpdateBufferPollInterval_toLow() throws Exception {
         classUnderTest.updateBufferPollInterval(new WorkhorseConfig(), 0);
     }
 
     @Test
-    public void testUpdateBufferPollInterval_toLowMessage() {
+    public void testUpdateBufferPollInterval_toLowMessage() throws Exception {
         try {
             classUnderTest.updateBufferPollInterval(new WorkhorseConfig(), 0);
             fail("bufferPollInterval to low!");
@@ -207,7 +207,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateBufferPollInterval_Lowest() {
+    public void testUpdateBufferPollInterval_Lowest() throws Exception {
 
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
         int bufferPollInterval = 1;
@@ -217,12 +217,12 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void testUpdateBufferPollInterval_toHigh() {
+    public void testUpdateBufferPollInterval_toHigh() throws Exception {
         classUnderTest.updateBufferPollInterval(new WorkhorseConfig(), 61);
     }
 
     @Test
-    public void testUpdateBufferPollInterval_toHighMessage() {
+    public void testUpdateBufferPollInterval_toHighMessage() throws Exception {
         try {
             classUnderTest.updateBufferPollInterval(new WorkhorseConfig(), 61);
             fail("bufferPollInterval to high!");
@@ -233,7 +233,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateBufferPollInterval_Highest() {
+    public void testUpdateBufferPollInterval_Highest() throws Exception {
 
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
         int bufferPollInterval = 60;
@@ -243,7 +243,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateBufferPollInterval_restart() {
+    public void testUpdateBufferPollInterval_restart() throws Exception {
 
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
         int bufferPollInterval = 3;
@@ -256,7 +256,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateBufferPollInterval_restartNotNeeded() {
+    public void testUpdateBufferPollInterval_restartNotNeeded() throws Exception {
 
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
         int bufferPollInterval = 3;
@@ -269,7 +269,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateBufferPollInterval_logMessage() {
+    public void testUpdateBufferPollInterval_logMessage() throws Exception {
 
         // Default is 5
         WorkhorseConfig workhorseConfigDefaults = new WorkhorseConfig();
@@ -282,7 +282,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateBufferPollInterval_with_too_high_bufferPollInterval() {
+    public void testUpdateBufferPollInterval_with_too_high_bufferPollInterval() throws Exception {
 
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
         int bufferPollInterval = 61;
@@ -295,7 +295,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateBufferPollInterval_with_too_small_bufferPollInterval() {
+    public void testUpdateBufferPollInterval_with_too_small_bufferPollInterval() throws Exception {
 
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
         int bufferPollInterval = 0;
@@ -308,7 +308,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateBufferPushFallbackPollInterval() {
+    public void testUpdateBufferPushFallbackPollInterval() throws Exception {
 
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
         int bufferPushFallbackPollInterval = 60;
@@ -320,7 +320,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateBufferPushFallbackPollInterval_dontUpdateIfEquals() {
+    public void testUpdateBufferPushFallbackPollInterval_dontUpdateIfEquals() throws Exception {
 
         int bufferPushFallbackPollInterval = 3;
 
@@ -335,7 +335,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateBufferPushFallbackPollInterval_restart() {
+    public void testUpdateBufferPushFallbackPollInterval_restart() throws Exception {
 
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
         int bufferPushFallbackPollInterval = 3;
@@ -348,7 +348,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateBufferPushFallbackPollInterval_tooLow() {
+    public void testUpdateBufferPushFallbackPollInterval_tooLow() throws Exception {
 
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
         int bufferPushFallbackPollInterval = 0;
@@ -361,7 +361,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateTimeZone() {
+    public void testUpdateTimeZone() throws Exception {
 
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
 
@@ -377,7 +377,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateTimeZone_dontUpdateIfEquals() {
+    public void testUpdateTimeZone_dontUpdateIfEquals() throws Exception {
 
         String timeZone = ZoneId.systemDefault().getId();
 
@@ -392,7 +392,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateTimeZone_withNullValue() {
+    public void testUpdateTimeZone_withNullValue() throws Exception {
 
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
         String timeZone = null;
@@ -407,7 +407,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateTimeZone_withNullValue_logChange() {
+    public void testUpdateTimeZone_withNullValue_logChange() throws Exception {
 
         WorkhorseConfig workhorseConfigDefaults = new WorkhorseConfig();
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
@@ -422,7 +422,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateTimeZone_NotAvailableZoneIds() {
+    public void testUpdateTimeZone_NotAvailableZoneIds() throws Exception {
 
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
         String timeZone = "Not a valide Time Zone";
@@ -434,7 +434,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateTimeZone_logMessage() {
+    public void testUpdateTimeZone_logMessage() throws Exception {
 
         WorkhorseConfig workhorseConfigDefaults = new WorkhorseConfig();
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
@@ -447,7 +447,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateLogChange() {
+    public void testUpdateLogChange() throws Exception {
 
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
         String logChange = "%s updated from '%s' to '%s'";
@@ -509,7 +509,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateLogInfoMarker() {
+    public void testUpdateLogInfoMarker() throws Exception {
 
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
         String logInfoMarker = "INFO";
@@ -521,7 +521,7 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateLogInfoMarker_dontUpdateIfEquals() {
+    public void testUpdateLogInfoMarker_dontUpdateIfEquals() throws Exception {
 
         WorkhorseConfig workhorseConfig = new WorkhorseConfig();
         String logInfoMarker = "info";
