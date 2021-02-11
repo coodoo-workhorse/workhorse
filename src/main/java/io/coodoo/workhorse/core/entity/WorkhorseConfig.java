@@ -5,7 +5,18 @@ package io.coodoo.workhorse.core.entity;
  */
 public class WorkhorseConfig {
 
+    // TODO Default Wert zum Löschen von alten Executions.
+
+    // TODO Gedanken über ein Konzept über Persistencespezifische Konfigurationen.
+
+    // TODO WorkhorseConfig wird zu einer abstrakten Klassen, die von jeder Persistence erweitert werden kann.
+
+    // TODO WorkhorseConfigBuilder erstellen, die von Persistencen abgeleitet werden kann.
+    // Die Builder-Methoden tragen die Attributnamen ( Example: bufferMax wird bufferMaximumSize()) und Javadoc.
+
     /**
+     * TODO Default ist systemDefault.
+     * 
      * ZoneId for LocalDateTime instance creation. Default is UTC
      */
     private String timeZone = "UTC";
@@ -26,32 +37,27 @@ public class WorkhorseConfig {
     private int bufferPollInterval = 5;
 
     /**
-     * Polling interval in seconds at which the intern buffer is loaded, that is
-     * used as fallback mechanism when new Executions are pushed by the persistence
+     * Polling interval in seconds at which the intern buffer is loaded, that is used as fallback mechanism when new Executions are pushed by the persistence
      */
     private int bufferPushFallbackPollInterval = 120;
 
     /**
-     * Duration in seconds after which an EXECUTION in status
-     * {@link ExecutionStatus#RUNNING} is consider as zombie oder expired.(if set to
-     * 0 the value is ignored)
+     * Duration in seconds after which an EXECUTION in status {@link ExecutionStatus#RUNNING} is consider as zombie oder expired.(if set to 0 the value is
+     * ignored)
      */
     private int executionTimeout = 120;
 
     /**
      * 
-     * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and
-     * doesn't change for {@link WorkhorseConfig#executionTimeout} seconds, it is
+     * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and doesn't change for {@link WorkhorseConfig#executionTimeout} seconds, it is
      * expired!
      * 
-     * <code>executionTimeoutStatus</code> defines which status this expired
-     * Execution have to get.
+     * <code>executionTimeoutStatus</code> defines which status this expired Execution have to get.
      */
     private ExecutionStatus executionTimeoutStatus = ExecutionStatus.ABORTED;
 
     /**
-     * Log change pattern. Placeholder <code>%s</code> for changeParameter,
-     * changeOld and changeNew in this order <br>
+     * Log change pattern. Placeholder <code>%s</code> for changeParameter, changeOld and changeNew in this order <br>
      * Default is <code>Changed %s from '%s' to '%s'</code>
      */
     private String logChange = "%s changed from '%s' to '%s'";
@@ -76,12 +82,11 @@ public class WorkhorseConfig {
      */
     private String logErrorMarker = "[ERROR]";
 
-    public WorkhorseConfig() {
-    }
+    public WorkhorseConfig() {}
 
-    public WorkhorseConfig(String timeZone, Long bufferMax, int bufferMin, int bufferPollInterval,
-            int bufferPushFallbackPollInterval, int executionTimeout, ExecutionStatus executionTimeoutStatus,
-            String logChange, String logTimeFormat, String logInfoMarker, String logWarnMarker, String logErrorMarker) {
+    public WorkhorseConfig(String timeZone, Long bufferMax, int bufferMin, int bufferPollInterval, int bufferPushFallbackPollInterval, int executionTimeout,
+                    ExecutionStatus executionTimeoutStatus, String logChange, String logTimeFormat, String logInfoMarker, String logWarnMarker,
+                    String logErrorMarker) {
         this.timeZone = timeZone;
         this.bufferMax = bufferMax;
         this.bufferMin = bufferMin;
@@ -206,12 +211,10 @@ public class WorkhorseConfig {
 
     @Override
     public String toString() {
-        return "WorkhorseConfig [timeZone=" + timeZone + ", bufferMax=" + bufferMax + ", bufferMin=" + bufferMin
-                + ", bufferPollInterval=" + bufferPollInterval + ", bufferPushFallbackPollInterval="
-                + bufferPushFallbackPollInterval + ", executionTimeout=" + executionTimeout
-                + ", executionTimeoutStatus=" + executionTimeoutStatus + ", logChange=" + logChange + ", logTimeFormat="
-                + logTimeFormat + ", logInfoMarker=" + logInfoMarker + ", logWarnMarker=" + logWarnMarker
-                + ", logErrorMarker=" + logErrorMarker + "]";
+        return "WorkhorseConfig [timeZone=" + timeZone + ", bufferMax=" + bufferMax + ", bufferMin=" + bufferMin + ", bufferPollInterval=" + bufferPollInterval
+                        + ", bufferPushFallbackPollInterval=" + bufferPushFallbackPollInterval + ", executionTimeout=" + executionTimeout
+                        + ", executionTimeoutStatus=" + executionTimeoutStatus + ", logChange=" + logChange + ", logTimeFormat=" + logTimeFormat
+                        + ", logInfoMarker=" + logInfoMarker + ", logWarnMarker=" + logWarnMarker + ", logErrorMarker=" + logErrorMarker + "]";
     }
 
 }

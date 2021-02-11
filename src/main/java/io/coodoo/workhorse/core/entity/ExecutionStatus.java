@@ -3,6 +3,11 @@ package io.coodoo.workhorse.core.entity;
 public enum ExecutionStatus {
 
     /**
+     * Execution is planned to be processed in the future.
+     */
+    PLANNED,
+
+    /**
      * Execution is queued for processing.
      */
     QUEUED,
@@ -19,14 +24,14 @@ public enum ExecutionStatus {
 
     /**
      * The Execution failed because of an error.
+     * 
+     * TODO Secondary/Fail status (TIMEOUT, EXCEPTION, MANUAL, CHAIN)
      */
     FAILED,
 
     /**
-     * The Execution was aborted by an user.
+     * The Execution was aborted by an user. The engine never set this status.
      */
-    // TODO chain: nach FAILED alle folgenden auch in FAILED statt ABORTED setzten (mit entsprechende fail message), damit ABORTED exklusiv manuell ist
     ABORTED
 
-    // TODO brainstorm neuer Status TIMEOUT oder vielleicht einfahc auch bei timeout in status FAILED
 }
