@@ -37,18 +37,9 @@ public class WorkhorseConfigController {
      * 
      * @return WorkhorseConfig
      */
-    public WorkhorseConfig getWorkhorseConfig() {
+    public <T extends WorkhorseConfig> WorkhorseConfig getWorkhorseConfig() {
 
-        WorkhorseConfig workhorseConfig = configPersistence.get();
-
-        if (workhorseConfig == null) {
-            workhorseConfig = new WorkhorseConfig();
-
-            configPersistence.update(workhorseConfig);
-
-            log.info(" Created: {}", workhorseConfig);
-        }
-        return workhorseConfig;
+        return configPersistence.get();
     }
 
     /**
@@ -63,6 +54,7 @@ public class WorkhorseConfigController {
 
         updateBufferPollInterval(workhorseConfig, newWorkhorseConfig.getBufferPollInterval());
         updateBufferPushFallbackPollInterval(workhorseConfig, newWorkhorseConfig.getBufferPushFallbackPollInterval());
+        updateExecutionTimeOut(workhorseConfig, newWorkhorseConfig.getExecutionTimeout());
         updateBufferMax(workhorseConfig, newWorkhorseConfig.getBufferMax());
         updateBufferMin(workhorseConfig, newWorkhorseConfig.getBufferMin());
         updateLogChange(workhorseConfig, newWorkhorseConfig.getLogChange());
@@ -82,9 +74,9 @@ public class WorkhorseConfigController {
      * 
      * @return WorkhorseConfig
      */
-    public WorkhorseConfig initializeStaticConfig() {
+    public <T extends WorkhorseConfig> WorkhorseConfig initializeStaticConfig(T config) {
 
-        WorkhorseConfig workhorseConfig = getWorkhorseConfig();
+        WorkhorseConfig workhorseConfig = config;
 
         StaticConfig.TIME_ZONE = workhorseConfig.getTimeZone();
         StaticConfig.BUFFER_MAX = workhorseConfig.getBufferMax();
@@ -99,6 +91,8 @@ public class WorkhorseConfigController {
         StaticConfig.LOG_WARN_MARKER = workhorseConfig.getLogWarnMarker();
         StaticConfig.LOG_ERROR_MARKER = workhorseConfig.getLogErrorMarker();
 
+        configPersistence.update(workhorseConfig);
+        log.info(" Created config: {}", workhorseConfig);
         log.info("Initialized: {}", workhorseConfig);
         workhorseLogService.logMessage("Initial config set: " + workhorseConfig, null, false);
         return workhorseConfig;
@@ -143,13 +137,29 @@ public class WorkhorseConfigController {
 
     }
 
+    protected void updateExecutionTimeOut(WorkhorseConfig workhorseConfig, int executionTimeout) {
+
+        if (executionTimeout < 0) {
+            throw new RuntimeException("The execution timeout can't be negative!");
+        }
+        if (workhorseConfig.getExecutionTimeout() != executionTimeout) {
+
+            StaticConfig.EXECUTION_TIMEOUT = executionTimeout;
+
+            String message = executionTimeout > 0 ? null : "Execution timeout is set to '0', so the hunt is off!";
+            workhorseLogService.logChange(null, null, "Execution timeout", workhorseConfig.getExecutionTimeout(),
+                    executionTimeout, message);
+            workhorseConfig.setExecutionTimeout(executionTimeout);
+        }
+    }
+
     protected void updateBufferMax(WorkhorseConfig workhorseConfig, Long bufferMax) {
 
         if (bufferMax < 1) {
             throw new RuntimeException(
                     "The max amount of executions to load into the memory buffer per job must be higher than 0!");
         }
-        if (workhorseConfig.getBufferMax() != bufferMax) {
+        if (!workhorseConfig.getBufferMax().equals(bufferMax)) {
 
             StaticConfig.BUFFER_MAX = bufferMax;
             workhorseLogService.logChange(null, null, "Max amount of executions to load into the memory buffer per job",

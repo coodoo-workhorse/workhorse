@@ -3,16 +3,7 @@ package io.coodoo.workhorse.core.entity;
 /**
  * @author coodoo GmbH (coodoo.io)
  */
-public class WorkhorseConfig {
-
-    // TODO Default Wert zum Löschen von alten Executions.
-
-    // TODO Gedanken über ein Konzept über Persistencespezifische Konfigurationen.
-
-    // TODO WorkhorseConfig wird zu einer abstrakten Klassen, die von jeder Persistence erweitert werden kann.
-
-    // TODO WorkhorseConfigBuilder erstellen, die von Persistencen abgeleitet werden kann.
-    // Die Builder-Methoden tragen die Attributnamen ( Example: bufferMax wird bufferMaximumSize()) und Javadoc.
+public abstract class WorkhorseConfig {
 
     /**
      * TODO Default ist systemDefault.
@@ -37,27 +28,32 @@ public class WorkhorseConfig {
     private int bufferPollInterval = 5;
 
     /**
-     * Polling interval in seconds at which the intern buffer is loaded, that is used as fallback mechanism when new Executions are pushed by the persistence
+     * Polling interval in seconds at which the intern buffer is loaded, that is
+     * used as fallback mechanism when new Executions are pushed by the persistence
      */
     private int bufferPushFallbackPollInterval = 120;
 
     /**
-     * Duration in seconds after which an EXECUTION in status {@link ExecutionStatus#RUNNING} is consider as zombie oder expired.(if set to 0 the value is
-     * ignored)
+     * Duration in seconds after which an EXECUTION in status
+     * {@link ExecutionStatus#RUNNING} is consider as zombie oder expired.(if set to
+     * 0 the value is ignored)
      */
     private int executionTimeout = 120;
 
     /**
      * 
-     * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and doesn't change for {@link WorkhorseConfig#executionTimeout} seconds, it is
+     * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and
+     * doesn't change for {@link WorkhorseConfig#executionTimeout} seconds, it is
      * expired!
      * 
-     * <code>executionTimeoutStatus</code> defines which status this expired Execution have to get.
+     * <code>executionTimeoutStatus</code> defines which status this expired
+     * Execution have to get.
      */
     private ExecutionStatus executionTimeoutStatus = ExecutionStatus.ABORTED;
 
     /**
-     * Log change pattern. Placeholder <code>%s</code> for changeParameter, changeOld and changeNew in this order <br>
+     * Log change pattern. Placeholder <code>%s</code> for changeParameter,
+     * changeOld and changeNew in this order <br>
      * Default is <code>Changed %s from '%s' to '%s'</code>
      */
     private String logChange = "%s changed from '%s' to '%s'";
@@ -82,139 +78,112 @@ public class WorkhorseConfig {
      */
     private String logErrorMarker = "[ERROR]";
 
-    public WorkhorseConfig() {}
-
-    public WorkhorseConfig(String timeZone, Long bufferMax, int bufferMin, int bufferPollInterval, int bufferPushFallbackPollInterval, int executionTimeout,
-                    ExecutionStatus executionTimeoutStatus, String logChange, String logTimeFormat, String logInfoMarker, String logWarnMarker,
-                    String logErrorMarker) {
-        this.timeZone = timeZone;
-        this.bufferMax = bufferMax;
-        this.bufferMin = bufferMin;
-        this.bufferPollInterval = bufferPollInterval;
-        this.bufferPushFallbackPollInterval = bufferPushFallbackPollInterval;
-        this.executionTimeout = executionTimeout;
-        this.executionTimeoutStatus = executionTimeoutStatus;
-        this.logChange = logChange;
-        this.logTimeFormat = logTimeFormat;
-        this.logInfoMarker = logInfoMarker;
-        this.logWarnMarker = logWarnMarker;
-        this.logErrorMarker = logErrorMarker;
-    }
+    public abstract String getPersistenceName();
 
     public String getTimeZone() {
         return timeZone;
     }
 
-    public WorkhorseConfig setTimeZone(String timeZone) {
+    public void setTimeZone(String timeZone) {
         this.timeZone = timeZone;
-        return this;
     }
 
     public Long getBufferMax() {
         return bufferMax;
     }
 
-    public WorkhorseConfig setBufferMax(Long bufferMax) {
+    public void setBufferMax(Long bufferMax) {
         this.bufferMax = bufferMax;
-        return this;
     }
 
     public int getBufferMin() {
         return bufferMin;
     }
 
-    public WorkhorseConfig setBufferMin(int bufferMin) {
+    public void setBufferMin(int bufferMin) {
         this.bufferMin = bufferMin;
-        return this;
     }
 
     public int getBufferPollInterval() {
         return bufferPollInterval;
     }
 
-    public WorkhorseConfig setBufferPollInterval(int bufferPollInterval) {
+    public void setBufferPollInterval(int bufferPollInterval) {
         this.bufferPollInterval = bufferPollInterval;
-        return this;
     }
 
     public int getBufferPushFallbackPollInterval() {
         return bufferPushFallbackPollInterval;
     }
 
-    public WorkhorseConfig setBufferPushFallbackPollInterval(int bufferPushFallbackPollInterval) {
+    public void setBufferPushFallbackPollInterval(int bufferPushFallbackPollInterval) {
         this.bufferPushFallbackPollInterval = bufferPushFallbackPollInterval;
-        return this;
     }
 
     public int getExecutionTimeout() {
         return executionTimeout;
     }
 
-    public WorkhorseConfig setExecutionTimeout(int executionTimeout) {
+    public void setExecutionTimeout(int executionTimeout) {
         this.executionTimeout = executionTimeout;
-        return this;
     }
 
     public ExecutionStatus getExecutionTimeoutStatus() {
         return executionTimeoutStatus;
     }
 
-    public WorkhorseConfig setExecutionTimeoutStatus(ExecutionStatus executionTimeoutStatus) {
+    public void setExecutionTimeoutStatus(ExecutionStatus executionTimeoutStatus) {
         this.executionTimeoutStatus = executionTimeoutStatus;
-        return this;
     }
 
     public String getLogChange() {
         return logChange;
     }
 
-    public WorkhorseConfig setLogChange(String logChange) {
+    public void setLogChange(String logChange) {
         this.logChange = logChange;
-        return this;
     }
 
     public String getLogTimeFormat() {
         return logTimeFormat;
     }
 
-    public WorkhorseConfig setLogTimeFormat(String logTimeFormat) {
+    public void setLogTimeFormat(String logTimeFormat) {
         this.logTimeFormat = logTimeFormat;
-        return this;
     }
 
     public String getLogInfoMarker() {
         return logInfoMarker;
     }
 
-    public WorkhorseConfig setLogInfoMarker(String logInfoMarker) {
+    public void setLogInfoMarker(String logInfoMarker) {
         this.logInfoMarker = logInfoMarker;
-        return this;
     }
 
     public String getLogWarnMarker() {
         return logWarnMarker;
     }
 
-    public WorkhorseConfig setLogWarnMarker(String logWarnMarker) {
+    public void setLogWarnMarker(String logWarnMarker) {
         this.logWarnMarker = logWarnMarker;
-        return this;
     }
 
     public String getLogErrorMarker() {
         return logErrorMarker;
     }
 
-    public WorkhorseConfig setLogErrorMarker(String logErrorMarker) {
+    public void setLogErrorMarker(String logErrorMarker) {
         this.logErrorMarker = logErrorMarker;
-        return this;
     }
 
     @Override
     public String toString() {
-        return "WorkhorseConfig [timeZone=" + timeZone + ", bufferMax=" + bufferMax + ", bufferMin=" + bufferMin + ", bufferPollInterval=" + bufferPollInterval
-                        + ", bufferPushFallbackPollInterval=" + bufferPushFallbackPollInterval + ", executionTimeout=" + executionTimeout
-                        + ", executionTimeoutStatus=" + executionTimeoutStatus + ", logChange=" + logChange + ", logTimeFormat=" + logTimeFormat
-                        + ", logInfoMarker=" + logInfoMarker + ", logWarnMarker=" + logWarnMarker + ", logErrorMarker=" + logErrorMarker + "]";
+        return "WorkhorseConfig [timeZone=" + timeZone + ", bufferMax=" + bufferMax + ", bufferMin=" + bufferMin
+                + ", bufferPollInterval=" + bufferPollInterval + ", bufferPushFallbackPollInterval="
+                + bufferPushFallbackPollInterval + ", executionTimeout=" + executionTimeout
+                + ", executionTimeoutStatus=" + executionTimeoutStatus + ", logChange=" + logChange + ", logTimeFormat="
+                + logTimeFormat + ", logInfoMarker=" + logInfoMarker + ", logWarnMarker=" + logWarnMarker
+                + ", logErrorMarker=" + logErrorMarker + "]";
     }
 
 }
