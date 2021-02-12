@@ -6,10 +6,20 @@ public class MemoryConfig extends WorkhorseConfig {
 
     private static final String NAME = "MEMORY";
 
+    protected String url = "";
+
     public MemoryConfig() {
         super();
         this.logInfoMarker = "[INFO]";
         this.executionTimeout = 10;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     @Override
