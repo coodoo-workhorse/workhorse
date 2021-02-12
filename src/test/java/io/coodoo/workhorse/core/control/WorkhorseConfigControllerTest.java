@@ -625,7 +625,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testGetWorkhorseConfig() throws Exception {
 
-        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().setBufferMax(100L).setBufferMin(3).setBufferPollInterval(4).build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(100L).bufferMinimumSize(3).bufferPollInterval(4).build();
 
         when(configPersistence.get()).thenReturn(workhorseConfig);
 
@@ -643,8 +643,8 @@ public class WorkhorseConfigControllerTest {
         int bufferMix = 3;
         int bufferPollInterval = 4;
         int bufferPushFallbackPollInterval = 60;
-        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().setBufferMax(bufferMax).setBufferMin(bufferMix).setBufferPollInterval(bufferPollInterval)
-                        .setBufferPushFallbackPollInterval(bufferPushFallbackPollInterval).build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(bufferMax).bufferMinimumSize(bufferMix).bufferPollInterval(bufferPollInterval)
+                        .bufferPushFallbackPollInterval(bufferPushFallbackPollInterval).build();
 
         when(configPersistence.get()).thenReturn(workhorseConfigDefaults);
 
@@ -663,8 +663,8 @@ public class WorkhorseConfigControllerTest {
         int bufferMix = 3;
         int bufferPollInterval = 4;
         int bufferPushFallbackPollInterval = 60;
-        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().setBufferMax(bufferMax).setBufferMin(bufferMix).setBufferPollInterval(bufferPollInterval)
-                        .setBufferPushFallbackPollInterval(bufferPushFallbackPollInterval).build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(bufferMax).bufferMinimumSize(bufferMix).bufferPollInterval(bufferPollInterval)
+                        .bufferPushFallbackPollInterval(bufferPushFallbackPollInterval).build();
 
         when(configPersistence.get()).thenReturn(workhorseConfigDefaults);
 
@@ -684,8 +684,8 @@ public class WorkhorseConfigControllerTest {
         int bufferPushFallbackPollInterval = 60;
         int executionTimeout = 1000;
         String timeZone = "UTC";
-        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().setBufferMax(bufferMax).setBufferMin(bufferMix).setBufferPollInterval(bufferPollInterval)
-                        .setBufferPushFallbackPollInterval(bufferPushFallbackPollInterval).setExecutionTimeout(executionTimeout).setTimeZone(timeZone).build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(bufferMax).bufferMinimumSize(bufferMix).bufferPollInterval(bufferPollInterval)
+                        .bufferPushFallbackPollInterval(bufferPushFallbackPollInterval).executionTimeout(executionTimeout).timeZone(timeZone).build();
 
         when(configPersistence.get()).thenReturn(workhorseConfig);
         classUnderTest.initializeStaticConfig(workhorseConfig);

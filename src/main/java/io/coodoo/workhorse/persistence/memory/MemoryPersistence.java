@@ -13,7 +13,6 @@ import io.coodoo.workhorse.core.entity.WorkhorseLog;
 @ApplicationScoped
 public class MemoryPersistence {
 
-    // TODO: Schema entwickeln, so dass jede persitenz ihren namen und weitere daten preisgeben muss
     public static final String NAME = "MEMORY";
 
     private Map<Long, Execution> executions = new ConcurrentHashMap<>();

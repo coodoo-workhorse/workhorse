@@ -6,67 +6,74 @@ public class MemoryConfigBuilder {
 
     private MemoryConfig memoryConfig = new MemoryConfig();
 
-    public MemoryConfigBuilder setPersistenceName(String persistenceName) {
-        memoryConfig.setPersistenceName(persistenceName);
-        return this;
-    }
-
-    public MemoryConfigBuilder setTimeZone(String timeZone) {
+    /**
+     * Set another time zone. It is used to create instances of LocalDateTime.
+     * 
+     * @param timeZone
+     * @return MemoryConfigBuilder
+     */
+    public MemoryConfigBuilder timeZone(String timeZone) {
         memoryConfig.setTimeZone(timeZone);
         return this;
     }
 
-    public MemoryConfigBuilder setBufferMax(Long bufferMax) {
+    public MemoryConfigBuilder bufferMaximumSize(Long bufferMax) {
         memoryConfig.setBufferMax(bufferMax);
         return this;
     }
 
-    public MemoryConfigBuilder setBufferMin(int bufferMin) {
+    /**
+     * set the ...
+     * 
+     * @param bufferMin
+     * @return
+     */
+    public MemoryConfigBuilder bufferMinimumSize(int bufferMin) {
         memoryConfig.setBufferMin(bufferMin);
         return this;
     }
 
-    public MemoryConfigBuilder setBufferPollInterval(int bufferPollInterval) {
+    public MemoryConfigBuilder bufferPollInterval(int bufferPollInterval) {
         memoryConfig.setBufferPollInterval(bufferPollInterval);
         return this;
     }
 
-    public MemoryConfigBuilder setBufferPushFallbackPollInterval(int bufferPushFallbackPollInterval) {
+    public MemoryConfigBuilder bufferPushFallbackPollInterval(int bufferPushFallbackPollInterval) {
         memoryConfig.setBufferPushFallbackPollInterval(bufferPushFallbackPollInterval);
         return this;
     }
 
-    public MemoryConfigBuilder setExecutionTimeout(int executionTimeout) {
+    public MemoryConfigBuilder executionTimeout(int executionTimeout) {
         memoryConfig.setExecutionTimeout(executionTimeout);
         return this;
     }
 
-    public MemoryConfigBuilder setExecutionTimeoutStatus(ExecutionStatus executionTimeoutStatus) {
+    public MemoryConfigBuilder executionTimeoutStatus(ExecutionStatus executionTimeoutStatus) {
         memoryConfig.setExecutionTimeoutStatus(executionTimeoutStatus);
         return this;
     }
 
-    public MemoryConfigBuilder setLogChange(String logChange) {
+    public MemoryConfigBuilder logChange(String logChange) {
         memoryConfig.setLogChange(logChange);
         return this;
     }
 
-    public MemoryConfigBuilder setLogTimeFormat(String logTimeFormat) {
+    public MemoryConfigBuilder logTimeFormat(String logTimeFormat) {
         memoryConfig.setLogTimeFormat(logTimeFormat);
         return this;
     }
 
-    public MemoryConfigBuilder setLogInfoMarker(String logInfoMarker) {
+    public MemoryConfigBuilder logInfoMarker(String logInfoMarker) {
         memoryConfig.setLogInfoMarker(logInfoMarker);
         return this;
     }
 
-    public MemoryConfigBuilder setLogWarnMarker(String logWarnMarker) {
+    public MemoryConfigBuilder logWarnMarker(String logWarnMarker) {
         memoryConfig.setLogWarnMarker(logWarnMarker);
         return this;
     }
 
-    public MemoryConfigBuilder setLogErrorMarker(String logErrorMarker) {
+    public MemoryConfigBuilder logErrorMarker(String logErrorMarker) {
         memoryConfig.setLogErrorMarker(logErrorMarker);
         return this;
     }

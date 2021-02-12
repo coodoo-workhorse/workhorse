@@ -1,83 +1,85 @@
 package io.coodoo.workhorse.core.entity;
 
+import java.time.ZoneId;
+
 /**
  * @author coodoo GmbH (coodoo.io)
  */
 public abstract class WorkhorseConfig {
 
     /**
-     * TODO Default ist systemDefault.
-     * 
-     * ZoneId for LocalDateTime instance creation. Default is UTC
+     * ZoneId for LocalDateTime instance creation. The default setting is that defined by the system.
      */
-    private String timeZone = "UTC";
+    protected String timeZone = ZoneId.systemDefault().getId();
 
     /**
      * Max amount of executions to load into the intern buffer per job
      */
-    private Long bufferMax = 1000L;
+    protected Long bufferMax = 1000L;
 
     /**
-     * Min amount of executions in intern buffer before the procesing begins
+     * Min amount of executions in intern buffer before the processing begins
      */
-    private int bufferMin = 1;
+    protected int bufferMin = 1;
 
     /**
      * Polling interval in seconds at which the intern buffer is loaded
      */
-    private int bufferPollInterval = 5;
+    protected int bufferPollInterval = 5;
 
     /**
-     * Polling interval in seconds at which the intern buffer is loaded, that is
-     * used as fallback mechanism when new Executions are pushed by the persistence
+     * Polling interval in seconds at which the intern buffer is loaded, that is used as fallback mechanism when new Executions are pushed by the persistence
      */
-    private int bufferPushFallbackPollInterval = 120;
+    protected int bufferPushFallbackPollInterval = 120;
 
     /**
-     * Duration in seconds after which an EXECUTION in status
-     * {@link ExecutionStatus#RUNNING} is consider as zombie oder expired.(if set to
-     * 0 the value is ignored)
+     * Duration in seconds after which an EXECUTION in status {@link ExecutionStatus#RUNNING} is consider as zombie oder expired.(if set to 0 the value is
+     * ignored)
      */
-    private int executionTimeout = 120;
+    protected int executionTimeout = 120;
 
     /**
      * 
-     * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and
-     * doesn't change for {@link WorkhorseConfig#executionTimeout} seconds, it is
+     * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and doesn't change for {@link WorkhorseConfig#executionTimeout} seconds, it is
      * expired!
      * 
-     * <code>executionTimeoutStatus</code> defines which status this expired
-     * Execution have to get.
+     * <code>executionTimeoutStatus</code> defines which status this expired Execution have to get.
      */
-    private ExecutionStatus executionTimeoutStatus = ExecutionStatus.ABORTED;
+    protected ExecutionStatus executionTimeoutStatus = ExecutionStatus.ABORTED;
 
     /**
-     * Log change pattern. Placeholder <code>%s</code> for changeParameter,
-     * changeOld and changeNew in this order <br>
+     * Log change pattern. Placeholder <code>%s</code> for changeParameter, changeOld and changeNew in this order <br>
      * Default is <code>Changed %s from '%s' to '%s'</code>
      */
-    private String logChange = "%s changed from '%s' to '%s'";
+    protected String logChange = "%s changed from '%s' to '%s'";
 
     /**
      * Execution log timestamp pattern. Default is <code>[HH:mm:ss.SSS]</code>
      */
-    private String logTimeFormat = "'['HH:mm:ss.SSS']'";
+    protected String logTimeFormat = "'['HH:mm:ss.SSS']'";
 
     /**
      * Execution log info marker. Default is none
      */
-    private String logInfoMarker = "";
+    protected String logInfoMarker = "";
 
     /**
      * Execution log warn marker. Default is <code>[WARN]</code>
      */
-    private String logWarnMarker = "[WARN]";
+    protected String logWarnMarker = "[WARN]";
 
     /**
      * Execution log error marker. Default is <code>[ERROR]</code>
      */
-    private String logErrorMarker = "[ERROR]";
+    protected String logErrorMarker = "[ERROR]";
 
+    /**
+     * TODO javadoc
+     * 
+     * central access point for the given persitence name
+     * 
+     * @return
+     */
     public abstract String getPersistenceName();
 
     public String getTimeZone() {
@@ -178,12 +180,10 @@ public abstract class WorkhorseConfig {
 
     @Override
     public String toString() {
-        return "WorkhorseConfig [timeZone=" + timeZone + ", bufferMax=" + bufferMax + ", bufferMin=" + bufferMin
-                + ", bufferPollInterval=" + bufferPollInterval + ", bufferPushFallbackPollInterval="
-                + bufferPushFallbackPollInterval + ", executionTimeout=" + executionTimeout
-                + ", executionTimeoutStatus=" + executionTimeoutStatus + ", logChange=" + logChange + ", logTimeFormat="
-                + logTimeFormat + ", logInfoMarker=" + logInfoMarker + ", logWarnMarker=" + logWarnMarker
-                + ", logErrorMarker=" + logErrorMarker + "]";
+        return "WorkhorseConfig [timeZone=" + timeZone + ", bufferMax=" + bufferMax + ", bufferMin=" + bufferMin + ", bufferPollInterval=" + bufferPollInterval
+                        + ", bufferPushFallbackPollInterval=" + bufferPushFallbackPollInterval + ", executionTimeout=" + executionTimeout
+                        + ", executionTimeoutStatus=" + executionTimeoutStatus + ", logChange=" + logChange + ", logTimeFormat=" + logTimeFormat
+                        + ", logInfoMarker=" + logInfoMarker + ", logWarnMarker=" + logWarnMarker + ", logErrorMarker=" + logErrorMarker + "]";
     }
 
 }

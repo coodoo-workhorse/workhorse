@@ -13,6 +13,8 @@ import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.interfaces.ConfigPersistence;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.ConfigQualifier;
+import io.coodoo.workhorse.persistence.memory.MemoryConfig;
+import io.coodoo.workhorse.persistence.memory.MemoryConfigBuilder;
 
 /**
  * @author coodoo GmbH (coodoo.io)
@@ -37,9 +39,19 @@ public class WorkhorseConfigController {
      * 
      * @return WorkhorseConfig
      */
-    public <T extends WorkhorseConfig> WorkhorseConfig getWorkhorseConfig() {
+    public WorkhorseConfig getWorkhorseConfig() {
 
-        return configPersistence.get();
+        WorkhorseConfig workhorseConfig = configPersistence.get();
+
+        if (workhorseConfig == null) {
+            workhorseConfig = new MemoryConfigBuilder().build();
+
+            configPersistence.update(workhorseConfig);
+
+            log.info(" Created: {}", workhorseConfig);
+        }
+        return workhorseConfig;
+
     }
 
     /**
@@ -74,7 +86,7 @@ public class WorkhorseConfigController {
      * 
      * @return WorkhorseConfig
      */
-    public <T extends WorkhorseConfig> WorkhorseConfig initializeStaticConfig(T config) {
+    public WorkhorseConfig initializeStaticConfig(WorkhorseConfig config) {
 
         WorkhorseConfig workhorseConfig = config;
 

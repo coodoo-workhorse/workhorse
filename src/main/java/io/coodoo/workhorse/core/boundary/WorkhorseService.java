@@ -22,7 +22,6 @@ import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
 import io.coodoo.workhorse.persistence.PersistenceManager;
-import io.coodoo.workhorse.persistence.memory.MemoryConfig;
 import io.coodoo.workhorse.persistence.memory.MemoryConfigBuilder;
 import io.coodoo.workhorse.util.CronExpression;
 import io.coodoo.workhorse.util.WorkhorseUtil;
@@ -59,21 +58,20 @@ public class WorkhorseService {
     JobScheduler jobScheduler;
 
     /**
-     * Start Workhorse
+     * Start Workhorse. The default persistence is Memory.
      */
     public void start() {
         start(new MemoryConfigBuilder().build());
     }
 
     /**
-     * Start Workhorse with the config object of the choosen persistence
+     * Start Workhorse with the configurations of a persistence.
      * 
-     * @param <T>    Generic typ of the persistence config
-     * @param config Persistence config of the choosen persistence
+     * @param configuration Configuration of a persistence.
      */
-    public <T extends WorkhorseConfig> void start(T config) {
-        persistenceManager.initializePersistence(config);
-        workhorseConfigController.initializeStaticConfig(config);
+    public void start(WorkhorseConfig configuration) {
+        persistenceManager.initializePersistence(configuration);
+        workhorseConfigController.initializeStaticConfig(configuration);
         workhorseController.loadWorkers();
         executionBuffer.initialize();
         workhorse.start();
@@ -198,13 +196,13 @@ public class WorkhorseService {
 
         Execution execution = getExecutionById(jobId, executionId);
         if (execution == null) {
-            log.info("Execution does not exist: " + execution);
+            log.info("Execution does not exist: {} ", execution);
             return;
         }
         if (execution.getStatus() == ExecutionStatus.QUEUED) {
             executionBuffer.removeFromBuffer(execution);
         }
-        log.info("Execution removed: " + execution);
+        log.info("Execution removed: {}", execution);
 
         workhorseController.deleteExecution(jobId, executionId);
     }
@@ -215,7 +213,7 @@ public class WorkhorseService {
         if (job == null) {
             throw new RuntimeException("Job not found");
         }
-        log.info("Activate job " + job.getName());
+        log.info("Activate job {}", job.getName());
         job.setStatus(JobStatus.ACTIVE);
         workhorseController.update(job.getId(), job);
         if (job.getSchedule() != null && !job.getSchedule().isEmpty()) {
@@ -228,7 +226,7 @@ public class WorkhorseService {
         if (job == null) {
             throw new RuntimeException("Job not found");
         }
-        log.info("Deactivate job " + job.getName());
+        log.info("Deactivate job {}", job.getName());
         job.setStatus(JobStatus.INACTIVE);
         workhorseController.update(job.getId(), job);
         if (job.getSchedule() != null && !job.getSchedule().isEmpty()) {
