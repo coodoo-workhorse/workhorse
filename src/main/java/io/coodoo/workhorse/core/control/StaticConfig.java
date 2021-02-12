@@ -49,8 +49,8 @@ public final class StaticConfig {
 
     /**
      * Duration in seconds after which an EXECUTION in status
-     * {@link ExecutionStatus#RUNNING} is consider as zombie oder expired.(if set to
-     * 0 the value is ignored)
+     * {@link ExecutionStatus#RUNNING} is consider as expired.(if set to 0 the value
+     * is ignored)
      */
     public static int EXECUTION_TIMEOUT;
 

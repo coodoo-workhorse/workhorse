@@ -3,6 +3,8 @@ package io.coodoo.workhorse.core.entity;
 import java.time.ZoneId;
 
 /**
+ * The class defines all the configurations that can be applied to Workhorse to adapt it for multiples usage.
+ * 
  * @author coodoo GmbH (coodoo.io)
  */
 public abstract class WorkhorseConfig {
@@ -33,8 +35,7 @@ public abstract class WorkhorseConfig {
     protected int bufferPushFallbackPollInterval = 120;
 
     /**
-     * Duration in seconds after which an EXECUTION in status {@link ExecutionStatus#RUNNING} is consider as zombie oder expired.(if set to 0 the value is
-     * ignored)
+     * Duration in seconds after which an EXECUTION in status {@link ExecutionStatus#RUNNING} is consider expired.(if set to 0 the value is ignored)
      */
     protected int executionTimeout = 120;
 
@@ -74,11 +75,9 @@ public abstract class WorkhorseConfig {
     protected String logErrorMarker = "[ERROR]";
 
     /**
-     * TODO javadoc
+     * Retrieves the name of the persistence that extends the class WorkhorseConfig.
      * 
-     * central access point for the given persitence name
-     * 
-     * @return
+     * @return the name of the persistence
      */
     public abstract String getPersistenceName();
 

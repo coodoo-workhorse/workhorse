@@ -52,21 +52,22 @@ public class WorkhorseControllerTest {
         execution1.setJobId(1L);
         execution2.setStatus(ExecutionStatus.RUNNING);
 
-        List<Execution> zombies = new ArrayList<>();
+        List<Execution> expiredExecutions = new ArrayList<>();
 
-        zombies.add(execution1);
-        zombies.add(execution2);
+        expiredExecutions.add(execution1);
+        expiredExecutions.add(execution2);
 
         // when(WorkhorseUtil.timestamp()).thenReturn(null);
-        when(executionPersistence.findExpiredExecutions(anyObject())).thenReturn(zombies);
+        when(executionPersistence.findExpiredExecutions(anyObject())).thenReturn(expiredExecutions);
 
         classUnderTest.huntExpiredExecutions();
 
-        for (Execution zombiExecution : zombies) {
+        for (Execution zombiExecution : expiredExecutions) {
             assertEquals(ExecutionStatus.ABORTED, zombiExecution.getStatus());
 
             String logMessage = "Zombie execution found (ID: " + zombiExecution.getId() + "): ";
-            verify(workhorseLogService).logMessage(logMessage + "Put in status " + ExecutionStatus.ABORTED, zombiExecution.getJobId(), false);
+            verify(workhorseLogService).logMessage(logMessage + "Put in status " + ExecutionStatus.ABORTED,
+                    zombiExecution.getJobId(), false);
 
             verify(executionPersistence).update(zombiExecution.getJobId(), zombiExecution.getId(), zombiExecution);
         }
@@ -90,21 +91,22 @@ public class WorkhorseControllerTest {
         execution1.setJobId(1L);
         execution2.setStatus(ExecutionStatus.RUNNING);
 
-        List<Execution> zombies = new ArrayList<>();
+        List<Execution> expiredExecutions = new ArrayList<>();
 
-        zombies.add(execution1);
-        zombies.add(execution2);
+        expiredExecutions.add(execution1);
+        expiredExecutions.add(execution2);
 
         // when(WorkhorseUtil.timestamp()).thenReturn(null);
-        when(executionPersistence.findExpiredExecutions(anyObject())).thenReturn(zombies);
+        when(executionPersistence.findExpiredExecutions(anyObject())).thenReturn(expiredExecutions);
 
         classUnderTest.huntExpiredExecutions();
 
-        for (Execution zombiExecution : zombies) {
+        for (Execution zombiExecution : expiredExecutions) {
             assertEquals(ExecutionStatus.FAILED, zombiExecution.getStatus());
 
             String logMessage = "Zombie execution found (ID: " + zombiExecution.getId() + "): ";
-            verify(workhorseLogService).logMessage(logMessage + "Marked as failed and queued a clone", zombiExecution.getJobId(), false);
+            verify(workhorseLogService).logMessage(logMessage + "Marked as failed and queued a clone",
+                    zombiExecution.getJobId(), false);
 
             verify(executionPersistence).update(zombiExecution.getJobId(), zombiExecution.getId(), zombiExecution);
         }
@@ -127,16 +129,16 @@ public class WorkhorseControllerTest {
         execution1.setJobId(1L);
         execution2.setStatus(ExecutionStatus.RUNNING);
 
-        List<Execution> zombies = new ArrayList<>();
+        List<Execution> expiredExecutions = new ArrayList<>();
 
-        zombies.add(execution1);
-        zombies.add(execution2);
+        expiredExecutions.add(execution1);
+        expiredExecutions.add(execution2);
 
-        when(executionPersistence.findExpiredExecutions(anyObject())).thenReturn(zombies);
+        when(executionPersistence.findExpiredExecutions(anyObject())).thenReturn(expiredExecutions);
 
         classUnderTest.huntExpiredExecutions();
 
-        for (Execution zombiExecution : zombies) {
+        for (Execution zombiExecution : expiredExecutions) {
             assertEquals(ExecutionStatus.RUNNING, zombiExecution.getStatus());
 
             String logMessage = "Zombie execution found (ID: " + zombiExecution.getId() + "): ";
@@ -153,9 +155,9 @@ public class WorkhorseControllerTest {
         StaticConfig.EXECUTION_TIMEOUT_STATUS = ExecutionStatus.ABORTED;
         StaticConfig.TIME_ZONE = "UTC";
 
-        List<Execution> zombies = new ArrayList<>();
+        List<Execution> expiredExecutions = new ArrayList<>();
 
-        when(executionPersistence.findExpiredExecutions(anyObject())).thenReturn(zombies);
+        when(executionPersistence.findExpiredExecutions(anyObject())).thenReturn(expiredExecutions);
 
         classUnderTest.huntExpiredExecutions();
 
