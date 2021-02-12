@@ -18,7 +18,6 @@ import io.coodoo.workhorse.persistence.interfaces.qualifier.ConfigQualifier;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.ExecutionQualifier;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.LogQualifier;
-import io.coodoo.workhorse.persistence.memory.MemoryConfig;
 import io.coodoo.workhorse.persistence.memory.MemoryConfigBuilder;
 
 @ApplicationScoped
@@ -59,18 +58,18 @@ public class PersistenceManager {
     private LogPersistence logPersistence;
 
     public void initializeStorage() {
-        initializePersistence(new MemoryConfig());
+        initializePersistence(new MemoryConfigBuilder().build());
     }
 
     /**
+     * Initialize the classes that enable the access to the persistence
      * 
-     * @param Configuration Configuration of a persistence.
+     * @param Configuration Configuration of the persistence.
      */
-    @SuppressWarnings("unchecked")
-    public <T extends WorkhorseConfig> void initializePersistence(T configuration) {
+    public void initializePersistence(WorkhorseConfig configuration) {
 
         if (configuration == null) {
-            configuration = (T) new MemoryConfigBuilder().build();
+            configuration = new MemoryConfigBuilder().build();
             log.warn("The persistence configuration can not be null. The default persistence {} is used",
                     configuration);
         }
@@ -82,7 +81,7 @@ public class PersistenceManager {
 
         if (jobPersistence == null || executionPersistence == null || configPersistence == null
                 || logPersistence == null) {
-            configuration = (T) new MemoryConfig();
+            configuration = new MemoryConfigBuilder().build();
             log.error("The given persistence configuration could not be loaded, the default persistence is used: {}",
                     configuration);
             initializePersistence(configuration);
@@ -90,7 +89,7 @@ public class PersistenceManager {
 
     }
 
-    protected <T extends WorkhorseConfig> JobPersistence initializeJobPersistence(T persistenceConfiguration) {
+    protected JobPersistence initializeJobPersistence(WorkhorseConfig persistenceConfiguration) {
         log.trace("Start of JobPersistence initialization");
         for (JobPersistence jobPersistenceInstance : jobPersistenceInstances) {
             if (jobPersistenceInstance != null && jobPersistenceInstance.getPersistenceName()
@@ -106,8 +105,7 @@ public class PersistenceManager {
         return null;
     }
 
-    protected <T extends WorkhorseConfig> ExecutionPersistence initializeExecutionPersistence(
-            T persistenceConfiguration) {
+    protected ExecutionPersistence initializeExecutionPersistence(WorkhorseConfig persistenceConfiguration) {
         log.trace("Start of ExecutionPersistence initialization");
         for (ExecutionPersistence executionPersistenceInstance : executionPersistenceInstances) {
             if (executionPersistenceInstance != null && executionPersistenceInstance.getPersistenceName()
@@ -122,8 +120,7 @@ public class PersistenceManager {
         return null;
     }
 
-    protected <T extends WorkhorseConfig> ConfigPersistence initializeJobEngineConfigPersistence(
-            T persistenceConfiguration) {
+    protected ConfigPersistence initializeJobEngineConfigPersistence(WorkhorseConfig persistenceConfiguration) {
         log.trace("Start of ExecutionPersistence initialization");
         for (ConfigPersistence configPersistenceInstance : configPersistenceInstances) {
             if (configPersistenceInstance != null && configPersistenceInstance.getPersistenceName()
@@ -138,7 +135,7 @@ public class PersistenceManager {
         return null;
     }
 
-    protected <T extends WorkhorseConfig> LogPersistence initializeLogPersistence(T persistenceConfiguration) {
+    protected LogPersistence initializeLogPersistence(WorkhorseConfig persistenceConfiguration) {
         log.trace("Start of LogPersistence initialization");
         for (LogPersistence logPersistenceInstance : logPersistenceInstances) {
             if (logPersistenceInstance != null && logPersistenceInstance.getPersistenceName()

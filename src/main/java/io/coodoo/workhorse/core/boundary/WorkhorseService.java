@@ -101,7 +101,7 @@ public class WorkhorseService {
     /**
      * Retrieves all jobs
      * 
-     * @return List of Job
+     * @return List of all Job
      */
     public List<Job> getAllJobs() {
         return workhorseController.getAllJobs();
@@ -144,9 +144,8 @@ public class WorkhorseService {
      * 
      * @return Job
      */
-    public Job updateJob(Long jobId, String name, String description, String workerClassName, String schedule,
-            JobStatus status, int threads, Integer maxPerMinute, int failRetries, int retryDelay, int daysUntilCleanUp,
-            boolean uniqueInQueue) {
+    public Job updateJob(Long jobId, String name, String description, String workerClassName, String schedule, JobStatus status, int threads,
+                    Integer maxPerMinute, int failRetries, int retryDelay, int daysUntilCleanUp, boolean uniqueInQueue) {
 
         Job job = getJobById(jobId);
 
@@ -154,8 +153,8 @@ public class WorkhorseService {
         // workhorse.stop(); maybe we don t need. To proove
         executionBuffer.cancelProcess(job);
 
-        workhorseController.updateJob(jobId, name, description, workerClassName, schedule, status, threads,
-                maxPerMinute, failRetries, retryDelay, daysUntilCleanUp, uniqueInQueue);
+        workhorseController.updateJob(jobId, name, description, workerClassName, schedule, status, threads, maxPerMinute, failRetries, retryDelay,
+                        daysUntilCleanUp, uniqueInQueue);
 
         executionBuffer.initialize(job);
         // workhorse.start();
@@ -167,14 +166,13 @@ public class WorkhorseService {
     /**
      * Update a {@link Execution}
      */
-    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime maturity,
-            Long batchId, Long chainId, Long chainedPreviousExecutionId, boolean uniqueInQueue) {
-        return workhorseController.createExecution(jobId, parameters, priority, maturity, batchId, chainId,
-                chainedPreviousExecutionId, uniqueInQueue);
+    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime maturity, Long batchId, Long chainId,
+                    Long chainedPreviousExecutionId, boolean uniqueInQueue) {
+        return workhorseController.createExecution(jobId, parameters, priority, maturity, batchId, chainId, chainedPreviousExecutionId, uniqueInQueue);
     }
 
-    public Execution updateExecution(Long jobId, Long executionId, ExecutionStatus status, String parameters,
-            boolean priority, LocalDateTime maturity, int fails) {
+    public Execution updateExecution(Long jobId, Long executionId, ExecutionStatus status, String parameters, boolean priority, LocalDateTime maturity,
+                    int fails) {
 
         Execution execution = getExecutionById(jobId, executionId);
 
@@ -281,13 +279,10 @@ public class WorkhorseService {
     /**
      * Get the execution times defined by {@link Job#getSchedule()}
      * 
-     * @param schedule  CRON Expression
-     * @param startTime start time for this request (if <tt>null</tt> then current
-     *                  time is used)
-     * @param endTime   end time for this request (if <tt>null</tt> then current
-     *                  time plus 1 day is used)
-     * @return List of {@link LocalDateTime} representing the execution times of a
-     *         scheduled job between the <tt>startTime</tt> and <tt>endTime</tt>
+     * @param schedule CRON Expression
+     * @param startTime start time for this request (if <tt>null</tt> then current time is used)
+     * @param endTime end time for this request (if <tt>null</tt> then current time plus 1 day is used)
+     * @return List of {@link LocalDateTime} representing the execution times of a scheduled job between the <tt>startTime</tt> and <tt>endTime</tt>
      */
     public List<LocalDateTime> getScheduledTimes(String schedule, LocalDateTime startTime, LocalDateTime endTime) {
 
