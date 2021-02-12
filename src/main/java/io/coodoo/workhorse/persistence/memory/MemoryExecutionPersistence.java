@@ -178,7 +178,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
             if (execution.getJobId().equals(jobId) && Objects.equals(execution.getChainId(), chainId)
                     && execution.getStatus() == ExecutionStatus.QUEUED) {
 
-                execution.setStatus(ExecutionStatus.ABORTED);
+                execution.setStatus(ExecutionStatus.FAILED);
                 update(jobId, execution.getId(), execution);
             }
         }

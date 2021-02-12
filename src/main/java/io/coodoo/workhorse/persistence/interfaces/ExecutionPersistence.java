@@ -155,10 +155,11 @@ public interface ExecutionPersistence {
     boolean isBatchFinished(Long jobId, Long batchId);
 
     /**
-     * Abort all chained Execution of the given chainedExecution
+     * Set the status of all queued Executions of the given chainedExecution to
+     * {@link ExecutionStatus#FAILED}
      * 
-     * @param jobId
-     * @param chainId
+     * @param jobId   id of the job
+     * @param chainId id of the chain
      * @return <code>true</code> if successful and <code>false</code> otherwise
      */
     boolean abortChain(Long jobId, Long chainId);
