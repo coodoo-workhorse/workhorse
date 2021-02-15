@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.coodoo.workhorse.core.entity.WorkhorseConfig;
+import io.coodoo.workhorse.core.entity.AbstractWorkhorseConfig;
 import io.coodoo.workhorse.persistence.interfaces.ConfigPersistence;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
@@ -66,7 +66,7 @@ public class PersistenceManager {
      * 
      * @param Configuration Configuration of the persistence.
      */
-    public void initializePersistence(WorkhorseConfig configuration) {
+    public void initializePersistence(AbstractWorkhorseConfig configuration) {
 
         if (configuration == null) {
             configuration = new MemoryConfigBuilder().build();
@@ -89,7 +89,7 @@ public class PersistenceManager {
 
     }
 
-    protected JobPersistence initializeJobPersistence(WorkhorseConfig persistenceConfiguration) {
+    protected JobPersistence initializeJobPersistence(AbstractWorkhorseConfig persistenceConfiguration) {
         log.trace("Start of JobPersistence initialization");
         for (JobPersistence jobPersistenceInstance : jobPersistenceInstances) {
             if (jobPersistenceInstance != null && jobPersistenceInstance.getPersistenceName()
@@ -105,7 +105,7 @@ public class PersistenceManager {
         return null;
     }
 
-    protected ExecutionPersistence initializeExecutionPersistence(WorkhorseConfig persistenceConfiguration) {
+    protected ExecutionPersistence initializeExecutionPersistence(AbstractWorkhorseConfig persistenceConfiguration) {
         log.trace("Start of ExecutionPersistence initialization");
         for (ExecutionPersistence executionPersistenceInstance : executionPersistenceInstances) {
             if (executionPersistenceInstance != null && executionPersistenceInstance.getPersistenceName()
@@ -120,7 +120,7 @@ public class PersistenceManager {
         return null;
     }
 
-    protected ConfigPersistence initializeJobEngineConfigPersistence(WorkhorseConfig persistenceConfiguration) {
+    protected ConfigPersistence initializeJobEngineConfigPersistence(AbstractWorkhorseConfig persistenceConfiguration) {
         log.trace("Start of ExecutionPersistence initialization");
         for (ConfigPersistence configPersistenceInstance : configPersistenceInstances) {
             if (configPersistenceInstance != null && configPersistenceInstance.getPersistenceName()
@@ -135,7 +135,7 @@ public class PersistenceManager {
         return null;
     }
 
-    protected LogPersistence initializeLogPersistence(WorkhorseConfig persistenceConfiguration) {
+    protected LogPersistence initializeLogPersistence(AbstractWorkhorseConfig persistenceConfiguration) {
         log.trace("Start of LogPersistence initialization");
         for (LogPersistence logPersistenceInstance : logPersistenceInstances) {
             if (logPersistenceInstance != null && logPersistenceInstance.getPersistenceName()

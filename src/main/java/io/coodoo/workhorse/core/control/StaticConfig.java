@@ -57,7 +57,7 @@ public final class StaticConfig {
     /**
      * 
      * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and
-     * doesn't change for {@link WorkhorseConfig#executionTimeout} seconds, it is
+     * doesn't change for {@link AbstractWorkhorseConfig#executionTimeout} seconds, it is
      * expired!
      * 
      * <code>executionTimeoutStatus</code> defines which status this expired

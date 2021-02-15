@@ -19,7 +19,7 @@ import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
-import io.coodoo.workhorse.core.entity.WorkhorseConfig;
+import io.coodoo.workhorse.core.entity.AbstractWorkhorseConfig;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
 import io.coodoo.workhorse.persistence.PersistenceManager;
 import io.coodoo.workhorse.persistence.memory.MemoryConfigBuilder;
@@ -67,11 +67,13 @@ public class WorkhorseService {
     /**
      * Start Workhorse with the configurations of a persistence.
      * 
-     * @param configuration Configuration of a persistence.
+     * TODO auf Builder aufmerksam machen
+     * 
+     * @param workhorseConfig Configuration of a persistence.
      */
-    public void start(WorkhorseConfig configuration) {
-        persistenceManager.initializePersistence(configuration);
-        workhorseConfigController.initializeStaticConfig(configuration);
+    public void start(AbstractWorkhorseConfig workhorseConfig) {
+        persistenceManager.initializePersistence(workhorseConfig);
+        workhorseConfigController.initializeStaticConfig(workhorseConfig);
         workhorseController.loadWorkers();
         executionBuffer.initialize();
         workhorse.start();
@@ -90,11 +92,13 @@ public class WorkhorseService {
         executionBuffer.clear();
     }
 
-    public WorkhorseConfig getWorkhorseConfig() {
+    // TODO javadoc
+    public AbstractWorkhorseConfig getWorkhorseConfig() {
         return workhorseConfigController.getWorkhorseConfig();
     }
 
-    public void updateWorkhorseConfig(WorkhorseConfig workhorseConfig) {
+    // TODO javadoc
+    public void updateWorkhorseConfig(AbstractWorkhorseConfig workhorseConfig) {
         workhorseConfigController.updateWorkhorseConfig(workhorseConfig);
     }
 
