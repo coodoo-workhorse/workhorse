@@ -25,7 +25,7 @@ public interface ConfigPersistence {
     void connect(Object... params);
 
     /**
-     * @return retrieve the name of the persistencesistence to initialize
+     * @return retrieve the name of the persistence to initialize
      */
     String getPersistenceName();
 
