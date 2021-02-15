@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import io.coodoo.workhorse.core.boundary.Worker;
 import io.coodoo.workhorse.core.boundary.WorkhorseService;
 import io.coodoo.workhorse.core.boundary.annotation.InitialJobConfig;
+import io.coodoo.workhorse.core.control.StaticConfig;
 import io.coodoo.workhorse.core.entity.Job;
 
 @ApplicationScoped
@@ -27,7 +28,7 @@ public class ExecutionCleanupWorker extends Worker {
         logInfo(logger, "Deleted | Days | Job ID | Job Name");
 
         for (Job job : workhorseService.getAllJobs()) {
-            if (job.getDaysUntilCleanUp() > 0) {
+            if (StaticConfig.DAYS_UNTIL_CLEANUP > 0) {
                 try {
                     int deleted = workhorseController.deleteOlderExecutions(job.getId(), job.getDaysUntilCleanUp());
                     logInfo(logger, String.format("%7d | %4d | %6d | %s", deleted, job.getDaysUntilCleanUp(),

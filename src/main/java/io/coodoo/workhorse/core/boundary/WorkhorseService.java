@@ -15,13 +15,14 @@ import io.coodoo.workhorse.core.control.JobScheduler;
 import io.coodoo.workhorse.core.control.Workhorse;
 import io.coodoo.workhorse.core.control.WorkhorseConfigController;
 import io.coodoo.workhorse.core.control.WorkhorseController;
+import io.coodoo.workhorse.core.entity.AbstractWorkhorseConfig;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
-import io.coodoo.workhorse.core.entity.AbstractWorkhorseConfig;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
 import io.coodoo.workhorse.persistence.PersistenceManager;
+import io.coodoo.workhorse.persistence.memory.MemoryConfig;
 import io.coodoo.workhorse.persistence.memory.MemoryConfigBuilder;
 import io.coodoo.workhorse.util.CronExpression;
 import io.coodoo.workhorse.util.WorkhorseUtil;
@@ -65,11 +66,15 @@ public class WorkhorseService {
     }
 
     /**
-     * Start Workhorse with the configurations of a persistence.
+     * Start Workhorse with the configuration of a persistence.
      * 
-     * TODO auf Builder aufmerksam machen
+     * The configuration can be built by using the builder that extends {@link WorkhorseConfigBuilder} of the chosen persisitence.
      * 
-     * @param workhorseConfig Configuration of a persistence.
+     * For example, if you want to use the default persistence {@link MemoryConfig} use the builder as follow:
+     * 
+     * <code>start(new MemoryConfigBuilder().build())</code>
+     * 
+     * @param workhorseConfig Configuration of the chosen persistence.
      */
     public void start(AbstractWorkhorseConfig workhorseConfig) {
         persistenceManager.initializePersistence(workhorseConfig);
@@ -92,12 +97,20 @@ public class WorkhorseService {
         executionBuffer.clear();
     }
 
-    // TODO javadoc
+    /**
+     * Retrieves the current configuration of the job engine
+     * 
+     * @return the current configuration of the job engine
+     */
     public AbstractWorkhorseConfig getWorkhorseConfig() {
         return workhorseConfigController.getWorkhorseConfig();
     }
 
-    // TODO javadoc
+    /**
+     * Update the configuration of the job engine
+     * 
+     * @param workhorseConfig the new configurations to set
+     */
     public void updateWorkhorseConfig(AbstractWorkhorseConfig workhorseConfig) {
         workhorseConfigController.updateWorkhorseConfig(workhorseConfig);
     }

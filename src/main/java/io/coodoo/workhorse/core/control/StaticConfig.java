@@ -48,6 +48,14 @@ public final class StaticConfig {
     public static int BUFFER_PUSH_FALL_BACK_POLL_INTERVAL;
 
     /**
+     * Number of days an execution can be held in the persistence before being
+     * deleted.
+     * 
+     * If set to 0, no cleanup is performed.
+     */
+    public static int DAYS_UNTIL_CLEANUP = 1;
+
+    /**
      * Duration in seconds after which an EXECUTION in status
      * {@link ExecutionStatus#RUNNING} is consider as expired.(if set to 0 the value
      * is ignored)
@@ -57,8 +65,8 @@ public final class StaticConfig {
     /**
      * 
      * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and
-     * doesn't change for {@link AbstractWorkhorseConfig#executionTimeout} seconds, it is
-     * expired!
+     * doesn't change for {@link AbstractWorkhorseConfig#executionTimeout} seconds,
+     * it is expired!
      * 
      * <code>executionTimeoutStatus</code> defines which status this expired
      * Execution have to get.
