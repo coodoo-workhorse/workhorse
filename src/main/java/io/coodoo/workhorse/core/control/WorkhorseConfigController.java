@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
-import io.coodoo.workhorse.core.entity.WorkhorseConfig;
+import io.coodoo.workhorse.core.entity.AbstractWorkhorseConfig;
 import io.coodoo.workhorse.persistence.interfaces.ConfigPersistence;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.ConfigQualifier;
 import io.coodoo.workhorse.persistence.memory.MemoryConfigBuilder;
@@ -38,9 +38,9 @@ public class WorkhorseConfigController {
      * 
      * @return the configuration given from the running persistence
      */
-    public WorkhorseConfig getWorkhorseConfig() {
+    public AbstractWorkhorseConfig getWorkhorseConfig() {
 
-        WorkhorseConfig workhorseConfig = configPersistence.get();
+        AbstractWorkhorseConfig workhorseConfig = configPersistence.get();
 
         if (workhorseConfig == null) {
             workhorseConfig = new MemoryConfigBuilder().build();
@@ -59,13 +59,13 @@ public class WorkhorseConfigController {
      * @param newWorkhorseConfig the new configurations to set
      * @return the updated configurations of the job engine
      */
-    public WorkhorseConfig updateWorkhorseConfig(WorkhorseConfig newWorkhorseConfig) {
+    public AbstractWorkhorseConfig updateWorkhorseConfig(AbstractWorkhorseConfig newWorkhorseConfig) {
 
-        WorkhorseConfig workhorseConfig = getWorkhorseConfig();
+        AbstractWorkhorseConfig workhorseConfig = getWorkhorseConfig();
 
         updateBufferPollInterval(workhorseConfig, newWorkhorseConfig.getBufferPollInterval());
         updateBufferPushFallbackPollInterval(workhorseConfig, newWorkhorseConfig.getBufferPushFallbackPollInterval());
-        updateExecutionTimeOut(workhorseConfig, newWorkhorseConfig.getExecutionTimeout());
+        updateExecutionTimeout(workhorseConfig, newWorkhorseConfig.getExecutionTimeout());
         updateBufferMax(workhorseConfig, newWorkhorseConfig.getBufferMax());
         updateBufferMin(workhorseConfig, newWorkhorseConfig.getBufferMin());
         updateLogChange(workhorseConfig, newWorkhorseConfig.getLogChange());
@@ -86,9 +86,9 @@ public class WorkhorseConfigController {
      * @param config the configuration given from the chosen persistence.
      * @return the initialized configuration
      */
-    public WorkhorseConfig initializeStaticConfig(WorkhorseConfig config) {
+    public AbstractWorkhorseConfig initializeStaticConfig(AbstractWorkhorseConfig config) {
 
-        WorkhorseConfig workhorseConfig = config;
+        AbstractWorkhorseConfig workhorseConfig = config;
 
         StaticConfig.TIME_ZONE = workhorseConfig.getTimeZone();
         StaticConfig.BUFFER_MAX = workhorseConfig.getBufferMax();
@@ -110,7 +110,7 @@ public class WorkhorseConfigController {
         return workhorseConfig;
     }
 
-    protected void updateBufferPollInterval(WorkhorseConfig workhorseConfig, int bufferPollInterval) {
+    protected void updateBufferPollInterval(AbstractWorkhorseConfig workhorseConfig, int bufferPollInterval) {
 
         if (bufferPollInterval < 1 || bufferPollInterval > 60) {
             throw new RuntimeException("The buffer poller interval must be between 1 and 60!");
@@ -127,7 +127,7 @@ public class WorkhorseConfigController {
         }
     }
 
-    protected void updateBufferPushFallbackPollInterval(WorkhorseConfig workhorseConfig, int bufferPushFallbackPollInterval) {
+    protected void updateBufferPushFallbackPollInterval(AbstractWorkhorseConfig workhorseConfig, int bufferPushFallbackPollInterval) {
 
         if (bufferPushFallbackPollInterval < 1) {
             throw new RuntimeException("The buffer push fallback poller interval must be higher than 0!");
@@ -147,7 +147,7 @@ public class WorkhorseConfigController {
 
     }
 
-    protected void updateExecutionTimeOut(WorkhorseConfig workhorseConfig, int executionTimeout) {
+    protected void updateExecutionTimeout(AbstractWorkhorseConfig workhorseConfig, int executionTimeout) {
 
         if (executionTimeout < 0) {
             throw new RuntimeException("The execution timeout can't be negative!");
@@ -162,7 +162,7 @@ public class WorkhorseConfigController {
         }
     }
 
-    protected void updateBufferMax(WorkhorseConfig workhorseConfig, Long bufferMax) {
+    protected void updateBufferMax(AbstractWorkhorseConfig workhorseConfig, Long bufferMax) {
 
         if (bufferMax < 1) {
             throw new RuntimeException("The max amount of executions to load into the memory buffer per job must be higher than 0!");
@@ -176,7 +176,7 @@ public class WorkhorseConfigController {
         }
     }
 
-    protected void updateBufferMin(WorkhorseConfig workhorseConfig, int bufferMin) {
+    protected void updateBufferMin(AbstractWorkhorseConfig workhorseConfig, int bufferMin) {
 
         if (bufferMin < 1) {
             throw new RuntimeException("The min amount of executions in memory buffer before the poller gets to add more must be higher than 0!");
@@ -190,7 +190,7 @@ public class WorkhorseConfigController {
         }
     }
 
-    protected void updateLogChange(WorkhorseConfig workhorseConfig, String logChange) {
+    protected void updateLogChange(AbstractWorkhorseConfig workhorseConfig, String logChange) {
 
         if (logChange == null) {
             throw new RuntimeException("The log change pattern is needed!");
@@ -206,7 +206,7 @@ public class WorkhorseConfigController {
         }
     }
 
-    protected void updateLogTimeFormatter(WorkhorseConfig workhorseConfig, String logTimeFormatter) {
+    protected void updateLogTimeFormatter(AbstractWorkhorseConfig workhorseConfig, String logTimeFormatter) {
 
         if (logTimeFormatter == null) {
             throw new RuntimeException("The execution log timestamp pattern is needed!");
@@ -219,7 +219,7 @@ public class WorkhorseConfigController {
         }
     }
 
-    protected void updateTimeZone(WorkhorseConfig workhorseConfig, String timeZone) {
+    protected void updateTimeZone(AbstractWorkhorseConfig workhorseConfig, String timeZone) {
 
         if (timeZone != null && !ZoneId.getAvailableZoneIds().contains(timeZone)) {
             throw new RuntimeException("Time zone '" + timeZone + "' is not available!");
@@ -241,7 +241,7 @@ public class WorkhorseConfigController {
         }
     }
 
-    protected void updateLogInfoMarker(WorkhorseConfig workhorseConfig, String logInfoMarker) {
+    protected void updateLogInfoMarker(AbstractWorkhorseConfig workhorseConfig, String logInfoMarker) {
 
         if (!Objects.equals(workhorseConfig.getLogInfoMarker(), logInfoMarker)) {
 
@@ -251,7 +251,7 @@ public class WorkhorseConfigController {
         }
     }
 
-    protected void updateLogWarnMarker(WorkhorseConfig workhorseConfig, String logWarnMarker) {
+    protected void updateLogWarnMarker(AbstractWorkhorseConfig workhorseConfig, String logWarnMarker) {
 
         if (!Objects.equals(workhorseConfig.getLogWarnMarker(), logWarnMarker)) {
 
@@ -261,7 +261,7 @@ public class WorkhorseConfigController {
         }
     }
 
-    protected void updateLogErrorMarker(WorkhorseConfig workhorseConfig, String logErrorMarker) {
+    protected void updateLogErrorMarker(AbstractWorkhorseConfig workhorseConfig, String logErrorMarker) {
 
         if (!Objects.equals(workhorseConfig.getLogErrorMarker(), logErrorMarker)) {
 

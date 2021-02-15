@@ -5,9 +5,13 @@ import java.time.ZoneId;
 /**
  * The class defines all the configurations that can be applied to Workhorse to adapt it for multiples usage.
  * 
+ * TODO: dem anwender sagen, wie er zu seinem config objekt kommt: durch persitence oder builder * {@link AbstractWorkhorseConfigBuilder}
+ * 
+ * TODO: dem anwender sagen, welche implementierungen es zu dieser abstrakten klasse gibt
+ * 
  * @author coodoo GmbH (coodoo.io)
  */
-public abstract class WorkhorseConfig {
+public abstract class AbstractWorkhorseConfig {
 
     /**
      * ZoneId for LocalDateTime instance creation. The default setting is that defined by the system.
@@ -41,7 +45,7 @@ public abstract class WorkhorseConfig {
 
     /**
      * 
-     * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and doesn't change for {@link WorkhorseConfig#executionTimeout} seconds, it is
+     * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and doesn't change for {@link AbstractWorkhorseConfig#executionTimeout} seconds, it is
      * expired!
      * 
      * <code>executionTimeoutStatus</code> defines which status this expired Execution have to get.

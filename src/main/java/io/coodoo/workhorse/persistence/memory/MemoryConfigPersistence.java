@@ -3,7 +3,7 @@ package io.coodoo.workhorse.persistence.memory;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import io.coodoo.workhorse.core.entity.WorkhorseConfig;
+import io.coodoo.workhorse.core.entity.AbstractWorkhorseConfig;
 import io.coodoo.workhorse.persistence.interfaces.ConfigPersistence;
 
 @ApplicationScoped
@@ -13,12 +13,12 @@ public class MemoryConfigPersistence implements ConfigPersistence {
     MemoryPersistence memoryPersistence;
 
     @Override
-    public WorkhorseConfig get() {
+    public AbstractWorkhorseConfig get() {
         return memoryPersistence.getWorkhorseConfig();
     }
 
     @Override
-    public WorkhorseConfig update(WorkhorseConfig workhorseConfig) {
+    public AbstractWorkhorseConfig update(AbstractWorkhorseConfig workhorseConfig) {
         memoryPersistence.setWorkhorseConfig(workhorseConfig);
         return workhorseConfig;
     }
