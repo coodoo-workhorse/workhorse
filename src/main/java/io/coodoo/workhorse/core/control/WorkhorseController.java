@@ -397,6 +397,8 @@ public class WorkhorseController {
      */
     public int deleteOlderExecutions(Long jobId, int minDaysOld) {
 
+        // Is minDaysOld negativ the global default value of daysUntilCleanup have to be
+        // used.
         if (minDaysOld < 0) {
             minDaysOld = StaticConfig.DAYS_UNTIL_CLEANUP;
         }
