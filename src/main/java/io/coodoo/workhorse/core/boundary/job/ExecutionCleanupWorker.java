@@ -13,7 +13,7 @@ import io.coodoo.workhorse.core.control.StaticConfig;
 import io.coodoo.workhorse.core.entity.Job;
 
 @ApplicationScoped
-@InitialJobConfig(name = "Execution Cleanup", schedule = "15 * * * * *", failRetries = 1, description = "Deletes old executions from the storage")
+@InitialJobConfig(name = "Execution Cleanup", schedule = "15 * * * * *", failRetries = 1, description = "Deletes old executions from the persistence")
 public class ExecutionCleanupWorker extends Worker {
 
     private final Logger logger = LoggerFactory.getLogger(ExecutionCleanupWorker.class);
