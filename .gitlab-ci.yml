@@ -34,7 +34,7 @@ before_script:
     - Java
   artifacts:
     paths:
-      - target/workhorse-test.jar
+      - target/workhorse.jar
     expire_in: 1 hour
   before_script:
     - echo -e " Home:\        ${HOME}\n Pipeline:\     ${CI_PIPELINE_ID}\n Branch/Tag:\  ${CI_JOB_REF_NAME}\n Gitlab User:\ ${GITLAB_USER_NAME}\n Verzeichnis:\ `pwd`\n MAVEN_OPTS:\ ${MAVEN_OPTS}\n MAVEN_CLI_OPTS:\ ${MAVEN_CLI_OPTS}"
@@ -57,11 +57,11 @@ test:
     reports:
       junit:
         - "*/target/surefire-reports/TEST-*.xml"
-        
+
 deploy:
-  image: maven:3.3.9-jdk-8
+  stage: deploy 
   script:
-    - 'mvn deploy -s ci_settings.xml'
+    - mvn $MAVEN_CLI_OPTS deploy -s ci_settings.xml
   only:
     - master
   
