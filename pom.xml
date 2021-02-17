@@ -212,10 +212,18 @@
 		</plugins>
 	</build>
 	<distributionManagement>
-		<snapshotRepository>
+		<!-- <snapshotRepository>
 			<id>ossrh</id>
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository> -->
+		<snapshotRepository>
+			<id>gitlab-maven</id>
+			<url>https://gitlab.coodoo.io/api/v4/projects/${env.CI_PROJECT_ID}/packages/maven</url>
 		</snapshotRepository>
+		<repository>
+			<id>gitlab-maven</id>
+			<url>https://gitlab.coodoo.io/api/v4/projects/${env.CI_PROJECT_ID}/packages/maven</url>
+		</repository>
 	</distributionManagement>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
