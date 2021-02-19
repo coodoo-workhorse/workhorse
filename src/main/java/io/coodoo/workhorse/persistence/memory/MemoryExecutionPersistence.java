@@ -34,7 +34,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     @Inject
     Event<NewExecutionEvent> newExecutionEventEvent;
 
-    private AtomicLong incId = new AtomicLong(0);
+    private AtomicLong executionId = new AtomicLong(0);
 
     @Override
     public Execution getById(Long jobId, Long id) {
@@ -43,13 +43,12 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
     @Override
     public void persist(Execution execution) {
-        Long id = incId.getAndIncrement();
+        Long id = executionId.getAndIncrement();
         execution.setId(id);
         execution.setCreatedAt(WorkhorseUtil.timestamp());
         memoryPersistence.getExecutions().put(id, execution);
 
         newExecutionEventEvent.fireAsync(new NewExecutionEvent(execution.getJobId(), execution.getId()));
-
     }
 
     @Override

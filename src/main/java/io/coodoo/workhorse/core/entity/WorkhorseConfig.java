@@ -8,7 +8,7 @@ import java.time.ZoneId;
  * 
  * @author coodoo GmbH (coodoo.io)
  */
-public abstract class AbstractWorkhorseConfig {
+public abstract class WorkhorseConfig {
 
     /**
      * ZoneId for LocalDateTime instance creation. The default setting is that
@@ -55,8 +55,8 @@ public abstract class AbstractWorkhorseConfig {
     /**
      * 
      * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and
-     * doesn't change for {@link AbstractWorkhorseConfig#executionTimeout} seconds,
-     * it is expired!
+     * doesn't change for {@link WorkhorseConfig#executionTimeout} seconds, it is
+     * expired!
      * 
      * <code>executionTimeoutStatus</code> defines which status this expired
      * Execution have to get.

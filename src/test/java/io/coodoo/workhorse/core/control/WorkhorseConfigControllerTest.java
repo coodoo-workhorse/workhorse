@@ -23,7 +23,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
-import io.coodoo.workhorse.core.entity.AbstractWorkhorseConfig;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.persistence.interfaces.ConfigPersistence;
 import io.coodoo.workhorse.persistence.memory.MemoryConfigBuilder;
@@ -49,7 +49,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateBufferMax() {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         Long bufferMax = 1L;
 
         classUnderTest.updateBufferMax(workhorseConfig, bufferMax);
@@ -62,11 +62,12 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateBufferMax_tooLow() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         Long bufferMax = 0L;
 
         exceptionRule.expect(RuntimeException.class);
-        exceptionRule.expectMessage("The max amount of executions to load into the memory buffer per job must be higher than 0!");
+        exceptionRule.expectMessage(
+                "The max amount of executions to load into the memory buffer per job must be higher than 0!");
 
         classUnderTest.updateBufferMax(workhorseConfig, bufferMax);
 
@@ -75,33 +76,35 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateBufferMax_dontUpdateIfEquals() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         Long bufferMax = 50L;
 
         workhorseConfig.setBufferMax(bufferMax);
         classUnderTest.updateBufferMax(workhorseConfig, bufferMax);
 
         // if nothing has changed, there will be no log and no restart
-        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(), anyObject(), anyString());
+        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(),
+                anyObject(), anyString());
     }
 
     @Test
     public void testUpdateBufferMax_logMessage() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfigDefaults = new MemoryConfigBuilder().build();
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfigDefaults = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         Long bufferMax = 50L;
 
         classUnderTest.updateBufferMax(workhorseConfig, bufferMax);
 
-        verify(workhorseLogService).logChange(null, null, "Max amount of executions to load into the memory buffer per job",
-                        workhorseConfigDefaults.getBufferMax(), bufferMax, null);
+        verify(workhorseLogService).logChange(null, null,
+                "Max amount of executions to load into the memory buffer per job",
+                workhorseConfigDefaults.getBufferMax(), bufferMax, null);
     }
 
     @Test
     public void testUpdateBufferMin() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         int bufferMin = 2;
 
         classUnderTest.updateBufferMin(workhorseConfig, bufferMin);
@@ -113,11 +116,12 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateBufferMin_tooLow() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         int bufferMin = 0;
 
         exceptionRule.expect(RuntimeException.class);
-        exceptionRule.expectMessage("The min amount of executions in memory buffer before the poller gets to add more must be higher than 0!");
+        exceptionRule.expectMessage(
+                "The min amount of executions in memory buffer before the poller gets to add more must be higher than 0!");
 
         classUnderTest.updateBufferMin(workhorseConfig, bufferMin);
     }
@@ -126,33 +130,35 @@ public class WorkhorseConfigControllerTest {
     public void testUpdateBufferMin_logMessage() throws Exception {
 
         // Default is 1
-        AbstractWorkhorseConfig workhorseConfigDefaults = new MemoryConfigBuilder().build();
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfigDefaults = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         int bufferMin = 4;
 
         classUnderTest.updateBufferMin(workhorseConfig, bufferMin);
 
-        verify(workhorseLogService).logChange(null, null, "Min amount of executions in memory buffer before the poller gets to add more",
-                        workhorseConfigDefaults.getBufferMin(), bufferMin, null);
+        verify(workhorseLogService).logChange(null, null,
+                "Min amount of executions in memory buffer before the poller gets to add more",
+                workhorseConfigDefaults.getBufferMin(), bufferMin, null);
     }
 
     @Test
     public void testUpdateBufferMin_dontUpdateIfEquals() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         int bufferMin = 50;
 
         workhorseConfig.setBufferMin(bufferMin);
         classUnderTest.updateBufferMin(workhorseConfig, bufferMin);
 
         // if nothing has changed, there will be no log and no restart
-        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(), anyObject(), anyString());
+        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(),
+                anyObject(), anyString());
     }
 
     @Test
     public void testUpdateBufferPollInterval() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         int bufferPollInterval = 1;
 
         // Default is 5
@@ -168,7 +174,7 @@ public class WorkhorseConfigControllerTest {
 
         StaticConfig.BUFFER_POLL_INTERVAL = 33;
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         int bufferPollInterval = 3;
 
         classUnderTest.updateBufferPollInterval(workhorseConfig, bufferPollInterval);
@@ -181,13 +187,14 @@ public class WorkhorseConfigControllerTest {
 
         int bufferPollInterval = 3;
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         workhorseConfig.setBufferPollInterval(bufferPollInterval);
 
         classUnderTest.updateBufferPollInterval(workhorseConfig, bufferPollInterval);
 
         // if nothing has changed, there will be no log and no restart
-        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(), anyObject(), anyString());
+        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(),
+                anyObject(), anyString());
         verify(workhorse, never()).isRunning();
     }
 
@@ -210,7 +217,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateBufferPollInterval_Lowest() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         int bufferPollInterval = 1;
 
         classUnderTest.updateBufferPollInterval(workhorseConfig, bufferPollInterval);
@@ -236,7 +243,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateBufferPollInterval_Highest() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         int bufferPollInterval = 60;
 
         classUnderTest.updateBufferPollInterval(workhorseConfig, bufferPollInterval);
@@ -246,7 +253,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateBufferPollInterval_restart() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         int bufferPollInterval = 3;
 
         given(workhorse.isRunning()).willReturn(true);
@@ -259,7 +266,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateBufferPollInterval_restartNotNeeded() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         int bufferPollInterval = 3;
 
         given(workhorse.isRunning()).willReturn(false);
@@ -273,19 +280,20 @@ public class WorkhorseConfigControllerTest {
     public void testUpdateBufferPollInterval_logMessage() throws Exception {
 
         // Default is 5
-        AbstractWorkhorseConfig workhorseConfigDefaults = new MemoryConfigBuilder().build();
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfigDefaults = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         int bufferPollInterval = 3;
 
         classUnderTest.updateBufferPollInterval(workhorseConfig, bufferPollInterval);
 
-        verify(workhorseLogService).logChange(null, null, "Buffer poller interval", workhorseConfigDefaults.getBufferPollInterval(), bufferPollInterval, null);
+        verify(workhorseLogService).logChange(null, null, "Buffer poller interval",
+                workhorseConfigDefaults.getBufferPollInterval(), bufferPollInterval, null);
     }
 
     @Test
     public void testUpdateBufferPollInterval_with_too_high_bufferPollInterval() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         int bufferPollInterval = 61;
 
         exceptionRule.expect(RuntimeException.class);
@@ -298,7 +306,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateBufferPollInterval_with_too_small_bufferPollInterval() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         int bufferPollInterval = 0;
 
         exceptionRule.expect(RuntimeException.class);
@@ -311,7 +319,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateBufferPushFallbackPollInterval() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         int bufferPushFallbackPollInterval = 60;
 
         classUnderTest.updateBufferPushFallbackPollInterval(workhorseConfig, bufferPushFallbackPollInterval);
@@ -325,20 +333,21 @@ public class WorkhorseConfigControllerTest {
 
         int bufferPushFallbackPollInterval = 3;
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         workhorseConfig.setBufferPushFallbackPollInterval(bufferPushFallbackPollInterval);
 
         classUnderTest.updateBufferPushFallbackPollInterval(workhorseConfig, bufferPushFallbackPollInterval);
 
         // if nothing has changed, there will be no log and no restart
-        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(), anyObject(), anyString());
+        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(),
+                anyObject(), anyString());
         verify(workhorse, never()).isRunning();
     }
 
     @Test
     public void testUpdateBufferPushFallbackPollInterval_restart() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         int bufferPushFallbackPollInterval = 3;
 
         given(workhorse.isRunning()).willReturn(true);
@@ -351,7 +360,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateBufferPushFallbackPollInterval_tooLow() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         int bufferPushFallbackPollInterval = 0;
 
         exceptionRule.expect(RuntimeException.class);
@@ -364,7 +373,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateTimeZone() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
 
         // Test all available zoneIds of the machine
         for (String timeZone : ZoneId.getAvailableZoneIds()) {
@@ -382,20 +391,21 @@ public class WorkhorseConfigControllerTest {
 
         String timeZone = ZoneId.systemDefault().getId();
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         workhorseConfig.setTimeZone(timeZone);
 
         classUnderTest.updateTimeZone(workhorseConfig, timeZone);
 
         // if nothing has changed, there will be no log and no restart
-        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(), anyObject(), anyString());
+        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(),
+                anyObject(), anyString());
 
     }
 
     @Test
     public void testUpdateTimeZone_withNullValue() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         String timeZone = null;
 
         String systemDefault = ZoneId.systemDefault().getId();
@@ -410,22 +420,22 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateTimeZone_withNullValue_logChange() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfigDefaults = new MemoryConfigBuilder().build();
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfigDefaults = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         String timeZone = null;
         ZoneId systemDefault = ZoneId.systemDefault();
 
         classUnderTest.updateTimeZone(workhorseConfig, timeZone);
 
-        verify(workhorseLogService).logChange(null, null, "Time zone", workhorseConfigDefaults.getTimeZone(), systemDefault.getId(),
-                        "System default time-zone is used: " + systemDefault);
+        verify(workhorseLogService).logChange(null, null, "Time zone", workhorseConfigDefaults.getTimeZone(),
+                systemDefault.getId(), "System default time-zone is used: " + systemDefault);
 
     }
 
     @Test
     public void testUpdateTimeZone_NotAvailableZoneIds() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         String timeZone = "Not a valide Time Zone";
 
         exceptionRule.expect(RuntimeException.class);
@@ -437,20 +447,21 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateTimeZone_logMessage() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfigDefaults = new MemoryConfigBuilder().build();
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfigDefaults = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         // Take the first time zone in the list of time zone the system knows
         String timeZone = ZoneId.getAvailableZoneIds().stream().findFirst().get();
 
         classUnderTest.updateTimeZone(workhorseConfig, timeZone);
 
-        verify(workhorseLogService).logChange(null, null, "Time zone", workhorseConfigDefaults.getTimeZone(), timeZone, null);
+        verify(workhorseLogService).logChange(null, null, "Time zone", workhorseConfigDefaults.getTimeZone(), timeZone,
+                null);
     }
 
     @Test
     public void testUpdateLogChange() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         String logChange = "%s updated from '%s' to '%s'";
 
         classUnderTest.updateLogChange(workhorseConfig, logChange);
@@ -462,7 +473,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateLogChange_withNullValue() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         String logChange = null;
 
         exceptionRule.expect(RuntimeException.class);
@@ -475,20 +486,21 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateLogChange_dontUpdateIfEquals() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         String logChange = "%s changed from '%s' to '%s'";
         workhorseConfig.setLogChange(logChange);
 
         classUnderTest.updateLogChange(workhorseConfig, logChange);
 
-        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(), anyObject(), anyString());
+        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(),
+                anyObject(), anyString());
 
     }
 
     @Test
     public void testUpdateLogChange_lowNumberOfPlaceholder() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         String logChange = " changed from '%s' to '%s'";
 
         exceptionRule.expect(RuntimeException.class);
@@ -500,7 +512,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateLogChange_TooHighNumberOfPlaceholder() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         String logChange = "'%s' changed from '%s' to '%s' and '%s'";
 
         exceptionRule.expect(RuntimeException.class);
@@ -512,7 +524,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateLogInfoMarker() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         String logInfoMarker = "INFO";
 
         classUnderTest.updateLogInfoMarker(workhorseConfig, logInfoMarker);
@@ -524,19 +536,20 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateLogInfoMarker_dontUpdateIfEquals() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         String logInfoMarker = "info";
         workhorseConfig.setLogInfoMarker(logInfoMarker);
 
         classUnderTest.updateLogInfoMarker(workhorseConfig, logInfoMarker);
 
-        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(), anyObject(), anyString());
+        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(),
+                anyObject(), anyString());
     }
 
     @Test
     public void testUpdateLogWarnMarker() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         String logWarnMarker = "Attention";
 
         classUnderTest.updateLogWarnMarker(workhorseConfig, logWarnMarker);
@@ -548,19 +561,20 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateLogWarnMarker_dontUpdateIfEquals() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         String logWarnMarker = "warn";
         workhorseConfig.setLogWarnMarker(logWarnMarker);
 
         classUnderTest.updateLogWarnMarker(workhorseConfig, logWarnMarker);
 
-        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(), anyObject(), anyString());
+        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(),
+                anyObject(), anyString());
     }
 
     @Test
     public void testUpdateLogErrorMarker() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         String logErrorMarker = "Errorr";
 
         classUnderTest.updateLogErrorMarker(workhorseConfig, logErrorMarker);
@@ -573,20 +587,21 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateLogErrorMarker_dontUpdateIfEquals() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         String logErrorMarker = "error";
         workhorseConfig.setLogErrorMarker(logErrorMarker);
 
         classUnderTest.updateLogErrorMarker(workhorseConfig, logErrorMarker);
 
-        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(), anyObject(), anyString());
+        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(),
+                anyObject(), anyString());
 
     }
 
     @Test
     public void testUpdateLogTimeFormatter() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         String logTimeFormat = "'['HH:mm:ss.SS']'";
 
         classUnderTest.updateLogTimeFormatter(workhorseConfig, logTimeFormat);
@@ -599,7 +614,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateLogTimeFormatter_withNullValue() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         String logTimeFormat = null;
 
         exceptionRule.expect(RuntimeException.class);
@@ -611,24 +626,26 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateLogTimeFormatter_dontUpdateIfEquals() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         String logTimeFormat = "'['HH:mm:ss.SSS']'";
         workhorseConfig.setLogTimeFormat(logTimeFormat);
 
         classUnderTest.updateLogTimeFormatter(workhorseConfig, logTimeFormat);
 
-        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(), anyObject(), anyString());
+        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(),
+                anyObject(), anyString());
 
     }
 
     @Test
     public void testGetWorkhorseConfig() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(100L).bufferMinimumSize(3).bufferPollInterval(4).build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(100L).bufferMinimumSize(3)
+                .bufferPollInterval(4).build();
 
         when(configPersistence.get()).thenReturn(workhorseConfig);
 
-        AbstractWorkhorseConfig foundWorkhorseConfig = classUnderTest.getWorkhorseConfig();
+        WorkhorseConfig foundWorkhorseConfig = classUnderTest.getWorkhorseConfig();
 
         assertEquals(foundWorkhorseConfig, workhorseConfig);
 
@@ -637,7 +654,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testGetWorkhorseConfig_withNulValue() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = classUnderTest.getWorkhorseConfig();
+        WorkhorseConfig workhorseConfig = classUnderTest.getWorkhorseConfig();
 
         assertEquals(workhorseConfig.toString(), new MemoryConfigBuilder().build().toString());
     }
@@ -645,17 +662,18 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateWorkhorseConfig() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfigDefaults = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfigDefaults = new MemoryConfigBuilder().build();
         Long bufferMax = 100L;
         int bufferMix = 3;
         int bufferPollInterval = 4;
         int bufferPushFallbackPollInterval = 60;
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(bufferMax).bufferMinimumSize(bufferMix)
-                        .bufferPollInterval(bufferPollInterval).bufferPushFallbackPollInterval(bufferPushFallbackPollInterval).build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(bufferMax)
+                .bufferMinimumSize(bufferMix).bufferPollInterval(bufferPollInterval)
+                .bufferPushFallbackPollInterval(bufferPushFallbackPollInterval).build();
 
         when(configPersistence.get()).thenReturn(workhorseConfigDefaults);
 
-        AbstractWorkhorseConfig newWorkhorseConfig = classUnderTest.updateWorkhorseConfig(workhorseConfig);
+        WorkhorseConfig newWorkhorseConfig = classUnderTest.updateWorkhorseConfig(workhorseConfig);
 
         assertEquals(newWorkhorseConfig.toString(), workhorseConfig.toString());
 
@@ -664,19 +682,21 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateWorkhorseConfig_withNonValidBufferMax() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfigDefaults = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfigDefaults = new MemoryConfigBuilder().build();
 
         Long bufferMax = 0L;
         int bufferMix = 3;
         int bufferPollInterval = 4;
         int bufferPushFallbackPollInterval = 60;
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(bufferMax).bufferMinimumSize(bufferMix)
-                        .bufferPollInterval(bufferPollInterval).bufferPushFallbackPollInterval(bufferPushFallbackPollInterval).build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(bufferMax)
+                .bufferMinimumSize(bufferMix).bufferPollInterval(bufferPollInterval)
+                .bufferPushFallbackPollInterval(bufferPushFallbackPollInterval).build();
 
         when(configPersistence.get()).thenReturn(workhorseConfigDefaults);
 
         exceptionRule.expect(RuntimeException.class);
-        exceptionRule.expectMessage("The max amount of executions to load into the memory buffer per job must be higher than 0!");
+        exceptionRule.expectMessage(
+                "The max amount of executions to load into the memory buffer per job must be higher than 0!");
 
         classUnderTest.updateWorkhorseConfig(workhorseConfig);
 
@@ -691,9 +711,10 @@ public class WorkhorseConfigControllerTest {
         int bufferPushFallbackPollInterval = 60;
         int executionTimeout = 1000;
         String timeZone = "UTC";
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(bufferMax).bufferMinimumSize(bufferMix)
-                        .bufferPollInterval(bufferPollInterval).bufferPushFallbackPollInterval(bufferPushFallbackPollInterval)
-                        .executionTimeout(executionTimeout).timeZone(timeZone).build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(bufferMax)
+                .bufferMinimumSize(bufferMix).bufferPollInterval(bufferPollInterval)
+                .bufferPushFallbackPollInterval(bufferPushFallbackPollInterval).executionTimeout(executionTimeout)
+                .timeZone(timeZone).build();
 
         when(configPersistence.get()).thenReturn(workhorseConfig);
         classUnderTest.initializeStaticConfig(workhorseConfig);
@@ -710,7 +731,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateDaysUntilCleanup() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
 
         int daysUntilCleanup = 1;
 
@@ -724,7 +745,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateDaysUntilCleanup_toLow() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
 
         int daysUntilCleanup = -1;
 
@@ -738,7 +759,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateDaysUntilCleanup_deactiveFeature() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
 
         int daysUntilCleanup = 0;
 
@@ -752,8 +773,8 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateDaysUntilCleanup_deactiveFeature_logChange() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
-        AbstractWorkhorseConfig workhorseConfigDefault = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfigDefault = new MemoryConfigBuilder().build();
 
         int daysUntilCleanup = 0;
 
@@ -761,13 +782,14 @@ public class WorkhorseConfigControllerTest {
 
         String message = "DaysUntilCleanup is set to '0', so the cleanup is off!";
 
-        verify(workhorseLogService).logChange(null, null, "daysUntilCleanup", workhorseConfigDefault.getDaysUntilCleanup(), daysUntilCleanup, message);
+        verify(workhorseLogService).logChange(null, null, "daysUntilCleanup",
+                workhorseConfigDefault.getDaysUntilCleanup(), daysUntilCleanup, message);
     }
 
     @Test
     public void testUpdateExecutionTimeout() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
 
         int executionTimeout = 1;
 
@@ -781,20 +803,21 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateExecutionTimeout_logChange() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
-        AbstractWorkhorseConfig workhorseConfigDefault = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfigDefault = new MemoryConfigBuilder().build();
 
         int executionTimeout = 1;
 
         classUnderTest.updateExecutionTimeout(workhorseConfig, executionTimeout);
 
-        verify(workhorseLogService).logChange(null, null, "Execution timeout", workhorseConfigDefault.getExecutionTimeout(), executionTimeout, null);
+        verify(workhorseLogService).logChange(null, null, "Execution timeout",
+                workhorseConfigDefault.getExecutionTimeout(), executionTimeout, null);
     }
 
     @Test
     public void testUpdateExecutionTimeout_toLow() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
 
         int executionTimeout = -1;
 
@@ -807,7 +830,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateExecutionTimeout_deactiveFeature() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
 
         int executionTimeout = 0;
 
@@ -820,8 +843,8 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testUpdateExecutionTimeout_deactiveFeature_logChange() throws Exception {
 
-        AbstractWorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
-        AbstractWorkhorseConfig workhorseConfigDefault = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfigDefault = new MemoryConfigBuilder().build();
 
         int executionTimeout = 0;
 
@@ -829,7 +852,8 @@ public class WorkhorseConfigControllerTest {
 
         String message = "Execution timeout is set to '0', so the hunt is off!";
 
-        verify(workhorseLogService).logChange(null, null, "Execution timeout", workhorseConfigDefault.getExecutionTimeout(), executionTimeout, message);
+        verify(workhorseLogService).logChange(null, null, "Execution timeout",
+                workhorseConfigDefault.getExecutionTimeout(), executionTimeout, message);
     }
 
 }

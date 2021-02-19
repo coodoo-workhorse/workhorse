@@ -1,6 +1,6 @@
 package io.coodoo.workhorse.persistence.interfaces;
 
-import io.coodoo.workhorse.core.entity.AbstractWorkhorseConfig;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 
 public interface ConfigPersistence {
 
@@ -9,7 +9,7 @@ public interface ConfigPersistence {
      * 
      * @return WorkhorseConfig
      */
-    AbstractWorkhorseConfig get();
+    WorkhorseConfig get();
 
     /**
      * Update the configuration of the Workhorse
@@ -17,7 +17,7 @@ public interface ConfigPersistence {
      * @param workhorseConfig configuration of the Workhorse
      * @return new configuration of the Workhorse
      */
-    AbstractWorkhorseConfig update(AbstractWorkhorseConfig workhorseConfig);
+    WorkhorseConfig update(WorkhorseConfig workhorseConfig);
 
     /**
      * initialize the connection with the persistence

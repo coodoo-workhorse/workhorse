@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
-import io.coodoo.workhorse.core.entity.AbstractWorkhorseConfig;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.interfaces.ConfigPersistence;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.ConfigQualifier;
 import io.coodoo.workhorse.persistence.memory.MemoryConfigBuilder;
@@ -38,9 +38,9 @@ public class WorkhorseConfigController {
      * 
      * @return the configuration given from the running persistence
      */
-    public AbstractWorkhorseConfig getWorkhorseConfig() {
+    public WorkhorseConfig getWorkhorseConfig() {
 
-        AbstractWorkhorseConfig workhorseConfig = configPersistence.get();
+        WorkhorseConfig workhorseConfig = configPersistence.get();
 
         if (workhorseConfig == null) {
             workhorseConfig = new MemoryConfigBuilder().build();
@@ -59,9 +59,9 @@ public class WorkhorseConfigController {
      * @param newWorkhorseConfig the new configurations to set
      * @return the updated configurations of the job engine
      */
-    public AbstractWorkhorseConfig updateWorkhorseConfig(AbstractWorkhorseConfig newWorkhorseConfig) {
+    public WorkhorseConfig updateWorkhorseConfig(WorkhorseConfig newWorkhorseConfig) {
 
-        AbstractWorkhorseConfig workhorseConfig = getWorkhorseConfig();
+        WorkhorseConfig workhorseConfig = getWorkhorseConfig();
 
         updateBufferPollInterval(workhorseConfig, newWorkhorseConfig.getBufferPollInterval());
         updateBufferPushFallbackPollInterval(workhorseConfig, newWorkhorseConfig.getBufferPushFallbackPollInterval());
@@ -87,9 +87,9 @@ public class WorkhorseConfigController {
      * @param config the configuration given from the chosen persistence.
      * @return the initialized configuration
      */
-    public AbstractWorkhorseConfig initializeStaticConfig(AbstractWorkhorseConfig config) {
+    public WorkhorseConfig initializeStaticConfig(WorkhorseConfig config) {
 
-        AbstractWorkhorseConfig workhorseConfig = config;
+        WorkhorseConfig workhorseConfig = config;
 
         StaticConfig.TIME_ZONE = workhorseConfig.getTimeZone();
         StaticConfig.BUFFER_MAX = workhorseConfig.getBufferMax();
@@ -112,7 +112,7 @@ public class WorkhorseConfigController {
         return workhorseConfig;
     }
 
-    protected void updateBufferPollInterval(AbstractWorkhorseConfig workhorseConfig, int bufferPollInterval) {
+    protected void updateBufferPollInterval(WorkhorseConfig workhorseConfig, int bufferPollInterval) {
 
         if (bufferPollInterval < 1 || bufferPollInterval > 60) {
             throw new RuntimeException("The buffer poller interval must be between 1 and 60!");
@@ -130,7 +130,7 @@ public class WorkhorseConfigController {
         }
     }
 
-    protected void updateBufferPushFallbackPollInterval(AbstractWorkhorseConfig workhorseConfig,
+    protected void updateBufferPushFallbackPollInterval(WorkhorseConfig workhorseConfig,
             int bufferPushFallbackPollInterval) {
 
         if (bufferPushFallbackPollInterval < 1) {
@@ -151,7 +151,7 @@ public class WorkhorseConfigController {
 
     }
 
-    protected void updateExecutionTimeout(AbstractWorkhorseConfig workhorseConfig, int executionTimeout) {
+    protected void updateExecutionTimeout(WorkhorseConfig workhorseConfig, int executionTimeout) {
 
         if (executionTimeout < 0) {
             throw new RuntimeException("The execution timeout can't be negative!");
@@ -167,7 +167,7 @@ public class WorkhorseConfigController {
         }
     }
 
-    protected void updateDaysUntilCleanup(AbstractWorkhorseConfig workhorseConfig, int daysUntilCleanup) {
+    protected void updateDaysUntilCleanup(WorkhorseConfig workhorseConfig, int daysUntilCleanup) {
 
         if (daysUntilCleanup < 0) {
             throw new RuntimeException("The daysUntilCleanup can't be negative!");
@@ -184,7 +184,7 @@ public class WorkhorseConfigController {
 
     }
 
-    protected void updateBufferMax(AbstractWorkhorseConfig workhorseConfig, Long bufferMax) {
+    protected void updateBufferMax(WorkhorseConfig workhorseConfig, Long bufferMax) {
 
         if (bufferMax < 1) {
             throw new RuntimeException(
@@ -199,7 +199,7 @@ public class WorkhorseConfigController {
         }
     }
 
-    protected void updateBufferMin(AbstractWorkhorseConfig workhorseConfig, int bufferMin) {
+    protected void updateBufferMin(WorkhorseConfig workhorseConfig, int bufferMin) {
 
         if (bufferMin < 1) {
             throw new RuntimeException(
@@ -215,7 +215,7 @@ public class WorkhorseConfigController {
         }
     }
 
-    protected void updateLogChange(AbstractWorkhorseConfig workhorseConfig, String logChange) {
+    protected void updateLogChange(WorkhorseConfig workhorseConfig, String logChange) {
 
         if (logChange == null) {
             throw new RuntimeException("The log change pattern is needed!");
@@ -232,7 +232,7 @@ public class WorkhorseConfigController {
         }
     }
 
-    protected void updateLogTimeFormatter(AbstractWorkhorseConfig workhorseConfig, String logTimeFormatter) {
+    protected void updateLogTimeFormatter(WorkhorseConfig workhorseConfig, String logTimeFormatter) {
 
         if (logTimeFormatter == null) {
             throw new RuntimeException("The execution log timestamp pattern is needed!");
@@ -246,7 +246,7 @@ public class WorkhorseConfigController {
         }
     }
 
-    protected void updateTimeZone(AbstractWorkhorseConfig workhorseConfig, String timeZone) {
+    protected void updateTimeZone(WorkhorseConfig workhorseConfig, String timeZone) {
 
         if (timeZone != null && !ZoneId.getAvailableZoneIds().contains(timeZone)) {
             throw new RuntimeException("Time zone '" + timeZone + "' is not available!");
@@ -268,7 +268,7 @@ public class WorkhorseConfigController {
         }
     }
 
-    protected void updateLogInfoMarker(AbstractWorkhorseConfig workhorseConfig, String logInfoMarker) {
+    protected void updateLogInfoMarker(WorkhorseConfig workhorseConfig, String logInfoMarker) {
 
         if (!Objects.equals(workhorseConfig.getLogInfoMarker(), logInfoMarker)) {
 
@@ -279,7 +279,7 @@ public class WorkhorseConfigController {
         }
     }
 
-    protected void updateLogWarnMarker(AbstractWorkhorseConfig workhorseConfig, String logWarnMarker) {
+    protected void updateLogWarnMarker(WorkhorseConfig workhorseConfig, String logWarnMarker) {
 
         if (!Objects.equals(workhorseConfig.getLogWarnMarker(), logWarnMarker)) {
 
@@ -290,7 +290,7 @@ public class WorkhorseConfigController {
         }
     }
 
-    protected void updateLogErrorMarker(AbstractWorkhorseConfig workhorseConfig, String logErrorMarker) {
+    protected void updateLogErrorMarker(WorkhorseConfig workhorseConfig, String logErrorMarker) {
 
         if (!Objects.equals(workhorseConfig.getLogErrorMarker(), logErrorMarker)) {
 

@@ -1,18 +1,18 @@
 package io.coodoo.workhorse.core.entity;
 
 /**
- * Abstract class to build an object of type {@link AbstractWorkhorseConfig}
+ * Abstract class to build an object of type {@link WorkhorseConfig}
  * 
  * @author coodoo GmbH (coodoo.io)
  */
-public abstract class AbstractWorkhorseConfigBuilder {
+public abstract class WorkhorseConfigBuilder {
 
-    protected AbstractWorkhorseConfig workhorseConfig;
+    protected WorkhorseConfig workhorseConfig;
 
     /**
-     * Build an {@link AbstractWorkhorseConfig} object
+     * Build an {@link WorkhorseConfig} object
      */
-    public abstract AbstractWorkhorseConfig build();
+    public abstract WorkhorseConfig build();
 
     /**
      * Set another time zone. It is used to create instances of LocalDateTime.
@@ -20,7 +20,7 @@ public abstract class AbstractWorkhorseConfigBuilder {
      * @param timeZone the timeZone as ZoneId
      * @return the builder to set another configuration
      */
-    public AbstractWorkhorseConfigBuilder timeZone(String timeZone) {
+    public WorkhorseConfigBuilder timeZone(String timeZone) {
         workhorseConfig.setTimeZone(timeZone);
         return this;
     }
@@ -31,7 +31,7 @@ public abstract class AbstractWorkhorseConfigBuilder {
      * @param bufferMax the maximum amount of executions
      * @return the builder to set another configuration
      */
-    public AbstractWorkhorseConfigBuilder bufferMaximumSize(Long bufferMax) {
+    public WorkhorseConfigBuilder bufferMaximumSize(Long bufferMax) {
         workhorseConfig.setBufferMax(bufferMax);
         return this;
     }
@@ -43,7 +43,7 @@ public abstract class AbstractWorkhorseConfigBuilder {
      * @param bufferMin the minimum amount of executions
      * @return the builder to set another configuration
      */
-    public AbstractWorkhorseConfigBuilder bufferMinimumSize(int bufferMin) {
+    public WorkhorseConfigBuilder bufferMinimumSize(int bufferMin) {
         workhorseConfig.setBufferMin(bufferMin);
         return this;
     }
@@ -54,7 +54,7 @@ public abstract class AbstractWorkhorseConfigBuilder {
      * @param bufferPollInterval the polling interval
      * @return the builder to set another configuration
      */
-    public AbstractWorkhorseConfigBuilder bufferPollInterval(int bufferPollInterval) {
+    public WorkhorseConfigBuilder bufferPollInterval(int bufferPollInterval) {
         workhorseConfig.setBufferPollInterval(bufferPollInterval);
         return this;
     }
@@ -69,7 +69,7 @@ public abstract class AbstractWorkhorseConfigBuilder {
      *                                       when the persistence can push events.
      * @return the builder to set another configuration
      */
-    public AbstractWorkhorseConfigBuilder bufferPushFallbackPollInterval(int bufferPushFallbackPollInterval) {
+    public WorkhorseConfigBuilder bufferPushFallbackPollInterval(int bufferPushFallbackPollInterval) {
         workhorseConfig.setBufferPushFallbackPollInterval(bufferPushFallbackPollInterval);
         return this;
     }
@@ -81,7 +81,7 @@ public abstract class AbstractWorkhorseConfigBuilder {
      * @param daysUntilCleanup number of days
      * @return the builder to set another configuration
      */
-    public AbstractWorkhorseConfigBuilder daysUntilCleanup(int daysUntilCleanup) {
+    public WorkhorseConfigBuilder daysUntilCleanup(int daysUntilCleanup) {
         workhorseConfig.setDaysUntilCleanup(daysUntilCleanup);
         return this;
     }
@@ -96,21 +96,20 @@ public abstract class AbstractWorkhorseConfigBuilder {
      *                         considered as expired.
      * @return the builder to set another configuration
      */
-    public AbstractWorkhorseConfigBuilder executionTimeout(int executionTimeout) {
+    public WorkhorseConfigBuilder executionTimeout(int executionTimeout) {
         workhorseConfig.setExecutionTimeout(executionTimeout);
         return this;
     }
 
     /**
      * Set the status that executions, that are stuck in status
-     * {@link ExecutionStatus#RUNNING} for
-     * {@link AbstractWorkhorseConfig#executionTimeout} seconds have to get to be
-     * cured.
+     * {@link ExecutionStatus#RUNNING} for {@link WorkhorseConfig#executionTimeout}
+     * seconds have to get to be cured.
      * 
      * @param executionTimeoutStatus status that the execution will get.
      * @return the builder to set another configuration
      */
-    public AbstractWorkhorseConfigBuilder executionTimeoutStatus(ExecutionStatus executionTimeoutStatus) {
+    public WorkhorseConfigBuilder executionTimeoutStatus(ExecutionStatus executionTimeoutStatus) {
         workhorseConfig.setExecutionTimeoutStatus(executionTimeoutStatus);
         return this;
     }
@@ -123,7 +122,7 @@ public abstract class AbstractWorkhorseConfigBuilder {
      * @param logChange log change pattern
      * @return the builder to set another configuration
      */
-    public AbstractWorkhorseConfigBuilder logChange(String logChange) {
+    public WorkhorseConfigBuilder logChange(String logChange) {
         workhorseConfig.setLogChange(logChange);
         return this;
     }
@@ -136,7 +135,7 @@ public abstract class AbstractWorkhorseConfigBuilder {
      * @param logTimeFormat log timestamp pattern.
      * @return the builder to set another configuration
      */
-    public AbstractWorkhorseConfigBuilder logTimeFormat(String logTimeFormat) {
+    public WorkhorseConfigBuilder logTimeFormat(String logTimeFormat) {
         workhorseConfig.setLogTimeFormat(logTimeFormat);
         return this;
     }
@@ -149,7 +148,7 @@ public abstract class AbstractWorkhorseConfigBuilder {
      * @param logInfoMarker log info marker
      * @return the builder to set another configuration
      */
-    public AbstractWorkhorseConfigBuilder logInfoMarker(String logInfoMarker) {
+    public WorkhorseConfigBuilder logInfoMarker(String logInfoMarker) {
         workhorseConfig.setLogInfoMarker(logInfoMarker);
         return this;
     }
@@ -162,7 +161,7 @@ public abstract class AbstractWorkhorseConfigBuilder {
      * @param logWarnMarker
      * @return the builder to set another configuration
      */
-    public AbstractWorkhorseConfigBuilder logWarnMarker(String logWarnMarker) {
+    public WorkhorseConfigBuilder logWarnMarker(String logWarnMarker) {
         workhorseConfig.setLogWarnMarker(logWarnMarker);
         return this;
     }
@@ -175,7 +174,7 @@ public abstract class AbstractWorkhorseConfigBuilder {
      * @param logErrorMarker log error marker
      * @return the builder to set another configuration
      */
-    public AbstractWorkhorseConfigBuilder logErrorMarker(String logErrorMarker) {
+    public WorkhorseConfigBuilder logErrorMarker(String logErrorMarker) {
         workhorseConfig.setLogErrorMarker(logErrorMarker);
         return this;
     }

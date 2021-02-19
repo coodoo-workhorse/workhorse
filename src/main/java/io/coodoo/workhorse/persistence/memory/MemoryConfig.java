@@ -1,13 +1,14 @@
 package io.coodoo.workhorse.persistence.memory;
 
-import io.coodoo.workhorse.core.entity.AbstractWorkhorseConfig;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 
 /**
- * A class to access the {@link AbstractWorkhorseConfig} configurations defined by the Memory Persistence.
+ * A class to access the {@link WorkhorseConfig} configurations defined by the
+ * Memory Persistence.
  * 
  * @author coodoo GmbH (coodoo.io)
  */
-public class MemoryConfig extends AbstractWorkhorseConfig {
+public class MemoryConfig extends WorkhorseConfig {
 
     private static final String NAME = "MEMORY";
 

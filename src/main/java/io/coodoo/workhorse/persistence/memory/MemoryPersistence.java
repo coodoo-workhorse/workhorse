@@ -7,7 +7,7 @@ import javax.enterprise.context.ApplicationScoped;
 
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.Job;
-import io.coodoo.workhorse.core.entity.AbstractWorkhorseConfig;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.entity.WorkhorseLog;
 
 @ApplicationScoped
@@ -21,13 +21,13 @@ public class MemoryPersistence {
 
     private Map<Long, WorkhorseLog> workhorseLog = new ConcurrentHashMap<>();
 
-    private AbstractWorkhorseConfig workhorseConfig;
+    private WorkhorseConfig workhorseConfig;
 
-    public synchronized AbstractWorkhorseConfig getWorkhorseConfig() {
+    public synchronized WorkhorseConfig getWorkhorseConfig() {
         return workhorseConfig;
     }
 
-    public synchronized AbstractWorkhorseConfig setWorkhorseConfig(AbstractWorkhorseConfig workhorseConfig) {
+    public synchronized WorkhorseConfig setWorkhorseConfig(WorkhorseConfig workhorseConfig) {
         this.workhorseConfig = workhorseConfig;
         return workhorseConfig;
     }

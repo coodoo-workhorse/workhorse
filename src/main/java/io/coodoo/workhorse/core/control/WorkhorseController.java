@@ -292,11 +292,13 @@ public class WorkhorseController {
         }
 
         if (uniqueInQueue) {
-            // Prüfen ob es bereits eine Job Excecution mit diesn Parametern existiert und
+            // Prüfen ob es bereits eine excecution mit diesen parametern existiert und
             // im Status QUEUED ist. Wenn ja diese zurückgeben.
             Execution equalQueuedJobExcecution = executionPersistence.getFirstCreatedByJobIdAndParametersHash(jobId,
                     parametersHash);
             if (equalQueuedJobExcecution != null) {
+                // TODO Warn Log ausgeben, dass es versucht wurde, eine Execution mit dem
+                // gleichen Parameter zu erstellen.
                 return equalQueuedJobExcecution;
             }
         }
@@ -311,11 +313,12 @@ public class WorkhorseController {
         execution.setChainId(chainId);
         execution.setChainedPreviousExecutionId(chainedPreviousExecutionId);
 
-        // Temporar add. Have to be replace as soon as possible.
         if (chainId != null) {
             execution.setChainedNextExecutionId(-1L);
         }
 
+        // TODO Prüfen, ob die Persistence eine Id zurückgibt. Wenn nicht, dann die
+        // ganze Engine abbrechen, wenn keine Id zurückgegeben wird.
         executionPersistence.persist(execution);
         log.trace("Execution successfully created: {}", execution);
         return execution;

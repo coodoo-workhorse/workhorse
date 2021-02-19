@@ -45,6 +45,7 @@ public class MemoryLogPersistence implements LogPersistence {
     }
 
     // FIXME
+    // TODO
     @Override
     public List<WorkhorseLog> getAll(int limit) {
         List<WorkhorseLog> result = new ArrayList<>();

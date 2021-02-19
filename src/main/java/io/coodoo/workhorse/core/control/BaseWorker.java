@@ -11,11 +11,12 @@ import org.slf4j.Logger;
 
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.Job;
-import io.coodoo.workhorse.core.entity.AbstractWorkhorseConfig;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
+// TODO COMMMENT
 public abstract class BaseWorker {
 
     @Inject
@@ -142,7 +143,7 @@ public abstract class BaseWorker {
     }
 
     /**
-     * @return Current Time by zone defined in {@link AbstractWorkhorseConfig#TIME_ZONE}
+     * @return Current Time by zone defined in {@link WorkhorseConfig#TIME_ZONE}
      */
     public LocalDateTime timestamp() {
         return LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE));
