@@ -16,7 +16,11 @@ import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
-// TODO COMMMENT
+/**
+ * Base worker class to define the creation and processing of executions.
+ * 
+ * @author coodoo GmbH (coodoo.io)
+ */
 public abstract class BaseWorker {
 
     @Inject
@@ -30,7 +34,24 @@ public abstract class BaseWorker {
 
     private StringBuffer logBuffer;
 
+    /**
+     * The job engine will uses this method to perform the execution.
+     * 
+     * @param execution execution object, containing parameters and meta information
+     * @throws Exception in case the execution fails
+     */
     public abstract void doWork(Execution execution) throws Exception;
+
+    /**
+     * This method will be called by the schedule timer in order to check if there
+     * is stuff to do.<br>
+     * Its goal is to create one (or more) {@link Execution} that gets added to the
+     * job engine to be executed. <i>If not overwritten, this method will create a
+     * {@link Execution} without parameters or specific settings.</i>
+     */
+    public void onSchedule() {
+        createExecution();
+    }
 
     /**
      * The job engine will call this callback method after the job execution is

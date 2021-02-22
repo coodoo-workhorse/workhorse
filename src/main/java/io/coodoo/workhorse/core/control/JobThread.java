@@ -21,6 +21,11 @@ import io.coodoo.workhorse.persistence.interfaces.qualifier.ExecutionQualifier;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
+/**
+ * Class that executes all executions of the a given job.
+ * 
+ * @author coodoo GmbH (coodoo.io)
+ */
 @Dependent
 public class JobThread {
 

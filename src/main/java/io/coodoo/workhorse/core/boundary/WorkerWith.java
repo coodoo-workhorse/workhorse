@@ -10,7 +10,15 @@ import io.coodoo.workhorse.core.control.BaseWorker;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
-// TODO COMMMENT
+/**
+ * worker class to define the creation and processing of execution with
+ * parameters. <br>
+ * <tt>T</tt> can be any Object or a {@link List} of {@link String} of
+ * {@link Integer} <br>
+ * Your job does not need parameters? See {@link Worker}!
+ * 
+ * @author coodoo GmbH (coodoo.io)
+ */
 public abstract class WorkerWith<T> extends BaseWorker {
 
     private Class<?> parametersClass;
