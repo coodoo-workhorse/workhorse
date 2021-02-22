@@ -552,9 +552,50 @@ This Worker override four callback methods:
 
 ## Configuration
 
-_TODO_
+The job engine can be started using the method `start()` without configuration of the `WorkhorseService` somewhere in your application. In this case the configurations come from the default persistence `Memory`.
 
+```java
+@Inject
+WorkhorseService workhorseService;
 
+public void init() {
+    workhorseService.start();
+}
+```
+The persistence package that you use for your job engine provides a child class of [WorkhorseConfigBuilder](src/main/java/io/coodoo/workhorse/core/entity/WorkhorseConfigBuilder.java), that is a config builder, that allows you to call a lot of extension methods to customize workhorse for your use.
+
+Let's take the example of the default persisitence which is `Memory` with his config builder class [MemoryConfigBuilder](/src/main/java/io/coodoo/workhorse/persistence/memory/MemoryConfigBuilder.java). 
+ 
+ ```java
+@Inject
+WorkhorseService workhorseService;
+
+public void init() {
+    workhorseService.start(new MemoryConfigBuilder().timeZone("Africa/Douala").executionTimeout(30).bufferMaximumSize(1000).build());
+}
+```
+
+In the example above we can see that methods calls can be chained, so there's no need to use the class name again and again. The configuration is made so for simplicity.
+
+The configurations of workhorse are persisited. Therefore they can also be retrieved and updated at runtime. 
+
+ ```java
+@Inject
+WorkhorseService workhorseService;
+
+public void changeExecutionTimeout() {
+  
+  WorkhorseConfig newWorkhorseConfig = workhorseService.getWorkhorseConfig;
+
+  newWorkhorseConfig.setExecutionTimeout(25);
+
+  workhorseService.updateWorkhorseConfig(newWorkhorseConfig);
+
+}
+```
+In the example above the current value of the configurations of the job engine are retrieved from the persisitence to update the attribut [WorkhorseConfig.executionTimeout](src/main/java/io/coodoo/workhorse/core/entity/WorkhorseConfig.java) at runtime. 
+
+For more details about all parameters that can be configured, have a look on the class [WorkhorseConfig](src/main/java/io/coodoo/workhorse/core/entity/WorkhorseConfig.java)
 ## Changelog
 
 All release changes can be viewed on our [changelog](./CHANGELOG.md).
