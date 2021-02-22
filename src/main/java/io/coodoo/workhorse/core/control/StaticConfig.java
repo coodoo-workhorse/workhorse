@@ -48,12 +48,12 @@ public final class StaticConfig {
     public static int BUFFER_PUSH_FALL_BACK_POLL_INTERVAL;
 
     /**
-     * Number of days an execution can be held in the persistence before being
+     * Number of minutes an execution can be held in the persistence before being
      * deleted.
      * 
      * If set to 0, no cleanup is performed.
      */
-    public static int DAYS_UNTIL_CLEANUP = 1;
+    public static long MINUTES_UNTIL_CLEANUP;
 
     /**
      * Duration in seconds after which an EXECUTION in status

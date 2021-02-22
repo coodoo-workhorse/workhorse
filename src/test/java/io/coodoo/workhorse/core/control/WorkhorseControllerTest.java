@@ -66,8 +66,7 @@ public class WorkhorseControllerTest {
             assertEquals(ExecutionStatus.ABORTED, zombiExecution.getStatus());
 
             String logMessage = "Zombie execution found (ID: " + zombiExecution.getId() + "): ";
-            verify(workhorseLogService).logMessage(logMessage + "Put in status " + ExecutionStatus.ABORTED,
-                    zombiExecution.getJobId(), false);
+            verify(workhorseLogService).logMessage(logMessage + "Put in status " + ExecutionStatus.ABORTED, zombiExecution.getJobId(), false);
 
             verify(executionPersistence).update(zombiExecution.getJobId(), zombiExecution.getId(), zombiExecution);
         }
@@ -105,8 +104,7 @@ public class WorkhorseControllerTest {
             assertEquals(ExecutionStatus.FAILED, zombiExecution.getStatus());
 
             String logMessage = "Zombie execution found (ID: " + zombiExecution.getId() + "): ";
-            verify(workhorseLogService).logMessage(logMessage + "Marked as failed and queued a clone",
-                    zombiExecution.getJobId(), false);
+            verify(workhorseLogService).logMessage(logMessage + "Marked as failed and queued a clone", zombiExecution.getJobId(), false);
 
             verify(executionPersistence).update(zombiExecution.getJobId(), zombiExecution.getId(), zombiExecution);
         }

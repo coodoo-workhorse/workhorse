@@ -38,12 +38,12 @@ public abstract class WorkhorseConfig {
     protected int bufferPushFallbackPollInterval = 120;
 
     /**
-     * Number of days an execution can be held in the persistence before being
-     * deleted.
+     * Number of minutes an execution can be held in the persistence before being
+     * automatically deleted.
      * 
      * If set to 0, no cleanup is performed.
      */
-    protected int daysUntilCleanup = 60;
+    protected long minutesUntilCleanup = 2;
 
     /**
      * Duration in seconds after which an EXECUTION in status
@@ -137,12 +137,12 @@ public abstract class WorkhorseConfig {
         this.bufferPushFallbackPollInterval = bufferPushFallbackPollInterval;
     }
 
-    public int getDaysUntilCleanup() {
-        return daysUntilCleanup;
+    public long getMinutesUntilCleanup() {
+        return minutesUntilCleanup;
     }
 
-    public void setDaysUntilCleanup(int daysUntilCleanup) {
-        this.daysUntilCleanup = daysUntilCleanup;
+    public void setMinutesUntilCleanup(long daysUntilCleanup) {
+        this.minutesUntilCleanup = daysUntilCleanup;
     }
 
     public int getExecutionTimeout() {

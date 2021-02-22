@@ -68,7 +68,7 @@ public class WorkhorseConfigController {
         updateExecutionTimeout(workhorseConfig, newWorkhorseConfig.getExecutionTimeout());
         updateBufferMax(workhorseConfig, newWorkhorseConfig.getBufferMax());
         updateBufferMin(workhorseConfig, newWorkhorseConfig.getBufferMin());
-        updateDaysUntilCleanup(workhorseConfig, newWorkhorseConfig.getDaysUntilCleanup());
+        updateMinutesUntilCleanup(workhorseConfig, newWorkhorseConfig.getMinutesUntilCleanup());
         updateLogChange(workhorseConfig, newWorkhorseConfig.getLogChange());
         updateLogTimeFormatter(workhorseConfig, newWorkhorseConfig.getLogTimeFormat());
         updateTimeZone(workhorseConfig, newWorkhorseConfig.getTimeZone());
@@ -96,7 +96,7 @@ public class WorkhorseConfigController {
         StaticConfig.BUFFER_MIN = workhorseConfig.getBufferMin();
         StaticConfig.BUFFER_POLL_INTERVAL = workhorseConfig.getBufferPollInterval();
         StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL = workhorseConfig.getBufferPushFallbackPollInterval();
-        StaticConfig.DAYS_UNTIL_CLEANUP = workhorseConfig.getDaysUntilCleanup();
+        StaticConfig.MINUTES_UNTIL_CLEANUP = workhorseConfig.getMinutesUntilCleanup();
         StaticConfig.EXECUTION_TIMEOUT = workhorseConfig.getExecutionTimeout();
         StaticConfig.EXECUTION_TIMEOUT_STATUS = workhorseConfig.getExecutionTimeoutStatus();
         StaticConfig.LOG_CHANGE = workhorseConfig.getLogChange();
@@ -167,19 +167,19 @@ public class WorkhorseConfigController {
         }
     }
 
-    protected void updateDaysUntilCleanup(WorkhorseConfig workhorseConfig, int daysUntilCleanup) {
+    protected void updateMinutesUntilCleanup(WorkhorseConfig workhorseConfig, long minutesUntilCleanup) {
 
-        if (daysUntilCleanup < 0) {
+        if (minutesUntilCleanup < 0) {
             throw new RuntimeException("The daysUntilCleanup can't be negative!");
         }
-        if (workhorseConfig.getDaysUntilCleanup() != daysUntilCleanup) {
+        if (workhorseConfig.getMinutesUntilCleanup() != minutesUntilCleanup) {
 
-            StaticConfig.DAYS_UNTIL_CLEANUP = daysUntilCleanup;
+            StaticConfig.MINUTES_UNTIL_CLEANUP = minutesUntilCleanup;
 
-            String message = daysUntilCleanup > 0 ? null : "DaysUntilCleanup is set to '0', so the cleanup is off!";
-            workhorseLogService.logChange(null, null, "daysUntilCleanup", workhorseConfig.getDaysUntilCleanup(),
-                    daysUntilCleanup, message);
-            workhorseConfig.setDaysUntilCleanup(daysUntilCleanup);
+            String message = minutesUntilCleanup > 0 ? null : "DaysUntilCleanup is set to '0', so the cleanup is off!";
+            workhorseLogService.logChange(null, null, "daysUntilCleanup", workhorseConfig.getMinutesUntilCleanup(),
+                    minutesUntilCleanup, message);
+            workhorseConfig.setMinutesUntilCleanup(minutesUntilCleanup);
         }
 
     }
