@@ -24,6 +24,11 @@ import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.util.CronExpression;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
+/**
+ * Class that have to execute all scheduled executions.
+ * 
+ * @author coodoo GmbH (coodoo.io)
+ */
 @ApplicationScoped
 public class JobScheduler {
 
@@ -84,7 +89,8 @@ public class JobScheduler {
             } catch (Exception e) {
                 job.setStatus(JobStatus.ERROR);
                 workhorseController.update(job.getId(), job);
-                jobErrorEvent.fire(new JobErrorEvent(e, ErrorType.INVALID_SCHEDULE.getMessage(), job.getId(), JobStatus.ERROR));
+                jobErrorEvent.fire(
+                        new JobErrorEvent(e, ErrorType.INVALID_SCHEDULE.getMessage(), job.getId(), JobStatus.ERROR));
             }
         }
     }

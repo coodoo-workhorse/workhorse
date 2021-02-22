@@ -6,7 +6,12 @@ import java.time.temporal.ChronoUnit;
 import io.coodoo.workhorse.core.control.BaseWorker;
 import io.coodoo.workhorse.core.entity.Execution;
 
-// TODO COMMMENT
+/**
+ * Worker class to define the creation and processing of execution. Your job
+ * needs parameters? See {@link WorkerWith}!
+ * 
+ * @author coodoo GmbH (coodoo.io)
+ */
 public abstract class Worker extends BaseWorker {
 
     public abstract void doWork() throws Exception;

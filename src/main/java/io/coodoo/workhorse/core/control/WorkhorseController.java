@@ -243,7 +243,7 @@ public class WorkhorseController {
      */
     public void triggerScheduledExecutionCreation(Job job) throws ClassNotFoundException {
         BaseWorker worker = getWorker(job);
-        worker.createExecution();
+        worker.onSchedule();
     }
 
     /**
