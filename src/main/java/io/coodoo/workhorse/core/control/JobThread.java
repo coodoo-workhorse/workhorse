@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.coodoo.workhorse.core.boundary.ExecutionContext;
 import io.coodoo.workhorse.core.control.event.AllExecutionsDoneEvent;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
@@ -87,6 +88,8 @@ public class JobThread {
 
                 long millisAtStart = System.currentTimeMillis();
 
+                ExecutionContext executionContext = workerInstance.getExecutionContext();
+
                 log.trace("On Running Job Execution: {}", runningExecution);
 
                 try {
@@ -104,7 +107,7 @@ public class JobThread {
                         Thread.sleep(minMillisPerExecution - duration);
                     }
 
-                    String executionLog = workerInstance.getLog();
+                    String executionLog = executionContext.getLog();
 
                     updateExecutionStatus(execution, ExecutionStatus.FINISHED, WorkhorseUtil.timestamp(),
                             Long.valueOf(duration), executionLog);
@@ -132,7 +135,7 @@ public class JobThread {
                     executionBuffer.removeRunningExecution(jobId, execution.getId());
                     long duration = System.currentTimeMillis() - millisAtStart;
 
-                    String executionLog = workerInstance.getLog();
+                    String executionLog = executionContext.getLog();
 
                     // create a new Job Execution to retry this fail.
                     execution = workhorseController.handleFailedExecution(job, execution.getId(), e, duration,
