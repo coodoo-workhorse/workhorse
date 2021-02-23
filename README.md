@@ -552,7 +552,7 @@ This Worker override four callback methods:
 
 ## Configuration
 
-The job engine can be started using the method `start()` without configuration of the `WorkhorseService` somewhere in your application. In this case the configurations come from the default persistence `Memory`.
+The job engine can be started using the method `start()` of the `WorkhorseService`. This should be done in an startup routine of your application. The method `start()` without the configuration parameters uses the default persistence `Memory` and all default configuration values.
 
 ```java
 @Inject
@@ -562,9 +562,9 @@ public void init() {
     workhorseService.start();
 }
 ```
-The persistence package that you use for your job engine provides a child class of [WorkhorseConfigBuilder](src/main/java/io/coodoo/workhorse/core/entity/WorkhorseConfigBuilder.java), that is a config builder, that allows you to call a lot of extension methods to customize workhorse for your use.
+The configuration depends on the selected persistence. So every persistence comes with an configuration object which is designed as config builder. All persictens config builders are child classes of [WorkhorseConfigBuilder](src/main/java/io/coodoo/workhorse/core/entity/WorkhorseConfigBuilder.java), that allows you to call a lot of extension methods to customize workhorse for your use.
 
-Let's take the example of the default persisitence which is `Memory` with his config builder class [MemoryConfigBuilder](/src/main/java/io/coodoo/workhorse/persistence/memory/MemoryConfigBuilder.java). 
+Let's take the example of the default persisitence `Memory` with it's config builder class [MemoryConfigBuilder](/src/main/java/io/coodoo/workhorse/persistence/memory/MemoryConfigBuilder.java). 
  
  ```java
 @Inject
@@ -574,10 +574,9 @@ public void init() {
     workhorseService.start(new MemoryConfigBuilder().timeZone("Africa/Douala").executionTimeout(30).bufferMaximumSize(1000).build());
 }
 ```
+Because of the builder style you can easily add your custom configurations. In this example the timezone is set to Afrifca/Douala, the default timeouts for long running executions are 30 seconds and the buffer maximum size for prebuffering next queued executions is set to 1000.
 
-In the example above we can see that methods calls can be chained, so there's no need to use the class name again and again. The configuration is made so for simplicity.
-
-The configurations of workhorse are persisited. Therefore they can also be retrieved and updated at runtime. 
+All configuration settings are saved persistently in the configured persistence. In this example the settings are persistet in memory as long as the apllication runs. Therefore they can also be retrieved and updated at runtime.
 
  ```java
 @Inject
@@ -593,7 +592,7 @@ public void changeExecutionTimeout() {
 
 }
 ```
-In the example above the current value of the configurations of the job engine are retrieved from the persisitence to update the attribut [WorkhorseConfig.executionTimeout](src/main/java/io/coodoo/workhorse/core/entity/WorkhorseConfig.java) at runtime. 
+In the example above the current workhorse configuration are retrieved from the `WorkhorseService`. This configuration object can be used to update attributes at runtime. To really perform this update use the methode 
 
 For more details about all parameters that can be configured, have a look on the class [WorkhorseConfig](src/main/java/io/coodoo/workhorse/core/entity/WorkhorseConfig.java)
 ## Changelog
