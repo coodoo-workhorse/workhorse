@@ -1,6 +1,7 @@
 package io.coodoo.workhorse.core.control;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.enterprise.context.Dependent;
@@ -96,7 +97,7 @@ public class JobThread {
 
                     updateExecutionStatus(execution, ExecutionStatus.RUNNING, WorkhorseUtil.timestamp(), null, null);
 
-                    // Land of Witch !!
+                    // mediterraneus
                     workerInstance.doWork(execution);
 
                     long duration = System.currentTimeMillis() - millisAtStart;
@@ -104,7 +105,7 @@ public class JobThread {
                     if (duration < minMillisPerExecution) {
                         // this execution was to fast and must wait to not exceed the limit of
                         // executions per minute
-                        Thread.sleep(minMillisPerExecution - duration);
+                        TimeUnit.MILLISECONDS.sleep(minMillisPerExecution - duration);
                     }
 
                     String executionLog = executionContext.getLog();

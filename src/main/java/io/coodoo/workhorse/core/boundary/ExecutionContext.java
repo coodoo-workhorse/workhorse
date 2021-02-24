@@ -13,18 +13,22 @@ import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
 /**
- * Class to use to get the access to an running execution outside of the
- * corresponding worker class
+ * This class gets the access to an running execution outside of the
+ * doWork()-method of the corresponding worker class. This is only useful for
+ * methods that need to be called by a doWork()-method of a worker class.
  * 
  * @author coodoo GmbH (coodoo.io)
  */
 @RequestScoped
 public class ExecutionContext {
 
+    // The visibility is protected to enable mocking in Junit Tests
     protected Job job;
 
+    // The visibility is protected to enable mocking in Junit Tests
     protected Execution execution;
 
+    // The visibility is protected to enable mocking in Junit Tests
     protected StringBuffer logBuffer;
 
     public void init(Execution execution) {
@@ -37,18 +41,53 @@ public class ExecutionContext {
         }
     }
 
-    public Execution getExecution() {
-        return execution;
+    /**
+     * Retrieves the {@link Job} object of the current execution. WARNING: Don't
+     * change the value of the retrieved job. Changes can be fatal or have no
+     * effect.
+     * 
+     * @return the job
+     */
+    public Job getJob() {
+        return job;
     }
 
+    /**
+     * Retrieves the ID of the {@link Job} object of the current execution. WARNING:
+     * Don't change the value of the job with the retrieved ID. Changes can be fatal
+     * or have no effect.
+     * 
+     * @return the ID of the job
+     */
     public Long getJobId() {
         return execution.getJobId();
     }
 
+    /**
+     * Retrieves the ID of the current execution. WARNING: Don't change the value of
+     * the retrieved execution. Changes can be fatal or have no effect.
+     * 
+     * @return the execution
+     */
+    public Execution getExecution() {
+        return execution;
+    }
+
+    /**
+     * Retrieves the ID of the current execution. WARNING: Don't change the value of
+     * the execution with the retrieved ID. Changes can be fatal or have no effect.
+     * 
+     * @return the ID of the execution
+     */
     public Long getExecutionId() {
         return execution.getId();
     }
 
+    /**
+     * Retrieves the messages logged during the processing of the current execution
+     * 
+     * @return
+     */
     public String getLog() {
 
         if (logBuffer != null && logBuffer.length() > 0) {
@@ -64,6 +103,18 @@ public class ExecutionContext {
      */
     public void logLine(String message) {
         appendLog(message, false, "l");
+    }
+
+    /**
+     * Adds the message text in as a new line to the executions log and also adds
+     * the message in severity INFO to the server log
+     * 
+     * @param logger  server log logger
+     * @param message text to log
+     */
+    public void logLine(Logger logger, String message) {
+        logger.info(message);
+        logLine(message);
     }
 
     /**
