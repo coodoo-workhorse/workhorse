@@ -170,7 +170,7 @@ public interface ExecutionPersistence {
      * @param time
      * @return list of Executions to abort
      */
-    List<Execution> findExpiredExecutions(LocalDateTime time);
+    List<Execution> findTimeoutExecutions(LocalDateTime time);
 
     /**
      * 
