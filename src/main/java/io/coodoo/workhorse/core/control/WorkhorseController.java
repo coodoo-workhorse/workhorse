@@ -148,14 +148,14 @@ public class WorkhorseController {
 
             job.setMinutesUntilCleanUp(initialJobConfig.minutesUntilCleanUp());
 
-            job.setUniqueInQueue(initialJobConfig.uniqueInQueue());
+            job.setUniqueQueued(initialJobConfig.uniqueQueued());
 
         } else {
 
             // Use initial default worker informations
             job.setName(workerClass.getSimpleName());
             job.setWorkerClassName(workerClass.getName());
-            job.setUniqueInQueue(InitialJobConfig.JOB_CONFIG_UNIQUE_IN_QUEUE);
+            job.setUniqueQueued(InitialJobConfig.JOB_CONFIG_UNIQUE_IN_QUEUE);
             job.setStatus(JobStatus.ACTIVE);
             job.setThreads(InitialJobConfig.JOB_CONFIG_THREADS);
             job.setMinutesUntilCleanUp(InitialJobConfig.JOB_CONFIG_MINUTES_UNTIL_CLEANUP);
@@ -276,11 +276,11 @@ public class WorkhorseController {
      * @param chainedPreviousExecutionId Id to the previous execution to process, if
      *                                   the execution belong to a chained
      *                                   Execution.
-     * @param uniqueInQueue
+     * @param uniqueQueued
      * @return the created Job Execution
      */
     public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime maturity,
-            Long batchId, Long chainId, Long chainedPreviousExecutionId, boolean uniqueInQueue) {
+            Long batchId, Long chainId, Long chainedPreviousExecutionId, boolean uniqueQueued) {
 
         Integer parametersHash = null;
         if (parameters != null) {
@@ -291,7 +291,7 @@ public class WorkhorseController {
             }
         }
 
-        if (uniqueInQueue) {
+        if (uniqueQueued) {
             // Prüfen ob es bereits eine excecution mit diesen parametern existiert und
             // im Status QUEUED ist. Wenn ja diese zurückgeben.
             Execution equalQueuedJobExcecution = executionPersistence.getFirstCreatedByJobIdAndParametersHash(jobId,
@@ -443,7 +443,7 @@ public class WorkhorseController {
 
     public Job updateJob(Long jobId, String name, String description, String workerClassName, String schedule,
             JobStatus status, int threads, Integer maxPerMinute, int failRetries, int retryDelay,
-            int minutesUntilCleanUp, boolean uniqueInQueue) {
+            int minutesUntilCleanUp, boolean uniqueQueued) {
 
         Job job = getJobById(jobId);
 
@@ -490,9 +490,10 @@ public class WorkhorseController {
                     minutesUntilCleanUp, null);
             job.setMinutesUntilCleanUp(minutesUntilCleanUp);
         }
-        if (!Objects.equals(job.isUniqueInQueue(), uniqueInQueue)) {
-            workhorseLogService.logChange(jobId, status, "Unique in queue", job.isUniqueInQueue(), uniqueInQueue, null);
-            job.setUniqueInQueue(uniqueInQueue);
+        if (!Objects.equals(job.isUniqueQueued(), uniqueQueued)) {
+            workhorseLogService.logChange(jobId, status, "Unique in status queued", job.isUniqueQueued(), uniqueQueued,
+                    null);
+            job.setUniqueQueued(uniqueQueued);
         }
 
         log.trace("Job updated: {}", job);

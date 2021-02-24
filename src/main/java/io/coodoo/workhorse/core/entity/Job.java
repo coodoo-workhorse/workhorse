@@ -59,7 +59,7 @@ public class Job extends BaseEntity {
      * If a job has the uniqueInqueue set <code>true</code>, Two or more job
      * execution with the same parameters are not authorised
      */
-    private Boolean uniqueInQueue;
+    private Boolean uniqueQueued;
 
     /**
      * Timstamp as Cron-syntax to schedule the job
@@ -122,12 +122,12 @@ public class Job extends BaseEntity {
         this.schedule = scheduler;
     }
 
-    public Boolean isUniqueInQueue() {
-        return uniqueInQueue;
+    public Boolean isUniqueQueued() {
+        return uniqueQueued;
     }
 
-    public void setUniqueInQueue(Boolean uniqueInQueue) {
-        this.uniqueInQueue = uniqueInQueue;
+    public void setUniqueQueued(Boolean uniqueQueued) {
+        this.uniqueQueued = uniqueQueued;
     }
 
     public int getMaxPerMinute() {
@@ -160,10 +160,6 @@ public class Job extends BaseEntity {
 
     public void setMinutesUntilCleanUp(int minutesUntilCleanUp) {
         this.minutesUntilCleanUp = minutesUntilCleanUp;
-    }
-
-    public Boolean getUniqueInQueue() {
-        return uniqueInQueue;
     }
 
     @Override

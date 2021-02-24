@@ -140,12 +140,12 @@ public abstract class BaseWorker {
     protected Execution createExecution(Object parameters, Boolean priority, LocalDateTime maturity, Long batchId,
             Long chainId, Long chainedPreviousExecutionId) {
         Long jobId = getJob().getId();
-        boolean uniqueInQueue = getJob().isUniqueInQueue();
+        boolean uniqueQueued = getJob().isUniqueQueued();
 
         String parametersAsJson = WorkhorseUtil.parametersToJson(parameters);
 
         return workhorseController.createExecution(jobId, parametersAsJson, priority, maturity, batchId, chainId,
-                chainedPreviousExecutionId, uniqueInQueue);
+                chainedPreviousExecutionId, uniqueQueued);
 
     }
 

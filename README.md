@@ -18,7 +18,7 @@
   - [Planned jobs](#planned-jobs)
   - [Priority jobs](#priority-jobs)
 - [Features](#features)
-  - [Unique in Queue](#unique-in-queue)
+  - [Unique in status queued](#unique-in-status-queue)
   - [Throughput control](#throughput-control)
   - [Execution context](#execution-context)
   - [Retry on failed](#retry-on-failed)
@@ -300,18 +300,18 @@ public void sendEmail(EmailData emailData) {
 
 ## Features
 
-### Unique in Queue
+### Unique in status queued
 If an execution with some parameters already exists in the queue and a new execution is created with the same parameters, it can be configured whether workhorse accepts or discards the creation of this new execution.
 
 
-You can configure this feature at the definition of your Worker. Under the annotation `@InitialJobConfig` you can activate or deactive the `Unique in Queue` with the paramater `uniqueInQueue`.
+You can configure this feature at the definition of your Worker. Under the annotation `@InitialJobConfig` you can activate or deactive the `Unique in status queued` with the paramater `UniqueQueued`.
 
 
-Let's suppose we have a worker `SendEmailWorker`, which job is to send e-mails. In this case we don't want to send the same e-mail to an user two times. To avoid this, we just have to use the feature `uniqueInQueue` at the definition of the Worker `SendEmailWorker`.
+Let's suppose we have a worker `SendEmailWorker`, which job is to send e-mails. In this case we don't want to send the same e-mail to an user two times. To avoid this, we just have to use the feature `UniqueQueued` at the definition of the Worker `SendEmailWorker`.
 
 ```java
 @Dependent
-@InitialJobConfig(uniqueInQueue = true)
+@InitialJobConfig(UniqueQueued = true)
 public class SendEmailWorker extends WorkerWith<EmailData> {
 
     private static Logger log = LoggerFactory.getLogger(SendEmailWorker.class);
@@ -324,7 +324,7 @@ public class SendEmailWorker extends WorkerWith<EmailData> {
     }
 }
 ```
-With the argument `uniqueInQueue` setted up to `true`, Workhorse ensure that the same e-mail can't be sent more than once to the same user.
+With the argument `UniqueQueued` setted up to `true`, Workhorse ensure that the same e-mail can't be sent more than once to the same user.
  
 ### Throughput control
 The throughput of executions of a job can be limited.
@@ -364,7 +364,7 @@ Let's define a Worker `SendEmailWorker`.
 
 ```java
 @Dependent
-@InitialJobConfig(uniqueInQueue = true)
+@InitialJobConfig(UniqueQueued = true)
 public class SendEmailWorker extends WorkerWith<EmailData> {
 
     private static Logger log = LoggerFactory.getLogger(SendEmailWorker.class);

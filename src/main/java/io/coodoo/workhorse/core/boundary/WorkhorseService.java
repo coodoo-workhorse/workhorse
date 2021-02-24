@@ -164,8 +164,8 @@ public class WorkhorseService {
      * @return Job
      */
     public Job updateJob(Long jobId, String name, String description, String workerClassName, String schedule,
-            JobStatus status, int threads, Integer maxPerMinute, int failRetries, int retryDelay,
-            int minutesUntilCleanUp, boolean uniqueInQueue) {
+            JobStatus status, int threads, Integer maxPerMinute, int failRetries, int retryDelay, int daysUntilCleanUp,
+            boolean uniqueQueued) {
 
         Job job = getJobById(jobId);
 
@@ -174,7 +174,7 @@ public class WorkhorseService {
         executionBuffer.cancelProcess(job);
 
         workhorseController.updateJob(jobId, name, description, workerClassName, schedule, status, threads,
-                maxPerMinute, failRetries, retryDelay, minutesUntilCleanUp, uniqueInQueue);
+                maxPerMinute, failRetries, retryDelay, daysUntilCleanUp, uniqueQueued);
 
         executionBuffer.initialize(job);
         // workhorse.start();
@@ -187,9 +187,9 @@ public class WorkhorseService {
      * Update a {@link Execution}
      */
     public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime maturity,
-            Long batchId, Long chainId, Long chainedPreviousExecutionId, boolean uniqueInQueue) {
+            Long batchId, Long chainId, Long chainedPreviousExecutionId, boolean uniqueQueued) {
         return workhorseController.createExecution(jobId, parameters, priority, maturity, batchId, chainId,
-                chainedPreviousExecutionId, uniqueInQueue);
+                chainedPreviousExecutionId, uniqueQueued);
     }
 
     public Execution updateExecution(Long jobId, Long executionId, ExecutionStatus status, String parameters,

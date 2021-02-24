@@ -77,5 +77,5 @@ public @interface InitialJobConfig {
      *         and saved into the queue if no other job with the same parameters
      *         exists in queue.
      */
-    boolean uniqueInQueue() default JOB_CONFIG_UNIQUE_IN_QUEUE;
+    boolean uniqueQueued() default JOB_CONFIG_UNIQUE_IN_QUEUE;
 }
