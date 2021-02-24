@@ -607,6 +607,19 @@ All release changes can be viewed on our [changelog](./CHANGELOG.md).
 
 Pull requests and [issues](https://github.com/coodoo-io/workhorse/issues) are welcome.
 
+You can read [how to contribute here](./CONTRIBUTING.md).
+
+
+### Definition of Done
+
+- There is JavaDoc 
+
+
+
+To spice things up
+
+
+
 ## License
 
 [Apache-2.0 © coodoo GmbH](./LICENSE)
