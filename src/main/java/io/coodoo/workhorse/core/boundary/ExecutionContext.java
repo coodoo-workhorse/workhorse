@@ -13,9 +13,10 @@ import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
 /**
- * This class gets the access to an running execution outside of the
- * doWork()-method of the corresponding worker class. This is only useful for
- * methods that need to be called by a doWork()-method of a worker class.
+ * This class gets the access to an running execution from anywhere in the
+ * business logic. It allows access for logging and to read meta data from the
+ * current job and execution while the doWork()-method of the worker class is
+ * invoked.
  * 
  * @author coodoo GmbH (coodoo.io)
  */
@@ -25,10 +26,8 @@ public class ExecutionContext {
     // The visibility is protected to enable mocking in Junit Tests
     protected Job job;
 
-    // The visibility is protected to enable mocking in Junit Tests
     protected Execution execution;
 
-    // The visibility is protected to enable mocking in Junit Tests
     protected StringBuffer logBuffer;
 
     public void init(Execution execution) {
@@ -86,7 +85,7 @@ public class ExecutionContext {
     /**
      * Retrieves the messages logged during the processing of the current execution
      * 
-     * @return
+     * @return the messages
      */
     public String getLog() {
 
