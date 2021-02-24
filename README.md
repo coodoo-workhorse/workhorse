@@ -592,7 +592,26 @@ public void changeExecutionTimeout() {
 
 }
 ```
-In the example above the current workhorse configuration are retrieved from the `WorkhorseService`. This configuration object can be used to update attributes at runtime. To really perform this update use the methode 
+In the example above the current workhorse configuration are retrieved from the `WorkhorseService`. This configuration object can be used to update attributes at runtime. 
+
+
+### Table of attributes of WorkhorseConfig
+
+| Attribut  | Description                                                                                     | Default value  |
+| :---      |    ---                                                                                        |            ---|
+| timeZone  | ZoneId for LocalDateTime instance creation. The default setting is that defined by the system.  | System default |
+| bufferMax  | Max amount of executions to load into the intern buffer per job  | 1000 executions  |
+| bufferMin |  Min amount of executions in intern buffer before the processing begins | 1 execution |
+| bufferPollInterval | Polling interval in seconds at which the intern buffer is loaded  | 5 seconds |
+| bufferPushFallbackPollInterval  | Polling interval in seconds at which the intern buffer is loaded, that is used as fallback mechanism when new Executions are pushed by the persistence | 120 seconds  |
+| minutesUntilCleanup  | Number of minutes an execution can be held in the persistence before being automatically deleted.  |  120 minutes  |
+| executionTimeout  |  Duration in seconds after which an EXECUTION in status [ExecutionStatus.RUNNING](/Users/Yvaris/Workhorse-Group/workhorse/src/main/java/io/coodoo/workhorse/core/entity/ExecutionStatus.java) is consider expired.(if set to 0 the value is ignored) |  60 seconds |
+| executionTimeoutStatus  | If an execution is stuck in status [ExecutionStatus.RUNNING](/Users/Yvaris/Workhorse-Group/workhorse/src/main/java/io/coodoo/workhorse/core/entity/ExecutionStatus.java) and doesn't change for `executionTimeout` seconds, it is expired. `executionTimeoutStatus` defines which status this execution have to get.  | [ExecutionStatus.ABORTED](/Users/Yvaris/Workhorse-Group/workhorse/src/main/java/io/coodoo/workhorse/core/entity/ExecutionStatus.java)  |
+| logChange  |  Log change pattern. Placeholder <code>%s</code> for changeParameter, changeOld and changeNew in this order <br> |  `Changed %s from '%s' to '%s'` |
+| logTimeFormat  | Execution log timestamp pattern. |  `['HH:mm:ss.SSS']` |
+| logInfoMarker  | Execution log info marker  |  none |
+| logWarnMarker | Execution log warn marker  | `[WARN]`  |
+| logErrorMarker |Execution log error marker | `[ERROR]` |
 
 For more details about all parameters that can be configured, have a look on the class [WorkhorseConfig](src/main/java/io/coodoo/workhorse/core/entity/WorkhorseConfig.java)
 ## Changelog
