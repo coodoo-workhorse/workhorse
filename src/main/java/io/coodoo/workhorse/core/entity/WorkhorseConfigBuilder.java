@@ -93,12 +93,12 @@ public abstract class WorkhorseConfigBuilder {
 
     /**
      * Set the duration in seconds after which an execution in status
-     * {@link ExecutionStatus#RUNNING} is considered as expired.
+     * {@link ExecutionStatus#RUNNING} is considered as in timeout.
      * 
      * If set to 0 the value is ignored
      * 
      * @param executionTimeout the duration after which an running execution is
-     *                         considered as expired.
+     *                         considered as in timout.
      * @return the builder to set another configuration
      */
     public WorkhorseConfigBuilder executionTimeout(int executionTimeout) {

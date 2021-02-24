@@ -1,6 +1,7 @@
 package io.coodoo.workhorse.core.control;
 
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.memory.MemoryPersistence;
 
 /**
@@ -57,19 +58,19 @@ public final class StaticConfig {
 
     /**
      * Duration in seconds after which an EXECUTION in status
-     * {@link ExecutionStatus#RUNNING} is consider as expired.(if set to 0 the value
-     * is ignored)
+     * {@link ExecutionStatus#RUNNING} is consider as in timeout.(if set to 0 the
+     * value is ignored)
      */
     public static int EXECUTION_TIMEOUT;
 
     /**
      * 
      * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and
-     * doesn't change for {@link WorkhorseConfig#executionTimeout} seconds, it is
-     * expired!
+     * doesn't change for {@link WorkhorseConfig#executionTimeout} seconds, it is in
+     * timout!
      * 
-     * <code>executionTimeoutStatus</code> defines which status this expired
-     * Execution have to get.
+     * <code>executionTimeoutStatus</code> defines which status this execution in
+     * timout have to get.
      */
     public static ExecutionStatus EXECUTION_TIMEOUT_STATUS;
 

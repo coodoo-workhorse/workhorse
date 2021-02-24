@@ -244,7 +244,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     }
 
     @Override
-    public List<Execution> findExpiredExecutions(LocalDateTime time) {
+    public List<Execution> findTimeoutExecutions(LocalDateTime time) {
 
         List<Execution> executions = new ArrayList<>();
 

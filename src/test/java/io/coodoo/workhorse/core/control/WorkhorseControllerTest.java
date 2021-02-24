@@ -36,7 +36,7 @@ public class WorkhorseControllerTest {
     WorkhorseController classUnderTest;
 
     @Test
-    public void testHuntExpiredExecutions() throws Exception {
+    public void testHuntTimeoutExecutions() throws Exception {
 
         StaticConfig.EXECUTION_TIMEOUT = 12;
         StaticConfig.EXECUTION_TIMEOUT_STATUS = ExecutionStatus.ABORTED;
@@ -52,21 +52,22 @@ public class WorkhorseControllerTest {
         execution1.setJobId(1L);
         execution2.setStatus(ExecutionStatus.RUNNING);
 
-        List<Execution> expiredExecutions = new ArrayList<>();
+        List<Execution> timeoutExecutions = new ArrayList<>();
 
-        expiredExecutions.add(execution1);
-        expiredExecutions.add(execution2);
+        timeoutExecutions.add(execution1);
+        timeoutExecutions.add(execution2);
 
         // when(WorkhorseUtil.timestamp()).thenReturn(null);
-        when(executionPersistence.findExpiredExecutions(anyObject())).thenReturn(expiredExecutions);
+        when(executionPersistence.findTimeoutExecutions(anyObject())).thenReturn(timeoutExecutions);
 
-        classUnderTest.huntExpiredExecutions();
+        classUnderTest.huntTimeoutExecution();
 
-        for (Execution zombiExecution : expiredExecutions) {
+        for (Execution zombiExecution : timeoutExecutions) {
             assertEquals(ExecutionStatus.ABORTED, zombiExecution.getStatus());
 
             String logMessage = "Zombie execution found (ID: " + zombiExecution.getId() + "): ";
-            verify(workhorseLogService).logMessage(logMessage + "Put in status " + ExecutionStatus.ABORTED, zombiExecution.getJobId(), false);
+            verify(workhorseLogService).logMessage(logMessage + "Put in status " + ExecutionStatus.ABORTED,
+                    zombiExecution.getJobId(), false);
 
             verify(executionPersistence).update(zombiExecution.getJobId(), zombiExecution.getId(), zombiExecution);
         }
@@ -74,7 +75,7 @@ public class WorkhorseControllerTest {
     }
 
     @Test
-    public void testHuntExpiredExecutions_ExecutionTimeoutStatus_is_QUEUED() throws Exception {
+    public void testHuntTimeoutExecutions_ExecutionTimeoutStatus_is_QUEUED() throws Exception {
 
         StaticConfig.EXECUTION_TIMEOUT = 12;
         StaticConfig.EXECUTION_TIMEOUT_STATUS = ExecutionStatus.QUEUED;
@@ -90,28 +91,29 @@ public class WorkhorseControllerTest {
         execution1.setJobId(1L);
         execution2.setStatus(ExecutionStatus.RUNNING);
 
-        List<Execution> expiredExecutions = new ArrayList<>();
+        List<Execution> timeoutExecutions = new ArrayList<>();
 
-        expiredExecutions.add(execution1);
-        expiredExecutions.add(execution2);
+        timeoutExecutions.add(execution1);
+        timeoutExecutions.add(execution2);
 
         // when(WorkhorseUtil.timestamp()).thenReturn(null);
-        when(executionPersistence.findExpiredExecutions(anyObject())).thenReturn(expiredExecutions);
+        when(executionPersistence.findTimeoutExecutions(anyObject())).thenReturn(timeoutExecutions);
 
-        classUnderTest.huntExpiredExecutions();
+        classUnderTest.huntTimeoutExecution();
 
-        for (Execution zombiExecution : expiredExecutions) {
+        for (Execution zombiExecution : timeoutExecutions) {
             assertEquals(ExecutionStatus.FAILED, zombiExecution.getStatus());
 
             String logMessage = "Zombie execution found (ID: " + zombiExecution.getId() + "): ";
-            verify(workhorseLogService).logMessage(logMessage + "Marked as failed and queued a clone", zombiExecution.getJobId(), false);
+            verify(workhorseLogService).logMessage(logMessage + "Marked as failed and queued a clone",
+                    zombiExecution.getJobId(), false);
 
             verify(executionPersistence).update(zombiExecution.getJobId(), zombiExecution.getId(), zombiExecution);
         }
     }
 
     @Test
-    public void testHuntExpiredExecutions_ExecutionTimeoutStatus_is_RUNNING() throws Exception {
+    public void testHuntTimeoutExecutions_ExecutionTimeoutStatus_is_RUNNING() throws Exception {
 
         StaticConfig.EXECUTION_TIMEOUT = 12;
         StaticConfig.EXECUTION_TIMEOUT_STATUS = ExecutionStatus.RUNNING;
@@ -127,16 +129,16 @@ public class WorkhorseControllerTest {
         execution1.setJobId(1L);
         execution2.setStatus(ExecutionStatus.RUNNING);
 
-        List<Execution> expiredExecutions = new ArrayList<>();
+        List<Execution> timeoutExecutions = new ArrayList<>();
 
-        expiredExecutions.add(execution1);
-        expiredExecutions.add(execution2);
+        timeoutExecutions.add(execution1);
+        timeoutExecutions.add(execution2);
 
-        when(executionPersistence.findExpiredExecutions(anyObject())).thenReturn(expiredExecutions);
+        when(executionPersistence.findTimeoutExecutions(anyObject())).thenReturn(timeoutExecutions);
 
-        classUnderTest.huntExpiredExecutions();
+        classUnderTest.huntTimeoutExecution();
 
-        for (Execution zombiExecution : expiredExecutions) {
+        for (Execution zombiExecution : timeoutExecutions) {
             assertEquals(ExecutionStatus.RUNNING, zombiExecution.getStatus());
 
             String logMessage = "Zombie execution found (ID: " + zombiExecution.getId() + "): ";
@@ -147,19 +149,19 @@ public class WorkhorseControllerTest {
     }
 
     @Test
-    public void testHuntExpiredExecutions_withEmptyList() throws Exception {
+    public void testHuntTimeoutExecutions_withEmptyList() throws Exception {
 
         StaticConfig.EXECUTION_TIMEOUT = 12;
         StaticConfig.EXECUTION_TIMEOUT_STATUS = ExecutionStatus.ABORTED;
         StaticConfig.TIME_ZONE = "UTC";
 
-        List<Execution> expiredExecutions = new ArrayList<>();
+        List<Execution> timeoutExecutions = new ArrayList<>();
 
-        when(executionPersistence.findExpiredExecutions(anyObject())).thenReturn(expiredExecutions);
+        when(executionPersistence.findTimeoutExecutions(anyObject())).thenReturn(timeoutExecutions);
 
-        classUnderTest.huntExpiredExecutions();
+        classUnderTest.huntTimeoutExecution();
 
-        verify(executionPersistence).findExpiredExecutions(anyObject());
+        verify(executionPersistence).findTimeoutExecutions(anyObject());
 
         verify(workhorseLogService, never()).logMessage(anyString(), anyLong(), anyBoolean());
 
@@ -167,13 +169,13 @@ public class WorkhorseControllerTest {
     }
 
     @Test
-    public void testHuntExpiredExecutions_ToLow_ExecutionTimeout() throws Exception {
+    public void testHuntTimeoutExecutions_ToLow_ExecutionTimeout() throws Exception {
 
         StaticConfig.EXECUTION_TIMEOUT = 0;
 
-        classUnderTest.huntExpiredExecutions();
+        classUnderTest.huntTimeoutExecution();
 
-        verify(executionPersistence, never()).findExpiredExecutions(anyObject());
+        verify(executionPersistence, never()).findTimeoutExecutions(anyObject());
 
         verify(workhorseLogService, never()).logMessage(anyString(), anyLong(), anyBoolean());
 

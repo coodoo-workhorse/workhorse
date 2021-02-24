@@ -527,49 +527,49 @@ public class WorkhorseController {
     }
 
     /**
-     * Hunt expired Executions and cure them
+     * Hunt timeout executions and cure them
      */
-    public void huntExpiredExecutions() {
+    public void huntTimeoutExecution() {
 
         if (StaticConfig.EXECUTION_TIMEOUT <= 0) {
             return;
         }
 
         LocalDateTime time = WorkhorseUtil.timestamp().minusSeconds(StaticConfig.EXECUTION_TIMEOUT);
-        List<Execution> expiredExecutions = executionPersistence.findExpiredExecutions(time);
+        List<Execution> timeoutExecutions = executionPersistence.findTimeoutExecutions(time);
 
-        if (expiredExecutions.isEmpty()) {
+        if (timeoutExecutions.isEmpty()) {
             return;
         }
 
-        for (Execution expiredExecution : expiredExecutions) {
-            log.warn("Zombie found! {}", expiredExecution);
+        for (Execution timeoutExecution : timeoutExecutions) {
+            log.warn("Zombie found! {}", timeoutExecution);
 
             ExecutionStatus cure = StaticConfig.EXECUTION_TIMEOUT_STATUS;
-            String logMessage = "Zombie execution found (ID: " + expiredExecution.getId() + "): ";
+            String logMessage = "Zombie execution found (ID: " + timeoutExecution.getId() + "): ";
 
             switch (cure) {
                 case QUEUED:
-                    Execution retryExecution = createRetryExecution(expiredExecution);
-                    expiredExecution.setStatus(ExecutionStatus.FAILED);
+                    Execution retryExecution = createRetryExecution(timeoutExecution);
+                    timeoutExecution.setStatus(ExecutionStatus.FAILED);
                     log.info("Zombie killed and risen from the death! Now it is {}", retryExecution);
                     workhorseLogService.logMessage(logMessage + "Marked as failed and queued a clone",
-                            expiredExecution.getJobId(), false);
+                            timeoutExecution.getJobId(), false);
                     break;
                 case RUNNING:
                     log.warn("Zombie will still walk free with status {}", cure);
-                    workhorseLogService.logMessage(logMessage + "No action is taken", expiredExecution.getJobId(),
+                    workhorseLogService.logMessage(logMessage + "No action is taken", timeoutExecution.getJobId(),
                             false);
                     break;
                 default:
-                    expiredExecution.setStatus(cure);
+                    timeoutExecution.setStatus(cure);
                     log.info("Zombie is cured with status {}", cure);
-                    workhorseLogService.logMessage(logMessage + "Put in status " + cure, expiredExecution.getJobId(),
+                    workhorseLogService.logMessage(logMessage + "Put in status " + cure, timeoutExecution.getJobId(),
                             false);
                     break;
             }
 
-            executionPersistence.update(expiredExecution.getJobId(), expiredExecution.getId(), expiredExecution);
+            executionPersistence.update(timeoutExecution.getJobId(), timeoutExecution.getId(), timeoutExecution);
 
         }
     }
