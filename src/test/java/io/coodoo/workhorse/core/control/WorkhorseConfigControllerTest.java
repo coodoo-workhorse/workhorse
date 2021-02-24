@@ -23,8 +23,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
-import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.entity.JobStatus;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.interfaces.ConfigPersistence;
 import io.coodoo.workhorse.persistence.memory.MemoryConfigBuilder;
 
@@ -729,61 +729,61 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateDaysUntilCleanup() throws Exception {
+    public void testUpdateMinutesUntilCleanup() throws Exception {
 
         WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
 
-        int daysUntilCleanup = 1;
+        int minutesUntilCleanup = 1;
 
-        classUnderTest.updateDaysUntilCleanup(workhorseConfig, daysUntilCleanup);
+        classUnderTest.updateMinutesUntilCleanup(workhorseConfig, minutesUntilCleanup);
 
-        assertEquals(StaticConfig.DAYS_UNTIL_CLEANUP, daysUntilCleanup);
-        assertEquals(workhorseConfig.getDaysUntilCleanup(), daysUntilCleanup);
+        assertEquals(StaticConfig.MINUTES_UNTIL_CLEANUP, minutesUntilCleanup);
+        assertEquals(workhorseConfig.getMinutesUntilCleanup(), minutesUntilCleanup);
 
     }
 
     @Test
-    public void testUpdateDaysUntilCleanup_toLow() throws Exception {
+    public void testUpdateMinutesUntilCleanup_toLow() throws Exception {
 
         WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
 
-        int daysUntilCleanup = -1;
+        int minutesUntilCleanup = -1;
 
         exceptionRule.expect(RuntimeException.class);
-        exceptionRule.expectMessage("The daysUntilCleanup can't be negative!");
+        exceptionRule.expectMessage("The minutesUntilCleanup can't be negative!");
 
-        classUnderTest.updateDaysUntilCleanup(workhorseConfig, daysUntilCleanup);
+        classUnderTest.updateMinutesUntilCleanup(workhorseConfig, minutesUntilCleanup);
 
     }
 
     @Test
-    public void testUpdateDaysUntilCleanup_deactiveFeature() throws Exception {
+    public void testUpdateMinutesUntilCleanup_deactiveFeature() throws Exception {
 
         WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
 
-        int daysUntilCleanup = 0;
+        int minutesUntilCleanup = 0;
 
-        classUnderTest.updateDaysUntilCleanup(workhorseConfig, daysUntilCleanup);
+        classUnderTest.updateMinutesUntilCleanup(workhorseConfig, minutesUntilCleanup);
 
-        assertEquals(StaticConfig.DAYS_UNTIL_CLEANUP, daysUntilCleanup);
-        assertEquals(workhorseConfig.getDaysUntilCleanup(), daysUntilCleanup);
+        assertEquals(StaticConfig.MINUTES_UNTIL_CLEANUP, minutesUntilCleanup);
+        assertEquals(workhorseConfig.getMinutesUntilCleanup(), minutesUntilCleanup);
 
     }
 
     @Test
-    public void testUpdateDaysUntilCleanup_deactiveFeature_logChange() throws Exception {
+    public void testUpdateMinutesUntilCleanup_deactiveFeature_logChange() throws Exception {
 
         WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
         WorkhorseConfig workhorseConfigDefault = new MemoryConfigBuilder().build();
 
-        int daysUntilCleanup = 0;
+        long minutesUntilCleanup = 0L;
 
-        classUnderTest.updateDaysUntilCleanup(workhorseConfig, daysUntilCleanup);
+        classUnderTest.updateMinutesUntilCleanup(workhorseConfig, minutesUntilCleanup);
 
-        String message = "DaysUntilCleanup is set to '0', so the cleanup is off!";
+        String message = "MinutesUntilCleanup is set to '0', so the cleanup is off!";
 
-        verify(workhorseLogService).logChange(null, null, "daysUntilCleanup",
-                workhorseConfigDefault.getDaysUntilCleanup(), daysUntilCleanup, message);
+        verify(workhorseLogService).logChange(null, null, "minutesUntilCleanup",
+                workhorseConfigDefault.getMinutesUntilCleanup(), minutesUntilCleanup, message);
     }
 
     @Test

@@ -36,12 +36,12 @@ public class Job extends BaseEntity {
     private int threads;
 
     /**
-     * Max number of Job Execution per minute
+     * Max number of execution per minute
      */
     private int maxPerMinute;
 
     /**
-     * number of retries for a failed Job Execution
+     * number of retries for a failed execution
      */
     private int failRetries;
 
@@ -51,12 +51,13 @@ public class Job extends BaseEntity {
     private int retryDelay;
 
     /**
-     * number of days before delete Job Execution of this Job
+     * number of minutes before delete execution of this Job
      */
-    private int daysUntilCleanUp;
+    private int minutesUntilCleanUp;
 
     /**
-     * If a job has the uniqueInqueue set <code>true</code>, Two or more job execution with the same parameters are not authorised
+     * If a job has the uniqueInqueue set <code>true</code>, Two or more job
+     * execution with the same parameters are not authorised
      */
     private Boolean uniqueInQueue;
 
@@ -153,12 +154,12 @@ public class Job extends BaseEntity {
         this.retryDelay = retryDelay;
     }
 
-    public int getDaysUntilCleanUp() {
-        return daysUntilCleanUp;
+    public int getMinutesUntilCleanUp() {
+        return minutesUntilCleanUp;
     }
 
-    public void setDaysUntilCleanUp(int daysUntilCleanUp) {
-        this.daysUntilCleanUp = daysUntilCleanUp;
+    public void setMinutesUntilCleanUp(int minutesUntilCleanUp) {
+        this.minutesUntilCleanUp = minutesUntilCleanUp;
     }
 
     public Boolean getUniqueInQueue() {
@@ -167,8 +168,9 @@ public class Job extends BaseEntity {
 
     @Override
     public String toString() {
-        return "Job [Id=" + id + ", description=" + description + ", name=" + name + ", parametersClassName=" + parametersClassName + ", schedule=" + schedule
-                        + ", status=" + status + ", threads=" + threads + ", workerClassName=" + workerClassName + "]";
+        return "Job [Id=" + id + ", description=" + description + ", name=" + name + ", parametersClassName="
+                + parametersClassName + ", schedule=" + schedule + ", status=" + status + ", threads=" + threads
+                + ", workerClassName=" + workerClassName + "]";
     }
 
 }

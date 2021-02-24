@@ -25,13 +25,13 @@ public class ExecutionCleanupWorker extends Worker {
     public void doWork() throws Exception {
         int deletedSum = 0;
 
-        logInfo(logger, "Deleted | Days | Job ID | Job Name");
+        logInfo(logger, "Deleted | Minutes | Job ID | Job Name");
 
         for (Job job : workhorseService.getAllJobs()) {
-            if (StaticConfig.DAYS_UNTIL_CLEANUP > 0) {
+            if (StaticConfig.MINUTES_UNTIL_CLEANUP > 0) {
                 try {
-                    int deleted = workhorseController.deleteOlderExecutions(job.getId(), job.getDaysUntilCleanUp());
-                    logInfo(logger, String.format("%7d | %4d | %6d | %s", deleted, job.getDaysUntilCleanUp(),
+                    int deleted = workhorseController.deleteOlderExecutions(job.getId(), job.getMinutesUntilCleanUp());
+                    logInfo(logger, String.format("%7d | %4d | %6d | %s", deleted, job.getMinutesUntilCleanUp(),
                             job.getId(), job.getName()));
                     deletedSum += deleted;
                 } catch (Exception e) {

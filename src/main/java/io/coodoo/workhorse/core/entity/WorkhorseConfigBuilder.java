@@ -1,5 +1,8 @@
 package io.coodoo.workhorse.core.entity;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+
 /**
  * Abstract class to build an object of type {@link WorkhorseConfig}
  * 
@@ -75,14 +78,16 @@ public abstract class WorkhorseConfigBuilder {
     }
 
     /***
-     * Set the number of days an execution can be held in the persistence before
-     * being automatic deleted
+     * Set how long an execution can be held in the persistence before being
+     * automatically deleted
      * 
-     * @param daysUntilCleanup number of days
+     * @param timeUntilCleanup duration before being deleted
+     * @param chronoUnit       kind of time (seconds, minutes, hours ...)
      * @return the builder to set another configuration
      */
-    public WorkhorseConfigBuilder daysUntilCleanup(int daysUntilCleanup) {
-        workhorseConfig.setDaysUntilCleanup(daysUntilCleanup);
+    public WorkhorseConfigBuilder timesUntilCleanup(long timeUntilCleanup, ChronoUnit chronoUnit) {
+        long minutesUntilCleanup = Duration.of(timeUntilCleanup, chronoUnit).toMinutes();
+        workhorseConfig.setMinutesUntilCleanup(minutesUntilCleanup);
         return this;
     }
 

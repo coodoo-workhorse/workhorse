@@ -146,7 +146,7 @@ public class WorkhorseController {
             job.setFailRetries(initialJobConfig.failRetries());
             job.setRetryDelay(initialJobConfig.retryDelay());
 
-            job.setDaysUntilCleanUp(initialJobConfig.daysUntilCleanUp());
+            job.setMinutesUntilCleanUp(initialJobConfig.minutesUntilCleanUp());
 
             job.setUniqueInQueue(initialJobConfig.uniqueInQueue());
 
@@ -158,7 +158,7 @@ public class WorkhorseController {
             job.setUniqueInQueue(InitialJobConfig.JOB_CONFIG_UNIQUE_IN_QUEUE);
             job.setStatus(JobStatus.ACTIVE);
             job.setThreads(InitialJobConfig.JOB_CONFIG_THREADS);
-            job.setDaysUntilCleanUp(InitialJobConfig.JOB_CONFIG_DAYS_UNTIL_CLEANUP);
+            job.setMinutesUntilCleanUp(InitialJobConfig.JOB_CONFIG_MINUTES_UNTIL_CLEANUP);
         }
 
         try {
@@ -391,27 +391,24 @@ public class WorkhorseController {
     }
 
     /**
-     * Delete all executions of a job that were created for a given number of days
+     * Delete all executions of a job that were created for a given number of
+     * minutes
      * 
-     * @param jobId      ID of the job
-     * @param minDaysOld Minimum number of days, that an execution have to exist to
-     *                   be deleted
+     * @param jobId         ID of the job
+     * @param minMinutesOld Minimum number of minutes, that an execution have to
+     *                      exist to be deleted
      * @return number of deleted executions
      */
-    public int deleteOlderExecutions(Long jobId, int minDaysOld) {
+    public int deleteOlderExecutions(Long jobId, long minMinutesOld) {
 
-        // Is minDaysOld negativ the global default value of daysUntilCleanup have to be
-        // used.
-        if (minDaysOld < 0) {
-            minDaysOld = StaticConfig.DAYS_UNTIL_CLEANUP;
+        // Is minMinutesOld negativ the global default value of minutesUntilCleanup is
+        // to use.
+        if (minMinutesOld < 0) {
+            minMinutesOld = StaticConfig.MINUTES_UNTIL_CLEANUP;
         }
 
-        // TODO Code to use live
-        // LocalDateTime time =
-        // LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)).minusDays(minDaysOld);
+        LocalDateTime time = LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)).minusMinutes(minMinutesOld);
 
-        // Code to use for Test purpose.
-        LocalDateTime time = LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)).minusSeconds(minDaysOld);
         return executionPersistence.deleteOlderExecutions(jobId, time);
     }
 
@@ -445,8 +442,8 @@ public class WorkhorseController {
     }
 
     public Job updateJob(Long jobId, String name, String description, String workerClassName, String schedule,
-            JobStatus status, int threads, Integer maxPerMinute, int failRetries, int retryDelay, int daysUntilCleanUp,
-            boolean uniqueInQueue) {
+            JobStatus status, int threads, Integer maxPerMinute, int failRetries, int retryDelay,
+            int minutesUntilCleanUp, boolean uniqueInQueue) {
 
         Job job = getJobById(jobId);
 
@@ -488,10 +485,10 @@ public class WorkhorseController {
             workhorseLogService.logChange(jobId, status, "Retry delay", job.getRetryDelay(), retryDelay, null);
             job.setRetryDelay(retryDelay);
         }
-        if (!Objects.equals(job.getDaysUntilCleanUp(), daysUntilCleanUp)) {
-            workhorseLogService.logChange(jobId, status, "Days until cleanup", job.getDaysUntilCleanUp(),
-                    daysUntilCleanUp, null);
-            job.setDaysUntilCleanUp(daysUntilCleanUp);
+        if (!Objects.equals(job.getMinutesUntilCleanUp(), minutesUntilCleanUp)) {
+            workhorseLogService.logChange(jobId, status, "Minutes until cleanup", job.getMinutesUntilCleanUp(),
+                    minutesUntilCleanUp, null);
+            job.setMinutesUntilCleanUp(minutesUntilCleanUp);
         }
         if (!Objects.equals(job.isUniqueInQueue(), uniqueInQueue)) {
             workhorseLogService.logChange(jobId, status, "Unique in queue", job.isUniqueInQueue(), uniqueInQueue, null);
