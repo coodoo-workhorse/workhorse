@@ -1,7 +1,11 @@
 package io.coodoo.workhorse.core.boundary;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -27,7 +31,8 @@ public abstract class WorkerWith<T> extends BaseWorker {
 
     @Override
     public void doWork(Execution execution) throws Exception {
-        init(execution);
+
+        this.executionContext.init(execution);
 
         doWork(getParameters(execution));
     }
@@ -43,10 +48,36 @@ public abstract class WorkerWith<T> extends BaseWorker {
         if (parametersClass != null) {
             return parametersClass;
         }
+
         Type type = getParameterWorkerClassType();
-        parametersClass = (Class<?>) type;
+        parametersClass = type2Class(type);
 
         return parametersClass;
+    }
+
+    // TODO Test complete the method
+    protected Class<?> type2Class(Type type) { // https://stackoverflow.com/a/48066001/4034100
+        if (type instanceof Class) {
+            return (Class<?>) type;
+        } else if (type instanceof GenericArrayType) {
+            // having to create an array instance to get the class is kinda nasty
+            // but apparently this is a current limitation of java-reflection concerning
+            // array classes.
+            // E.g. T[] -> T -> Object.class if <T> or Number.class if <T extends Number &
+            // Comparable>
+            return Array.newInstance(type2Class(((GenericArrayType) type).getGenericComponentType()), 0).getClass();
+        } else if (type instanceof ParameterizedType) {
+            return type2Class(((ParameterizedType) type).getRawType()); // Eg. List<T> would return List.class
+        } else if (type instanceof TypeVariable) {
+            Type[] bounds = ((TypeVariable<?>) type).getBounds();
+            return bounds.length == 0 ? Object.class : type2Class(bounds[0]); // erasure is to the left-most bound.
+        } else if (type instanceof WildcardType) {
+            Type[] bounds = ((WildcardType) type).getUpperBounds();
+            return bounds.length == 0 ? Object.class : type2Class(bounds[0]); // erasure is to the left-most upper
+                                                                              // bound.
+        } else {
+            throw new UnsupportedOperationException("cannot handle type class: " + type.getClass());
+        }
     }
 
     public String getParametersClassName() {

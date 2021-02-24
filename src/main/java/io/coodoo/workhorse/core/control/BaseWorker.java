@@ -2,13 +2,13 @@ package io.coodoo.workhorse.core.control;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
+import io.coodoo.workhorse.core.boundary.ExecutionContext;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
@@ -30,9 +30,10 @@ public abstract class BaseWorker {
     @Inject
     protected WorkhorseController workhorseController;
 
-    private Job job;
+    @Inject
+    protected ExecutionContext executionContext;
 
-    private StringBuffer logBuffer;
+    private Job job;
 
     /**
      * The job engine will uses this method to perform the execution.
@@ -186,45 +187,161 @@ public abstract class BaseWorker {
         return maturity;
     }
 
-    public void init(Execution execution) {
-
-        if (execution != null && execution.getLog() != null) {
-            this.logBuffer = new StringBuffer(execution.getLog());
-        } else {
-            this.logBuffer = new StringBuffer();
-        }
+    /**
+     * Adds the message text in as a new line to the executions log <br>
+     * <i>CAUTION: This will only work in the context of the doWork method!</i>
+     * 
+     * @param message text to log
+     */
+    protected void logLine(String message) {
+        executionContext.logLine(message);
     }
 
-    public void logInfo(String message) {
-
-        if (logBuffer != null) {
-            if (logBuffer.length() > 0) {
-                logBuffer.append(System.lineSeparator());
-            }
-
-            logBuffer.append(timestamp().format(DateTimeFormatter.ofPattern(StaticConfig.LOG_TIME_FORMATTER)));
-            logBuffer.append(" ");
-
-            if (StaticConfig.LOG_INFO_MARKER != null) {
-                logBuffer.append(StaticConfig.LOG_INFO_MARKER);
-                logBuffer.append(" ");
-            }
-
-            logBuffer.append(message);
-        }
-
+    /**
+     * Adds a timestamp followed by the message text in as a new line to the
+     * executions log <br>
+     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in
+     * {@link JobEngineConfig#LOG_TIME_FORMATTER}<br>
+     * Example: <code>[22:06:42.680] Step 3 complete</code> <br>
+     * <i>CAUTION: This will only work in the context of the doWork method!</i>
+     * 
+     * @param message text to log
+     */
+    protected void logLineWithTimestamp(String message) {
+        executionContext.logLineWithTimestamp(message);
     }
 
-    public void logInfo(Logger logger, String message) {
-        logger.info(message);
-        logInfo(message);
+    /**
+     * Adds a timestamp followed by an info marker and the info message text in as a
+     * new line to the executions log<br>
+     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in
+     * {@link JobEngineConfig#LOG_TIME_FORMATTER}<br>
+     * Info marker: Only if defined in {@link JobEngineConfig#LOG_INFO_MARKER}<br>
+     * Example: <code>[22:06:42.680] Step 3 complete</code> <br>
+     * <i>CAUTION: This will only work in the context of the doWork method!</i>
+     * 
+     * @param message text to log
+     */
+    protected void logInfo(String message) {
+        executionContext.logInfo(message);
     }
 
-    public String getLog() {
+    /**
+     * Adds a timestamp followed by an info marker and the info message text in as a
+     * new line to the executions log and also adds the message in severity INFO to
+     * the server log<br>
+     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in
+     * {@link JobEngineConfig#LOG_TIME_FORMATTER}<br>
+     * Info marker: Only if defined in {@link JobEngineConfig#LOG_INFO_MARKER}<br>
+     * Example: <code>[22:06:42.680] Step 3 complete</code> <br>
+     * <i>CAUTION: This will only work in the context of the doWork method!</i>
+     * 
+     * @param logger  server log logger
+     * @param message text to log
+     */
+    protected void logInfo(Logger logger, String message) {
+        executionContext.logInfo(logger, message);
+    }
 
-        if (logBuffer != null && logBuffer.length() > 0) {
-            return logBuffer.toString();
-        }
-        return null;
+    /**
+     * Adds a timestamp followed by an warn marker and the warn message as a new
+     * line to the executions log<br>
+     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in
+     * {@link JobEngineConfig#LOG_TIME_FORMATTER}<br>
+     * Error marker: <code>[WARN]</code> or as defined in
+     * {@link JobEngineConfig#LOG_WARN_MARKER}<br>
+     * Example: <code>[22:06:42.680] [WARN] Well thats suspicious...</code> <br>
+     * <i>CAUTION: This will only work in the context of the doWork method!</i>
+     * 
+     * @param message text to log
+     */
+    protected void logWarn(String message) {
+        executionContext.logWarn(message);
+    }
+
+    /**
+     * Adds a timestamp followed by an warn marker and the warn message as a new
+     * line to the executions log. It also adds the message in severity WARN to the
+     * server log<br>
+     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in
+     * {@link JobEngineConfig#LOG_TIME_FORMATTER}<br>
+     * Error marker: <code>[WARN]</code> or as defined in
+     * {@link JobEngineConfig#LOG_WARN_MARKER}<br>
+     * Example: <code>[22:06:42.680] [WARN] Well thats suspicious...</code> <br>
+     * <i>CAUTION: This will only work in the context of the doWork method!</i>
+     * 
+     * @param logger  server log logger
+     * @param message text to log
+     */
+    protected void logWarn(Logger logger, String message) {
+        executionContext.logWarn(logger, message);
+    }
+
+    /**
+     * Adds a timestamp followed by an error marker and the error message as a new
+     * line to the executions log<br>
+     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in
+     * {@link JobEngineConfig#LOG_TIME_FORMATTER}<br>
+     * Error marker: <code>[ERROR]</code> or as defined in
+     * {@link JobEngineConfig#LOG_ERROR_MARKER}<br>
+     * Example: <code>[22:06:42.680] [ERROR] Dafuq was that?!?!</code> <br>
+     * <i>CAUTION: This will only work in the context of the doWork method!</i>
+     * 
+     * @param message text to log
+     */
+    protected void logError(String message) {
+        executionContext.logError(message);
+    }
+
+    /**
+     * Adds a timestamp followed by an error marker and the error message as a new
+     * line to the executions log. It also adds the message in severity ERROR to the
+     * server log<br>
+     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in
+     * {@link JobEngineConfig#LOG_TIME_FORMATTER}<br>
+     * Error marker: <code>[ERROR]</code> or as defined in
+     * {@link JobEngineConfig#LOG_ERROR_MARKER}<br>
+     * Example: <code>[22:06:42.680] [ERROR] Dafuq was that?!?!</code> <br>
+     * <i>CAUTION: This will only work in the context of the doWork method!</i>
+     * 
+     * @param logger  server log logger
+     * @param message text to log
+     */
+    protected void logError(Logger logger, String message) {
+        executionContext.logError(logger, message);
+    }
+
+    /**
+     * Adds a timestamp followed by an error marker and the error message as a new
+     * line to the executions log. It also adds the message in severity ERROR and
+     * the throwable to the server log<br>
+     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in
+     * {@link JobEngineConfig#LOG_TIME_FORMATTER}<br>
+     * Error marker: <code>[ERROR]</code> or as defined in
+     * {@link JobEngineConfig#LOG_ERROR_MARKER}<br>
+     * Example: <code>[22:06:42.680] [ERROR] Dafuq was that?!?!</code> <br>
+     * <i>CAUTION: This will only work in the context of the doWork method!</i>
+     * 
+     * @param logger    server log logger
+     * @param message   text to log
+     * @param throwable cause of error
+     */
+    protected void logError(Logger logger, String message, Throwable throwable) {
+        executionContext.logError(logger, message, throwable);
+    }
+
+    /**
+     * @return the log text of the current running job execution or
+     *         <code>null</code> if there isn't any
+     */
+    public String getJobExecutionLog() {
+        return executionContext.getLog();
+    }
+
+    /**
+     * @return the context of the current running job execution
+     */
+    public ExecutionContext getExecutionContext() {
+        return executionContext;
     }
 }

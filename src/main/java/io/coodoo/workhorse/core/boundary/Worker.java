@@ -18,7 +18,9 @@ public abstract class Worker extends BaseWorker {
 
     @Override
     public void doWork(Execution execution) throws Exception {
-        init(execution);
+
+        this.executionContext.init(execution);
+
         doWork();
     }
 

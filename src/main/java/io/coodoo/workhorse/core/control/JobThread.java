@@ -1,6 +1,7 @@
 package io.coodoo.workhorse.core.control;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.enterprise.context.Dependent;
@@ -11,6 +12,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.coodoo.workhorse.core.boundary.ExecutionContext;
 import io.coodoo.workhorse.core.control.event.AllExecutionsDoneEvent;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
@@ -87,13 +89,15 @@ public class JobThread {
 
                 long millisAtStart = System.currentTimeMillis();
 
+                ExecutionContext executionContext = workerInstance.getExecutionContext();
+
                 log.trace("On Running Job Execution: {}", runningExecution);
 
                 try {
 
                     updateExecutionStatus(execution, ExecutionStatus.RUNNING, WorkhorseUtil.timestamp(), null, null);
 
-                    // Land of Witch !!
+                    // mediterraneus
                     workerInstance.doWork(execution);
 
                     long duration = System.currentTimeMillis() - millisAtStart;
@@ -101,10 +105,10 @@ public class JobThread {
                     if (duration < minMillisPerExecution) {
                         // this execution was to fast and must wait to not exceed the limit of
                         // executions per minute
-                        Thread.sleep(minMillisPerExecution - duration);
+                        TimeUnit.MILLISECONDS.sleep(minMillisPerExecution - duration);
                     }
 
-                    String executionLog = workerInstance.getLog();
+                    String executionLog = executionContext.getLog();
 
                     updateExecutionStatus(execution, ExecutionStatus.FINISHED, WorkhorseUtil.timestamp(),
                             Long.valueOf(duration), executionLog);
@@ -132,7 +136,7 @@ public class JobThread {
                     executionBuffer.removeRunningExecution(jobId, execution.getId());
                     long duration = System.currentTimeMillis() - millisAtStart;
 
-                    String executionLog = workerInstance.getLog();
+                    String executionLog = executionContext.getLog();
 
                     // create a new Job Execution to retry this fail.
                     execution = workhorseController.handleFailedExecution(job, execution.getId(), e, duration,
