@@ -25,7 +25,7 @@ public class ExecutionCleanupWorker extends Worker {
     public void doWork() throws Exception {
         int deletedSum = 0;
 
-        logInfo(logger, "Deleted | Days | Job ID | Job Name");
+        logInfo(logger, "Deleted | Minutes | Job ID | Job Name");
 
         for (Job job : workhorseService.getAllJobs()) {
             if (StaticConfig.MINUTES_UNTIL_CLEANUP > 0) {
