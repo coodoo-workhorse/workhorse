@@ -164,8 +164,8 @@ public class WorkhorseService {
      * @return Job
      */
     public Job updateJob(Long jobId, String name, String description, String workerClassName, String schedule,
-            JobStatus status, int threads, Integer maxPerMinute, int failRetries, int retryDelay, int daysUntilCleanUp,
-            boolean uniqueInQueue) {
+            JobStatus status, int threads, Integer maxPerMinute, int failRetries, int retryDelay,
+            int minutesUntilCleanUp, boolean uniqueInQueue) {
 
         Job job = getJobById(jobId);
 
@@ -174,7 +174,7 @@ public class WorkhorseService {
         executionBuffer.cancelProcess(job);
 
         workhorseController.updateJob(jobId, name, description, workerClassName, schedule, status, threads,
-                maxPerMinute, failRetries, retryDelay, daysUntilCleanUp, uniqueInQueue);
+                maxPerMinute, failRetries, retryDelay, minutesUntilCleanUp, uniqueInQueue);
 
         executionBuffer.initialize(job);
         // workhorse.start();

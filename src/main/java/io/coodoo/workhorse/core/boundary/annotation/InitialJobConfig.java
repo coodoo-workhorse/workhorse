@@ -67,8 +67,8 @@ public @interface InitialJobConfig {
     int retryDelay() default JOB_CONFIG_RETRY_DELAY;
 
     /**
-     * @return Number of days after the job executions get deleted. Default is 30
-     *         days, if set to 0 no job execution will get deleted.
+     * @return Number of minutes after the job executions get deleted. Default is 30
+     *         minutes, if set to 0 no job execution will get deleted.
      */
     int minutesUntilCleanUp() default JOB_CONFIG_MINUTES_UNTIL_CLEANUP;
 

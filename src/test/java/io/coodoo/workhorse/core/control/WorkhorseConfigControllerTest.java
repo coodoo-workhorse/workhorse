@@ -729,44 +729,44 @@ public class WorkhorseConfigControllerTest {
     }
 
     @Test
-    public void testUpdateDaysUntilCleanup() throws Exception {
+    public void testUpdateMinutesUntilCleanup() throws Exception {
 
         WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
 
-        int daysUntilCleanup = 1;
+        int minutesUntilCleanup = 1;
 
-        classUnderTest.updateMinutesUntilCleanup(workhorseConfig, daysUntilCleanup);
+        classUnderTest.updateMinutesUntilCleanup(workhorseConfig, minutesUntilCleanup);
 
-        assertEquals(StaticConfig.MINUTES_UNTIL_CLEANUP, daysUntilCleanup);
-        assertEquals(workhorseConfig.getMinutesUntilCleanup(), daysUntilCleanup);
+        assertEquals(StaticConfig.MINUTES_UNTIL_CLEANUP, minutesUntilCleanup);
+        assertEquals(workhorseConfig.getMinutesUntilCleanup(), minutesUntilCleanup);
 
     }
 
     @Test
-    public void testUpdateDaysUntilCleanup_toLow() throws Exception {
+    public void testUpdateMinutesUntilCleanup_toLow() throws Exception {
 
         WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
 
-        int daysUntilCleanup = -1;
+        int minutesUntilCleanup = -1;
 
         exceptionRule.expect(RuntimeException.class);
-        exceptionRule.expectMessage("The daysUntilCleanup can't be negative!");
+        exceptionRule.expectMessage("The minutesUntilCleanup can't be negative!");
 
-        classUnderTest.updateMinutesUntilCleanup(workhorseConfig, daysUntilCleanup);
+        classUnderTest.updateMinutesUntilCleanup(workhorseConfig, minutesUntilCleanup);
 
     }
 
     @Test
-    public void testUpdateDaysUntilCleanup_deactiveFeature() throws Exception {
+    public void testUpdateMinutesUntilCleanup_deactiveFeature() throws Exception {
 
         WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
 
-        int daysUntilCleanup = 0;
+        int minutesUntilCleanup = 0;
 
-        classUnderTest.updateMinutesUntilCleanup(workhorseConfig, daysUntilCleanup);
+        classUnderTest.updateMinutesUntilCleanup(workhorseConfig, minutesUntilCleanup);
 
-        assertEquals(StaticConfig.MINUTES_UNTIL_CLEANUP, daysUntilCleanup);
-        assertEquals(workhorseConfig.getMinutesUntilCleanup(), daysUntilCleanup);
+        assertEquals(StaticConfig.MINUTES_UNTIL_CLEANUP, minutesUntilCleanup);
+        assertEquals(workhorseConfig.getMinutesUntilCleanup(), minutesUntilCleanup);
 
     }
 
@@ -780,9 +780,9 @@ public class WorkhorseConfigControllerTest {
 
         classUnderTest.updateMinutesUntilCleanup(workhorseConfig, minutesUntilCleanup);
 
-        String message = "DaysUntilCleanup is set to '0', so the cleanup is off!";
+        String message = "MinutesUntilCleanup is set to '0', so the cleanup is off!";
 
-        verify(workhorseLogService).logChange(null, null, "daysUntilCleanup",
+        verify(workhorseLogService).logChange(null, null, "minutesUntilCleanup",
                 workhorseConfigDefault.getMinutesUntilCleanup(), minutesUntilCleanup, message);
     }
 

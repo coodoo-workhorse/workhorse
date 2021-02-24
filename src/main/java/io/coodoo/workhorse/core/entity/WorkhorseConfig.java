@@ -141,8 +141,8 @@ public abstract class WorkhorseConfig {
         return minutesUntilCleanup;
     }
 
-    public void setMinutesUntilCleanup(long daysUntilCleanup) {
-        this.minutesUntilCleanup = daysUntilCleanup;
+    public void setMinutesUntilCleanup(long minutesUntilCleanup) {
+        this.minutesUntilCleanup = minutesUntilCleanup;
     }
 
     public int getExecutionTimeout() {

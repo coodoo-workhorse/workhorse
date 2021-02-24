@@ -442,8 +442,8 @@ public class WorkhorseController {
     }
 
     public Job updateJob(Long jobId, String name, String description, String workerClassName, String schedule,
-            JobStatus status, int threads, Integer maxPerMinute, int failRetries, int retryDelay, int daysUntilCleanUp,
-            boolean uniqueInQueue) {
+            JobStatus status, int threads, Integer maxPerMinute, int failRetries, int retryDelay,
+            int minutesUntilCleanUp, boolean uniqueInQueue) {
 
         Job job = getJobById(jobId);
 
@@ -485,10 +485,10 @@ public class WorkhorseController {
             workhorseLogService.logChange(jobId, status, "Retry delay", job.getRetryDelay(), retryDelay, null);
             job.setRetryDelay(retryDelay);
         }
-        if (!Objects.equals(job.getMinutesUntilCleanUp(), daysUntilCleanUp)) {
-            workhorseLogService.logChange(jobId, status, "Days until cleanup", job.getMinutesUntilCleanUp(),
-                    daysUntilCleanUp, null);
-            job.setMinutesUntilCleanUp(daysUntilCleanUp);
+        if (!Objects.equals(job.getMinutesUntilCleanUp(), minutesUntilCleanUp)) {
+            workhorseLogService.logChange(jobId, status, "Minutes until cleanup", job.getMinutesUntilCleanUp(),
+                    minutesUntilCleanUp, null);
+            job.setMinutesUntilCleanUp(minutesUntilCleanUp);
         }
         if (!Objects.equals(job.isUniqueInQueue(), uniqueInQueue)) {
             workhorseLogService.logChange(jobId, status, "Unique in queue", job.isUniqueInQueue(), uniqueInQueue, null);

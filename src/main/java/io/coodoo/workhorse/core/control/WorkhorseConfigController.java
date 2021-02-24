@@ -170,14 +170,15 @@ public class WorkhorseConfigController {
     protected void updateMinutesUntilCleanup(WorkhorseConfig workhorseConfig, long minutesUntilCleanup) {
 
         if (minutesUntilCleanup < 0) {
-            throw new RuntimeException("The daysUntilCleanup can't be negative!");
+            throw new RuntimeException("The minutesUntilCleanup can't be negative!");
         }
         if (workhorseConfig.getMinutesUntilCleanup() != minutesUntilCleanup) {
 
             StaticConfig.MINUTES_UNTIL_CLEANUP = minutesUntilCleanup;
 
-            String message = minutesUntilCleanup > 0 ? null : "DaysUntilCleanup is set to '0', so the cleanup is off!";
-            workhorseLogService.logChange(null, null, "daysUntilCleanup", workhorseConfig.getMinutesUntilCleanup(),
+            String message = minutesUntilCleanup > 0 ? null
+                    : "MinutesUntilCleanup is set to '0', so the cleanup is off!";
+            workhorseLogService.logChange(null, null, "minutesUntilCleanup", workhorseConfig.getMinutesUntilCleanup(),
                     minutesUntilCleanup, message);
             workhorseConfig.setMinutesUntilCleanup(minutesUntilCleanup);
         }
