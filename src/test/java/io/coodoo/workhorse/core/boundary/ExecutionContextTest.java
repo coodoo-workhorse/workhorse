@@ -48,7 +48,7 @@ public class ExecutionContextTest {
         StaticConfig.BUFFER_MIN = workhorseConfig.getBufferMin();
         StaticConfig.BUFFER_POLL_INTERVAL = workhorseConfig.getBufferPollInterval();
         StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL = workhorseConfig.getBufferPushFallbackPollInterval();
-        StaticConfig.DAYS_UNTIL_CLEANUP = workhorseConfig.getDaysUntilCleanup();
+        StaticConfig.MINUTES_UNTIL_CLEANUP = workhorseConfig.getMinutesUntilCleanup();
         StaticConfig.EXECUTION_TIMEOUT = workhorseConfig.getExecutionTimeout();
         StaticConfig.EXECUTION_TIMEOUT_STATUS = workhorseConfig.getExecutionTimeoutStatus();
         StaticConfig.LOG_CHANGE = workhorseConfig.getLogChange();
