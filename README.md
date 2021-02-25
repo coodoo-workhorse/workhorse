@@ -571,7 +571,11 @@ Let's take the example of the default persisitence `Memory` with it's config bui
 WorkhorseService workhorseService;
 
 public void init() {
-    workhorseService.start(new MemoryConfigBuilder().timeZone("Africa/Douala").executionTimeout(30).bufferMaximumSize(1000).build());
+    workhorseService.start(new MemoryConfigBuilder()
+                                .timeZone("Africa/Douala")
+                                .executionTimeout(30)
+                                .bufferMaximumSize(1000)
+                                .build());
 }
 ```
 Because of the builder style you can easily add your custom configurations. In this example the timezone is set to Afrifca/Douala, the default timeouts for long running executions are 30 seconds and the buffer maximum size for prebuffering next queued executions is set to 1000.
