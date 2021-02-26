@@ -749,11 +749,10 @@ public class WorkhorseConfigControllerTest {
 
         int minutesUntilCleanup = -1;
 
-        exceptionRule.expect(RuntimeException.class);
-        exceptionRule.expectMessage("The minutesUntilCleanup can't be negative!");
-
         classUnderTest.updateMinutesUntilCleanup(workhorseConfig, minutesUntilCleanup);
 
+        assertEquals(0, StaticConfig.MINUTES_UNTIL_CLEANUP);
+        assertEquals(0, workhorseConfig.getMinutesUntilCleanup());
     }
 
     @Test
@@ -765,8 +764,8 @@ public class WorkhorseConfigControllerTest {
 
         classUnderTest.updateMinutesUntilCleanup(workhorseConfig, minutesUntilCleanup);
 
-        assertEquals(StaticConfig.MINUTES_UNTIL_CLEANUP, minutesUntilCleanup);
-        assertEquals(workhorseConfig.getMinutesUntilCleanup(), minutesUntilCleanup);
+        assertEquals(minutesUntilCleanup, StaticConfig.MINUTES_UNTIL_CLEANUP);
+        assertEquals(minutesUntilCleanup, workhorseConfig.getMinutesUntilCleanup());
 
     }
 
@@ -821,10 +820,10 @@ public class WorkhorseConfigControllerTest {
 
         int executionTimeout = -1;
 
-        exceptionRule.expect(RuntimeException.class);
-        exceptionRule.expectMessage("The execution timeout can't be negative!");
-
         classUnderTest.updateExecutionTimeout(workhorseConfig, executionTimeout);
+
+        assertEquals(0, StaticConfig.EXECUTION_TIMEOUT);
+        assertEquals(0, workhorseConfig.getExecutionTimeout());
     }
 
     @Test
@@ -836,8 +835,8 @@ public class WorkhorseConfigControllerTest {
 
         classUnderTest.updateExecutionTimeout(workhorseConfig, executionTimeout);
 
-        assertEquals(StaticConfig.EXECUTION_TIMEOUT, executionTimeout);
-        assertEquals(workhorseConfig.getExecutionTimeout(), executionTimeout);
+        assertEquals(executionTimeout, StaticConfig.EXECUTION_TIMEOUT);
+        assertEquals(executionTimeout, workhorseConfig.getExecutionTimeout());
     }
 
     @Test

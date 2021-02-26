@@ -154,7 +154,8 @@ public class WorkhorseConfigController {
     protected void updateExecutionTimeout(WorkhorseConfig workhorseConfig, int executionTimeout) {
 
         if (executionTimeout < 0) {
-            throw new RuntimeException("The execution timeout can't be negative!");
+            executionTimeout = 0;
+            log.trace("For robustness the value of executionTimeout is set to '0', when the given value is negativ.");
         }
         if (workhorseConfig.getExecutionTimeout() != executionTimeout) {
 
@@ -170,7 +171,9 @@ public class WorkhorseConfigController {
     protected void updateMinutesUntilCleanup(WorkhorseConfig workhorseConfig, long minutesUntilCleanup) {
 
         if (minutesUntilCleanup < 0) {
-            throw new RuntimeException("The minutesUntilCleanup can't be negative!");
+            minutesUntilCleanup = 0;
+            log.trace(
+                    "For robustness the value of minutesUntilCleanup is set to '0', when the given value is negativ.");
         }
         if (workhorseConfig.getMinutesUntilCleanup() != minutesUntilCleanup) {
 

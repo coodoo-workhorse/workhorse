@@ -203,12 +203,12 @@ public abstract class WorkhorseConfig {
 
     @Override
     public String toString() {
-        return "WorkhorseConfig [timeZone=" + timeZone + ", bufferMax=" + bufferMax + ", bufferMin=" + bufferMin
-                + ", bufferPollInterval=" + bufferPollInterval + ", bufferPushFallbackPollInterval="
-                + bufferPushFallbackPollInterval + ", executionTimeout=" + executionTimeout
-                + ", executionTimeoutStatus=" + executionTimeoutStatus + ", logChange=" + logChange + ", logTimeFormat="
-                + logTimeFormat + ", logInfoMarker=" + logInfoMarker + ", logWarnMarker=" + logWarnMarker
-                + ", logErrorMarker=" + logErrorMarker + "]";
+        return "WorkhorseConfig [bufferMax=" + bufferMax + ", bufferMin=" + bufferMin + ", bufferPollInterval="
+                + bufferPollInterval + ", bufferPushFallbackPollInterval=" + bufferPushFallbackPollInterval
+                + ", executionTimeout=" + executionTimeout + ", executionTimeoutStatus=" + executionTimeoutStatus
+                + ", logChange=" + logChange + ", logErrorMarker=" + logErrorMarker + ", logInfoMarker=" + logInfoMarker
+                + ", logTimeFormat=" + logTimeFormat + ", logWarnMarker=" + logWarnMarker + ", minutesUntilCleanup="
+                + minutesUntilCleanup + ", timeZone=" + timeZone + "]";
     }
 
 }
