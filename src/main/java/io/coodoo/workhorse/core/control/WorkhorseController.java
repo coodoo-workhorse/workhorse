@@ -285,7 +285,7 @@ public class WorkhorseController {
         Integer parametersHash = null;
         if (parameters != null) {
             parametersHash = parameters.hashCode();
-            if (parameters.trim().isEmpty() || parameters.isEmpty()) {
+            if (parameters.trim().isEmpty()) {
                 parameters = null;
                 parametersHash = null;
             }

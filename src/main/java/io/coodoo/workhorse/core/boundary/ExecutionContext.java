@@ -47,7 +47,7 @@ public class ExecutionContext {
      * 
      * @return the job
      */
-    public Job getJob() {
+    private Job getJob() {
         return job;
     }
 
@@ -68,7 +68,7 @@ public class ExecutionContext {
      * 
      * @return the execution
      */
-    public Execution getExecution() {
+    private Execution getExecution() {
         return execution;
     }
 
