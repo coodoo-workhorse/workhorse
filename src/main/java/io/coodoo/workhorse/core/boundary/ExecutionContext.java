@@ -24,31 +24,16 @@ import io.coodoo.workhorse.util.WorkhorseUtil;
 public class ExecutionContext {
 
     // The visibility is protected to enable mocking in Junit Tests
-    protected Job job;
-
     protected Execution execution;
-
     protected StringBuffer logBuffer;
 
     public void init(Execution execution) {
-
         this.execution = execution;
         if (execution != null && execution.getLog() != null) {
             this.logBuffer = new StringBuffer(execution.getLog());
         } else {
             this.logBuffer = new StringBuffer();
         }
-    }
-
-    /**
-     * Retrieves the {@link Job} object of the current execution. WARNING: Don't
-     * change the value of the retrieved job. Changes can be fatal or have no
-     * effect.
-     * 
-     * @return the job
-     */
-    private Job getJob() {
-        return job;
     }
 
     /**
@@ -59,17 +44,10 @@ public class ExecutionContext {
      * @return the ID of the job
      */
     public Long getJobId() {
+        if (execution == null) {
+            return null;
+        }
         return execution.getJobId();
-    }
-
-    /**
-     * Retrieves the ID of the current execution. WARNING: Don't change the value of
-     * the retrieved execution. Changes can be fatal or have no effect.
-     * 
-     * @return the execution
-     */
-    private Execution getExecution() {
-        return execution;
     }
 
     /**
@@ -79,6 +57,9 @@ public class ExecutionContext {
      * @return the ID of the execution
      */
     public Long getExecutionId() {
+        if (execution == null) {
+            return null;
+        }
         return execution.getId();
     }
 
