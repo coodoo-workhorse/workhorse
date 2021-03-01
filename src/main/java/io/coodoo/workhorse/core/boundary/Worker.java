@@ -37,7 +37,7 @@ public abstract class Worker extends BaseWorker {
      * @return job execution ID
      */
     public Long createExecution(Boolean priority, LocalDateTime maturity) {
-        return createExecution(null, priority, maturity, null, null, null).getId();
+        return createExecution(null, priority, maturity, null, null, null, null).getId();
 
     }
 
@@ -55,12 +55,12 @@ public abstract class Worker extends BaseWorker {
      * @return job execution ID
      */
     public Long createExecution(Boolean priority, Long delayValue, ChronoUnit delayUnit) {
-        return createExecution(null, priority, delayToMaturity(delayValue, delayUnit), null, null, null).getId();
+        return createExecution(null, priority, delayToMaturity(delayValue, delayUnit), null, null, null, null).getId();
 
     }
 
     public Long createPriorityExecution() {
-        return createExecution(null, true, null, null, null, null).getId();
+        return createExecution(null, true, null, null, null, null, null).getId();
     }
 
     /**
@@ -74,7 +74,7 @@ public abstract class Worker extends BaseWorker {
      * @return job execution ID
      */
     public Long createDelayedExecution(Long delayValue, ChronoUnit delayUnit) {
-        return createExecution(null, false, delayToMaturity(delayValue, delayUnit), null, null, null).getId();
+        return createExecution(null, false, delayToMaturity(delayValue, delayUnit), null, null, null, null).getId();
     }
 
     /**
@@ -87,6 +87,6 @@ public abstract class Worker extends BaseWorker {
      * @return job execution ID
      */
     public Long createPlannedExecution(LocalDateTime maturity) {
-        return createExecution(null, false, maturity, null, null, null).getId();
+        return createExecution(null, false, maturity, null, null, null, null).getId();
     }
 }

@@ -22,10 +22,17 @@ public class Execution extends BaseEntity {
     private Long jobId;
 
     /**
-     * Status of the Execution. <code>QUEUED</code>, <code>RUNNING</code>,
-     * <code>FINISHED</code>, <code>FAILED</code>, <code>ABORTED</code>
+     * Status of the Execution. <code>PLANNED</code> <code>QUEUED</code>,
+     * <code>RUNNING</code>, <code>FINISHED</code>, <code>FAILED</code>,
+     * <code>ABORTED</code>
      */
     private ExecutionStatus status;
+
+    /**
+     * Status of an failed Execution. <code>TIMEOUT</code>, <code>EXCEPTION</code>,
+     * <code>MANUAL</code>, <code>EXPIRED</code>
+     */
+    private ExecutionFailStatus failStatus;
 
     /**
      * Timestamp of the begin of the processing
@@ -45,8 +52,8 @@ public class Execution extends BaseEntity {
     // TODO Execution Outomce als teil eines info-features: status zeit outcome
 
     /**
-     * If a job exectution has the priority set to <code>true</code> it will be
-     * executed before all jobs with priority <code>false</code>.
+     * If a exectution has the priority set to <code>true</code> it will be executed
+     * before all jobs with priority <code>false</code>.
      */
     private Boolean priority;
 
@@ -56,6 +63,12 @@ public class Execution extends BaseEntity {
      */
     @JsonbDateFormat(value = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     private LocalDateTime plannedAt;
+
+    /**
+     * If expired is given, the execution could not be executed after, if the
+     * processing has not began until this time.
+     */
+    private LocalDateTime expired;
 
     /**
      * Id to refer to a group of executions to handle as a single entity.
@@ -154,6 +167,14 @@ public class Execution extends BaseEntity {
         this.plannedAt = plannedAt;
     }
 
+    public LocalDateTime getExpired() {
+        return expired;
+    }
+
+    public void setExpired(LocalDateTime expired) {
+        this.expired = expired;
+    }
+
     public Long getBatchId() {
         return batchId;
     }
@@ -184,6 +205,14 @@ public class Execution extends BaseEntity {
 
     public void setStatus(ExecutionStatus status) {
         this.status = status;
+    }
+
+    public ExecutionFailStatus getFailStatus() {
+        return failStatus;
+    }
+
+    public void setFailStatus(ExecutionFailStatus failStatus) {
+        this.failStatus = failStatus;
     }
 
     public LocalDateTime getStartedAt() {

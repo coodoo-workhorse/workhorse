@@ -24,6 +24,7 @@ import io.coodoo.workhorse.core.control.event.JobErrorEvent;
 import io.coodoo.workhorse.core.control.event.NewExecutionEvent;
 import io.coodoo.workhorse.core.entity.ErrorType;
 import io.coodoo.workhorse.core.entity.Execution;
+import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
@@ -196,11 +197,23 @@ public class Workhorse {
      */
     public boolean executionDistributor(Execution execution) {
 
+        // Only QUEUED and PLANNED executions are permitted !
         if (execution == null || (!ExecutionStatus.QUEUED.equals(execution.getStatus())
                 && !ExecutionStatus.PLANNED.equals(execution.getStatus()))) {
             return false;
         }
 
+        // If the execution is 'expired' these don't have to be processed.
+        if (execution.getExpired() != null && WorkhorseUtil.timestamp().compareTo(execution.getExpired()) > 0) {
+            execution.setStatus(ExecutionStatus.FAILED);
+            execution.setFailStatus(ExecutionFailStatus.EXPIRED);
+            workhorseController.updateExecution(execution.getJobId(), execution.getId(), execution);
+
+            return false;
+        }
+
+        // Execution in status PLANNED have to be updated to QUEUED before being added
+        // to the buffer.
         if (ExecutionStatus.PLANNED.equals(execution.getStatus())) {
             execution.setStatus(ExecutionStatus.QUEUED);
             workhorseController.updateExecution(execution.getJobId(), execution.getId(), execution);

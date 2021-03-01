@@ -269,6 +269,9 @@ public class WorkhorseController {
      *                                   add.
      * @param plannedAt                  If a maturity is given, the job execution
      *                                   will not be executed before this time.
+     * @param expired                    If expired is given, the execution have to
+     *                                   be process before this time. Otherwise the
+     *                                   execution is cancelled.
      * @param batchId                    Id to refer to a group of executions to
      *                                   handle as a single entity.
      * @param chainId                    Id to refer to a group of executions to
@@ -280,7 +283,7 @@ public class WorkhorseController {
      * @return the created Job Execution
      */
     public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime plannedAt,
-            Long batchId, Long chainId, Long chainedPreviousExecutionId, boolean uniqueQueued) {
+            LocalDateTime expired, Long batchId, Long chainId, Long chainedPreviousExecutionId, boolean uniqueQueued) {
 
         Integer parametersHash = null;
         if (parameters != null) {
@@ -315,6 +318,7 @@ public class WorkhorseController {
         execution.setParametersHash(parametersHash);
         execution.setPriority(priority != null ? priority : false);
         execution.setPlannedAt(plannedAt);
+        execution.setExpired(expired);
         execution.setBatchId(batchId);
         execution.setChainId(chainId);
         execution.setChainedPreviousExecutionId(chainedPreviousExecutionId);

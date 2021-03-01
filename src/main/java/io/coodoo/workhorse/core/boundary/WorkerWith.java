@@ -115,7 +115,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * @return job execution ID
      */
     public Long createExecution(T parameters, Boolean priority, LocalDateTime maturity) {
-        return createExecution(parameters, priority, maturity, null, null, null).getId();
+        return createExecution(parameters, priority, maturity, null, null, null, null).getId();
     }
 
     /**
@@ -133,7 +133,8 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * @return job execution ID
      */
     public Long createExecution(T parameters, Boolean priority, Long delayValue, ChronoUnit delayUnit) {
-        return createExecution(parameters, priority, delayToMaturity(delayValue, delayUnit), null, null, null).getId();
+        return createExecution(parameters, priority, delayToMaturity(delayValue, delayUnit), null, null, null, null)
+                .getId();
     }
 
     /**
@@ -203,14 +204,14 @@ public abstract class WorkerWith<T> extends BaseWorker {
         for (T parameters : parametersList) {
             if (batchId == null) { // start of batch
 
-                Execution execution = createExecution(parameters, priority, maturity, -1L, null, null);
+                Execution execution = createExecution(parameters, priority, maturity, null, -1L, null, null);
                 // Use the Id of the first added job execution in Batch as BatchId.
                 execution.setBatchId(execution.getId());
                 workhorseController.updateExecution(execution.getJobId(), execution.getId(), execution);
 
                 batchId = execution.getId();
             } else { // now that we have the batch id, all the beloning executions can have it!
-                createExecution(parameters, priority, maturity, batchId, null, null);
+                createExecution(parameters, priority, maturity, null, batchId, null, null);
             }
         }
         return batchId;
@@ -247,7 +248,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
         for (T parameters : parametersList) {
             if (chainId == null) { // start of chain
 
-                Execution execution = createExecution(parameters, priority, maturity, null, -1L, null);
+                Execution execution = createExecution(parameters, priority, maturity, null, null, -1L, null);
                 execution.setChainId(execution.getId());
                 workhorseController.updateExecution(jobId, execution.getId(), execution);
 
@@ -255,7 +256,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
                 chainedPreviousExecutionId = execution.getId();
                 continue;
             }
-            Execution execution = createExecution(parameters, priority, maturity, null, chainId,
+            Execution execution = createExecution(parameters, priority, maturity, null, null, chainId,
                     chainedPreviousExecutionId);
             chainedPreviousExecutionId = execution.getId();
 

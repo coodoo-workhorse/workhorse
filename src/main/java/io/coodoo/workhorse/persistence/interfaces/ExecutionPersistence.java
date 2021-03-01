@@ -27,9 +27,10 @@ public interface ExecutionPersistence {
     List<Execution> getByJobId(Long jobId, Long limit);
 
     /**
-     * Retrieves the next queued executions with given JobId, order by priority and
-     * createdAt. Executions with existent value
-     * <code>ChainedPreviousExecutionId</code> do not have to be retrieve.
+     * Retrieves the next queued executions and the planned executions that have to
+     * be process now with given JobId, order by priority and createdAt. Executions
+     * with existent value <code>ChainedPreviousExecutionId</code> do not have to be
+     * retrieve.
      * 
      * @param jobId Id of the job
      * @return List of executions order by <code>priority</code> and
