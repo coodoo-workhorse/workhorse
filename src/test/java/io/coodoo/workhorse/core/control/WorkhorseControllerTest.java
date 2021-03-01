@@ -2,6 +2,7 @@ package io.coodoo.workhorse.core.control;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
@@ -12,6 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -366,8 +368,64 @@ public class WorkhorseControllerTest {
         Execution execution = classUnderTest.createExecution(jobId, parameters, priority, maturity, batchId, chainId,
                 chainedPreviousExecutionId, uniqueQueued);
 
+        assertNotNull(execution);
         assertEquals(expectedChainedNextExecution, execution.getChainedNextExecutionId());
 
+    }
+
+    @Test
+    public void testCreateExecution_with_plannedAt_in_the_past() throws Exception {
+
+        StaticConfig.TIME_ZONE = "UTC";
+
+        Long jobId = 1L;
+        String parameters = "parameter";
+
+        Boolean priority = false;
+
+        LocalDateTime maturity = LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE));
+        Long batchId = null;
+
+        // Value to test
+        Long chainId = 1L;
+
+        Long chainedPreviousExecutionId = null;
+        boolean uniqueQueued = true;
+
+        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, maturity, batchId, chainId,
+                chainedPreviousExecutionId, uniqueQueued);
+
+        assertNotNull(execution);
+        assertEquals(ExecutionStatus.QUEUED, execution.getStatus());
+        assertEquals(maturity, execution.getPlannedAt());
+
+    }
+
+    @Test
+    public void testCreateExecution_with_plannedAt_in_the_future() throws Exception {
+
+        StaticConfig.TIME_ZONE = "UTC";
+
+        Long jobId = 1L;
+        String parameters = "parameter";
+
+        Boolean priority = false;
+
+        LocalDateTime maturity = LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)).plusSeconds(30);
+        Long batchId = null;
+
+        // Value to test
+        Long chainId = 1L;
+
+        Long chainedPreviousExecutionId = null;
+        boolean uniqueQueued = true;
+
+        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, maturity, batchId, chainId,
+                chainedPreviousExecutionId, uniqueQueued);
+
+        assertNotNull(execution);
+        assertEquals(ExecutionStatus.PLANNED, execution.getStatus());
+        assertEquals(maturity, execution.getPlannedAt());
     }
 
 }

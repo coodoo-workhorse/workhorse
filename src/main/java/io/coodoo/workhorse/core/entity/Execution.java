@@ -22,7 +22,8 @@ public class Execution extends BaseEntity {
     private Long jobId;
 
     /**
-     * Status of the Execution. <code>QUEUED</code>, <code>RUNNING</code>, <code>FINISHED</code>, <code>FAILED</code>, <code>ABORTED</code>
+     * Status of the Execution. <code>QUEUED</code>, <code>RUNNING</code>,
+     * <code>FINISHED</code>, <code>FAILED</code>, <code>ABORTED</code>
      */
     private ExecutionStatus status;
 
@@ -44,15 +45,17 @@ public class Execution extends BaseEntity {
     // TODO Execution Outomce als teil eines info-features: status zeit outcome
 
     /**
-     * If a job exectution has the priority set to <code>true</code> it will be executed before all jobs with priority <code>false</code>.
+     * If a job exectution has the priority set to <code>true</code> it will be
+     * executed before all jobs with priority <code>false</code>.
      */
     private Boolean priority;
 
     /**
-     * If a maturity is given, the job execution will not be executed before this time.
+     * If a maturity is given, the job execution will not be executed before this
+     * time.
      */
     @JsonbDateFormat(value = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-    private LocalDateTime maturity;
+    private LocalDateTime plannedAt;
 
     /**
      * Id to refer to a group of executions to handle as a single entity.
@@ -65,12 +68,14 @@ public class Execution extends BaseEntity {
     private Long chainId;
 
     /**
-     * Id to the previous execution to process, if the execution belong to a chained Execution.
+     * Id to the previous execution to process, if the execution belong to a chained
+     * Execution.
      */
     private Long chainedPreviousExecutionId;
 
     /**
-     * Id to the next execution to process, if the execution belong to a chained Execution.
+     * Id to the next execution to process, if the execution belong to a chained
+     * Execution.
      */
     private Long chainedNextExecutionId;
 
@@ -146,12 +151,12 @@ public class Execution extends BaseEntity {
         this.priority = priority;
     }
 
-    public LocalDateTime getMaturity() {
-        return maturity;
+    public LocalDateTime getPlannedAt() {
+        return plannedAt;
     }
 
-    public void setMaturity(LocalDateTime maturity) {
-        this.maturity = maturity;
+    public void setPlannedAt(LocalDateTime plannedAt) {
+        this.plannedAt = plannedAt;
     }
 
     public Long getBatchId() {
@@ -268,8 +273,9 @@ public class Execution extends BaseEntity {
 
     @Override
     public String toString() {
-        return "Execution [Id=" + id + ", batchId=" + batchId + ", chainId=" + chainId + ", jobId=" + jobId + ", maturity=" + maturity + ", parameters="
-                        + parameters + ", priority=" + priority + ", status=" + status + "]";
+        return "Execution [Id=" + id + ", batchId=" + batchId + ", chainId=" + chainId + ", jobId=" + jobId
+                + ", maturity=" + plannedAt + ", parameters=" + parameters + ", priority=" + priority + ", status="
+                + status + "]";
     }
 
 }

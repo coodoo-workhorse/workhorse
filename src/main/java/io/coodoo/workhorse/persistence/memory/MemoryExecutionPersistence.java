@@ -86,8 +86,10 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
         for (Execution execution : memoryPersistence.getExecutions().values()) {
 
-            if (execution.getJobId().equals(jobId) && execution.getStatus() == ExecutionStatus.QUEUED
-                    && (execution.getMaturity() == null || execution.getMaturity().compareTo(currentTimeStamp) < 0)
+            if (execution.getJobId().equals(jobId)
+                    && (execution.getStatus() == ExecutionStatus.QUEUED
+                            || execution.getStatus() == ExecutionStatus.PLANNED)
+                    && (execution.getPlannedAt() == null || execution.getPlannedAt().compareTo(currentTimeStamp) < 0)
                     && execution.getChainedPreviousExecutionId() == null && executions.size() < limit.intValue()) {
 
                 executions.add(execution);

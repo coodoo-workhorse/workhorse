@@ -267,7 +267,7 @@ public class WorkhorseController {
      *                                   process before other execution. Otherwise
      *                                   the execution will be process in order of
      *                                   add.
-     * @param maturity                   If a maturity is given, the job execution
+     * @param plannedAt                  If a maturity is given, the job execution
      *                                   will not be executed before this time.
      * @param batchId                    Id to refer to a group of executions to
      *                                   handle as a single entity.
@@ -279,7 +279,7 @@ public class WorkhorseController {
      * @param uniqueQueued
      * @return the created Job Execution
      */
-    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime maturity,
+    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime plannedAt,
             Long batchId, Long chainId, Long chainedPreviousExecutionId, boolean uniqueQueued) {
 
         Integer parametersHash = null;
@@ -304,11 +304,17 @@ public class WorkhorseController {
         }
         Execution execution = new Execution();
         execution.setJobId(jobId);
-        execution.setStatus(ExecutionStatus.QUEUED);
+
+        if (plannedAt != null && WorkhorseUtil.timestamp().compareTo(plannedAt) < 0) {
+            execution.setStatus(ExecutionStatus.PLANNED);
+        } else {
+            execution.setStatus(ExecutionStatus.QUEUED);
+        }
+
         execution.setParameters(parameters);
         execution.setParametersHash(parametersHash);
         execution.setPriority(priority != null ? priority : false);
-        execution.setMaturity(maturity);
+        execution.setPlannedAt(plannedAt);
         execution.setBatchId(batchId);
         execution.setChainId(chainId);
         execution.setChainedPreviousExecutionId(chainedPreviousExecutionId);
@@ -338,7 +344,7 @@ public class WorkhorseController {
         retryExecution.setStatus(failedExecution.getStatus());
         retryExecution.setStartedAt(LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)));
         retryExecution.setPriority(failedExecution.getPriority());
-        retryExecution.setMaturity(failedExecution.getMaturity());
+        retryExecution.setPlannedAt(failedExecution.getPlannedAt());
         retryExecution.setChainId(failedExecution.getChainId());
         retryExecution.setChainedNextExecutionId(failedExecution.getChainedNextExecutionId());
         retryExecution.setChainedPreviousExecutionId(failedExecution.getChainedPreviousExecutionId());
@@ -513,6 +519,13 @@ public class WorkhorseController {
 
     public List<Execution> getExecutions(Long jobId) {
         return executionPersistence.getByJobId(jobId, 100L);
+    }
+
+    public Execution updateExecutionStatus(Long jobId, Long executionId, ExecutionStatus executionStatus) {
+        Execution execution = executionPersistence.getById(jobId, executionId);
+        execution.setStatus(executionStatus);
+        return updateExecution(jobId, executionId, execution);
+
     }
 
     public Execution updateExecution(Long jobId, Long executionId, Execution execution) {

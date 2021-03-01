@@ -203,7 +203,7 @@ public class WorkhorseService {
         execution.setStatus(status);
         execution.setParameters(parameters);
         execution.setPriority(priority);
-        execution.setMaturity(maturity);
+        execution.setPlannedAt(maturity);
         execution.setFailRetry(fails);
         log.info("Execution updated: " + execution);
 

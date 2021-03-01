@@ -68,9 +68,9 @@ public class Workhorse {
     @Inject
     Event<AllExecutionsDoneEvent> allExecutionsDoneEvent;
 
-    private ScheduledExecutorService scheduledExecutorService;
+    protected ScheduledExecutorService scheduledExecutorService;
 
-    private ScheduledFuture<?> scheduledFuture;
+    protected ScheduledFuture<?> scheduledFuture;
 
     @PostConstruct
     public void init() {
@@ -115,9 +115,7 @@ public class Workhorse {
                     if (execution == null) {
                         continue;
                     }
-                    if (!executionDistributor(execution)) {
-                        // TODO
-                    }
+                    executionDistributor(execution);
                 }
             }
             log.trace("Number of job execution in buffer: {}", executionBuffer.getNumberOfExecution(job.getId()));
@@ -126,9 +124,9 @@ public class Workhorse {
     }
 
     /**
-     * recieve the notification about new persisted job execution
+     * Receive the notification about new persisted job execution
      * 
-     * @param newExecutionEvent
+     * @param newExecutionEvent describes the newly persisted execution
      */
     public void push(@ObservesAsync NewExecutionEvent newExecutionEvent) {
         if (!executionPersistence.isPusherAvailable() || scheduledFuture == null) {
@@ -138,12 +136,14 @@ public class Workhorse {
         if (executionBuffer.getNumberOfExecution(newExecutionEvent.jobId) < StaticConfig.BUFFER_MAX) {
             Execution execution = executionPersistence.getById(newExecutionEvent.jobId, newExecutionEvent.executionId);
             if (execution != null) {
-                if (execution.getMaturity() != null) {
+                if (ExecutionStatus.PLANNED.equals(execution.getStatus()) && execution.getPlannedAt() != null) {
                     long delayInSeconds = ChronoUnit.SECONDS.between(WorkhorseUtil.timestamp(),
-                            execution.getMaturity());
+                            execution.getPlannedAt());
 
                     log.trace("Job Execution : {} will be process in {} seconds", execution, delayInSeconds);
                     scheduledExecutorService.schedule(() -> {
+                        execution.setStatus(ExecutionStatus.QUEUED);
+                        workhorseController.updateExecution(execution.getJobId(), execution.getId(), execution);
                         executionDistributor(execution);
                     }, delayInSeconds, TimeUnit.SECONDS);
                     // Only the head of a chainExecution may integrate the executionBuffer
@@ -151,7 +151,7 @@ public class Workhorse {
                     executionDistributor(execution);
                 }
             } else {
-                log.error("No job execution found for executionId: {} ", newExecutionEvent.jobId);
+                log.error("No job execution found for executionId: {} ", newExecutionEvent.executionId);
             }
         }
     }
@@ -189,15 +189,21 @@ public class Workhorse {
     }
 
     /**
-     * add a job execution in the executionQueue of the correspondent job
+     * Add an execution in the executionBuffer of the correspondent job
      * 
-     * @param execution Job Execution to map with a executionQueue
+     * @param execution Execution to map with a executionBuffer
      * @return true if the mapping was successful and false otherwise
      */
     public boolean executionDistributor(Execution execution) {
 
-        if (execution == null || execution.getStatus() != ExecutionStatus.QUEUED) {
+        if (execution == null || (!ExecutionStatus.QUEUED.equals(execution.getStatus())
+                && !ExecutionStatus.PLANNED.equals(execution.getStatus()))) {
             return false;
+        }
+
+        if (ExecutionStatus.PLANNED.equals(execution.getStatus())) {
+            execution.setStatus(ExecutionStatus.QUEUED);
+            workhorseController.updateExecution(execution.getJobId(), execution.getId(), execution);
         }
 
         Long jobId = execution.getJobId();

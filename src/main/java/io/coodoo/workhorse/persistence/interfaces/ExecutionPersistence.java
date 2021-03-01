@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import io.coodoo.workhorse.core.entity.Execution;
+import io.coodoo.workhorse.core.entity.ExecutionStatus;
 
 public interface ExecutionPersistence {
 
@@ -26,13 +27,13 @@ public interface ExecutionPersistence {
     List<Execution> getByJobId(Long jobId, Long limit);
 
     /**
-     * Retrieves the next queued job executions with given JobId, order by priority
-     * and createdAt. Job executions with existent value
+     * Retrieves the next queued executions with given JobId, order by priority and
+     * createdAt. Executions with existent value
      * <code>ChainedPreviousExecutionId</code> do not have to be retrieve.
      * 
-     * @param jobId Id of th job
-     * @return List of job execution order by job executions parameters
-     *         <code>priority</code> and <code>createdAt</code>
+     * @param jobId Id of the job
+     * @return List of executions order by <code>priority</code> and
+     *         <code>createdAt</code>
      */
     List<Execution> pollNextExecutions(Long jobId, Long limit);
 
