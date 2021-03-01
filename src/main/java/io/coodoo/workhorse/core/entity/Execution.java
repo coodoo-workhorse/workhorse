@@ -95,11 +95,6 @@ public class Execution extends BaseEntity {
     private String log;
 
     /**
-     * Date until clean-up of the execution
-     */
-    private LocalDateTime dayUntilCleanUp;
-
-    /**
      * Number of retries
      */
     private int failRetry;
@@ -181,14 +176,6 @@ public class Execution extends BaseEntity {
 
     public void setLog(String log) {
         this.log = log;
-    }
-
-    public LocalDateTime getDayUntilCleanUp() {
-        return dayUntilCleanUp;
-    }
-
-    public void setDayUntilCleanUp(LocalDateTime dayUntilCleanUp) {
-        this.dayUntilCleanUp = dayUntilCleanUp;
     }
 
     public ExecutionStatus getStatus() {
