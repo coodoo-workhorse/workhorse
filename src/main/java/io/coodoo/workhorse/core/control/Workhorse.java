@@ -125,7 +125,7 @@ public class Workhorse {
     }
 
     /**
-     * Receive the notification about new persisted job execution
+     * Receive the notification about new persisted execution
      * 
      * @param newExecutionEvent describes the newly persisted execution
      */
@@ -133,7 +133,7 @@ public class Workhorse {
         if (!executionPersistence.isPusherAvailable() || scheduledFuture == null) {
             return;
         }
-        log.trace("New Job Execution pushed: " + newExecutionEvent);
+        log.trace("New Execution pushed: " + newExecutionEvent);
         if (executionBuffer.getNumberOfExecution(newExecutionEvent.jobId) < StaticConfig.BUFFER_MAX) {
             Execution execution = executionPersistence.getById(newExecutionEvent.jobId, newExecutionEvent.executionId);
             if (execution != null) {
@@ -141,7 +141,7 @@ public class Workhorse {
                     long delayInSeconds = ChronoUnit.SECONDS.between(WorkhorseUtil.timestamp(),
                             execution.getPlannedAt());
 
-                    log.trace("Job Execution : {} will be process in {} seconds", execution, delayInSeconds);
+                    log.trace("Execution : {} will be process in {} seconds", execution, delayInSeconds);
                     scheduledExecutorService.schedule(() -> {
                         execution.setStatus(ExecutionStatus.QUEUED);
                         workhorseController.updateExecution(execution.getJobId(), execution.getId(), execution);
@@ -152,7 +152,7 @@ public class Workhorse {
                     executionDistributor(execution);
                 }
             } else {
-                log.error("No job execution found for executionId: {} ", newExecutionEvent.executionId);
+                log.error("No execution found for executionId: {} ", newExecutionEvent.executionId);
             }
         }
     }

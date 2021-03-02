@@ -34,7 +34,7 @@ public abstract class Worker extends BaseWorker {
      * 
      * @param priority priority queuing
      * @param maturity specified time for the execution
-     * @return job execution ID
+     * @return execution ID
      */
     public Long createExecution(Boolean priority, LocalDateTime maturity) {
         return createExecution(null, priority, maturity, null, null, null, null).getId();
@@ -52,7 +52,7 @@ public abstract class Worker extends BaseWorker {
      * @param priority   priority queuing
      * @param delayValue time to wait
      * @param delayUnit  what kind of time to wait
-     * @return job execution ID
+     * @return execution ID
      */
     public Long createExecution(Boolean priority, Long delayValue, ChronoUnit delayUnit) {
         return createExecution(null, priority, delayToMaturity(delayValue, delayUnit), null, null, null, null).getId();
@@ -64,29 +64,42 @@ public abstract class Worker extends BaseWorker {
     }
 
     /**
-     * <i>Convenience method to create a job execution</i><br>
+     * <i>Convenience method to create an execution</i><br>
      * <br>
      * This creates a {@link Execution} object that gets added to the job engine
      * after the given delay.
      * 
      * @param delayValue time to wait
      * @param delayUnit  what kind of time to wait
-     * @return job execution ID
+     * @return execution ID
      */
     public Long createDelayedExecution(Long delayValue, ChronoUnit delayUnit) {
         return createExecution(null, false, delayToMaturity(delayValue, delayUnit), null, null, null, null).getId();
     }
 
     /**
-     * <i>Convenience method to create a job execution</i><br>
+     * <i>Convenience method to create an execution</i><br>
      * <br>
      * This creates a {@link Execution} object that gets added to the job engine at
      * a specified time.
      * 
      * @param maturity specified time for the execution
-     * @return job execution ID
+     * @return execution ID
      */
     public Long createPlannedExecution(LocalDateTime maturity) {
         return createExecution(null, false, maturity, null, null, null, null).getId();
+    }
+
+    /**
+     * <i>Convenience method to create an execution</i><br>
+     * <br>
+     * This creates a {@link Execution} object that will expire (cancel), if it is
+     * not being processed until the given time.
+     * 
+     * @param expired specified time to cancel the execution
+     * @return execution ID
+     */
+    public Long createToExpireExecution(LocalDateTime expired) {
+        return createExecution(null, false, null, expired, null, null, null).getId();
     }
 }

@@ -183,12 +183,9 @@ public class WorkhorseService {
 
     }
 
-    /**
-     * Update a {@link Execution}
-     */
     public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime maturity,
-            Long batchId, Long chainId, Long chainedPreviousExecutionId, boolean uniqueQueued) {
-        return workhorseController.createExecution(jobId, parameters, priority, maturity, batchId, chainId,
+            LocalDateTime expired, Long batchId, Long chainId, Long chainedPreviousExecutionId, boolean uniqueQueued) {
+        return workhorseController.createExecution(jobId, parameters, priority, maturity, expired, batchId, chainId,
                 chainedPreviousExecutionId, uniqueQueued);
     }
 
@@ -226,6 +223,13 @@ public class WorkhorseService {
         workhorseController.deleteExecution(jobId, executionId);
     }
 
+    /**
+     * <i>Activate a job.</i><br>
+     * <br>
+     * The executions of this job can again be processed by the job engine
+     * 
+     * @param jobId ID of the job to activate
+     */
     public void activateJob(Long jobId) {
 
         Job job = getJobById(jobId);
@@ -238,8 +242,16 @@ public class WorkhorseService {
         if (job.getSchedule() != null && !job.getSchedule().isEmpty()) {
             jobScheduler.start(job);
         }
+        executionBuffer.initialize(job);
     }
 
+    /**
+     * <i>Deactivate a job.</i><br>
+     * <br>
+     * The next executions of this job will not be processed by the job engine
+     * 
+     * @param jobId ID of the job to deactivate
+     */
     public void deactivateJob(Long jobId) {
         Job job = getJobById(jobId);
         if (job == null) {
@@ -250,8 +262,8 @@ public class WorkhorseService {
         workhorseController.update(job.getId(), job);
         if (job.getSchedule() != null && !job.getSchedule().isEmpty()) {
             jobScheduler.stop(job);
-            executionBuffer.cancelProcess(job);
         }
+        executionBuffer.cancelProcess(job);
     }
 
     /**
