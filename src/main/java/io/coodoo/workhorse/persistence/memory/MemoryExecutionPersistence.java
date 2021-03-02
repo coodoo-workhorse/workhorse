@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import io.coodoo.workhorse.core.control.StaticConfig;
 import io.coodoo.workhorse.core.control.event.NewExecutionEvent;
 import io.coodoo.workhorse.core.entity.Execution;
+import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.util.WorkhorseUtil;
@@ -35,6 +36,8 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     Event<NewExecutionEvent> newExecutionEventEvent;
 
     private AtomicLong executionId = new AtomicLong(0);
+
+    private AtomicLong executionLogId = new AtomicLong(0);
 
     @Override
     public Execution getById(Long jobId, Long id) {
@@ -103,6 +106,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
     @Override
     public Execution update(Long jobId, Long id, Execution execution) {
+        execution.setUpdatedAt(WorkhorseUtil.timestamp());
         if (memoryPersistence.getExecutions().put(id, execution) == null) {
             return null;
         } else {
@@ -255,6 +259,30 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
             }
         }
         return executions;
+    }
+
+    @Override
+    public ExecutionLog getLog(Long executionId) {
+        return memoryPersistence.getExecutionLogs().get(executionId);
+    }
+
+    @Override
+    public ExecutionLog createLog(ExecutionLog executionLog) {
+        Long id = executionLogId.getAndIncrement();
+        executionLog.setId(id);
+        executionLog.setCreatedAt(WorkhorseUtil.timestamp());
+        memoryPersistence.getExecutionLogs().put(executionLog.getExecutionId(), executionLog);
+        return null;
+    }
+
+    @Override
+    public ExecutionLog updateLog(Long executionId, ExecutionLog executionLog) {
+
+        executionLog.setUpdatedAt(WorkhorseUtil.timestamp());
+        if (memoryPersistence.getExecutionLogs().put(executionId, executionLog) != null) {
+            return executionLog;
+        }
+        return null;
     }
 
 }

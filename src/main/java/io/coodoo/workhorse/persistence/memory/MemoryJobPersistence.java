@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
+import io.coodoo.workhorse.util.WorkhorseUtil;
 
 @ApplicationScoped
 public class MemoryJobPersistence implements JobPersistence {
@@ -40,12 +41,14 @@ public class MemoryJobPersistence implements JobPersistence {
     public void persist(Job job) {
         Long id = incId.getAndIncrement();
         job.setId(id);
+        job.setCreatedAt(WorkhorseUtil.timestamp());
         memoryPersistence.getJobs().put(id, job);
 
     }
 
     @Override
     public void update(Long id, Job job) {
+        job.setUpdatedAt(WorkhorseUtil.timestamp());
         memoryPersistence.getJobs().put(id, job);
     }
 

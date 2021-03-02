@@ -112,6 +112,7 @@ public class JobThread {
 
                     updateExecutionStatus(execution, ExecutionStatus.FINISHED, WorkhorseUtil.timestamp(),
                             Long.valueOf(duration), executionLog);
+                    workhorseController.createExecutionLog(execution.getId(), executionLog);
 
                     log.trace("Execution {}, duration: {} was successfull", execution.getId(), execution.getDuration());
                     executionBuffer.removeRunningExecution(jobId, execution.getId());

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import io.coodoo.workhorse.core.entity.Execution;
+import io.coodoo.workhorse.core.entity.ExecutionLog;
 
 public interface ExecutionPersistence {
 
@@ -171,6 +172,30 @@ public interface ExecutionPersistence {
      * @return list of Executions to abort
      */
     List<Execution> findTimeoutExecutions(LocalDateTime time);
+
+    /**
+     * Get a {@link ExecutionLog}
+     * 
+     * @param executionId ID of the corresponding {@link Execution}
+     * @return {@link ExecutionLog}
+     */
+    ExecutionLog getLog(Long executionId);
+
+    /**
+     * Create a {@link ExecutionLog}
+     * 
+     * @return {@link ExecutionLog}
+     */
+    ExecutionLog createLog(ExecutionLog executionLog);
+
+    /**
+     * Update {@link ExecutionLog}
+     * 
+     * @param id           ID of the {@link ExecutionLog} to update
+     * @param executionLog new {@link ExecutionLog} object
+     * @return {@link ExecutionLog}
+     */
+    ExecutionLog updateLog(Long id, ExecutionLog executionLog);
 
     /**
      * 

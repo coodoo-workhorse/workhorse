@@ -21,6 +21,7 @@ import io.coodoo.workhorse.core.boundary.annotation.InitialJobConfig;
 import io.coodoo.workhorse.core.control.event.JobErrorEvent;
 import io.coodoo.workhorse.core.entity.ErrorType;
 import io.coodoo.workhorse.core.entity.Execution;
+import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
@@ -376,6 +377,8 @@ public class WorkhorseController {
         failedExecution.setFailMessage(WorkhorseUtil.getMessagesFromException(exception));
         failedExecution.setFailStacktrace(WorkhorseUtil.stacktraceToString(exception));
 
+        createExecutionLog(executionId, executionLog, exception);
+
         if (retryExecution == null) {
             worker.onFailed(executionId);
             if (failedExecution.getChainId() != null) {
@@ -388,6 +391,39 @@ public class WorkhorseController {
         executionPersistence.update(job.getId(), failedExecution.getId(), failedExecution);
 
         return retryExecution;
+    }
+
+    /**
+     * Create a {@link ExecutionLog}
+     * 
+     * @param executionId Id of the corresponding {@link Execution}
+     * @param log         Message to log
+     * @return a {@link ExecutionLog} object
+     */
+    public ExecutionLog createExecutionLog(Long executionId, String log) {
+        return createExecutionLog(executionId, log, null);
+    }
+
+    /**
+     * Create a {@link ExecutionLog}
+     * 
+     * @param executionId Id of the corresponding {@link Execution}
+     * @param log         Message to log
+     * @param exception   Exception to log
+     * @return a {@link ExecutionLog} object
+     */
+    public ExecutionLog createExecutionLog(Long executionId, String log, Exception exception) {
+
+        ExecutionLog executionLog = new ExecutionLog();
+        executionLog.setExecutionId(executionId);
+        executionLog.setLog(log);
+
+        if (exception != null) {
+            executionLog.setException(WorkhorseUtil.getMessagesFromException(exception));
+            executionLog.setStacktrace(WorkhorseUtil.stacktraceToString(exception));
+        }
+
+        return executionPersistence.createLog(executionLog);
     }
 
     /**

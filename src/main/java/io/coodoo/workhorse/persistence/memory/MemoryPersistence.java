@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.enterprise.context.ApplicationScoped;
 
 import io.coodoo.workhorse.core.entity.Execution;
+import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.entity.WorkhorseLog;
@@ -14,6 +15,8 @@ import io.coodoo.workhorse.core.entity.WorkhorseLog;
 public class MemoryPersistence {
 
     public static final String NAME = "MEMORY";
+
+    private Map<Long, ExecutionLog> executionLogs = new ConcurrentHashMap<>();
 
     private Map<Long, Execution> executions = new ConcurrentHashMap<>();
 
@@ -30,6 +33,10 @@ public class MemoryPersistence {
     public synchronized WorkhorseConfig setWorkhorseConfig(WorkhorseConfig workhorseConfig) {
         this.workhorseConfig = workhorseConfig;
         return workhorseConfig;
+    }
+
+    public Map<Long, ExecutionLog> getExecutionLogs() {
+        return executionLogs;
     }
 
     public Map<Long, Execution> getExecutions() {
