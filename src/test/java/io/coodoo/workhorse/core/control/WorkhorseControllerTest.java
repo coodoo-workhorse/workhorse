@@ -71,10 +71,9 @@ public class WorkhorseControllerTest {
             assertEquals(ExecutionStatus.ABORTED, zombiExecution.getStatus());
 
             String logMessage = "Zombie execution found (ID: " + zombiExecution.getId() + "): ";
-            verify(workhorseLogService).logMessage(logMessage + "Put in status " + ExecutionStatus.ABORTED,
-                    zombiExecution.getJobId(), false);
+            verify(workhorseLogService).logMessage(logMessage + "Put in status " + ExecutionStatus.ABORTED, zombiExecution.getJobId(), false);
 
-            verify(executionPersistence).update(zombiExecution.getJobId(), zombiExecution.getId(), zombiExecution);
+            verify(executionPersistence).update(zombiExecution);
         }
 
     }
@@ -110,10 +109,9 @@ public class WorkhorseControllerTest {
             assertEquals(ExecutionStatus.FAILED, zombiExecution.getStatus());
 
             String logMessage = "Zombie execution found (ID: " + zombiExecution.getId() + "): ";
-            verify(workhorseLogService).logMessage(logMessage + "Marked as failed and queued a clone",
-                    zombiExecution.getJobId(), false);
+            verify(workhorseLogService).logMessage(logMessage + "Marked as failed and queued a clone", zombiExecution.getJobId(), false);
 
-            verify(executionPersistence).update(zombiExecution.getJobId(), zombiExecution.getId(), zombiExecution);
+            verify(executionPersistence).update(zombiExecution);
         }
     }
 
@@ -149,7 +147,7 @@ public class WorkhorseControllerTest {
             String logMessage = "Zombie execution found (ID: " + zombiExecution.getId() + "): ";
             verify(workhorseLogService).logMessage(logMessage + "No action is taken", zombiExecution.getJobId(), false);
 
-            verify(executionPersistence).update(zombiExecution.getJobId(), zombiExecution.getId(), zombiExecution);
+            verify(executionPersistence).update(zombiExecution);
         }
     }
 
@@ -170,7 +168,7 @@ public class WorkhorseControllerTest {
 
         verify(workhorseLogService, never()).logMessage(anyString(), anyLong(), anyBoolean());
 
-        verify(executionPersistence, never()).update(anyLong(), anyLong(), anyObject());
+        verify(executionPersistence, never()).update(anyObject());
     }
 
     @Test
@@ -184,7 +182,7 @@ public class WorkhorseControllerTest {
 
         verify(workhorseLogService, never()).logMessage(anyString(), anyLong(), anyBoolean());
 
-        verify(executionPersistence, never()).update(anyLong(), anyLong(), anyObject());
+        verify(executionPersistence, never()).update(anyObject());
     }
 
     @Test
@@ -193,15 +191,15 @@ public class WorkhorseControllerTest {
         Long jobId = 1L;
         String parameters = "parameter";
         boolean priority = false;
-        LocalDateTime plannedAt = null;
-        LocalDateTime expired = null;
+        LocalDateTime plannedFor = null;
+        LocalDateTime expiresAt = null;
         Long batchId = null;
         Long chainId = null;
         Long chainedPreviousExecutionId = null;
         boolean uniqueQueued = false;
 
-        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedAt, expired, batchId,
-                chainId, chainedPreviousExecutionId, uniqueQueued);
+        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, chainedPreviousExecutionId,
+                        uniqueQueued);
 
         verify(executionPersistence, never()).getFirstCreatedByJobIdAndParametersHash(jobId, parameters.hashCode());
 
@@ -214,15 +212,14 @@ public class WorkhorseControllerTest {
         Long jobId = 1L;
         String parameters = "parameter";
         boolean priority = false;
-        LocalDateTime plannedAt = null;
-        LocalDateTime expired = null;
+        LocalDateTime plannedFor = null;
+        LocalDateTime expiresAt = null;
         Long batchId = null;
         Long chainId = null;
         Long chainedPreviousExecutionId = null;
         boolean uniqueQueued = true;
 
-        classUnderTest.createExecution(jobId, parameters, priority, plannedAt, expired, batchId, chainId,
-                chainedPreviousExecutionId, uniqueQueued);
+        classUnderTest.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, chainedPreviousExecutionId, uniqueQueued);
 
         verify(executionPersistence).getFirstCreatedByJobIdAndParametersHash(jobId, parameters.hashCode());
 
@@ -234,19 +231,18 @@ public class WorkhorseControllerTest {
         Long jobId = 1L;
         String parameters = "parameter";
         boolean priority = false;
-        LocalDateTime plannedAt = null;
-        LocalDateTime expired = null;
+        LocalDateTime plannedFor = null;
+        LocalDateTime expiresAt = null;
         Long batchId = null;
         Long chainId = null;
         Long chainedPreviousExecutionId = null;
         boolean uniqueQueued = true;
 
         Execution foundExecution = new Execution();
-        when(executionPersistence.getFirstCreatedByJobIdAndParametersHash(jobId, parameters.hashCode()))
-                .thenReturn(foundExecution);
+        when(executionPersistence.getFirstCreatedByJobIdAndParametersHash(jobId, parameters.hashCode())).thenReturn(foundExecution);
 
-        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedAt, expired, batchId,
-                chainId, chainedPreviousExecutionId, uniqueQueued);
+        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, chainedPreviousExecutionId,
+                        uniqueQueued);
 
         // check if the search after an execution with given parameter succeed
         verify(executionPersistence).getFirstCreatedByJobIdAndParametersHash(jobId, parameters.hashCode());
@@ -263,15 +259,15 @@ public class WorkhorseControllerTest {
         Long jobId = 1L;
         String parameters = null;
         boolean priority = false;
-        LocalDateTime plannedAt = null;
-        LocalDateTime expired = null;
+        LocalDateTime plannedFor = null;
+        LocalDateTime expiresAt = null;
         Long batchId = null;
         Long chainId = null;
         Long chainedPreviousExecutionId = null;
         boolean uniqueQueued = true;
 
-        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedAt, expired, batchId,
-                chainId, chainedPreviousExecutionId, uniqueQueued);
+        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, chainedPreviousExecutionId,
+                        uniqueQueued);
 
         verify(executionPersistence).getFirstCreatedByJobIdAndParametersHash(jobId, null);
 
@@ -288,15 +284,15 @@ public class WorkhorseControllerTest {
         Long jobId = 1L;
         String parameters = "  ";
         boolean priority = false;
-        LocalDateTime plannedAt = null;
-        LocalDateTime expired = null;
+        LocalDateTime plannedFor = null;
+        LocalDateTime expiresAt = null;
         Long batchId = null;
         Long chainId = null;
         Long chainedPreviousExecutionId = null;
         boolean uniqueQueued = true;
 
-        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedAt, expired, batchId,
-                chainId, chainedPreviousExecutionId, uniqueQueued);
+        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, chainedPreviousExecutionId,
+                        uniqueQueued);
 
         verify(executionPersistence).getFirstCreatedByJobIdAndParametersHash(jobId, null);
 
@@ -312,15 +308,15 @@ public class WorkhorseControllerTest {
         Long jobId = 1L;
         String parameters = "";
         boolean priority = false;
-        LocalDateTime plannedAt = null;
-        LocalDateTime expired = null;
+        LocalDateTime plannedFor = null;
+        LocalDateTime expiresAt = null;
         Long batchId = null;
         Long chainId = null;
         Long chainedPreviousExecutionId = null;
         boolean uniqueQueued = true;
 
-        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedAt, expired, batchId,
-                chainId, chainedPreviousExecutionId, uniqueQueued);
+        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, chainedPreviousExecutionId,
+                        uniqueQueued);
 
         verify(executionPersistence).getFirstCreatedByJobIdAndParametersHash(jobId, null);
 
@@ -339,15 +335,15 @@ public class WorkhorseControllerTest {
         // Null value is tested
         Boolean priority = null;
 
-        LocalDateTime plannedAt = null;
-        LocalDateTime expired = null;
+        LocalDateTime plannedFor = null;
+        LocalDateTime expiresAt = null;
         Long batchId = null;
         Long chainId = null;
         Long chainedPreviousExecutionId = null;
         boolean uniqueQueued = true;
 
-        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedAt, expired, batchId,
-                chainId, chainedPreviousExecutionId, uniqueQueued);
+        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, chainedPreviousExecutionId,
+                        uniqueQueued);
 
         assertFalse(execution.getPriority());
 
@@ -361,8 +357,8 @@ public class WorkhorseControllerTest {
 
         Boolean priority = false;
 
-        LocalDateTime plannedAt = null;
-        LocalDateTime expired = null;
+        LocalDateTime plannedFor = null;
+        LocalDateTime expiresAt = null;
         Long batchId = null;
 
         // Value to test
@@ -373,8 +369,8 @@ public class WorkhorseControllerTest {
 
         Long expectedChainedNextExecution = -1L;
 
-        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedAt, expired, batchId,
-                chainId, chainedPreviousExecutionId, uniqueQueued);
+        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, chainedPreviousExecutionId,
+                        uniqueQueued);
 
         assertNotNull(execution);
         assertEquals(expectedChainedNextExecution, execution.getChainedNextExecutionId());
@@ -382,7 +378,7 @@ public class WorkhorseControllerTest {
     }
 
     @Test
-    public void testCreateExecution_with_plannedAt_in_the_past() throws Exception {
+    public void testCreateExecution_with_plannedFor_in_the_past() throws Exception {
 
         StaticConfig.TIME_ZONE = "UTC";
 
@@ -391,8 +387,8 @@ public class WorkhorseControllerTest {
 
         Boolean priority = false;
 
-        LocalDateTime plannedAt = LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE));
-        LocalDateTime expired = null;
+        LocalDateTime plannedFor = LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE));
+        LocalDateTime expiresAt = null;
         Long batchId = null;
 
         // Value to test
@@ -401,17 +397,17 @@ public class WorkhorseControllerTest {
         Long chainedPreviousExecutionId = null;
         boolean uniqueQueued = true;
 
-        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedAt, expired, batchId,
-                chainId, chainedPreviousExecutionId, uniqueQueued);
+        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, chainedPreviousExecutionId,
+                        uniqueQueued);
 
         assertNotNull(execution);
         assertEquals(ExecutionStatus.QUEUED, execution.getStatus());
-        assertEquals(plannedAt, execution.getPlannedAt());
+        assertEquals(plannedFor, execution.getPlannedFor());
 
     }
 
     @Test
-    public void testCreateExecution_with_plannedAt_in_the_future() throws Exception {
+    public void testCreateExecution_with_plannedFor_in_the_future() throws Exception {
 
         StaticConfig.TIME_ZONE = "UTC";
 
@@ -420,8 +416,8 @@ public class WorkhorseControllerTest {
 
         Boolean priority = false;
 
-        LocalDateTime plannedAt = LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)).plusSeconds(30);
-        LocalDateTime expired = null;
+        LocalDateTime plannedFor = LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)).plusSeconds(30);
+        LocalDateTime expiresAt = null;
         Long batchId = null;
 
         // Value to test
@@ -430,12 +426,12 @@ public class WorkhorseControllerTest {
         Long chainedPreviousExecutionId = null;
         boolean uniqueQueued = true;
 
-        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedAt, expired, batchId,
-                chainId, chainedPreviousExecutionId, uniqueQueued);
+        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, chainedPreviousExecutionId,
+                        uniqueQueued);
 
         assertNotNull(execution);
         assertEquals(ExecutionStatus.PLANNED, execution.getStatus());
-        assertEquals(plannedAt, execution.getPlannedAt());
+        assertEquals(plannedFor, execution.getPlannedFor());
     }
 
 }

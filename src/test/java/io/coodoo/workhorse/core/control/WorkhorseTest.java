@@ -110,7 +110,7 @@ public class WorkhorseTest {
         execution.setId(executionId);
         execution.setJobId(jobId);
         execution.setStatus(ExecutionStatus.PLANNED);
-        execution.setPlannedAt(LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)).plusSeconds(30));
+        execution.setPlannedFor(LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)).plusSeconds(30));
 
         NewExecutionEvent newExecutionEvent = new NewExecutionEvent(jobId, executionId);
 

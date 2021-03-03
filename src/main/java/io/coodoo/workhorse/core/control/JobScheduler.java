@@ -88,9 +88,8 @@ public class JobScheduler {
 
             } catch (Exception e) {
                 job.setStatus(JobStatus.ERROR);
-                workhorseController.update(job.getId(), job);
-                jobErrorEvent.fire(
-                        new JobErrorEvent(e, ErrorType.INVALID_SCHEDULE.getMessage(), job.getId(), JobStatus.ERROR));
+                workhorseController.update(job);
+                jobErrorEvent.fire(new JobErrorEvent(e, ErrorType.INVALID_SCHEDULE.getMessage(), job.getId(), JobStatus.ERROR));
             }
         }
     }

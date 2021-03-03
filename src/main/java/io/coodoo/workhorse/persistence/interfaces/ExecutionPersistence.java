@@ -27,14 +27,11 @@ public interface ExecutionPersistence {
     List<Execution> getByJobId(Long jobId, Long limit);
 
     /**
-     * Retrieves the next queued executions and the planned executions that have to
-     * be process now with given JobId, order by priority and createdAt. Executions
-     * with existent value <code>ChainedPreviousExecutionId</code> do not have to be
-     * retrieve.
+     * Retrieves the next queued executions and the planned executions that have to be process now with given JobId, order by priority and createdAt. Executions
+     * with existent value <code>ChainedPreviousExecutionId</code> do not have to be retrieve.
      * 
      * @param jobId Id of the job
-     * @return List of executions order by <code>priority</code> and
-     *         <code>createdAt</code>
+     * @return List of executions order by <code>priority</code> and <code>createdAt</code>
      */
     List<Execution> pollNextExecutions(Long jobId, Long limit);
 
@@ -53,8 +50,7 @@ public interface ExecutionPersistence {
     void persist(Execution execution);
 
     /**
-     * Delete a job execution by <code>jobId</code> and <code>id</code> of the
-     * execution
+     * Delete a job execution by <code>jobId</code> and <code>id</code> of the execution
      * 
      * @param jobId Id of the job
      * @param id    Id of the job execution
@@ -64,16 +60,14 @@ public interface ExecutionPersistence {
     /**
      * Update a job execution
      * 
-     * @param jobId     Id of the correspondent job
-     * @param id        Id of the job execution to update
      * @param execution New value of the job execution
+     * 
      * @return the updated job execution
      */
-    Execution update(Long jobId, Long id, Execution execution);
+    Execution update(Execution execution);
 
     /**
-     * Given the Id of the corresponent job <code>jobId</code> and the limit date
-     * <code>preDate</code>, delete all job executions where
+     * Given the Id of the corresponent job <code>jobId</code> and the limit date <code>preDate</code>, delete all job executions where
      * <code>Execution.createdAt < preDate</code>
      * 
      * @param jobId
@@ -119,8 +113,7 @@ public interface ExecutionPersistence {
     List<Execution> getFailedBatchExecutions(Long jobId, Long batchId);
 
     /**
-     * Optional. Set the Id the given job execution <code>execution</code> at end of
-     * the chained Execution with Id <code>chainId</code> .
+     * Optional. Set the Id the given job execution <code>execution</code> at end of the chained Execution with Id <code>chainId</code> .
      * 
      * @param jobId     Id of the correspondent job
      * @param chainId   Id of the chainedExecution
@@ -138,8 +131,7 @@ public interface ExecutionPersistence {
     Execution getNextQueuedExecutionInChain(Long jobId, Long chainId, Execution execution);
 
     /**
-     * Check whether there is already an execution with these parameters and whether
-     * it has the status QUEUED. If so, return this.
+     * Check whether there is already an execution with these parameters and whether it has the status QUEUED. If so, return this.
      * 
      * @param jobId          the jobId
      * @param parametersHash the parameterHash
@@ -157,8 +149,7 @@ public interface ExecutionPersistence {
     boolean isBatchFinished(Long jobId, Long batchId);
 
     /**
-     * Set the status of all queued Executions of the given chainedExecution to
-     * {@link ExecutionStatus#FAILED}
+     * Set the status of all queued Executions of the given chainedExecution to {@link ExecutionStatus#FAILED}
      * 
      * @param jobId   id of the job
      * @param chainId id of the chain

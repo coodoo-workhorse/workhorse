@@ -75,7 +75,7 @@ public class ExecutionTimeoutWorker extends Worker {
                     break;
             }
 
-            executionPersistence.update(timeoutExecution.getJobId(), timeoutExecution.getId(), timeoutExecution);
+            executionPersistence.update(timeoutExecution);
 
         }
     }

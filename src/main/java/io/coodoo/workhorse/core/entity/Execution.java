@@ -2,8 +2,6 @@ package io.coodoo.workhorse.core.entity;
 
 import java.time.LocalDateTime;
 
-import javax.json.bind.annotation.JsonbDateFormat;
-
 /**
  * <p>
  * A Exceuction defines a single job which will be excecuted by the job engine.
@@ -22,15 +20,12 @@ public class Execution extends BaseEntity {
     private Long jobId;
 
     /**
-     * Status of the Execution. <code>PLANNED</code> <code>QUEUED</code>,
-     * <code>RUNNING</code>, <code>FINISHED</code>, <code>FAILED</code>,
-     * <code>ABORTED</code>
+     * Status of the Execution. <code>PLANNED</code> <code>QUEUED</code>, <code>RUNNING</code>, <code>FINISHED</code>, <code>FAILED</code>, <code>ABORTED</code>
      */
     private ExecutionStatus status;
 
     /**
-     * Status of an failed Execution. <code>TIMEOUT</code>, <code>EXCEPTION</code>,
-     * <code>MANUAL</code>, <code>EXPIRED</code>
+     * Status of an failed Execution. <code>TIMEOUT</code>, <code>EXCEPTION</code>, <code>MANUAL</code>, <code>EXPIRED</code>
      */
     private ExecutionFailStatus failStatus;
 
@@ -52,23 +47,19 @@ public class Execution extends BaseEntity {
     // TODO Execution Outomce als teil eines info-features: status zeit outcome
 
     /**
-     * If a exectution has the priority set to <code>true</code> it will be executed
-     * before all jobs with priority <code>false</code>.
+     * If a exectution has the priority set to <code>true</code> it will be executed before all jobs with priority <code>false</code>.
      */
     private Boolean priority;
 
     /**
-     * If a maturity is given, the job execution will not be executed before this
-     * time.
+     * If a plannedFor is given, the job execution will not be executed before this time.
      */
-    @JsonbDateFormat(value = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-    private LocalDateTime plannedAt;
+    private LocalDateTime plannedFor;
 
     /**
-     * If expired is given, the execution could not be executed after, if the
-     * processing has not began until this time.
+     * If expiresAt is given, the execution could not be executed after, if the processing has not began until this time.
      */
-    private LocalDateTime expired;
+    private LocalDateTime expiresAt;
 
     /**
      * Id to refer to a group of executions to handle as a single entity.
@@ -81,14 +72,12 @@ public class Execution extends BaseEntity {
     private Long chainId;
 
     /**
-     * Id to the previous execution to process, if the execution belong to a chained
-     * Execution.
+     * Id to the previous execution to process, if the execution belong to a chained Execution.
      */
     private Long chainedPreviousExecutionId;
 
     /**
-     * Id to the next execution to process, if the execution belong to a chained
-     * Execution.
+     * Id to the next execution to process, if the execution belong to a chained Execution.
      */
     private Long chainedNextExecutionId;
 
@@ -159,20 +148,20 @@ public class Execution extends BaseEntity {
         this.priority = priority;
     }
 
-    public LocalDateTime getPlannedAt() {
-        return plannedAt;
+    public LocalDateTime getPlannedFor() {
+        return plannedFor;
     }
 
-    public void setPlannedAt(LocalDateTime plannedAt) {
-        this.plannedAt = plannedAt;
+    public void setPlannedFor(LocalDateTime plannedFor) {
+        this.plannedFor = plannedFor;
     }
 
-    public LocalDateTime getExpired() {
-        return expired;
+    public LocalDateTime getExpiresAt() {
+        return expiresAt;
     }
 
-    public void setExpired(LocalDateTime expired) {
-        this.expired = expired;
+    public void setExpiresAt(LocalDateTime expiresAt) {
+        this.expiresAt = expiresAt;
     }
 
     public Long getBatchId() {
@@ -289,11 +278,10 @@ public class Execution extends BaseEntity {
 
     @Override
     public String toString() {
-        return "Execution [ID=" + id + ", batchId=" + batchId + ", chainId=" + chainId + ", duration=" + duration
-                + ", endedAt=" + endedAt + ", expired=" + expired + ", failRetry=" + failRetry
-                + ", failRetryExecutionId=" + failRetryExecutionId + ", failStatus=" + failStatus + ", jobId=" + jobId
-                + ", parameters=" + parameters + ", parametersHash=" + parametersHash + ", plannedAt=" + plannedAt
-                + ", priority=" + priority + ", startedAt=" + startedAt + ", status=" + status + "]";
+        return "Execution [ID=" + id + ", batchId=" + batchId + ", chainId=" + chainId + ", duration=" + duration + ", endedAt=" + endedAt + ", expiresAt="
+                        + expiresAt + ", failRetry=" + failRetry + ", failRetryExecutionId=" + failRetryExecutionId + ", failStatus=" + failStatus + ", jobId="
+                        + jobId + ", parameters=" + parameters + ", parametersHash=" + parametersHash + ", plannedFor=" + plannedFor + ", priority=" + priority
+                        + ", startedAt=" + startedAt + ", status=" + status + "]";
     }
 
 }

@@ -68,11 +68,9 @@ public class WorkhorseService {
     /**
      * Start Workhorse with the configuration of a persistence.
      * 
-     * The configuration can be built by using the builder that extends
-     * {@link WorkhorseConfigBuilder} of the chosen persisitence.
+     * The configuration can be built by using the builder that extends {@link WorkhorseConfigBuilder} of the chosen persisitence.
      * 
-     * For example, if you want to use the default persistence {@link MemoryConfig}
-     * use the builder as follow:
+     * For example, if you want to use the default persistence {@link MemoryConfig} use the builder as follow:
      * 
      * <code>start(new MemoryConfigBuilder().build())</code>
      * 
@@ -163,9 +161,8 @@ public class WorkhorseService {
      * 
      * @return Job
      */
-    public Job updateJob(Long jobId, String name, String description, String workerClassName, String schedule,
-            JobStatus status, int threads, Integer maxPerMinute, int failRetries, int retryDelay, int daysUntilCleanUp,
-            boolean uniqueQueued) {
+    public Job updateJob(Long jobId, String name, String description, String workerClassName, String schedule, JobStatus status, int threads,
+                    Integer maxPerMinute, int failRetries, int retryDelay, int daysUntilCleanUp, boolean uniqueQueued) {
 
         Job job = getJobById(jobId);
 
@@ -173,8 +170,8 @@ public class WorkhorseService {
         // workhorse.stop(); maybe we don t need. To proove
         executionBuffer.cancelProcess(job);
 
-        workhorseController.updateJob(jobId, name, description, workerClassName, schedule, status, threads,
-                maxPerMinute, failRetries, retryDelay, daysUntilCleanUp, uniqueQueued);
+        workhorseController.updateJob(jobId, name, description, workerClassName, schedule, status, threads, maxPerMinute, failRetries, retryDelay,
+                        daysUntilCleanUp, uniqueQueued);
 
         executionBuffer.initialize(job);
         // workhorse.start();
@@ -183,14 +180,14 @@ public class WorkhorseService {
 
     }
 
-    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime maturity,
-            LocalDateTime expired, Long batchId, Long chainId, Long chainedPreviousExecutionId, boolean uniqueQueued) {
-        return workhorseController.createExecution(jobId, parameters, priority, maturity, expired, batchId, chainId,
-                chainedPreviousExecutionId, uniqueQueued);
+    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime plannedFor, LocalDateTime expiresAt, Long batchId,
+                    Long chainId, Long chainedPreviousExecutionId, boolean uniqueQueued) {
+        return workhorseController.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, chainedPreviousExecutionId,
+                        uniqueQueued);
     }
 
-    public Execution updateExecution(Long jobId, Long executionId, ExecutionStatus status, String parameters,
-            boolean priority, LocalDateTime maturity, int fails) {
+    public Execution updateExecution(Long jobId, Long executionId, ExecutionStatus status, String parameters, boolean priority, LocalDateTime plannedFor,
+                    int fails) {
 
         Execution execution = getExecutionById(jobId, executionId);
 
@@ -200,11 +197,11 @@ public class WorkhorseService {
         execution.setStatus(status);
         execution.setParameters(parameters);
         execution.setPriority(priority);
-        execution.setPlannedAt(maturity);
+        execution.setPlannedFor(plannedFor);
         execution.setFailRetry(fails);
         log.info("Execution updated: " + execution);
 
-        workhorseController.updateExecution(jobId, executionId, execution);
+        workhorseController.updateExecution(execution);
         return execution;
     }
 
@@ -238,7 +235,7 @@ public class WorkhorseService {
         }
         log.info("Activate job {}", job.getName());
         job.setStatus(JobStatus.ACTIVE);
-        workhorseController.update(job.getId(), job);
+        workhorseController.update(job);
         if (job.getSchedule() != null && !job.getSchedule().isEmpty()) {
             jobScheduler.start(job);
         }
@@ -259,7 +256,7 @@ public class WorkhorseService {
         }
         log.info("Deactivate job {}", job.getName());
         job.setStatus(JobStatus.INACTIVE);
-        workhorseController.update(job.getId(), job);
+        workhorseController.update(job);
         if (job.getSchedule() != null && !job.getSchedule().isEmpty()) {
             jobScheduler.stop(job);
         }
@@ -313,12 +310,9 @@ public class WorkhorseService {
      * Get the execution times defined by {@link Job#getSchedule()}
      * 
      * @param schedule  CRON Expression
-     * @param startTime start time for this request (if <tt>null</tt> then current
-     *                  time is used)
-     * @param endTime   end time for this request (if <tt>null</tt> then current
-     *                  time plus 1 day is used)
-     * @return List of {@link LocalDateTime} representing the execution times of a
-     *         scheduled job between the <tt>startTime</tt> and <tt>endTime</tt>
+     * @param startTime start time for this request (if <tt>null</tt> then current time is used)
+     * @param endTime   end time for this request (if <tt>null</tt> then current time plus 1 day is used)
+     * @return List of {@link LocalDateTime} representing the execution times of a scheduled job between the <tt>startTime</tt> and <tt>endTime</tt>
      */
     public List<LocalDateTime> getScheduledTimes(String schedule, LocalDateTime startTime, LocalDateTime endTime) {
 
