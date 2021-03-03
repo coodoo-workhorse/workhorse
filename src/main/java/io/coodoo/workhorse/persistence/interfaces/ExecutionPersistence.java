@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import io.coodoo.workhorse.core.entity.Execution;
+import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 
 public interface ExecutionPersistence {
@@ -65,6 +66,17 @@ public interface ExecutionPersistence {
      * @return the updated job execution
      */
     Execution update(Execution execution);
+
+    /**
+     * Update the status of an execution
+     * 
+     * @param jobId  ID of the corresponding job
+     * @param id     ID of the execution
+     * @param status Status that the execution have to take
+     * @param failStatus TODO
+     * @return the updated execution
+     */
+    Execution updateStatus(Long jobId, Long id, ExecutionStatus status, ExecutionFailStatus failStatus);
 
     /**
      * Given the Id of the corresponent job <code>jobId</code> and the limit date <code>preDate</code>, delete all job executions where

@@ -27,7 +27,7 @@ public class Execution extends BaseEntity {
     /**
      * Status of an failed Execution. <code>TIMEOUT</code>, <code>EXCEPTION</code>, <code>MANUAL</code>, <code>EXPIRED</code>
      */
-    private ExecutionFailStatus failStatus;
+    private ExecutionFailStatus failStatus = ExecutionFailStatus.NONE;
 
     /**
      * Timestamp of the begin of the processing

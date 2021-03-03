@@ -104,6 +104,7 @@ public class Workhorse {
      * poll the Execution with an given intervall
      */
     void poll() {
+        log.info("Poll start");
         for (Job job : jobPersistence.getAllByStatus(JobStatus.ACTIVE)) {
 
             if (executionBuffer.getNumberOfExecution(job.getId()) < StaticConfig.BUFFER_MIN) {
@@ -129,7 +130,7 @@ public class Workhorse {
         if (!executionPersistence.isPusherAvailable() || scheduledFuture == null) {
             return;
         }
-        log.trace("New Execution pushed: " + newExecutionEvent);
+        log.trace("New Execution pushed: {}", newExecutionEvent);
         if (executionBuffer.getNumberOfExecution(newExecutionEvent.jobId) < StaticConfig.BUFFER_MAX) {
             Execution execution = executionPersistence.getById(newExecutionEvent.jobId, newExecutionEvent.executionId);
             if (execution != null) {
@@ -138,8 +139,6 @@ public class Workhorse {
 
                     log.trace("Execution : {} will be process in {} seconds", execution, delayInSeconds);
                     scheduledExecutorService.schedule(() -> {
-                        execution.setStatus(ExecutionStatus.QUEUED);
-                        workhorseController.updateExecution(execution);
                         executionDistributor(execution);
                     }, delayInSeconds, TimeUnit.SECONDS);
                     // Only the head of a chainExecution may integrate the executionBuffer
@@ -192,25 +191,20 @@ public class Workhorse {
      */
     public boolean executionDistributor(Execution execution) {
 
-        // Only QUEUED and PLANNED executions are permitted !
-        if (execution == null || (!ExecutionStatus.QUEUED.equals(execution.getStatus()) && !ExecutionStatus.PLANNED.equals(execution.getStatus()))) {
-            return false;
-        }
-
-        // If the execution is 'expiresAt' these don't have to be processed.
-        if (execution.getExpiresAt() != null && WorkhorseUtil.timestamp().compareTo(execution.getExpiresAt()) > 0) {
-            execution.setStatus(ExecutionStatus.FAILED);
-            execution.setFailStatus(ExecutionFailStatus.EXPIRED);
-            workhorseController.updateExecution(execution);
-
-            return false;
-        }
-
-        // Execution in status PLANNED have to be updated to QUEUED before being added
-        // to the buffer.
-        if (ExecutionStatus.PLANNED.equals(execution.getStatus())) {
-            execution.setStatus(ExecutionStatus.QUEUED);
-            workhorseController.updateExecution(execution);
+        switch (execution.getStatus()) {
+            // Execution in status PLANNED have to be updated to QUEUED before being added to the buffer.
+            case PLANNED:
+                workhorseController.updateExecutionStatus(execution.getJobId(), execution.getId(), ExecutionStatus.QUEUED);
+            case QUEUED:
+                // If the execution is 'expired' these don't have to be processed.
+                if (execution.getExpiresAt() != null && execution.getExpiresAt().isBefore(WorkhorseUtil.timestamp())) {
+                    workhorseController.updateExecutionFailStatus(execution.getJobId(), execution.getId(), ExecutionFailStatus.EXPIRED);
+                    return false;
+                }
+                break;
+            default:
+                // Only QUEUED and PLANNED executions are permitted!
+                return false;
         }
 
         Long jobId = execution.getJobId();

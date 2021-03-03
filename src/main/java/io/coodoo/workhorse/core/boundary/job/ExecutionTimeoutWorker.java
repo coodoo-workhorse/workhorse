@@ -14,6 +14,7 @@ import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
 import io.coodoo.workhorse.core.boundary.annotation.InitialJobConfig;
 import io.coodoo.workhorse.core.control.StaticConfig;
 import io.coodoo.workhorse.core.entity.Execution;
+import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.ExecutionQualifier;
@@ -49,33 +50,28 @@ public class ExecutionTimeoutWorker extends Worker {
         }
 
         for (Execution timeoutExecution : timeoutExecutions) {
-            log.warn("Zombie found! {}", timeoutExecution);
+            log.warn("Execution in timeout found! {}", timeoutExecution);
 
             ExecutionStatus cure = StaticConfig.EXECUTION_TIMEOUT_STATUS;
-            String logMessage = "Zombie execution found (ID: " + timeoutExecution.getId() + "): ";
+            String logMessage = "Execution in timeout found (ID: " + timeoutExecution.getId() + "): ";
 
             switch (cure) {
                 case QUEUED:
                     Execution retryExecution = workhorseController.createRetryExecution(timeoutExecution);
-                    timeoutExecution.setStatus(ExecutionStatus.FAILED);
-                    log.info("Zombie killed and risen from the death! Now it is {}", retryExecution);
-                    workhorseLogService.logMessage(logMessage + "Marked as failed and queued a clone",
-                            timeoutExecution.getJobId(), false);
+                    workhorseController.updateExecutionFailStatus(timeoutExecution.getJobId(), timeoutExecution.getId(), ExecutionFailStatus.TIMEOUT);
+                    log.trace("Execution in timeout killed and risen from the death! Now it is {}", retryExecution);
+                    workhorseLogService.logMessage(logMessage + "Marked as failed and queued a clone", timeoutExecution.getJobId(), false);
                     break;
                 case RUNNING:
-                    log.warn("Zombie will still walk free with status {}", cure);
-                    workhorseLogService.logMessage(logMessage + "No action is taken", timeoutExecution.getJobId(),
-                            false);
+                    log.warn("Execution in timeout will still walk free with status {}", cure);
+                    workhorseLogService.logMessage(logMessage + "No action is taken", timeoutExecution.getJobId(), false);
                     break;
                 default:
-                    timeoutExecution.setStatus(cure);
-                    log.info("Zombie is cured with status {}", cure);
-                    workhorseLogService.logMessage(logMessage + "Put in status " + cure, timeoutExecution.getJobId(),
-                            false);
+                    workhorseController.updateExecutionStatus(timeoutExecution.getJobId(), timeoutExecution.getId(), cure);
+                    log.trace("Execution in timeout is cured with status {}", cure);
+                    workhorseLogService.logMessage(logMessage + "Put in status " + cure, timeoutExecution.getJobId(), false);
                     break;
             }
-
-            executionPersistence.update(timeoutExecution);
 
         }
     }

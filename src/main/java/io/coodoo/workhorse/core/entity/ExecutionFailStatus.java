@@ -8,9 +8,9 @@ package io.coodoo.workhorse.core.entity;
 public enum ExecutionFailStatus {
 
     /**
-     * The execution was running for a too long time
+     * No Fail
      */
-    TIMEOUT,
+    NONE,
 
     /**
      * The execution throws an exception during the processing
@@ -18,9 +18,9 @@ public enum ExecutionFailStatus {
     EXCEPTION,
 
     /**
-     * The execution was set on FAIL by an user
+     * The execution was running for a too long time
      */
-    MANUAL,
+    TIMEOUT,
 
     /**
      * The execution couldn't be executed within a given time window
@@ -28,7 +28,8 @@ public enum ExecutionFailStatus {
     EXPIRED,
 
     /**
-     * No Fail
+     * The execution was set on FAIL by an user
      */
-    NONE
+    MANUAL,
+
 }

@@ -21,6 +21,7 @@ import io.coodoo.workhorse.core.boundary.annotation.InitialJobConfig;
 import io.coodoo.workhorse.core.control.event.JobErrorEvent;
 import io.coodoo.workhorse.core.entity.ErrorType;
 import io.coodoo.workhorse.core.entity.Execution;
+import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
@@ -503,10 +504,15 @@ public class WorkhorseController {
     }
 
     public Execution updateExecutionStatus(Long jobId, Long executionId, ExecutionStatus executionStatus) {
-        Execution execution = executionPersistence.getById(jobId, executionId);
-        execution.setStatus(executionStatus);
-        return updateExecution(execution);
+        return updateExecutionStatus(jobId, executionId, executionStatus, ExecutionFailStatus.NONE);
+    }
 
+    public Execution updateExecutionFailStatus(Long jobId, Long executionId, ExecutionFailStatus executionfailStatus) {
+        return updateExecutionStatus(jobId, executionId, ExecutionStatus.FAILED, executionfailStatus);
+    }
+
+    protected Execution updateExecutionStatus(Long jobId, Long executionId, ExecutionStatus executionStatus, ExecutionFailStatus executionfailStatus) {
+        return executionPersistence.updateStatus(jobId, executionId, executionStatus, executionfailStatus);
     }
 
     public Execution updateExecution(Execution execution) {

@@ -1,5 +1,6 @@
 package io.coodoo.workhorse.persistence.memory;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import io.coodoo.workhorse.core.control.StaticConfig;
 import io.coodoo.workhorse.core.control.event.NewExecutionEvent;
 import io.coodoo.workhorse.core.entity.Execution;
+import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.util.WorkhorseUtil;
@@ -104,9 +106,55 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     public Execution update(Execution execution) {
         if (memoryPersistence.getExecutions().put(execution.getId(), execution) == null) {
             return null;
-        } else {
-            return execution;
         }
+        return execution;
+
+    }
+
+    @Override
+    public Execution updateStatus(Long jobId, Long id, ExecutionStatus status, ExecutionFailStatus failStatus) {
+        Execution execution = memoryPersistence.getExecutions().get(id);
+
+        if (execution == null) {
+            return null;
+        }
+
+        switch (status) {
+
+            case RUNNING:
+                execution.setStartedAt(WorkhorseUtil.timestamp());
+                break;
+
+            case FINISHED:
+
+                LocalDateTime endTime = WorkhorseUtil.timestamp();
+                Long duration = Duration.between(execution.getStartedAt(), endTime).toMillis();
+                execution.setEndedAt(endTime);
+                execution.setDuration(duration);
+                break;
+
+            case FAILED:
+                if (execution.getStatus().equals(ExecutionStatus.RUNNING)) {
+                    LocalDateTime endFailTime = WorkhorseUtil.timestamp();
+                    Long durationToFail = Duration.between(execution.getStartedAt(), endFailTime).toMillis();
+                    execution.setEndedAt(endFailTime);
+                    execution.setDuration(durationToFail);
+                }
+                break;
+            default:
+                break;
+        }
+
+        execution.setStatus(status);
+        if (failStatus != null) {
+            execution.setFailStatus(failStatus);
+        }
+        execution.setUpdatedAt(WorkhorseUtil.timestamp());
+
+        if (memoryPersistence.getExecutions().put(id, execution) == null) {
+            return null;
+        }
+        return execution;
     }
 
     @Override

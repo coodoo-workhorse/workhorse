@@ -95,7 +95,7 @@ public class JobThread {
 
                 try {
 
-                    updateExecutionStatus(execution, ExecutionStatus.RUNNING, WorkhorseUtil.timestamp(), null, null);
+                    workhorseController.updateExecutionStatus(execution.getJobId(), execution.getId(), ExecutionStatus.RUNNING);
 
                     // mediterraneus
                     workerInstance.doWork(execution);
@@ -110,7 +110,9 @@ public class JobThread {
 
                     String executionLog = executionContext.getLog();
 
-                    updateExecutionStatus(execution, ExecutionStatus.FINISHED, WorkhorseUtil.timestamp(), Long.valueOf(duration), executionLog);
+                    execution.setLog(executionLog);
+                    executionPersistence.update(execution);
+                    workhorseController.updateExecutionStatus(execution.getJobId(), execution.getId(), ExecutionStatus.FINISHED);
 
                     log.trace("Execution {}, duration: {} was successfull", execution.getId(), execution.getDuration());
                     executionBuffer.removeRunningExecution(jobId, execution.getId());
@@ -216,35 +218,6 @@ public class JobThread {
         }
 
         return nextInChain;
-    }
-
-    /**
-     * Set Execution on RUNNING status
-     * 
-     * @param execution
-     * @param timeStamp
-     */
-    public void updateExecutionStatusToRunning(Execution execution, LocalDateTime timeStamp) {
-        updateExecutionStatus(execution, ExecutionStatus.RUNNING, timeStamp, null, null);
-    }
-
-    public void updateExecutionStatus(Execution execution, ExecutionStatus executionStatus, LocalDateTime timeStamp, Long duration, String executionLog) {
-        execution.setStatus(executionStatus);
-        execution.setLog(executionLog);
-
-        switch (executionStatus) {
-            case RUNNING:
-                execution.setStartedAt(timeStamp);
-                break;
-            case FINISHED:
-            case FAILED:
-                execution.setDuration(duration);
-                execution.setEndedAt(timeStamp);
-                break;
-            default:
-                break;
-        }
-        executionPersistence.update(execution);
     }
 
     public void stop() {
