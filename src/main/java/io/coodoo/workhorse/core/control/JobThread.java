@@ -110,9 +110,7 @@ public class JobThread {
 
                     String executionLog = executionContext.getLog();
 
-                    updateExecutionStatus(execution, ExecutionStatus.FINISHED, WorkhorseUtil.timestamp(),
-                            Long.valueOf(duration), executionLog);
-                    workhorseController.createExecutionLog(execution.getId(), executionLog);
+                    updateExecutionStatus(execution, ExecutionStatus.FINISHED, WorkhorseUtil.timestamp(), Long.valueOf(duration), executionLog);
 
                     log.trace("Execution {}, duration: {} was successfull", execution.getId(), execution.getDuration());
                     executionBuffer.removeRunningExecution(jobId, execution.getId());
@@ -127,8 +125,7 @@ public class JobThread {
                     if (nextInChain != null) {
                         execution = nextInChain;
                         runningExecution = execution;
-                        log.trace("This execution, Id: {} of the chain {} will be process as next.", execution.getId(),
-                                nextInChain.getChainId());
+                        log.trace("This execution, Id: {} of the chain {} will be process as next.", execution.getId(), nextInChain.getChainId());
                         continue executionLoop;
                     }
 
@@ -140,8 +137,7 @@ public class JobThread {
                     String executionLog = executionContext.getLog();
 
                     // create a new Job Execution to retry this fail.
-                    execution = workhorseController.handleFailedExecution(job, execution.getId(), e, duration,
-                            workerInstance, executionLog);
+                    execution = workhorseController.handleFailedExecution(job, execution.getId(), e, duration, workerInstance, executionLog);
 
                     if (execution == null) {
                         break executionLoop; // Do not retry
@@ -149,8 +145,7 @@ public class JobThread {
 
                     runningExecution = execution;
 
-                    log.trace("Execution {} failed. It will be retry in {} seconds. ", execution.getJobId(),
-                            job.getRetryDelay() / 1000);
+                    log.trace("Execution {} failed. It will be retry in {} seconds. ", execution.getJobId(), job.getRetryDelay() / 1000);
 
                     Thread.sleep(job.getRetryDelay());
                 }
@@ -233,8 +228,7 @@ public class JobThread {
         updateExecutionStatus(execution, ExecutionStatus.RUNNING, timeStamp, null, null);
     }
 
-    public void updateExecutionStatus(Execution execution, ExecutionStatus executionStatus, LocalDateTime timeStamp,
-            Long duration, String executionLog) {
+    public void updateExecutionStatus(Execution execution, ExecutionStatus executionStatus, LocalDateTime timeStamp, Long duration, String executionLog) {
         execution.setStatus(executionStatus);
         execution.setLog(executionLog);
 

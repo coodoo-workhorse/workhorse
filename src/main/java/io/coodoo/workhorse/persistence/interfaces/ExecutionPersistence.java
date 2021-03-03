@@ -27,13 +27,11 @@ public interface ExecutionPersistence {
     List<Execution> getByJobId(Long jobId, Long limit);
 
     /**
-     * Retrieves the next queued job executions with given JobId, order by priority
-     * and createdAt. Job executions with existent value
+     * Retrieves the next queued job executions with given JobId, order by priority and createdAt. Job executions with existent value
      * <code>ChainedPreviousExecutionId</code> do not have to be retrieve.
      * 
      * @param jobId Id of th job
-     * @return List of job execution order by job executions parameters
-     *         <code>priority</code> and <code>createdAt</code>
+     * @return List of job execution order by job executions parameters <code>priority</code> and <code>createdAt</code>
      */
     List<Execution> pollNextExecutions(Long jobId, Long limit);
 
@@ -52,8 +50,7 @@ public interface ExecutionPersistence {
     void persist(Execution execution);
 
     /**
-     * Delete a job execution by <code>jobId</code> and <code>id</code> of the
-     * execution
+     * Delete a job execution by <code>jobId</code> and <code>id</code> of the execution
      * 
      * @param jobId Id of the job
      * @param id    Id of the job execution
@@ -71,8 +68,7 @@ public interface ExecutionPersistence {
     Execution update(Long jobId, Long id, Execution execution);
 
     /**
-     * Given the Id of the corresponent job <code>jobId</code> and the limit date
-     * <code>preDate</code>, delete all job executions where
+     * Given the Id of the corresponent job <code>jobId</code> and the limit date <code>preDate</code>, delete all job executions where
      * <code>Execution.createdAt < preDate</code>
      * 
      * @param jobId
@@ -118,8 +114,7 @@ public interface ExecutionPersistence {
     List<Execution> getFailedBatchExecutions(Long jobId, Long batchId);
 
     /**
-     * Optional. Set the Id the given job execution <code>execution</code> at end of
-     * the chained Execution with Id <code>chainId</code> .
+     * Optional. Set the Id the given job execution <code>execution</code> at end of the chained Execution with Id <code>chainId</code> .
      * 
      * @param jobId     Id of the correspondent job
      * @param chainId   Id of the chainedExecution
@@ -137,8 +132,7 @@ public interface ExecutionPersistence {
     Execution getNextQueuedExecutionInChain(Long jobId, Long chainId, Execution execution);
 
     /**
-     * Check whether there is already an execution with these parameters and whether
-     * it has the status QUEUED. If so, return this.
+     * Check whether there is already an execution with these parameters and whether it has the status QUEUED. If so, return this.
      * 
      * @param jobId          the jobId
      * @param parametersHash the parameterHash
@@ -156,8 +150,7 @@ public interface ExecutionPersistence {
     boolean isBatchFinished(Long jobId, Long batchId);
 
     /**
-     * Set the status of all queued Executions of the given chainedExecution to
-     * {@link ExecutionStatus#FAILED}
+     * Set the status of all queued Executions of the given chainedExecution to {@link ExecutionStatus#FAILED}
      * 
      * @param jobId   id of the job
      * @param chainId id of the chain
@@ -180,6 +173,25 @@ public interface ExecutionPersistence {
      * @return {@link ExecutionLog}
      */
     ExecutionLog getLog(Long executionId);
+
+    /**
+     * Log a message.
+     * 
+     * @param jobId       ID of the corresponding job
+     * @param executionId ID of corresponding execution
+     * @param message     message to log.
+     */
+    void log(Long jobId, Long executionId, String message);
+
+    /**
+     * Log a error message.
+     * 
+     * @param jobId       Id of the corresponding job
+     * @param executionId ID of corresponding execution
+     * @param error       error message
+     * @param stacktrace  stacktrace of the exception
+     */
+    void log(Long jobId, Long executionId, String error, String stacktrace);
 
     /**
      * Create a {@link ExecutionLog}

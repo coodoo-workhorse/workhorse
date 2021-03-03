@@ -85,17 +85,15 @@ public class WorkhorseController {
                     job.setStatus(JobStatus.NO_WORKER);
                     jobPersistence.update(job.getId(), job);
                     log.error("No Worker Class found for Job: {}", job);
-                    jobErrorEvent.fire(new JobErrorEvent(new Throwable(ErrorType.NO_JOB_WORKER_FOUND.getMessage()),
-                            ErrorType.NO_JOB_WORKER_FOUND.getMessage(), job.getId(), job.getStatus()));
+                    jobErrorEvent.fire(new JobErrorEvent(new Throwable(ErrorType.NO_JOB_WORKER_FOUND.getMessage()), ErrorType.NO_JOB_WORKER_FOUND.getMessage(),
+                                    job.getId(), job.getStatus()));
                     continue;
                 }
                 if (job.getStatus().equals(JobStatus.NO_WORKER)) {
                     job.setStatus(JobStatus.INACTIVE);
                     jobPersistence.update(job.getId(), job);
-                    log.trace("JobStatus of Job {} updated from {} to {}", job, JobStatus.NO_WORKER,
-                            JobStatus.INACTIVE);
-                    workhorseLogService.logChange(job.getId(), job.getStatus(), " Status ", JobStatus.NO_WORKER,
-                            JobStatus.INACTIVE, " Worker class found. ");
+                    log.trace("JobStatus of Job {} updated from {} to {}", job, JobStatus.NO_WORKER, JobStatus.INACTIVE);
+                    workhorseLogService.logChange(job.getId(), job.getStatus(), " Status ", JobStatus.NO_WORKER, JobStatus.INACTIVE, " Worker class found. ");
 
                 } else {
 
@@ -104,10 +102,10 @@ public class WorkhorseController {
                     // The Objects-Class is null-safe and can handle Worker-classes without
                     // Parameters
                     if (!Objects.equals(parametersClassName, job.getParametersClassName())) {
-                        log.warn("Parameters class name of {} changed from {} to {}", job.getWorkerClassName(),
-                                job.getParametersClassName(), parametersClassName);
-                        workhorseLogService.logChange(job.getId(), job.getStatus(), " Parameters class ",
-                                job.getParametersClassName(), parametersClassName, null);
+                        log.warn("Parameters class name of {} changed from {} to {}", job.getWorkerClassName(), job.getParametersClassName(),
+                                        parametersClassName);
+                        workhorseLogService.logChange(job.getId(), job.getStatus(), " Parameters class ", job.getParametersClassName(), parametersClassName,
+                                        null);
 
                         job.setParametersClassName(parametersClassName);
                         jobPersistence.update(job.getId(), job);
@@ -117,8 +115,7 @@ public class WorkhorseController {
 
                 job.setStatus(JobStatus.ERROR);
                 log.error("Can't handle Worker class found for job: {} Exception {}", job, exception);
-                jobErrorEvent.fire(new JobErrorEvent(exception, ErrorType.ERROR_BY_FOUND_JOB_WORKER.getMessage(),
-                        job.getId(), job.getStatus()));
+                jobErrorEvent.fire(new JobErrorEvent(exception, ErrorType.ERROR_BY_FOUND_JOB_WORKER.getMessage(), job.getId(), job.getStatus()));
             }
         }
     }
@@ -208,14 +205,12 @@ public class WorkhorseController {
         }
 
         log.error("No Worker class found for {}", job);
-        workhorseLogService.logChange(job.getId(), JobStatus.NO_WORKER, "Status", job.getStatus(), JobStatus.NO_WORKER,
-                null);
+        workhorseLogService.logChange(job.getId(), JobStatus.NO_WORKER, "Status", job.getStatus(), JobStatus.NO_WORKER, null);
 
         job.setStatus(JobStatus.NO_WORKER);
         jobPersistence.update(job.getId(), job);
 
-        jobErrorEvent.fire(new JobErrorEvent(new ClassNotFoundException(), ErrorType.NO_JOB_WORKER_FOUND.getMessage(),
-                job.getId(), job.getStatus()));
+        jobErrorEvent.fire(new JobErrorEvent(new ClassNotFoundException(), ErrorType.NO_JOB_WORKER_FOUND.getMessage(), job.getId(), job.getStatus()));
         throw new ClassNotFoundException();
 
     }
@@ -264,24 +259,17 @@ public class WorkhorseController {
      * 
      * @param jobId                      Id of the correspondant JOB
      * @param parameters                 parameters of the execution
-     * @param priority                   if <code>true</code> the execution will be
-     *                                   process before other execution. Otherwise
-     *                                   the execution will be process in order of
-     *                                   add.
-     * @param maturity                   If a maturity is given, the job execution
-     *                                   will not be executed before this time.
-     * @param batchId                    Id to refer to a group of executions to
-     *                                   handle as a single entity.
-     * @param chainId                    Id to refer to a group of executions to
-     *                                   process by an order.
-     * @param chainedPreviousExecutionId Id to the previous execution to process, if
-     *                                   the execution belong to a chained
-     *                                   Execution.
+     * @param priority                   if <code>true</code> the execution will be process before other execution. Otherwise the execution will be process in
+     *                                   order of add.
+     * @param maturity                   If a maturity is given, the job execution will not be executed before this time.
+     * @param batchId                    Id to refer to a group of executions to handle as a single entity.
+     * @param chainId                    Id to refer to a group of executions to process by an order.
+     * @param chainedPreviousExecutionId Id to the previous execution to process, if the execution belong to a chained Execution.
      * @param uniqueQueued
      * @return the created Job Execution
      */
-    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime maturity,
-            Long batchId, Long chainId, Long chainedPreviousExecutionId, boolean uniqueQueued) {
+    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime maturity, Long batchId, Long chainId,
+                    Long chainedPreviousExecutionId, boolean uniqueQueued) {
 
         Integer parametersHash = null;
         if (parameters != null) {
@@ -295,8 +283,7 @@ public class WorkhorseController {
         if (uniqueQueued) {
             // Prüfen ob es bereits eine excecution mit diesen parametern existiert und
             // im Status QUEUED ist. Wenn ja diese zurückgeben.
-            Execution equalQueuedJobExcecution = executionPersistence.getFirstCreatedByJobIdAndParametersHash(jobId,
-                    parametersHash);
+            Execution equalQueuedJobExcecution = executionPersistence.getFirstCreatedByJobIdAndParametersHash(jobId, parametersHash);
             if (equalQueuedJobExcecution != null) {
                 // TODO Warn Log ausgeben, dass es versucht wurde, eine Execution mit dem
                 // gleichen Parameter zu erstellen.
@@ -357,8 +344,7 @@ public class WorkhorseController {
 
     }
 
-    public synchronized Execution handleFailedExecution(Job job, Long executionId, Exception exception, Long duration,
-            BaseWorker worker, String executionLog) {
+    public synchronized Execution handleFailedExecution(Job job, Long executionId, Exception exception, Long duration, BaseWorker worker, String executionLog) {
         Execution failedExecution = executionPersistence.getById(job.getId(), executionId);
         Execution retryExecution = null;
 
@@ -377,7 +363,8 @@ public class WorkhorseController {
         failedExecution.setFailMessage(WorkhorseUtil.getMessagesFromException(exception));
         failedExecution.setFailStacktrace(WorkhorseUtil.stacktraceToString(exception));
 
-        createExecutionLog(executionId, executionLog, exception);
+        // createExecutionLog(executionId, executionLog, exception);
+        executionPersistence.log(job.getId(), executionId, WorkhorseUtil.getMessagesFromException(exception), WorkhorseUtil.stacktraceToString(exception));
 
         if (retryExecution == null) {
             worker.onFailed(executionId);
@@ -394,45 +381,10 @@ public class WorkhorseController {
     }
 
     /**
-     * Create a {@link ExecutionLog}
-     * 
-     * @param executionId Id of the corresponding {@link Execution}
-     * @param log         Message to log
-     * @return a {@link ExecutionLog} object
-     */
-    public ExecutionLog createExecutionLog(Long executionId, String log) {
-        return createExecutionLog(executionId, log, null);
-    }
-
-    /**
-     * Create a {@link ExecutionLog}
-     * 
-     * @param executionId Id of the corresponding {@link Execution}
-     * @param log         Message to log
-     * @param exception   Exception to log
-     * @return a {@link ExecutionLog} object
-     */
-    public ExecutionLog createExecutionLog(Long executionId, String log, Exception exception) {
-
-        ExecutionLog executionLog = new ExecutionLog();
-        executionLog.setExecutionId(executionId);
-        executionLog.setLog(log);
-
-        if (exception != null) {
-            executionLog.setException(WorkhorseUtil.getMessagesFromException(exception));
-            executionLog.setStacktrace(WorkhorseUtil.stacktraceToString(exception));
-        }
-
-        return executionPersistence.createLog(executionLog);
-    }
-
-    /**
-     * Delete all executions of a job that were created for a given number of
-     * minutes
+     * Delete all executions of a job that were created for a given number of minutes
      * 
      * @param jobId         ID of the job
-     * @param minMinutesOld Minimum number of minutes, that an execution have to
-     *                      exist to be deleted
+     * @param minMinutesOld Minimum number of minutes, that an execution have to exist to be deleted
      * @return number of deleted executions
      */
     public int deleteOlderExecutions(Long jobId, long minMinutesOld) {
@@ -477,9 +429,8 @@ public class WorkhorseController {
         return getJobById(jobId);
     }
 
-    public Job updateJob(Long jobId, String name, String description, String workerClassName, String schedule,
-            JobStatus status, int threads, Integer maxPerMinute, int failRetries, int retryDelay,
-            int minutesUntilCleanUp, boolean uniqueQueued) {
+    public Job updateJob(Long jobId, String name, String description, String workerClassName, String schedule, JobStatus status, int threads,
+                    Integer maxPerMinute, int failRetries, int retryDelay, int minutesUntilCleanUp, boolean uniqueQueued) {
 
         Job job = getJobById(jobId);
 
@@ -492,8 +443,7 @@ public class WorkhorseController {
             job.setDescription(description);
         }
         if (!Objects.equals(job.getWorkerClassName(), workerClassName)) {
-            workhorseLogService.logChange(jobId, status, "Worker class name", job.getWorkerClassName(), workerClassName,
-                    null);
+            workhorseLogService.logChange(jobId, status, "Worker class name", job.getWorkerClassName(), workerClassName, null);
             job.setWorkerClassName(workerClassName);
         }
         if (!Objects.equals(job.getSchedule(), schedule)) {
@@ -509,8 +459,7 @@ public class WorkhorseController {
             job.setThreads(threads);
         }
         if (!Objects.equals(job.getMaxPerMinute(), maxPerMinute)) {
-            workhorseLogService.logChange(jobId, status, "Max executions per minute", job.getMaxPerMinute(),
-                    maxPerMinute, null);
+            workhorseLogService.logChange(jobId, status, "Max executions per minute", job.getMaxPerMinute(), maxPerMinute, null);
             job.setMaxPerMinute(maxPerMinute);
         }
         if (!Objects.equals(job.getFailRetries(), failRetries)) {
@@ -522,13 +471,11 @@ public class WorkhorseController {
             job.setRetryDelay(retryDelay);
         }
         if (!Objects.equals(job.getMinutesUntilCleanUp(), minutesUntilCleanUp)) {
-            workhorseLogService.logChange(jobId, status, "Minutes until cleanup", job.getMinutesUntilCleanUp(),
-                    minutesUntilCleanUp, null);
+            workhorseLogService.logChange(jobId, status, "Minutes until cleanup", job.getMinutesUntilCleanUp(), minutesUntilCleanUp, null);
             job.setMinutesUntilCleanUp(minutesUntilCleanUp);
         }
         if (!Objects.equals(job.isUniqueQueued(), uniqueQueued)) {
-            workhorseLogService.logChange(jobId, status, "Unique in status queued", job.isUniqueQueued(), uniqueQueued,
-                    null);
+            workhorseLogService.logChange(jobId, status, "Unique in status queued", job.isUniqueQueued(), uniqueQueued, null);
             job.setUniqueQueued(uniqueQueued);
         }
 
@@ -590,19 +537,16 @@ public class WorkhorseController {
                     Execution retryExecution = createRetryExecution(timeoutExecution);
                     timeoutExecution.setStatus(ExecutionStatus.FAILED);
                     log.info("Zombie killed and risen from the death! Now it is {}", retryExecution);
-                    workhorseLogService.logMessage(logMessage + "Marked as failed and queued a clone",
-                            timeoutExecution.getJobId(), false);
+                    workhorseLogService.logMessage(logMessage + "Marked as failed and queued a clone", timeoutExecution.getJobId(), false);
                     break;
                 case RUNNING:
                     log.warn("Zombie will still walk free with status {}", cure);
-                    workhorseLogService.logMessage(logMessage + "No action is taken", timeoutExecution.getJobId(),
-                            false);
+                    workhorseLogService.logMessage(logMessage + "No action is taken", timeoutExecution.getJobId(), false);
                     break;
                 default:
                     timeoutExecution.setStatus(cure);
                     log.info("Zombie is cured with status {}", cure);
-                    workhorseLogService.logMessage(logMessage + "Put in status " + cure, timeoutExecution.getJobId(),
-                            false);
+                    workhorseLogService.logMessage(logMessage + "Put in status " + cure, timeoutExecution.getJobId(), false);
                     break;
             }
 

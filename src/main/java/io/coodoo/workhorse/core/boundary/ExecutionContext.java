@@ -3,6 +3,7 @@ package io.coodoo.workhorse.core.boundary;
 import java.time.format.DateTimeFormatter;
 
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
@@ -10,13 +11,12 @@ import io.coodoo.workhorse.core.control.StaticConfig;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
+import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
 /**
- * This class gets the access to an running execution from anywhere in the
- * business logic. It allows access for logging and to read meta data from the
- * current job and execution while the doWork()-method of the worker class is
- * invoked.
+ * This class gets the access to an running execution from anywhere in the business logic. It allows access for logging and to read meta data from the current
+ * job and execution while the doWork()-method of the worker class is invoked.
  * 
  * @author coodoo GmbH (coodoo.io)
  */
@@ -26,6 +26,9 @@ public class ExecutionContext {
     // The visibility is protected to enable mocking in Junit Tests
     protected Execution execution;
     protected StringBuffer logBuffer;
+
+    @Inject
+    ExecutionPersistence executionPersistence;
 
     public void init(Execution execution) {
         this.execution = execution;
@@ -37,9 +40,8 @@ public class ExecutionContext {
     }
 
     /**
-     * Retrieves the ID of the {@link Job} object of the current execution. WARNING:
-     * Don't change the value of the job with the retrieved ID. Changes can be fatal
-     * or have no effect.
+     * Retrieves the ID of the {@link Job} object of the current execution. WARNING: Don't change the value of the job with the retrieved ID. Changes can be
+     * fatal or have no effect.
      * 
      * @return the ID of the job
      */
@@ -51,8 +53,8 @@ public class ExecutionContext {
     }
 
     /**
-     * Retrieves the ID of the current execution. WARNING: Don't change the value of
-     * the execution with the retrieved ID. Changes can be fatal or have no effect.
+     * Retrieves the ID of the current execution. WARNING: Don't change the value of the execution with the retrieved ID. Changes can be fatal or have no
+     * effect.
      * 
      * @return the ID of the execution
      */
@@ -86,8 +88,7 @@ public class ExecutionContext {
     }
 
     /**
-     * Adds the message text in as a new line to the executions log and also adds
-     * the message in severity INFO to the server log
+     * Adds the message text in as a new line to the executions log and also adds the message in severity INFO to the server log
      * 
      * @param logger  server log logger
      * @param message text to log
@@ -98,10 +99,8 @@ public class ExecutionContext {
     }
 
     /**
-     * Adds a timestamp followed by the message text in as a new line to the
-     * executions log <br>
-     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in
-     * {@link WorkhorseConfig#LOG_TIME_FORMATTER}<br>
+     * Adds a timestamp followed by the message text in as a new line to the executions log <br>
+     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in {@link WorkhorseConfig#LOG_TIME_FORMATTER}<br>
      * Example: <code>[22:06:42.680] Step 3 complete</code>
      * 
      * @param message text to log
@@ -111,10 +110,8 @@ public class ExecutionContext {
     }
 
     /**
-     * Adds a timestamp followed by an info marker and the info message text in as a
-     * new line to the executions log<br>
-     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in
-     * {@link WorkhorseConfig#LOG_TIME_FORMATTER}<br>
+     * Adds a timestamp followed by an info marker and the info message text in as a new line to the executions log<br>
+     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in {@link WorkhorseConfig#LOG_TIME_FORMATTER}<br>
      * Info marker: Only if defined in {@link WorkhorseConfig#LOG_INFO_MARKER}<br>
      * Example: <code>[22:06:42.680] Step 3 complete</code>
      * 
@@ -125,11 +122,9 @@ public class ExecutionContext {
     }
 
     /**
-     * Adds a timestamp followed by an info marker and the info message text in as a
-     * new line to the executions log and also adds the message in severity INFO to
-     * the server log<br>
-     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in
-     * {@link WorkhorseConfig#LOG_TIME_FORMATTER}<br>
+     * Adds a timestamp followed by an info marker and the info message text in as a new line to the executions log and also adds the message in severity INFO
+     * to the server log<br>
+     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in {@link WorkhorseConfig#LOG_TIME_FORMATTER}<br>
      * Info marker: Only if defined in {@link WorkhorseConfig#LOG_INFO_MARKER}<br>
      * Example: <code>[22:06:42.680] Step 3 complete</code>
      * 
@@ -142,12 +137,9 @@ public class ExecutionContext {
     }
 
     /**
-     * Adds a timestamp followed by an warn marker and the warn message as a new
-     * line to the executions log<br>
-     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in
-     * {@link WorkhorseConfig#LOG_TIME_FORMATTER}<br>
-     * Error marker: <code>[WARN]</code> or as defined in
-     * {@link WorkhorseConfig#LOG_WARN_MARKER}<br>
+     * Adds a timestamp followed by an warn marker and the warn message as a new line to the executions log<br>
+     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in {@link WorkhorseConfig#LOG_TIME_FORMATTER}<br>
+     * Error marker: <code>[WARN]</code> or as defined in {@link WorkhorseConfig#LOG_WARN_MARKER}<br>
      * Example: <code>[22:06:42.680] [WARN] Well thats suspicious...</code>
      * 
      * @param message text to log
@@ -157,13 +149,10 @@ public class ExecutionContext {
     }
 
     /**
-     * Adds a timestamp followed by an warn marker and the warn message as a new
-     * line to the executions log. It also adds the message in severity WARN to the
+     * Adds a timestamp followed by an warn marker and the warn message as a new line to the executions log. It also adds the message in severity WARN to the
      * server log<br>
-     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in
-     * {@link WorkhorseConfig#LOG_TIME_FORMATTER}<br>
-     * Error marker: <code>[WARN]</code> or as defined in
-     * {@link WorkhorseConfig#LOG_WARN_MARKER}<br>
+     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in {@link WorkhorseConfig#LOG_TIME_FORMATTER}<br>
+     * Error marker: <code>[WARN]</code> or as defined in {@link WorkhorseConfig#LOG_WARN_MARKER}<br>
      * Example: <code>[22:06:42.680] [WARN] Well thats suspicious...</code>
      * 
      * @param logger  server log logger
@@ -175,12 +164,9 @@ public class ExecutionContext {
     }
 
     /**
-     * Adds a timestamp followed by an error marker and the error message as a new
-     * line to the executions log<br>
-     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in
-     * {@link WorkhorseConfig#LOG_TIME_FORMATTER}<br>
-     * Error marker: <code>[ERROR]</code> or as defined in
-     * {@link WorkhorseConfig#LOG_ERROR_MARKER}<br>
+     * Adds a timestamp followed by an error marker and the error message as a new line to the executions log<br>
+     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in {@link WorkhorseConfig#LOG_TIME_FORMATTER}<br>
+     * Error marker: <code>[ERROR]</code> or as defined in {@link WorkhorseConfig#LOG_ERROR_MARKER}<br>
      * Example: <code>[22:06:42.680] [ERROR] Dafuq was that?!?!</code>
      * 
      * @param message text to log
@@ -190,13 +176,10 @@ public class ExecutionContext {
     }
 
     /**
-     * Adds a timestamp followed by an error marker and the error message as a new
-     * line to the executions log. It also adds the message in severity ERROR to the
+     * Adds a timestamp followed by an error marker and the error message as a new line to the executions log. It also adds the message in severity ERROR to the
      * server log<br>
-     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in
-     * {@link WorkhorseConfig#LOG_TIME_FORMATTER}<br>
-     * Error marker: <code>[ERROR]</code> or as defined in
-     * {@link WorkhorseConfig#LOG_ERROR_MARKER}<br>
+     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in {@link WorkhorseConfig#LOG_TIME_FORMATTER}<br>
+     * Error marker: <code>[ERROR]</code> or as defined in {@link WorkhorseConfig#LOG_ERROR_MARKER}<br>
      * Example: <code>[22:06:42.680] [ERROR] Dafuq was that?!?!</code>
      * 
      * @param logger  server log logger
@@ -208,13 +191,10 @@ public class ExecutionContext {
     }
 
     /**
-     * Adds a timestamp followed by an error marker and the error message as a new
-     * line to the executions log. It also adds the message in severity ERROR and
+     * Adds a timestamp followed by an error marker and the error message as a new line to the executions log. It also adds the message in severity ERROR and
      * the throwable to the server log<br>
-     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in
-     * {@link WorkhorseConfig#LOG_TIME_FORMATTER}<br>
-     * Error marker: <code>[ERROR]</code> or as defined in
-     * {@link WorkhorseConfig#LOG_ERROR_MARKER}<br>
+     * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in {@link WorkhorseConfig#LOG_TIME_FORMATTER}<br>
+     * Error marker: <code>[ERROR]</code> or as defined in {@link WorkhorseConfig#LOG_ERROR_MARKER}<br>
      * Example: <code>[22:06:42.680] [ERROR] Dafuq was that?!?!</code>
      * 
      * @param logger    server log logger
@@ -260,6 +240,11 @@ public class ExecutionContext {
                     break;
             }
             logBuffer.append(message);
+
+            if (executionPersistence != null) {
+                executionPersistence.log(getJobId(), getExecutionId(), message);
+            }
+
         }
     }
 
