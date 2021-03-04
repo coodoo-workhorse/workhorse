@@ -24,6 +24,7 @@ import io.coodoo.workhorse.core.control.event.JobErrorEvent;
 import io.coodoo.workhorse.core.control.event.NewExecutionEvent;
 import io.coodoo.workhorse.core.entity.ErrorType;
 import io.coodoo.workhorse.core.entity.Execution;
+import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
@@ -68,9 +69,9 @@ public class Workhorse {
     @Inject
     Event<AllExecutionsDoneEvent> allExecutionsDoneEvent;
 
-    private ScheduledExecutorService scheduledExecutorService;
+    protected ScheduledExecutorService scheduledExecutorService;
 
-    private ScheduledFuture<?> scheduledFuture;
+    protected ScheduledFuture<?> scheduledFuture;
 
     @PostConstruct
     public void init() {
@@ -88,15 +89,12 @@ public class Workhorse {
         }
 
         if (executionPersistence.isPusherAvailable()) {
-            scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0,
-                    StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL, TimeUnit.SECONDS);
+            scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0, StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL, TimeUnit.SECONDS);
 
-            log.trace("Job queue pusher started with a {} seconds interval",
-                    StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL);
+            log.trace("Job queue pusher started with a {} seconds interval", StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL);
 
         } else {
-            scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0,
-                    StaticConfig.BUFFER_POLL_INTERVAL, TimeUnit.SECONDS);
+            scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0, StaticConfig.BUFFER_POLL_INTERVAL, TimeUnit.SECONDS);
             log.trace("Job queue poller started with a {} seconds interval", StaticConfig.BUFFER_POLL_INTERVAL);
         }
 
@@ -106,18 +104,16 @@ public class Workhorse {
      * poll the Execution with an given intervall
      */
     void poll() {
+        log.info("Poll start");
         for (Job job : jobPersistence.getAllByStatus(JobStatus.ACTIVE)) {
 
             if (executionBuffer.getNumberOfExecution(job.getId()) < StaticConfig.BUFFER_MIN) {
-                List<Execution> executions = executionPersistence.pollNextExecutions(job.getId(),
-                        StaticConfig.BUFFER_MAX);
+                List<Execution> executions = executionPersistence.pollNextExecutions(job.getId(), StaticConfig.BUFFER_MAX);
                 for (Execution execution : executions) {
                     if (execution == null) {
                         continue;
                     }
-                    if (!executionDistributor(execution)) {
-                        // TODO
-                    }
+                    executionDistributor(execution);
                 }
             }
             log.trace("Number of job execution in buffer: {}", executionBuffer.getNumberOfExecution(job.getId()));
@@ -126,23 +122,22 @@ public class Workhorse {
     }
 
     /**
-     * recieve the notification about new persisted job execution
+     * Receive the notification about new persisted execution
      * 
-     * @param newExecutionEvent
+     * @param newExecutionEvent describes the newly persisted execution
      */
     public void push(@ObservesAsync NewExecutionEvent newExecutionEvent) {
         if (!executionPersistence.isPusherAvailable() || scheduledFuture == null) {
             return;
         }
-        log.trace("New Job Execution pushed: " + newExecutionEvent);
+        log.trace("New Execution pushed: {}", newExecutionEvent);
         if (executionBuffer.getNumberOfExecution(newExecutionEvent.jobId) < StaticConfig.BUFFER_MAX) {
             Execution execution = executionPersistence.getById(newExecutionEvent.jobId, newExecutionEvent.executionId);
             if (execution != null) {
-                if (execution.getMaturity() != null) {
-                    long delayInSeconds = ChronoUnit.SECONDS.between(WorkhorseUtil.timestamp(),
-                            execution.getMaturity());
+                if (ExecutionStatus.PLANNED.equals(execution.getStatus()) && execution.getPlannedFor() != null) {
+                    long delayInSeconds = ChronoUnit.SECONDS.between(WorkhorseUtil.timestamp(), execution.getPlannedFor());
 
-                    log.trace("Job Execution : {} will be process in {} seconds", execution, delayInSeconds);
+                    log.trace("Execution : {} will be process in {} seconds", execution, delayInSeconds);
                     scheduledExecutorService.schedule(() -> {
                         executionDistributor(execution);
                     }, delayInSeconds, TimeUnit.SECONDS);
@@ -151,7 +146,7 @@ public class Workhorse {
                     executionDistributor(execution);
                 }
             } else {
-                log.error("No job execution found for executionId: {} ", newExecutionEvent.jobId);
+                log.error("No execution found for executionId: {} ", newExecutionEvent.executionId);
             }
         }
     }
@@ -189,15 +184,27 @@ public class Workhorse {
     }
 
     /**
-     * add a job execution in the executionQueue of the correspondent job
+     * Add an execution in the executionBuffer of the correspondent job
      * 
-     * @param execution Job Execution to map with a executionQueue
+     * @param execution Execution to map with a executionBuffer
      * @return true if the mapping was successful and false otherwise
      */
     public boolean executionDistributor(Execution execution) {
 
-        if (execution == null || execution.getStatus() != ExecutionStatus.QUEUED) {
-            return false;
+        switch (execution.getStatus()) {
+            // Execution in status PLANNED have to be updated to QUEUED before being added to the buffer.
+            case PLANNED:
+                workhorseController.updateExecutionStatus(execution.getJobId(), execution.getId(), ExecutionStatus.QUEUED);
+            case QUEUED:
+                // If the execution is 'expired' these don't have to be processed.
+                if (execution.getExpiresAt() != null && execution.getExpiresAt().isBefore(WorkhorseUtil.timestamp())) {
+                    workhorseController.setExecutionStatusToFailed(execution, ExecutionFailStatus.EXPIRED);
+                    return false;
+                }
+                break;
+            default:
+                // Only QUEUED and PLANNED executions are permitted!
+                return false;
         }
 
         Long jobId = execution.getJobId();
@@ -216,7 +223,7 @@ public class Workhorse {
         try {
             lock.lock();
 
-            if (Boolean.TRUE.equals(execution.getPriority())) {
+            if (Boolean.TRUE.equals(execution.isPriority())) {
                 executionBuffer.addPriorityExecution(jobId, execution.getId());
             } else {
                 executionBuffer.addExecution(jobId, execution.getId());
@@ -227,13 +234,12 @@ public class Workhorse {
             lock.unlock();
         }
 
-        log.trace(" Numbers of running's jobThreads : {}", executionBuffer.getRunningJobThreadCounts(jobId));
+        log.trace("Numbers of running's jobThreads: {}", executionBuffer.getRunningJobThreadCounts(jobId));
         if (executionBuffer.getJobThreadCounts(jobId) > executionBuffer.getRunningJobThreadCounts(jobId)) {
             // lock = executionQueue.getLock(jobId);
             try {
                 lock.lock();
-                for (int i = executionBuffer.getRunningJobThreadCounts(jobId); i < executionBuffer
-                        .getJobThreadCounts(jobId); i++) {
+                for (int i = executionBuffer.getRunningJobThreadCounts(jobId); i < executionBuffer.getJobThreadCounts(jobId); i++) {
                     startJobThread(jobId);
                 }
             } finally {
@@ -267,12 +273,11 @@ public class Workhorse {
         completion.exceptionally(exception -> {
             log.error("Error in job thread - Process gets cancelled", exception);
             job.setStatus(JobStatus.ERROR);
-            jobPersistence.update(jobId, job);
+            jobPersistence.update(job);
 
             executionBuffer.cancelProcess(job);
 
-            jobErrorEvent.fire(new JobErrorEvent(exception, ErrorType.JOB_THREAD_ERROR.getMessage(), job.getId(),
-                    JobStatus.ERROR));
+            jobErrorEvent.fire(new JobErrorEvent(exception, ErrorType.JOB_THREAD_ERROR.getMessage(), job.getId(), JobStatus.ERROR));
             return job;
         });
 
@@ -292,8 +297,7 @@ public class Workhorse {
             long durationMillis = System.currentTimeMillis() - startTime;
 
             final String durationText = String.format("%d min, %d sec", TimeUnit.MILLISECONDS.toMinutes(durationMillis),
-                    TimeUnit.MILLISECONDS.toSeconds(durationMillis)
-                            - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(durationMillis)));
+                            TimeUnit.MILLISECONDS.toSeconds(durationMillis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(durationMillis)));
             final String message = "Duration of all " + job.getName() + " job executions: " + durationText;
 
             log.trace(message + durationMillis);

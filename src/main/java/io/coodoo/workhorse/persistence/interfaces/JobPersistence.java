@@ -69,8 +69,7 @@ public interface JobPersistence {
     Long countByStatus(JobStatus jobStatus);
 
     /**
-     * persist a Job in storage. The id of the job have to be set by the
-     * persistence.
+     * persist a Job in storage. The id of the job have to be set by the persistence.
      * 
      * @param job
      */
@@ -79,10 +78,9 @@ public interface JobPersistence {
     /**
      * Update the job given by Id
      * 
-     * @param id
      * @param job
      */
-    void update(Long id, Job job);
+    void update(Job job);
 
     /**
      * rollback fonction to initialize the connection with the persistence

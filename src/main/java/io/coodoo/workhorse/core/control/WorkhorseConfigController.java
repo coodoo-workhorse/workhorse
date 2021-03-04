@@ -120,8 +120,7 @@ public class WorkhorseConfigController {
         if (workhorseConfig.getBufferPollInterval() != bufferPollInterval) {
 
             StaticConfig.BUFFER_POLL_INTERVAL = bufferPollInterval;
-            workhorseLogService.logChange(null, null, "Buffer poller interval", workhorseConfig.getBufferPollInterval(),
-                    bufferPollInterval, null);
+            workhorseLogService.logChange(null, null, "Buffer poller interval", workhorseConfig.getBufferPollInterval(), bufferPollInterval, null);
             workhorseConfig.setBufferPollInterval(bufferPollInterval);
 
             if (workhorse.isRunning()) {
@@ -130,8 +129,7 @@ public class WorkhorseConfigController {
         }
     }
 
-    protected void updateBufferPushFallbackPollInterval(WorkhorseConfig workhorseConfig,
-            int bufferPushFallbackPollInterval) {
+    protected void updateBufferPushFallbackPollInterval(WorkhorseConfig workhorseConfig, int bufferPushFallbackPollInterval) {
 
         if (bufferPushFallbackPollInterval < 1) {
             throw new RuntimeException("The buffer push fallback poller interval must be higher than 0!");
@@ -140,8 +138,8 @@ public class WorkhorseConfigController {
         if (workhorseConfig.getBufferPushFallbackPollInterval() != bufferPushFallbackPollInterval) {
 
             StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL = bufferPushFallbackPollInterval;
-            workhorseLogService.logChange(null, null, "Buffer PusherPoll interval",
-                    workhorseConfig.getBufferPushFallbackPollInterval(), bufferPushFallbackPollInterval, null);
+            workhorseLogService.logChange(null, null, "Buffer PusherPoll interval", workhorseConfig.getBufferPushFallbackPollInterval(),
+                            bufferPushFallbackPollInterval, null);
             workhorseConfig.setBufferPushFallbackPollInterval(bufferPushFallbackPollInterval);
 
             if (workhorse.isRunning()) {
@@ -162,8 +160,7 @@ public class WorkhorseConfigController {
             StaticConfig.EXECUTION_TIMEOUT = executionTimeout;
 
             String message = executionTimeout > 0 ? null : "Execution timeout is set to '0', so the hunt is off!";
-            workhorseLogService.logChange(null, null, "Execution timeout", workhorseConfig.getExecutionTimeout(),
-                    executionTimeout, message);
+            workhorseLogService.logChange(null, null, "Execution timeout", workhorseConfig.getExecutionTimeout(), executionTimeout, message);
             workhorseConfig.setExecutionTimeout(executionTimeout);
         }
     }
@@ -172,17 +169,14 @@ public class WorkhorseConfigController {
 
         if (minutesUntilCleanup < 0) {
             minutesUntilCleanup = 0;
-            log.trace(
-                    "For robustness the value of minutesUntilCleanup is set to '0', when the given value is negativ.");
+            log.trace("For robustness the value of minutesUntilCleanup is set to '0', when the given value is negativ.");
         }
         if (workhorseConfig.getMinutesUntilCleanup() != minutesUntilCleanup) {
 
             StaticConfig.MINUTES_UNTIL_CLEANUP = minutesUntilCleanup;
 
-            String message = minutesUntilCleanup > 0 ? null
-                    : "MinutesUntilCleanup is set to '0', so the cleanup is off!";
-            workhorseLogService.logChange(null, null, "minutesUntilCleanup", workhorseConfig.getMinutesUntilCleanup(),
-                    minutesUntilCleanup, message);
+            String message = minutesUntilCleanup > 0 ? null : "MinutesUntilCleanup is set to '0', so the cleanup is off!";
+            workhorseLogService.logChange(null, null, "minutesUntilCleanup", workhorseConfig.getMinutesUntilCleanup(), minutesUntilCleanup, message);
             workhorseConfig.setMinutesUntilCleanup(minutesUntilCleanup);
         }
 
@@ -191,14 +185,13 @@ public class WorkhorseConfigController {
     protected void updateBufferMax(WorkhorseConfig workhorseConfig, Long bufferMax) {
 
         if (bufferMax < 1) {
-            throw new RuntimeException(
-                    "The max amount of executions to load into the memory buffer per job must be higher than 0!");
+            throw new RuntimeException("The max amount of executions to load into the memory buffer per job must be higher than 0!");
         }
         if (!workhorseConfig.getBufferMax().equals(bufferMax)) {
 
             StaticConfig.BUFFER_MAX = bufferMax;
-            workhorseLogService.logChange(null, null, "Max amount of executions to load into the memory buffer per job",
-                    workhorseConfig.getBufferMax(), bufferMax, null);
+            workhorseLogService.logChange(null, null, "Max amount of executions to load into the memory buffer per job", workhorseConfig.getBufferMax(),
+                            bufferMax, null);
             workhorseConfig.setBufferMax(bufferMax);
         }
     }
@@ -206,15 +199,13 @@ public class WorkhorseConfigController {
     protected void updateBufferMin(WorkhorseConfig workhorseConfig, int bufferMin) {
 
         if (bufferMin < 1) {
-            throw new RuntimeException(
-                    "The min amount of executions in memory buffer before the poller gets to add more must be higher than 0!");
+            throw new RuntimeException("The min amount of executions in memory buffer before the poller gets to add more must be higher than 0!");
         }
         if (workhorseConfig.getBufferMin() != bufferMin) {
 
             StaticConfig.BUFFER_MIN = bufferMin;
-            workhorseLogService.logChange(null, null,
-                    "Min amount of executions in memory buffer before the poller gets to add more",
-                    workhorseConfig.getBufferMin(), bufferMin, null);
+            workhorseLogService.logChange(null, null, "Min amount of executions in memory buffer before the poller gets to add more",
+                            workhorseConfig.getBufferMin(), bufferMin, null);
             workhorseConfig.setBufferMin(bufferMin);
         }
     }
@@ -230,8 +221,7 @@ public class WorkhorseConfigController {
         if (!Objects.equals(workhorseConfig.getLogChange(), logChange)) {
 
             StaticConfig.LOG_CHANGE = logChange;
-            workhorseLogService.logChange(null, null, "Log change pattern", workhorseConfig.getLogChange(), logChange,
-                    null);
+            workhorseLogService.logChange(null, null, "Log change pattern", workhorseConfig.getLogChange(), logChange, null);
             workhorseConfig.setLogChange(logChange);
         }
     }
@@ -244,8 +234,7 @@ public class WorkhorseConfigController {
         if (!Objects.equals(workhorseConfig.getLogTimeFormat(), logTimeFormatter)) {
 
             StaticConfig.LOG_TIME_FORMATTER = logTimeFormatter;
-            workhorseLogService.logChange(null, null, "Execution log timestamp pattern",
-                    workhorseConfig.getLogTimeFormat(), logTimeFormatter, null);
+            workhorseLogService.logChange(null, null, "Execution log timestamp pattern", workhorseConfig.getLogTimeFormat(), logTimeFormatter, null);
             workhorseConfig.setLogTimeFormat(logTimeFormatter);
         }
     }
@@ -260,8 +249,8 @@ public class WorkhorseConfigController {
             if (timeZone == null || systemDefault.getId().equals(timeZone)) {
 
                 StaticConfig.TIME_ZONE = systemDefault.getId();
-                workhorseLogService.logChange(null, null, "Time zone", workhorseConfig.getTimeZone(),
-                        systemDefault.getId(), "System default time-zone is used: " + systemDefault);
+                workhorseLogService.logChange(null, null, "Time zone", workhorseConfig.getTimeZone(), systemDefault.getId(),
+                                "System default time-zone is used: " + systemDefault);
                 workhorseConfig.setTimeZone(systemDefault.getId());
             } else {
 
@@ -277,8 +266,7 @@ public class WorkhorseConfigController {
         if (!Objects.equals(workhorseConfig.getLogInfoMarker(), logInfoMarker)) {
 
             StaticConfig.LOG_INFO_MARKER = logInfoMarker;
-            workhorseLogService.logChange(null, null, "Execution log info marker", workhorseConfig.getLogInfoMarker(),
-                    logInfoMarker, null);
+            workhorseLogService.logChange(null, null, "Execution log info marker", workhorseConfig.getLogInfoMarker(), logInfoMarker, null);
             workhorseConfig.setLogInfoMarker(logInfoMarker);
         }
     }
@@ -288,8 +276,7 @@ public class WorkhorseConfigController {
         if (!Objects.equals(workhorseConfig.getLogWarnMarker(), logWarnMarker)) {
 
             StaticConfig.LOG_WARN_MARKER = logWarnMarker;
-            workhorseLogService.logChange(null, null, "Execution log warn marker", workhorseConfig.getLogWarnMarker(),
-                    logWarnMarker, null);
+            workhorseLogService.logChange(null, null, "Execution log warn marker", workhorseConfig.getLogWarnMarker(), logWarnMarker, null);
             workhorseConfig.setLogWarnMarker(logWarnMarker);
         }
     }
@@ -299,8 +286,7 @@ public class WorkhorseConfigController {
         if (!Objects.equals(workhorseConfig.getLogErrorMarker(), logErrorMarker)) {
 
             StaticConfig.LOG_ERROR_MARKER = logErrorMarker;
-            workhorseLogService.logChange(null, null, "Execution log error marker", workhorseConfig.getLogErrorMarker(),
-                    logErrorMarker, null);
+            workhorseLogService.logChange(null, null, "Execution log error marker", workhorseConfig.getLogErrorMarker(), logErrorMarker, null);
             workhorseConfig.setLogErrorMarker(logErrorMarker);
         }
     }

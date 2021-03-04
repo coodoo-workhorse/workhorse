@@ -1,6 +1,5 @@
 package io.coodoo.workhorse.core.control;
 
-import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -15,13 +14,11 @@ import org.slf4j.LoggerFactory;
 import io.coodoo.workhorse.core.boundary.ExecutionContext;
 import io.coodoo.workhorse.core.control.event.AllExecutionsDoneEvent;
 import io.coodoo.workhorse.core.entity.Execution;
-import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.ExecutionQualifier;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
-import io.coodoo.workhorse.util.WorkhorseUtil;
 
 /**
  * Class that executes all executions of the a given job.
@@ -95,7 +92,7 @@ public class JobThread {
 
                 try {
 
-                    updateExecutionStatus(execution, ExecutionStatus.RUNNING, WorkhorseUtil.timestamp(), null, null);
+                    workhorseController.setExecutionStatusToRunning(execution);
 
                     // mediterraneus
                     workerInstance.doWork(execution);
@@ -109,8 +106,9 @@ public class JobThread {
                     }
 
                     String executionLog = executionContext.getLog();
-
-                    updateExecutionStatus(execution, ExecutionStatus.FINISHED, WorkhorseUtil.timestamp(), Long.valueOf(duration), executionLog);
+                    execution.setLog(executionLog);
+                    executionPersistence.update(execution);
+                    workhorseController.setExecutionStatusToFinished(execution);
 
                     log.trace("Execution {}, duration: {} was successfull", execution.getId(), execution.getDuration());
                     executionBuffer.removeRunningExecution(jobId, execution.getId());
@@ -216,35 +214,6 @@ public class JobThread {
         }
 
         return nextInChain;
-    }
-
-    /**
-     * Set Execution on RUNNING status
-     * 
-     * @param execution
-     * @param timeStamp
-     */
-    public void updateExecutionStatusToRunning(Execution execution, LocalDateTime timeStamp) {
-        updateExecutionStatus(execution, ExecutionStatus.RUNNING, timeStamp, null, null);
-    }
-
-    public void updateExecutionStatus(Execution execution, ExecutionStatus executionStatus, LocalDateTime timeStamp, Long duration, String executionLog) {
-        execution.setStatus(executionStatus);
-        execution.setLog(executionLog);
-
-        switch (executionStatus) {
-            case RUNNING:
-                execution.setStartedAt(timeStamp);
-                break;
-            case FINISHED:
-            case FAILED:
-                execution.setDuration(duration);
-                execution.setEndedAt(timeStamp);
-                break;
-            default:
-                break;
-        }
-        executionPersistence.update(execution.getJobId(), execution.getId(), execution);
     }
 
     public void stop() {

@@ -2,8 +2,6 @@ package io.coodoo.workhorse.core.entity;
 
 import java.time.LocalDateTime;
 
-import javax.json.bind.annotation.JsonbDateFormat;
-
 /**
  * <p>
  * A Exceuction defines a single job which will be excecuted by the job engine.
@@ -22,9 +20,14 @@ public class Execution extends BaseEntity {
     private Long jobId;
 
     /**
-     * Status of the Execution. <code>QUEUED</code>, <code>RUNNING</code>, <code>FINISHED</code>, <code>FAILED</code>, <code>ABORTED</code>
+     * Status of the Execution. <code>PLANNED</code> <code>QUEUED</code>, <code>RUNNING</code>, <code>FINISHED</code>, <code>FAILED</code>, <code>ABORTED</code>
      */
     private ExecutionStatus status;
+
+    /**
+     * The Execution failed. @see ExecutionFailStatus
+     */
+    private ExecutionFailStatus failStatus = ExecutionFailStatus.NONE;
 
     /**
      * Timestamp of the begin of the processing
@@ -44,15 +47,19 @@ public class Execution extends BaseEntity {
     // TODO Execution Outomce als teil eines info-features: status zeit outcome
 
     /**
-     * If a job exectution has the priority set to <code>true</code> it will be executed before all jobs with priority <code>false</code>.
+     * If a exectution has the priority set to <code>true</code> it will be executed before all jobs with priority <code>false</code>.
      */
-    private Boolean priority;
+    private boolean priority;
 
     /**
-     * If a maturity is given, the job execution will not be executed before this time.
+     * If a plannedFor is given, the job execution will not be executed before this time.
      */
-    @JsonbDateFormat(value = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-    private LocalDateTime maturity;
+    private LocalDateTime plannedFor;
+
+    /**
+     * If expiresAt is given, the execution could not be executed after, if the processing has not began until this time.
+     */
+    private LocalDateTime expiresAt;
 
     /**
      * Id to refer to a group of executions to handle as a single entity.
@@ -88,11 +95,6 @@ public class Execution extends BaseEntity {
      * Log info about the execution
      */
     private String log;
-
-    /**
-     * Date until clean-up of the execution
-     */
-    private LocalDateTime dayUntilCleanUp;
 
     /**
      * Number of retries
@@ -138,20 +140,28 @@ public class Execution extends BaseEntity {
         this.parameters = parameters;
     }
 
-    public Boolean getPriority() {
+    public boolean isPriority() {
         return priority;
     }
 
-    public void setPriority(Boolean priority) {
+    public void setPriority(boolean priority) {
         this.priority = priority;
     }
 
-    public LocalDateTime getMaturity() {
-        return maturity;
+    public LocalDateTime getPlannedFor() {
+        return plannedFor;
     }
 
-    public void setMaturity(LocalDateTime maturity) {
-        this.maturity = maturity;
+    public void setPlannedFor(LocalDateTime plannedFor) {
+        this.plannedFor = plannedFor;
+    }
+
+    public LocalDateTime getExpiresAt() {
+        return expiresAt;
+    }
+
+    public void setExpiresAt(LocalDateTime expiresAt) {
+        this.expiresAt = expiresAt;
     }
 
     public Long getBatchId() {
@@ -178,20 +188,20 @@ public class Execution extends BaseEntity {
         this.log = log;
     }
 
-    public LocalDateTime getDayUntilCleanUp() {
-        return dayUntilCleanUp;
-    }
-
-    public void setDayUntilCleanUp(LocalDateTime dayUntilCleanUp) {
-        this.dayUntilCleanUp = dayUntilCleanUp;
-    }
-
     public ExecutionStatus getStatus() {
         return status;
     }
 
     public void setStatus(ExecutionStatus status) {
         this.status = status;
+    }
+
+    public ExecutionFailStatus getFailStatus() {
+        return failStatus;
+    }
+
+    public void setFailStatus(ExecutionFailStatus failStatus) {
+        this.failStatus = failStatus;
     }
 
     public LocalDateTime getStartedAt() {
@@ -268,8 +278,10 @@ public class Execution extends BaseEntity {
 
     @Override
     public String toString() {
-        return "Execution [Id=" + id + ", batchId=" + batchId + ", chainId=" + chainId + ", jobId=" + jobId + ", maturity=" + maturity + ", parameters="
-                        + parameters + ", priority=" + priority + ", status=" + status + "]";
+        return "Execution [ID=" + id + ", batchId=" + batchId + ", chainId=" + chainId + ", duration=" + duration + ", endedAt=" + endedAt + ", expiresAt="
+                        + expiresAt + ", failRetry=" + failRetry + ", failRetryExecutionId=" + failRetryExecutionId + ", failStatus=" + failStatus + ", jobId="
+                        + jobId + ", parameters=" + parameters + ", parametersHash=" + parametersHash + ", plannedFor=" + plannedFor + ", priority=" + priority
+                        + ", startedAt=" + startedAt + ", status=" + status + "]";
     }
 
 }

@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import io.coodoo.workhorse.core.control.StaticConfig;
 import io.coodoo.workhorse.core.control.event.NewExecutionEvent;
 import io.coodoo.workhorse.core.entity.Execution;
+import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
@@ -89,28 +90,41 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
         for (Execution execution : memoryPersistence.getExecutions().values()) {
 
-            if (execution.getJobId().equals(jobId) && execution.getStatus() == ExecutionStatus.QUEUED
-                            && (execution.getMaturity() == null || execution.getMaturity().compareTo(currentTimeStamp) < 0)
+            if (execution.getJobId().equals(jobId) && (execution.getStatus() == ExecutionStatus.QUEUED || execution.getStatus() == ExecutionStatus.PLANNED)
+                            && (execution.getPlannedFor() == null || execution.getPlannedFor().isBefore(currentTimeStamp))
                             && execution.getChainedPreviousExecutionId() == null && executions.size() < limit.intValue()) {
 
                 executions.add(execution);
             }
         }
 
-        Comparator<Execution> sortByPriority = (Execution e1, Execution e2) -> e1.getPriority().compareTo(e2.getPriority());
+        Comparator<Execution> sortByPriority = (Execution e1, Execution e2) -> Boolean.compare(e1.isPriority(), e2.isPriority());
         Collections.sort(executions, sortByPriority);
 
         return executions;
     }
 
     @Override
-    public Execution update(Long jobId, Long id, Execution execution) {
+    public Execution update(Execution execution) {
+
         execution.setUpdatedAt(WorkhorseUtil.timestamp());
-        if (memoryPersistence.getExecutions().put(id, execution) == null) {
+
+        if (memoryPersistence.getExecutions().put(execution.getId(), execution) == null) {
             return null;
-        } else {
-            return execution;
         }
+        return execution;
+    }
+
+    @Override
+    public Execution updateStatus(Long jobId, Long id, ExecutionStatus status, ExecutionFailStatus failStatus) {
+
+        Execution execution = memoryPersistence.getExecutions().get(id);
+
+        execution.setStatus(status);
+        if (failStatus != null) {
+            execution.setFailStatus(failStatus);
+        }
+        return update(execution);
     }
 
     @Override
@@ -178,7 +192,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
             if (execution.getJobId().equals(jobId) && Objects.equals(execution.getChainId(), chainId) && execution.getStatus() == ExecutionStatus.QUEUED) {
 
                 execution.setStatus(ExecutionStatus.FAILED);
-                update(jobId, execution.getId(), execution);
+                update(execution);
             }
         }
         return true;
@@ -222,7 +236,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     public int deleteOlderExecutions(Long jobId, LocalDateTime preDate) {
         int count = 0;
         for (Execution execution : memoryPersistence.getExecutions().values()) {
-            if (jobId.equals(execution.getJobId()) && preDate.compareTo(execution.getCreatedAt()) > 0) {
+            if (jobId.equals(execution.getJobId()) && preDate.isAfter(execution.getCreatedAt())) {
                 log.trace("Next Execution have to be delete: {}", execution);
                 delete(jobId, execution.getId());
                 count++;
@@ -250,7 +264,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
         for (Execution execution : memoryPersistence.getExecutions().values()) {
 
-            if (time.compareTo(execution.getStartedAt()) > 0 && ExecutionStatus.RUNNING.equals(execution.getStatus())) {
+            if (time.isAfter(execution.getStartedAt()) && ExecutionStatus.RUNNING.equals(execution.getStatus())) {
                 executions.add(execution);
             }
         }

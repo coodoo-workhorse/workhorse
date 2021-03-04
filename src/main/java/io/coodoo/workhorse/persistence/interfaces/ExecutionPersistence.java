@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import io.coodoo.workhorse.core.entity.Execution;
+import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
@@ -14,7 +15,7 @@ public interface ExecutionPersistence {
      * Retrieves the job execution by given Id of a job and id of job execution
      * 
      * @param jobId Id of the job
-     * @param id    Id of the job execution
+     * @param id Id of the job execution
      * @return A job execution
      */
     Execution getById(Long jobId, Long id);
@@ -29,11 +30,11 @@ public interface ExecutionPersistence {
     List<Execution> getByJobId(Long jobId, Long limit);
 
     /**
-     * Retrieves the next queued job executions with given JobId, order by priority and createdAt. Job executions with existent value
-     * <code>ChainedPreviousExecutionId</code> do not have to be retrieve.
+     * Retrieves the next queued executions and the planned executions that have to be process now with given JobId, order by priority and createdAt. Executions
+     * with existent value <code>ChainedPreviousExecutionId</code> do not have to be retrieve.
      * 
-     * @param jobId Id of th job
-     * @return List of job execution order by job executions parameters <code>priority</code> and <code>createdAt</code>
+     * @param jobId Id of the job
+     * @return List of executions order by <code>priority</code> and <code>createdAt</code>
      */
     List<Execution> pollNextExecutions(Long jobId, Long limit);
 
@@ -55,19 +56,29 @@ public interface ExecutionPersistence {
      * Delete a job execution by <code>jobId</code> and <code>id</code> of the execution
      * 
      * @param jobId Id of the job
-     * @param id    Id of the job execution
+     * @param id Id of the job execution
      */
     void delete(Long jobId, Long id);
 
     /**
      * Update a job execution
      * 
-     * @param jobId     Id of the correspondent job
-     * @param id        Id of the job execution to update
      * @param execution New value of the job execution
+     * 
      * @return the updated job execution
      */
-    Execution update(Long jobId, Long id, Execution execution);
+    Execution update(Execution execution);
+
+    /**
+     * Update the status of an execution
+     * 
+     * @param jobId ID of the corresponding job
+     * @param id ID of the execution
+     * @param status New Status to set
+     * @param failStatus Specific status of a failed execution
+     * @return the updated execution
+     */
+    Execution updateStatus(Long jobId, Long id, ExecutionStatus status, ExecutionFailStatus failStatus);
 
     /**
      * Given the Id of the corresponent job <code>jobId</code> and the limit date <code>preDate</code>, delete all job executions where
@@ -82,7 +93,7 @@ public interface ExecutionPersistence {
     /**
      * Retrieve all job executions of a batchExecution
      * 
-     * @param jobId   Id of the correspondent job
+     * @param jobId Id of the correspondent job
      * @param batchId Id of the batchExecution
      * @return List of all job executions of the batchExecution
      */
@@ -91,7 +102,7 @@ public interface ExecutionPersistence {
     /**
      * Retrieve all job execution of a chainedExecution
      * 
-     * @param jobId   Id of the correspondent job
+     * @param jobId Id of the correspondent job
      * @param chainId Id of the chainedExecution
      * @return List of all job executions of the chainedExecution
      */
@@ -100,7 +111,7 @@ public interface ExecutionPersistence {
     /**
      * Get the first found job execution of the Batch.
      * 
-     * @param jobId   Id of the correspondent job
+     * @param jobId Id of the correspondent job
      * @param BatchId Id of the batchExecution
      * @return the found job executon
      */
@@ -109,7 +120,7 @@ public interface ExecutionPersistence {
     /**
      * Get all Failed job executions of a batchExecution
      * 
-     * @param jobId   Id of the correspondent job
+     * @param jobId Id of the correspondent job
      * @param BatchId Id of the batchExecution
      * @return
      */
@@ -118,16 +129,16 @@ public interface ExecutionPersistence {
     /**
      * Optional. Set the Id the given job execution <code>execution</code> at end of the chained Execution with Id <code>chainId</code> .
      * 
-     * @param jobId     Id of the correspondent job
-     * @param chainId   Id of the chainedExecution
+     * @param jobId Id of the correspondent job
+     * @param chainId Id of the chainedExecution
      * @param execution Job execution to set at end of the chain.
      * @return Last job execution of the chain.
      */
     Execution addExecutionAtEndOfChain(Long jobId, Long chainId, Execution execution);
 
     /**
-     * @param jobId     Id of the correspondent job
-     * @param chainId   Id of the chainedExecution
+     * @param jobId Id of the correspondent job
+     * @param chainId Id of the chainedExecution
      * @param execution Job execution whose next execution have to be found.
      * @return Next job execution of the chain
      */
@@ -136,7 +147,7 @@ public interface ExecutionPersistence {
     /**
      * Check whether there is already an execution with these parameters and whether it has the status QUEUED. If so, return this.
      * 
-     * @param jobId          the jobId
+     * @param jobId the jobId
      * @param parametersHash the parameterHash
      * @return List of Execution
      */
@@ -145,7 +156,7 @@ public interface ExecutionPersistence {
     /**
      * Check if they are other QUEUED job execution of the given batchExecution
      * 
-     * @param jobId   Id of the correspondent job
+     * @param jobId Id of the correspondent job
      * @param batchId Id of the batchExecution
      * @return
      */
@@ -154,7 +165,7 @@ public interface ExecutionPersistence {
     /**
      * Set the status of all queued Executions of the given chainedExecution to {@link ExecutionStatus#FAILED}
      * 
-     * @param jobId   id of the job
+     * @param jobId id of the job
      * @param chainId id of the chain
      * @return <code>true</code> if successful and <code>false</code> otherwise
      */
@@ -179,19 +190,19 @@ public interface ExecutionPersistence {
     /**
      * Log a message.
      * 
-     * @param jobId       ID of the corresponding {@link Job}
+     * @param jobId ID of the corresponding {@link Job}
      * @param executionId ID of corresponding {@link Execution}
-     * @param message     message to log.
+     * @param message message to log.
      */
     void log(Long jobId, Long executionId, String message);
 
     /**
      * Log a error message.
      * 
-     * @param jobId       Id of the corresponding {@link Job}
+     * @param jobId Id of the corresponding {@link Job}
      * @param executionId ID of corresponding {@link Execution}
-     * @param error       error message
-     * @param stacktrace  stacktrace of the {@link Execution}
+     * @param error error message
+     * @param stacktrace stacktrace of the {@link Execution}
      */
     void log(Long jobId, Long executionId, String error, String stacktrace);
 

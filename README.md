@@ -264,7 +264,7 @@ public void performDelayedJob() {
 ### Planned jobs
 A planned job is executed once at a given moment.
 
-Call the method `createPlannedJobExecution(LocalDateTime maturity)` on the worker instance to create an execution to be processed at a given time in the future.
+Call the method `createPlannedJobExecution(LocalDateTime plannedFor)` on the worker instance to create an execution to be processed at a given time in the future.
 
 Let us take as example a backup job, that have to be executed at a given timestamp.
 ```java
@@ -272,9 +272,9 @@ Let us take as example a backup job, that have to be executed at a given timesta
 BackupWoker backupWoker;
 
 public void performPlannedJob() {
-    LocalDateTime maturity = LocalDateTime.of(Year.now().getValue(), Month.OCTOBER, 4, 13, 37);
-    Long executionId = backupWoker.createPlannedJobExecution(maturity);
-    log.info("Backup starts at " + maturity + " with execution-ID " + executionId);
+    LocalDateTime plannedFor = LocalDateTime.of(Year.now().getValue(), Month.OCTOBER, 4, 13, 37);
+    Long executionId = backupWoker.createPlannedJobExecution(plannedFor);
+    log.info("Backup starts at " + plannedFor + " with execution-ID " + executionId);
 }
 ```
 

@@ -1,5 +1,6 @@
 package io.coodoo.workhorse.core.control;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import io.coodoo.workhorse.core.boundary.annotation.InitialJobConfig;
 import io.coodoo.workhorse.core.control.event.JobErrorEvent;
 import io.coodoo.workhorse.core.entity.ErrorType;
 import io.coodoo.workhorse.core.entity.Execution;
+import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
@@ -83,7 +85,7 @@ public class WorkhorseController {
                 if (!workers.contains(workerClass)) {
                     log.trace("JobStatus of Job {} updated from {} to {}", job, job.getStatus(), JobStatus.NO_WORKER);
                     job.setStatus(JobStatus.NO_WORKER);
-                    jobPersistence.update(job.getId(), job);
+                    jobPersistence.update(job);
                     log.error("No Worker Class found for Job: {}", job);
                     jobErrorEvent.fire(new JobErrorEvent(new Throwable(ErrorType.NO_JOB_WORKER_FOUND.getMessage()), ErrorType.NO_JOB_WORKER_FOUND.getMessage(),
                                     job.getId(), job.getStatus()));
@@ -91,7 +93,7 @@ public class WorkhorseController {
                 }
                 if (job.getStatus().equals(JobStatus.NO_WORKER)) {
                     job.setStatus(JobStatus.INACTIVE);
-                    jobPersistence.update(job.getId(), job);
+                    jobPersistence.update(job);
                     log.trace("JobStatus of Job {} updated from {} to {}", job, JobStatus.NO_WORKER, JobStatus.INACTIVE);
                     workhorseLogService.logChange(job.getId(), job.getStatus(), " Status ", JobStatus.NO_WORKER, JobStatus.INACTIVE, " Worker class found. ");
 
@@ -108,7 +110,7 @@ public class WorkhorseController {
                                         null);
 
                         job.setParametersClassName(parametersClassName);
-                        jobPersistence.update(job.getId(), job);
+                        jobPersistence.update(job);
                     }
                 }
             } catch (Exception exception) {
@@ -208,7 +210,7 @@ public class WorkhorseController {
         workhorseLogService.logChange(job.getId(), JobStatus.NO_WORKER, "Status", job.getStatus(), JobStatus.NO_WORKER, null);
 
         job.setStatus(JobStatus.NO_WORKER);
-        jobPersistence.update(job.getId(), job);
+        jobPersistence.update(job);
 
         jobErrorEvent.fire(new JobErrorEvent(new ClassNotFoundException(), ErrorType.NO_JOB_WORKER_FOUND.getMessage(), job.getId(), job.getStatus()));
         throw new ClassNotFoundException();
@@ -257,19 +259,19 @@ public class WorkhorseController {
     /**
      * create a Job Execution
      * 
-     * @param jobId                      Id of the correspondant JOB
-     * @param parameters                 parameters of the execution
-     * @param priority                   if <code>true</code> the execution will be process before other execution. Otherwise the execution will be process in
-     *                                   order of add.
-     * @param maturity                   If a maturity is given, the job execution will not be executed before this time.
-     * @param batchId                    Id to refer to a group of executions to handle as a single entity.
-     * @param chainId                    Id to refer to a group of executions to process by an order.
+     * @param jobId Id of the correspondant JOB
+     * @param parameters parameters of the execution
+     * @param priority if <code>true</code> the execution will be process before other execution. Otherwise the execution will be process in order of add.
+     * @param plannedFor If a plannedFor is given, the job execution will not be executed before this time.
+     * @param expiresAt If expiresAt is given, the execution have to be process before this time. Otherwise the execution is cancelled.
+     * @param batchId Id to refer to a group of executions to handle as a single entity.
+     * @param chainId Id to refer to a group of executions to process by an order.
      * @param chainedPreviousExecutionId Id to the previous execution to process, if the execution belong to a chained Execution.
      * @param uniqueQueued
      * @return the created Job Execution
      */
-    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime maturity, Long batchId, Long chainId,
-                    Long chainedPreviousExecutionId, boolean uniqueQueued) {
+    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime plannedFor, LocalDateTime expiresAt, Long batchId,
+                    Long chainId, Long chainedPreviousExecutionId, boolean uniqueQueued) {
 
         Integer parametersHash = null;
         if (parameters != null) {
@@ -292,11 +294,18 @@ public class WorkhorseController {
         }
         Execution execution = new Execution();
         execution.setJobId(jobId);
-        execution.setStatus(ExecutionStatus.QUEUED);
+
+        if (plannedFor != null && WorkhorseUtil.timestamp().isBefore(plannedFor)) {
+            execution.setStatus(ExecutionStatus.PLANNED);
+        } else {
+            execution.setStatus(ExecutionStatus.QUEUED);
+        }
+
         execution.setParameters(parameters);
         execution.setParametersHash(parametersHash);
         execution.setPriority(priority != null ? priority : false);
-        execution.setMaturity(maturity);
+        execution.setPlannedFor(plannedFor);
+        execution.setExpiresAt(expiresAt);
         execution.setBatchId(batchId);
         execution.setChainId(chainId);
         execution.setChainedPreviousExecutionId(chainedPreviousExecutionId);
@@ -325,8 +334,8 @@ public class WorkhorseController {
         retryExecution.setJobId(failedExecution.getJobId());
         retryExecution.setStatus(failedExecution.getStatus());
         retryExecution.setStartedAt(LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)));
-        retryExecution.setPriority(failedExecution.getPriority());
-        retryExecution.setMaturity(failedExecution.getMaturity());
+        retryExecution.setPriority(failedExecution.isPriority());
+        retryExecution.setPlannedFor(failedExecution.getPlannedFor());
         retryExecution.setChainId(failedExecution.getChainId());
         retryExecution.setChainedNextExecutionId(failedExecution.getChainedNextExecutionId());
         retryExecution.setChainedPreviousExecutionId(failedExecution.getChainedPreviousExecutionId());
@@ -347,9 +356,9 @@ public class WorkhorseController {
     /**
      * Log a message.
      * 
-     * @param jobId       ID of the corresponding job
+     * @param jobId ID of the corresponding job
      * @param executionId ID of corresponding execution
-     * @param message     message to log.
+     * @param message message to log.
      */
     public void log(Long jobId, Long executionId, String message) {
 
@@ -359,10 +368,10 @@ public class WorkhorseController {
     /**
      * Log a error message.
      * 
-     * @param jobId       Id of the corresponding job
+     * @param jobId Id of the corresponding job
      * @param executionId ID of corresponding execution
-     * @param error       error message
-     * @param stacktrace  stacktrace of the exception
+     * @param error error message
+     * @param stacktrace stacktrace of the exception
      */
     public void log(Long jobId, Long executionId, String error, String stacktrace) {
 
@@ -400,7 +409,7 @@ public class WorkhorseController {
             worker.onRetry(executionId, retryExecution.getId());
         }
 
-        executionPersistence.update(job.getId(), failedExecution.getId(), failedExecution);
+        executionPersistence.update(failedExecution);
 
         return retryExecution;
     }
@@ -408,7 +417,10 @@ public class WorkhorseController {
     /**
      * Delete all executions of a job that were created for a given number of minutes
      * 
-     * @param jobId         ID of the job
+     * <<<<<<< HEAD
+     * 
+     * @param jobId ID of the job =======
+     * @param jobId ID of the job >>>>>>> master
      * @param minMinutesOld Minimum number of minutes, that an execution have to exist to be deleted
      * @return number of deleted executions
      */
@@ -449,9 +461,9 @@ public class WorkhorseController {
         return jobPersistence.getByName(className);
     }
 
-    public Job update(Long jobId, Job job) {
-        jobPersistence.update(jobId, job);
-        return getJobById(jobId);
+    public Job update(Job job) {
+        jobPersistence.update(job);
+        return getJobById(job.getId());
     }
 
     public Job updateJob(Long jobId, String name, String description, String workerClassName, String schedule, JobStatus status, int threads,
@@ -506,7 +518,7 @@ public class WorkhorseController {
 
         log.trace("Job updated: {}", job);
 
-        jobPersistence.update(jobId, job);
+        jobPersistence.update(job);
 
         return job;
     }
@@ -528,8 +540,87 @@ public class WorkhorseController {
         return executionPersistence.getByJobId(jobId, 100L);
     }
 
-    public Execution updateExecution(Long jobId, Long executionId, Execution execution) {
-        return executionPersistence.update(jobId, executionId, execution);
+    public void setExecutionStatusToRunning(Execution execution) {
+        updateExecutionStatus(execution, ExecutionStatus.RUNNING, ExecutionFailStatus.NONE);
+    }
+
+    public void setExecutionStatusToFinished(Execution execution) {
+        updateExecutionStatus(execution, ExecutionStatus.FINISHED, ExecutionFailStatus.NONE);
+    }
+
+    /**
+     * Set the status of the execution to fail.
+     * 
+     * The default fail status is {@link ExecutionFailStatus#EXCEPTION}
+     * 
+     * @param execution Execution to update
+     */
+    public void setExecutionStatusToFailed(Execution execution) {
+        setExecutionStatusToFailed(execution, ExecutionFailStatus.EXCEPTION);
+    }
+
+    /**
+     * Set the status of the execution to fail.
+     * 
+     * @param execution Execution to update
+     * @param failStatus Status that describes the cause of the failure
+     */
+    public void setExecutionStatusToFailed(Execution execution, ExecutionFailStatus failStatus) {
+        updateExecutionStatus(execution, ExecutionStatus.FAILED, failStatus);
+    }
+
+    public Execution updateExecutionStatus(Long jobId, Long executionId, ExecutionStatus executionStatus) {
+        return executionPersistence.updateStatus(jobId, executionId, executionStatus, ExecutionFailStatus.NONE);
+    }
+
+    /**
+     * Update the status of an execution.
+     * 
+     * @param jobId ID of the corresponding job
+     * @param id ID of the execution
+     * @param status New Status to set
+     * @param failStatus Specific status of a failed execution
+     * @return the updated execution
+     */
+    protected Execution updateExecutionStatus(Execution execution, ExecutionStatus status, ExecutionFailStatus failStatus) {
+
+        switch (status) {
+
+            case RUNNING:
+                execution.setStartedAt(WorkhorseUtil.timestamp());
+                break;
+
+            case FINISHED:
+
+                LocalDateTime endTime = WorkhorseUtil.timestamp();
+                Long duration = Duration.between(execution.getStartedAt(), endTime).toMillis();
+                execution.setEndedAt(endTime);
+                execution.setDuration(duration);
+                break;
+
+            case FAILED:
+                if (execution.getStatus().equals(ExecutionStatus.RUNNING)) {
+                    LocalDateTime endFailTime = WorkhorseUtil.timestamp();
+                    Long durationToFail = Duration.between(execution.getStartedAt(), endFailTime).toMillis();
+                    execution.setEndedAt(endFailTime);
+                    execution.setDuration(durationToFail);
+                }
+                break;
+            default:
+                break;
+        }
+
+        execution.setStatus(status);
+        if (failStatus != null) {
+            execution.setFailStatus(failStatus);
+        }
+        execution.setUpdatedAt(WorkhorseUtil.timestamp());
+
+        return updateExecution(execution);
+    }
+
+    public Execution updateExecution(Execution execution) {
+        return executionPersistence.update(execution);
     }
 
     public void deleteExecution(Long jobId, Long executionId) {
@@ -580,7 +671,7 @@ public class WorkhorseController {
                     break;
             }
 
-            executionPersistence.update(timeoutExecution.getJobId(), timeoutExecution.getId(), timeoutExecution);
+            executionPersistence.update(timeoutExecution);
 
         }
     }

@@ -15,12 +15,13 @@ import io.coodoo.workhorse.core.control.JobScheduler;
 import io.coodoo.workhorse.core.control.Workhorse;
 import io.coodoo.workhorse.core.control.WorkhorseConfigController;
 import io.coodoo.workhorse.core.control.WorkhorseController;
-import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
+import io.coodoo.workhorse.core.entity.WorkhorseConfigBuilder;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
 import io.coodoo.workhorse.persistence.PersistenceManager;
 import io.coodoo.workhorse.persistence.memory.MemoryConfig;
@@ -151,7 +152,7 @@ public class WorkhorseService {
     /**
      * Retrieves a {@link ExecutionLog} of the correspnding executionId
      * 
-     * @param jobId       ID of the correspnding job
+     * @param jobId ID of the correspnding job
      * @param executionId ID of the correspnding execution
      * @return the log of the execution
      */
@@ -193,15 +194,13 @@ public class WorkhorseService {
 
     }
 
-    /**
-     * Update a {@link Execution}
-     */
-    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime maturity, Long batchId, Long chainId,
-                    Long chainedPreviousExecutionId, boolean uniqueQueued) {
-        return workhorseController.createExecution(jobId, parameters, priority, maturity, batchId, chainId, chainedPreviousExecutionId, uniqueQueued);
+    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime plannedFor, LocalDateTime expiresAt, Long batchId,
+                    Long chainId, Long chainedPreviousExecutionId, boolean uniqueQueued) {
+        return workhorseController.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, chainedPreviousExecutionId,
+                        uniqueQueued);
     }
 
-    public Execution updateExecution(Long jobId, Long executionId, ExecutionStatus status, String parameters, boolean priority, LocalDateTime maturity,
+    public Execution updateExecution(Long jobId, Long executionId, ExecutionStatus status, String parameters, boolean priority, LocalDateTime plannedFor,
                     int fails) {
 
         Execution execution = getExecutionById(jobId, executionId);
@@ -212,11 +211,11 @@ public class WorkhorseService {
         execution.setStatus(status);
         execution.setParameters(parameters);
         execution.setPriority(priority);
-        execution.setMaturity(maturity);
+        execution.setPlannedFor(plannedFor);
         execution.setFailRetry(fails);
         log.info("Execution updated: " + execution);
 
-        workhorseController.updateExecution(jobId, executionId, execution);
+        workhorseController.updateExecution(execution);
         return execution;
     }
 
@@ -235,6 +234,13 @@ public class WorkhorseService {
         workhorseController.deleteExecution(jobId, executionId);
     }
 
+    /**
+     * <i>Activate a job.</i><br>
+     * <br>
+     * The executions of this job can again be processed by the job engine
+     * 
+     * @param jobId ID of the job to activate
+     */
     public void activateJob(Long jobId) {
 
         Job job = getJobById(jobId);
@@ -243,12 +249,20 @@ public class WorkhorseService {
         }
         log.info("Activate job {}", job.getName());
         job.setStatus(JobStatus.ACTIVE);
-        workhorseController.update(job.getId(), job);
+        workhorseController.update(job);
         if (job.getSchedule() != null && !job.getSchedule().isEmpty()) {
             jobScheduler.start(job);
         }
+        executionBuffer.initialize(job);
     }
 
+    /**
+     * <i>Deactivate a job.</i><br>
+     * <br>
+     * The next executions of this job will not be processed by the job engine
+     * 
+     * @param jobId ID of the job to deactivate
+     */
     public void deactivateJob(Long jobId) {
         Job job = getJobById(jobId);
         if (job == null) {
@@ -256,11 +270,11 @@ public class WorkhorseService {
         }
         log.info("Deactivate job {}", job.getName());
         job.setStatus(JobStatus.INACTIVE);
-        workhorseController.update(job.getId(), job);
+        workhorseController.update(job);
         if (job.getSchedule() != null && !job.getSchedule().isEmpty()) {
             jobScheduler.stop(job);
-            executionBuffer.cancelProcess(job);
         }
+        executionBuffer.cancelProcess(job);
     }
 
     /**
@@ -309,9 +323,14 @@ public class WorkhorseService {
     /**
      * Get the execution times defined by {@link Job#getSchedule()}
      * 
-     * @param schedule  CRON Expression
+     * <<<<<<< HEAD
+     * 
+     * @param schedule CRON Expression
      * @param startTime start time for this request (if <tt>null</tt> then current time is used)
-     * @param endTime   end time for this request (if <tt>null</tt> then current time plus 1 day is used)
+     * @param endTime end time for this request (if <tt>null</tt> then current time plus 1 day is used) =======
+     * @param schedule CRON Expression
+     * @param startTime start time for this request (if <tt>null</tt> then current time is used)
+     * @param endTime end time for this request (if <tt>null</tt> then current time plus 1 day is used) >>>>>>> master
      * @return List of {@link LocalDateTime} representing the execution times of a scheduled job between the <tt>startTime</tt> and <tt>endTime</tt>
      */
     public List<LocalDateTime> getScheduledTimes(String schedule, LocalDateTime startTime, LocalDateTime endTime) {
