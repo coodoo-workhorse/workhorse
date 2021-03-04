@@ -53,4 +53,9 @@ public class ExecutionLog extends BaseEntity {
     public void setStacktrace(String failStacktrace) {
         this.stacktrace = failStacktrace;
     }
+
+    @Override
+    public String toString() {
+        return "ExecutionLog [executionId=" + executionId + ", log=" + log + ", exception=" + exception + ",  stacktrace=" + stacktrace + "]";
+    }
 }

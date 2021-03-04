@@ -12,6 +12,7 @@ import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
+import io.coodoo.workhorse.persistence.interfaces.qualifier.ExecutionQualifier;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
 /**
@@ -28,6 +29,7 @@ public class ExecutionContext {
     protected StringBuffer logBuffer;
 
     @Inject
+    @ExecutionQualifier
     ExecutionPersistence executionPersistence;
 
     public void init(Execution execution) {
@@ -90,7 +92,7 @@ public class ExecutionContext {
     /**
      * Adds the message text in as a new line to the executions log and also adds the message in severity INFO to the server log
      * 
-     * @param logger  server log logger
+     * @param logger server log logger
      * @param message text to log
      */
     public void logLine(Logger logger, String message) {
@@ -128,7 +130,7 @@ public class ExecutionContext {
      * Info marker: Only if defined in {@link WorkhorseConfig#LOG_INFO_MARKER}<br>
      * Example: <code>[22:06:42.680] Step 3 complete</code>
      * 
-     * @param logger  server log logger
+     * @param logger server log logger
      * @param message text to log
      */
     public void logInfo(Logger logger, String message) {
@@ -155,7 +157,7 @@ public class ExecutionContext {
      * Error marker: <code>[WARN]</code> or as defined in {@link WorkhorseConfig#LOG_WARN_MARKER}<br>
      * Example: <code>[22:06:42.680] [WARN] Well thats suspicious...</code>
      * 
-     * @param logger  server log logger
+     * @param logger server log logger
      * @param message text to log
      */
     public void logWarn(Logger logger, String message) {
@@ -182,7 +184,7 @@ public class ExecutionContext {
      * Error marker: <code>[ERROR]</code> or as defined in {@link WorkhorseConfig#LOG_ERROR_MARKER}<br>
      * Example: <code>[22:06:42.680] [ERROR] Dafuq was that?!?!</code>
      * 
-     * @param logger  server log logger
+     * @param logger server log logger
      * @param message text to log
      */
     public void logError(Logger logger, String message) {
@@ -197,8 +199,8 @@ public class ExecutionContext {
      * Error marker: <code>[ERROR]</code> or as defined in {@link WorkhorseConfig#LOG_ERROR_MARKER}<br>
      * Example: <code>[22:06:42.680] [ERROR] Dafuq was that?!?!</code>
      * 
-     * @param logger    server log logger
-     * @param message   text to log
+     * @param logger server log logger
+     * @param message text to log
      * @param throwable cause of error
      */
     public void logError(Logger logger, String message, Throwable throwable) {

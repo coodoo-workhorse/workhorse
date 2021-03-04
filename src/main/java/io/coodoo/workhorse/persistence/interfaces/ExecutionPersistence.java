@@ -5,6 +5,8 @@ import java.util.List;
 
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
+import io.coodoo.workhorse.core.entity.ExecutionStatus;
+import io.coodoo.workhorse.core.entity.Job;
 
 public interface ExecutionPersistence {
 
@@ -172,13 +174,13 @@ public interface ExecutionPersistence {
      * @param executionId ID of the corresponding {@link Execution}
      * @return {@link ExecutionLog}
      */
-    ExecutionLog getLog(Long executionId);
+    ExecutionLog getLog(Long jobId, Long executionId);
 
     /**
      * Log a message.
      * 
-     * @param jobId       ID of the corresponding job
-     * @param executionId ID of corresponding execution
+     * @param jobId       ID of the corresponding {@link Job}
+     * @param executionId ID of corresponding {@link Execution}
      * @param message     message to log.
      */
     void log(Long jobId, Long executionId, String message);
@@ -186,28 +188,12 @@ public interface ExecutionPersistence {
     /**
      * Log a error message.
      * 
-     * @param jobId       Id of the corresponding job
-     * @param executionId ID of corresponding execution
+     * @param jobId       Id of the corresponding {@link Job}
+     * @param executionId ID of corresponding {@link Execution}
      * @param error       error message
-     * @param stacktrace  stacktrace of the exception
+     * @param stacktrace  stacktrace of the {@link Execution}
      */
     void log(Long jobId, Long executionId, String error, String stacktrace);
-
-    /**
-     * Create a {@link ExecutionLog}
-     * 
-     * @return {@link ExecutionLog}
-     */
-    ExecutionLog createLog(ExecutionLog executionLog);
-
-    /**
-     * Update {@link ExecutionLog}
-     * 
-     * @param id           ID of the {@link ExecutionLog} to update
-     * @param executionLog new {@link ExecutionLog} object
-     * @return {@link ExecutionLog}
-     */
-    ExecutionLog updateLog(Long id, ExecutionLog executionLog);
 
     /**
      * 

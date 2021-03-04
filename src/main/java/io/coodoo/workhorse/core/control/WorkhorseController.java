@@ -344,6 +344,31 @@ public class WorkhorseController {
 
     }
 
+    /**
+     * Log a message.
+     * 
+     * @param jobId       ID of the corresponding job
+     * @param executionId ID of corresponding execution
+     * @param message     message to log.
+     */
+    public void log(Long jobId, Long executionId, String message) {
+
+        executionPersistence.log(jobId, executionId, message);
+    }
+
+    /**
+     * Log a error message.
+     * 
+     * @param jobId       Id of the corresponding job
+     * @param executionId ID of corresponding execution
+     * @param error       error message
+     * @param stacktrace  stacktrace of the exception
+     */
+    public void log(Long jobId, Long executionId, String error, String stacktrace) {
+
+        executionPersistence.log(jobId, executionId, error, stacktrace);
+    }
+
     public synchronized Execution handleFailedExecution(Job job, Long executionId, Exception exception, Long duration, BaseWorker worker, String executionLog) {
         Execution failedExecution = executionPersistence.getById(job.getId(), executionId);
         Execution retryExecution = null;
@@ -492,6 +517,11 @@ public class WorkhorseController {
 
     public List<Execution> getchain(Long jobId, Long chainId) {
         return executionPersistence.getChain(jobId, chainId);
+    }
+
+    public ExecutionLog getExecutionLog(Long jobId, Long executionId) {
+
+        return executionPersistence.getLog(jobId, executionId);
     }
 
     public List<Execution> getExecutions(Long jobId) {

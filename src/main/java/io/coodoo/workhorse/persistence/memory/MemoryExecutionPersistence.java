@@ -258,34 +258,15 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     }
 
     @Override
-    public ExecutionLog getLog(Long executionId) {
+    public ExecutionLog getLog(Long jobId, Long executionId) {
         return memoryPersistence.getExecutionLogs().get(executionId);
-    }
-
-    @Override
-    public ExecutionLog createLog(ExecutionLog executionLog) {
-        Long id = executionLogId.getAndIncrement();
-        executionLog.setId(id);
-        executionLog.setCreatedAt(WorkhorseUtil.timestamp());
-        memoryPersistence.getExecutionLogs().put(executionLog.getExecutionId(), executionLog);
-        return null;
-    }
-
-    @Override
-    public ExecutionLog updateLog(Long executionId, ExecutionLog executionLog) {
-
-        executionLog.setUpdatedAt(WorkhorseUtil.timestamp());
-        if (memoryPersistence.getExecutionLogs().put(executionId, executionLog) != null) {
-            return executionLog;
-        }
-        return null;
     }
 
     @Override
     public void log(Long jobId, Long executionId, String message) {
 
         ExecutionLog executionLog = memoryPersistence.getExecutionLogs().get(executionId);
-
+        StringBuffer logBuffer;
         if (executionLog == null) {
 
             executionLog = new ExecutionLog();
@@ -295,8 +276,11 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
         } else {
             executionLog.setUpdatedAt(WorkhorseUtil.timestamp());
         }
-
-        StringBuffer logBuffer = new StringBuffer(executionLog.getLog());
+        if (executionLog.getLog() != null) {
+            logBuffer = new StringBuffer(executionLog.getLog());
+        } else {
+            logBuffer = new StringBuffer();
+        }
 
         if (logBuffer.length() > 0) {
 
