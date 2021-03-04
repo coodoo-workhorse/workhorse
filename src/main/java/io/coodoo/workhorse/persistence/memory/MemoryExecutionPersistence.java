@@ -89,14 +89,14 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
         for (Execution execution : memoryPersistence.getExecutions().values()) {
 
             if (execution.getJobId().equals(jobId) && (execution.getStatus() == ExecutionStatus.QUEUED || execution.getStatus() == ExecutionStatus.PLANNED)
-                            && (execution.getPlannedFor() == null || execution.getPlannedFor().compareTo(currentTimeStamp) < 0)
+                            && (execution.getPlannedFor() == null || execution.getPlannedFor().isBefore(currentTimeStamp))
                             && execution.getChainedPreviousExecutionId() == null && executions.size() < limit.intValue()) {
 
                 executions.add(execution);
             }
         }
 
-        Comparator<Execution> sortByPriority = (Execution e1, Execution e2) -> e1.getPriority().compareTo(e2.getPriority());
+        Comparator<Execution> sortByPriority = (Execution e1, Execution e2) -> Boolean.compare(e1.isPriority(), e2.isPriority());
         Collections.sort(executions, sortByPriority);
 
         return executions;
@@ -266,7 +266,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     public int deleteOlderExecutions(Long jobId, LocalDateTime preDate) {
         int count = 0;
         for (Execution execution : memoryPersistence.getExecutions().values()) {
-            if (jobId.equals(execution.getJobId()) && preDate.compareTo(execution.getCreatedAt()) > 0) {
+            if (jobId.equals(execution.getJobId()) && preDate.isAfter(execution.getCreatedAt())) {
                 log.trace("Next Execution have to be delete: {}", execution);
                 delete(jobId, execution.getId());
                 count++;
@@ -294,7 +294,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
         for (Execution execution : memoryPersistence.getExecutions().values()) {
 
-            if (time.compareTo(execution.getStartedAt()) > 0 && ExecutionStatus.RUNNING.equals(execution.getStatus())) {
+            if (time.isAfter(execution.getStartedAt()) && ExecutionStatus.RUNNING.equals(execution.getStatus())) {
                 executions.add(execution);
             }
         }

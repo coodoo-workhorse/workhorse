@@ -223,7 +223,7 @@ public class Workhorse {
         try {
             lock.lock();
 
-            if (Boolean.TRUE.equals(execution.getPriority())) {
+            if (Boolean.TRUE.equals(execution.isPriority())) {
                 executionBuffer.addPriorityExecution(jobId, execution.getId());
             } else {
                 executionBuffer.addExecution(jobId, execution.getId());
@@ -234,7 +234,7 @@ public class Workhorse {
             lock.unlock();
         }
 
-        log.trace(" Numbers of running's jobThreads : {}", executionBuffer.getRunningJobThreadCounts(jobId));
+        log.trace("Numbers of running's jobThreads: {}", executionBuffer.getRunningJobThreadCounts(jobId));
         if (executionBuffer.getJobThreadCounts(jobId) > executionBuffer.getRunningJobThreadCounts(jobId)) {
             // lock = executionQueue.getLock(jobId);
             try {

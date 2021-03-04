@@ -345,7 +345,7 @@ public class WorkhorseControllerTest {
         Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, chainedPreviousExecutionId,
                         uniqueQueued);
 
-        assertFalse(execution.getPriority());
+        assertFalse(execution.isPriority());
 
     }
 

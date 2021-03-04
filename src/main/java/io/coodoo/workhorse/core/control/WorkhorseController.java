@@ -294,7 +294,7 @@ public class WorkhorseController {
         Execution execution = new Execution();
         execution.setJobId(jobId);
 
-        if (plannedFor != null && WorkhorseUtil.timestamp().compareTo(plannedFor) < 0) {
+        if (plannedFor != null && WorkhorseUtil.timestamp().isBefore(plannedFor)) {
             execution.setStatus(ExecutionStatus.PLANNED);
         } else {
             execution.setStatus(ExecutionStatus.QUEUED);
@@ -333,7 +333,7 @@ public class WorkhorseController {
         retryExecution.setJobId(failedExecution.getJobId());
         retryExecution.setStatus(failedExecution.getStatus());
         retryExecution.setStartedAt(LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)));
-        retryExecution.setPriority(failedExecution.getPriority());
+        retryExecution.setPriority(failedExecution.isPriority());
         retryExecution.setPlannedFor(failedExecution.getPlannedFor());
         retryExecution.setChainId(failedExecution.getChainId());
         retryExecution.setChainedNextExecutionId(failedExecution.getChainedNextExecutionId());

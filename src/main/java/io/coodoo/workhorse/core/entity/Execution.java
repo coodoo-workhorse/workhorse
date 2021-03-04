@@ -25,7 +25,7 @@ public class Execution extends BaseEntity {
     private ExecutionStatus status;
 
     /**
-     * Status of an failed Execution. <code>TIMEOUT</code>, <code>EXCEPTION</code>, <code>MANUAL</code>, <code>EXPIRED</code>
+     * The Execution failed. @see ExecutionFailStatus
      */
     private ExecutionFailStatus failStatus = ExecutionFailStatus.NONE;
 
@@ -49,7 +49,7 @@ public class Execution extends BaseEntity {
     /**
      * If a exectution has the priority set to <code>true</code> it will be executed before all jobs with priority <code>false</code>.
      */
-    private Boolean priority;
+    private boolean priority;
 
     /**
      * If a plannedFor is given, the job execution will not be executed before this time.
@@ -140,11 +140,11 @@ public class Execution extends BaseEntity {
         this.parameters = parameters;
     }
 
-    public Boolean getPriority() {
+    public boolean isPriority() {
         return priority;
     }
 
-    public void setPriority(Boolean priority) {
+    public void setPriority(boolean priority) {
         this.priority = priority;
     }
 
