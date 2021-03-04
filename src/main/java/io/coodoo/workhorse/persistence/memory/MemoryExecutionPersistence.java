@@ -116,9 +116,9 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     }
 
     @Override
-    public Execution updateStatus(Long jobId, Long id, ExecutionStatus status, ExecutionFailStatus failStatus) {
+    public Execution updateStatus(Long jobId, Long executionId, ExecutionStatus status, ExecutionFailStatus failStatus) {
 
-        Execution execution = memoryPersistence.getExecutions().get(id);
+        Execution execution = memoryPersistence.getExecutions().get(executionId);
 
         execution.setStatus(status);
         if (failStatus != null) {
@@ -223,8 +223,9 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     }
 
     @Override
-    public void delete(Long jobId, Long id) {
-        memoryPersistence.getExecutions().remove(id);
+    public void delete(Long jobId, Long executionId) {
+        memoryPersistence.getExecutionLogs().remove(executionId);
+        memoryPersistence.getExecutions().remove(executionId);
     }
 
     @Override
@@ -277,41 +278,29 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     }
 
     @Override
-    public void log(Long jobId, Long executionId, String message) {
+    public void log(Long jobId, Long executionId, String log) {
 
         ExecutionLog executionLog = memoryPersistence.getExecutionLogs().get(executionId);
-        StringBuffer logBuffer;
+
         if (executionLog == null) {
 
             executionLog = new ExecutionLog();
             executionLog.setId(executionId);
             executionLog.setExecutionId(executionId);
             executionLog.setCreatedAt(WorkhorseUtil.timestamp());
+            executionLog.setLog(log);
+
         } else {
+
+            executionLog.setLog(executionLog.getLog() + System.lineSeparator() + log);
             executionLog.setUpdatedAt(WorkhorseUtil.timestamp());
         }
-        if (executionLog.getLog() != null) {
-            logBuffer = new StringBuffer(executionLog.getLog());
-        } else {
-            logBuffer = new StringBuffer();
-        }
-
-        if (logBuffer.length() > 0) {
-
-            logBuffer.append(System.lineSeparator());
-
-        }
-
-        logBuffer.append(message);
-
-        executionLog.setLog(logBuffer.toString());
 
         memoryPersistence.getExecutionLogs().put(executionId, executionLog);
-
     }
 
     @Override
-    public void log(Long jobId, Long executionId, String exception, String stacktrace) {
+    public void log(Long jobId, Long executionId, String error, String stacktrace) {
 
         ExecutionLog executionLog = memoryPersistence.getExecutionLogs().get(executionId);
 
@@ -325,11 +314,10 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
             executionLog.setUpdatedAt(WorkhorseUtil.timestamp());
         }
 
-        executionLog.setException(exception);
+        executionLog.setError(error);
         executionLog.setStacktrace(stacktrace);
 
         memoryPersistence.getExecutionLogs().put(executionId, executionLog);
-
     }
 
 }

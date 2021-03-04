@@ -10,10 +10,10 @@ public interface JobPersistence {
     /**
      * Get a job by his Id
      * 
-     * @param id
+     * @param jobId
      * @return
      */
-    Job get(Long id);
+    Job get(Long jobId);
 
     /**
      * Get a Job by his Name

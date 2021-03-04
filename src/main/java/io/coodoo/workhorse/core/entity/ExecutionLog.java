@@ -15,7 +15,7 @@ public class ExecutionLog extends BaseEntity {
     /**
      * The exception message, if the job execution ends in an exception.
      */
-    private String exception;
+    private String error;
 
     /**
      * The exception stacktrace, if the job execution ends in an exception.
@@ -38,24 +38,25 @@ public class ExecutionLog extends BaseEntity {
         this.log = log;
     }
 
-    public String getException() {
-        return exception;
+    public String getError() {
+        return error;
     }
 
-    public void setException(String failMessage) {
-        this.exception = failMessage;
+    public void setError(String error) {
+        this.error = error;
     }
 
     public String getStacktrace() {
         return stacktrace;
     }
 
-    public void setStacktrace(String failStacktrace) {
-        this.stacktrace = failStacktrace;
+    public void setStacktrace(String stacktrace) {
+        this.stacktrace = stacktrace;
     }
 
     @Override
     public String toString() {
-        return "ExecutionLog [executionId=" + executionId + ", log=" + log + ", exception=" + exception + ",  stacktrace=" + stacktrace + "]";
+        return "ExecutionLog [executionId=" + executionId + ", log=" + log + ", error=" + error + ", stacktrace=" + stacktrace + "]";
     }
+
 }

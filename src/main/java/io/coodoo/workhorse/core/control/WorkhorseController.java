@@ -353,31 +353,6 @@ public class WorkhorseController {
 
     }
 
-    /**
-     * Log a message.
-     * 
-     * @param jobId ID of the corresponding job
-     * @param executionId ID of corresponding execution
-     * @param message message to log.
-     */
-    public void log(Long jobId, Long executionId, String message) {
-
-        executionPersistence.log(jobId, executionId, message);
-    }
-
-    /**
-     * Log a error message.
-     * 
-     * @param jobId Id of the corresponding job
-     * @param executionId ID of corresponding execution
-     * @param error error message
-     * @param stacktrace stacktrace of the exception
-     */
-    public void log(Long jobId, Long executionId, String error, String stacktrace) {
-
-        executionPersistence.log(jobId, executionId, error, stacktrace);
-    }
-
     public synchronized Execution handleFailedExecution(Job job, Long executionId, Exception exception, Long duration, BaseWorker worker, String executionLog) {
         Execution failedExecution = executionPersistence.getById(job.getId(), executionId);
         Execution retryExecution = null;
@@ -417,10 +392,7 @@ public class WorkhorseController {
     /**
      * Delete all executions of a job that were created for a given number of minutes
      * 
-     * <<<<<<< HEAD
-     * 
-     * @param jobId ID of the job =======
-     * @param jobId ID of the job >>>>>>> master
+     * @param jobId ID of the job
      * @param minMinutesOld Minimum number of minutes, that an execution have to exist to be deleted
      * @return number of deleted executions
      */
