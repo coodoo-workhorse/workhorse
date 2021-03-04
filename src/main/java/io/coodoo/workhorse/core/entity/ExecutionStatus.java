@@ -1,5 +1,10 @@
 package io.coodoo.workhorse.core.entity;
 
+/**
+ * This enum describes all status that an execution can get
+ * 
+ * @author coodoo GmbH (coodoo.io)
+ */
 public enum ExecutionStatus {
 
     /**

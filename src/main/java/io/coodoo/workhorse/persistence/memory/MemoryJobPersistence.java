@@ -45,8 +45,8 @@ public class MemoryJobPersistence implements JobPersistence {
     }
 
     @Override
-    public void update(Long id, Job job) {
-        memoryPersistence.getJobs().put(id, job);
+    public void update(Job job) {
+        memoryPersistence.getJobs().put(job.getId(), job);
     }
 
     @Override
