@@ -198,7 +198,7 @@ public class Workhorse {
             case QUEUED:
                 // If the execution is 'expired' these don't have to be processed.
                 if (execution.getExpiresAt() != null && execution.getExpiresAt().isBefore(WorkhorseUtil.timestamp())) {
-                    workhorseController.updateExecutionFailStatus(execution.getJobId(), execution.getId(), ExecutionFailStatus.EXPIRED);
+                    workhorseController.setExecutionStatusToFailed(execution, ExecutionFailStatus.EXPIRED);
                     return false;
                 }
                 break;

@@ -7,15 +7,13 @@ import io.coodoo.workhorse.persistence.memory.MemoryPersistence;
 /**
  * FOR INTERNAL USAGE ONLY!
  * 
- * The static members get updated by
- * {@link WorkhorseConfigController#initializeStaticConfig()}
+ * The static members get updated by {@link WorkhorseConfigController#initializeStaticConfig()}
  * 
  * @author coodoo GmbH (coodoo.io)
  */
 public final class StaticConfig {
 
-    private StaticConfig() {
-    }
+    private StaticConfig() {}
 
     /**
      * Name of the peristence (Default is {@link MemoryPersistence})
@@ -43,40 +41,33 @@ public final class StaticConfig {
     public static int BUFFER_POLL_INTERVAL;
 
     /**
-     * Polling interval in seconds at which the intern buffer is loaded, that is
-     * used as fallback mechanism when new Executions are pushed by the persistence
+     * Polling interval in seconds at which the intern buffer is loaded, that is used as fallback mechanism when new Executions are pushed by the persistence
      */
     public static int BUFFER_PUSH_FALL_BACK_POLL_INTERVAL;
 
     /**
-     * Number of minutes an execution can be held in the persistence before being
-     * deleted.
+     * Number of minutes an execution can be held in the persistence before being deleted.
      * 
      * If set to 0, no cleanup is performed.
      */
     public static long MINUTES_UNTIL_CLEANUP;
 
     /**
-     * Duration in seconds after which an EXECUTION in status
-     * {@link ExecutionStatus#RUNNING} is consider as in timeout.(if set to 0 the
-     * value is ignored)
+     * Duration in seconds after which an EXECUTION in status {@link ExecutionStatus#RUNNING} is consider as in timeout.(if set to 0 the value is ignored)
      */
     public static int EXECUTION_TIMEOUT;
 
     /**
      * 
-     * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and
-     * doesn't change for {@link WorkhorseConfig#executionTimeout} seconds, it is in
+     * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and doesn't change for {@link WorkhorseConfig#executionTimeout} seconds, it is in
      * timout!
      * 
-     * <code>executionTimeoutStatus</code> defines which status this execution in
-     * timout have to get.
+     * <code>executionTimeoutStatus</code> defines which status this execution in timout have to get.
      */
     public static ExecutionStatus EXECUTION_TIMEOUT_STATUS;
 
     /**
-     * Log change pattern. Placeholder <code>%s</code> for changeParameter,
-     * changeOld and changeNew in this order <br>
+     * Log change pattern. Placeholder <code>%s</code> for changeParameter, changeOld and changeNew in this order <br>
      * Default is <code>Changed %s from '%s' to '%s'</code>
      */
     public static String LOG_CHANGE;

@@ -58,7 +58,7 @@ public class ExecutionTimeoutWorker extends Worker {
             switch (cure) {
                 case QUEUED:
                     Execution retryExecution = workhorseController.createRetryExecution(timeoutExecution);
-                    workhorseController.updateExecutionFailStatus(timeoutExecution.getJobId(), timeoutExecution.getId(), ExecutionFailStatus.TIMEOUT);
+                    workhorseController.setExecutionStatusToFailed(timeoutExecution, ExecutionFailStatus.TIMEOUT);
                     log.trace("Execution in timeout killed and risen from the death! Now it is {}", retryExecution);
                     workhorseLogService.logMessage(logMessage + "Marked as failed and queued a clone", timeoutExecution.getJobId(), false);
                     break;

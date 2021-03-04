@@ -95,7 +95,7 @@ public class JobThread {
 
                 try {
 
-                    workhorseController.updateExecutionStatus(execution.getJobId(), execution.getId(), ExecutionStatus.RUNNING);
+                    workhorseController.setExecutionStatusToRunning(execution);
 
                     // mediterraneus
                     workerInstance.doWork(execution);
@@ -112,7 +112,7 @@ public class JobThread {
 
                     execution.setLog(executionLog);
                     executionPersistence.update(execution);
-                    workhorseController.updateExecutionStatus(execution.getJobId(), execution.getId(), ExecutionStatus.FINISHED);
+                    workhorseController.setExecutionStatusToFinished(execution);
 
                     log.trace("Execution {}, duration: {} was successfull", execution.getId(), execution.getDuration());
                     executionBuffer.removeRunningExecution(jobId, execution.getId());

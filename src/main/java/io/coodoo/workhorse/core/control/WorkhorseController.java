@@ -1,5 +1,6 @@
 package io.coodoo.workhorse.core.control;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -257,14 +258,13 @@ public class WorkhorseController {
     /**
      * create a Job Execution
      * 
-     * @param jobId                      Id of the correspondant JOB
-     * @param parameters                 parameters of the execution
-     * @param priority                   if <code>true</code> the execution will be process before other execution. Otherwise the execution will be process in
-     *                                   order of add.
-     * @param plannedFor                 If a plannedFor is given, the job execution will not be executed before this time.
-     * @param expiresAt                  If expiresAt is given, the execution have to be process before this time. Otherwise the execution is cancelled.
-     * @param batchId                    Id to refer to a group of executions to handle as a single entity.
-     * @param chainId                    Id to refer to a group of executions to process by an order.
+     * @param jobId Id of the correspondant JOB
+     * @param parameters parameters of the execution
+     * @param priority if <code>true</code> the execution will be process before other execution. Otherwise the execution will be process in order of add.
+     * @param plannedFor If a plannedFor is given, the job execution will not be executed before this time.
+     * @param expiresAt If expiresAt is given, the execution have to be process before this time. Otherwise the execution is cancelled.
+     * @param batchId Id to refer to a group of executions to handle as a single entity.
+     * @param chainId Id to refer to a group of executions to process by an order.
      * @param chainedPreviousExecutionId Id to the previous execution to process, if the execution belong to a chained Execution.
      * @param uniqueQueued
      * @return the created Job Execution
@@ -388,7 +388,7 @@ public class WorkhorseController {
     /**
      * Delete all executions of a job that were created for a given number of minutes
      * 
-     * @param jobId         ID of the job
+     * @param jobId ID of the job
      * @param minMinutesOld Minimum number of minutes, that an execution have to exist to be deleted
      * @return number of deleted executions
      */
@@ -503,16 +503,83 @@ public class WorkhorseController {
         return executionPersistence.getByJobId(jobId, 100L);
     }
 
+    public void setExecutionStatusToRunning(Execution execution) {
+        updateExecutionStatus(execution, ExecutionStatus.RUNNING, ExecutionFailStatus.NONE);
+    }
+
+    public void setExecutionStatusToFinished(Execution execution) {
+        updateExecutionStatus(execution, ExecutionStatus.FINISHED, ExecutionFailStatus.NONE);
+    }
+
+    /**
+     * Set the status of the execution to fail.
+     * 
+     * The default fail status is {@link ExecutionFailStatus#EXCEPTION}
+     * 
+     * @param execution Execution to update
+     */
+    public void setExecutionStatusToFailed(Execution execution) {
+        setExecutionStatusToFailed(execution, ExecutionFailStatus.EXCEPTION);
+    }
+
+    /**
+     * Set the status of the execution to fail.
+     * 
+     * @param execution Execution to update
+     * @param failStatus Status that describes the cause of the failure
+     */
+    public void setExecutionStatusToFailed(Execution execution, ExecutionFailStatus failStatus) {
+        updateExecutionStatus(execution, ExecutionStatus.FAILED, failStatus);
+    }
+
     public Execution updateExecutionStatus(Long jobId, Long executionId, ExecutionStatus executionStatus) {
-        return updateExecutionStatus(jobId, executionId, executionStatus, ExecutionFailStatus.NONE);
+        return executionPersistence.updateStatus(jobId, executionId, executionStatus, ExecutionFailStatus.NONE);
     }
 
-    public Execution updateExecutionFailStatus(Long jobId, Long executionId, ExecutionFailStatus executionfailStatus) {
-        return updateExecutionStatus(jobId, executionId, ExecutionStatus.FAILED, executionfailStatus);
-    }
+    /**
+     * Update the status of an execution.
+     * 
+     * @param jobId ID of the corresponding job
+     * @param id ID of the execution
+     * @param status New Status to set
+     * @param failStatus Specific status of a failed execution
+     * @return the updated execution
+     */
+    protected Execution updateExecutionStatus(Execution execution, ExecutionStatus status, ExecutionFailStatus failStatus) {
 
-    protected Execution updateExecutionStatus(Long jobId, Long executionId, ExecutionStatus executionStatus, ExecutionFailStatus executionfailStatus) {
-        return executionPersistence.updateStatus(jobId, executionId, executionStatus, executionfailStatus);
+        switch (status) {
+
+            case RUNNING:
+                execution.setStartedAt(WorkhorseUtil.timestamp());
+                break;
+
+            case FINISHED:
+
+                LocalDateTime endTime = WorkhorseUtil.timestamp();
+                Long duration = Duration.between(execution.getStartedAt(), endTime).toMillis();
+                execution.setEndedAt(endTime);
+                execution.setDuration(duration);
+                break;
+
+            case FAILED:
+                if (execution.getStatus().equals(ExecutionStatus.RUNNING)) {
+                    LocalDateTime endFailTime = WorkhorseUtil.timestamp();
+                    Long durationToFail = Duration.between(execution.getStartedAt(), endFailTime).toMillis();
+                    execution.setEndedAt(endFailTime);
+                    execution.setDuration(durationToFail);
+                }
+                break;
+            default:
+                break;
+        }
+
+        execution.setStatus(status);
+        if (failStatus != null) {
+            execution.setFailStatus(failStatus);
+        }
+        execution.setUpdatedAt(WorkhorseUtil.timestamp());
+
+        return updateExecution(execution);
     }
 
     public Execution updateExecution(Execution execution) {

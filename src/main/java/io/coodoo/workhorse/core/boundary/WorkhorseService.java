@@ -309,9 +309,9 @@ public class WorkhorseService {
     /**
      * Get the execution times defined by {@link Job#getSchedule()}
      * 
-     * @param schedule  CRON Expression
+     * @param schedule CRON Expression
      * @param startTime start time for this request (if <tt>null</tt> then current time is used)
-     * @param endTime   end time for this request (if <tt>null</tt> then current time plus 1 day is used)
+     * @param endTime end time for this request (if <tt>null</tt> then current time plus 1 day is used)
      * @return List of {@link LocalDateTime} representing the execution times of a scheduled job between the <tt>startTime</tt> and <tt>endTime</tt>
      */
     public List<LocalDateTime> getScheduledTimes(String schedule, LocalDateTime startTime, LocalDateTime endTime) {

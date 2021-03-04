@@ -1,6 +1,5 @@
 package io.coodoo.workhorse.persistence.memory;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -113,37 +112,8 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
     @Override
     public Execution updateStatus(Long jobId, Long id, ExecutionStatus status, ExecutionFailStatus failStatus) {
+
         Execution execution = memoryPersistence.getExecutions().get(id);
-
-        if (execution == null) {
-            return null;
-        }
-
-        switch (status) {
-
-            case RUNNING:
-                execution.setStartedAt(WorkhorseUtil.timestamp());
-                break;
-
-            case FINISHED:
-
-                LocalDateTime endTime = WorkhorseUtil.timestamp();
-                Long duration = Duration.between(execution.getStartedAt(), endTime).toMillis();
-                execution.setEndedAt(endTime);
-                execution.setDuration(duration);
-                break;
-
-            case FAILED:
-                if (execution.getStatus().equals(ExecutionStatus.RUNNING)) {
-                    LocalDateTime endFailTime = WorkhorseUtil.timestamp();
-                    Long durationToFail = Duration.between(execution.getStartedAt(), endFailTime).toMillis();
-                    execution.setEndedAt(endFailTime);
-                    execution.setDuration(durationToFail);
-                }
-                break;
-            default:
-                break;
-        }
 
         execution.setStatus(status);
         if (failStatus != null) {
