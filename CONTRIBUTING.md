@@ -30,3 +30,28 @@ email, or any other method with the owners of this repository before making a ch
 - There are sufficient JUnit tests
 - There are test cases in the `worhorse-test` project
 - There are well explained examples in the available `worhorse-example-*` projects
+
+
+## Formatting rules
+We use the Ecplise Formatter to format our code. The configuration file that
+instructs the formatter on how to format the code is:
+```sh
+src/main/resources/coodooJavaStyle.xml
+```
+You can [consult the official documentation of Eclipse][1] to learn how to use
+this configuration as your default formatting rules. Probably it makes sense to
+[format code automagically on each save][2].
+To check for correct formatting in our GitLab Pipelines, we use
+[spotless-maven-plugin][spotless]. If you do not use Eclipse, you can leverage
+the plugin to format the entire codebase with the following command:
+```sh
+mvn spotless:apply
+```
+or you can format individual files with the following command:
+```sh
+mvn spotless:apply -DspotlessFiles=my/file/pattern.java,more/generic/.*-pattern.java
+```
+[1]: https://help.eclipse.org/neon/index.jsp?topic=%2Forg.eclipse.jdt.doc.user%2Freference%2Fpreferences%2Fjava%2Fcodestyle%2Fref-preferences-formatter.htm
+[2]: http://www.eclipseonetips.com/2009/12/13/automatically-format-and-cleanup-code-every-time-you-save/
+[spotless]: https://github.com/diffplug/spotless
+[spotless-specific]: https://github.com/diffplug/spotless/blob/master/plugin-maven/README.md#can-i-apply-spotless-to-specific-files
