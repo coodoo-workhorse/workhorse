@@ -26,7 +26,6 @@ public class ExecutionContext {
 
     // The visibility is protected to enable mocking in Junit Tests
     protected Execution execution;
-    protected StringBuffer logBuffer;
 
     @Inject
     @ExecutionQualifier
@@ -34,11 +33,6 @@ public class ExecutionContext {
 
     public void init(Execution execution) {
         this.execution = execution;
-        if (execution != null && execution.getLog() != null) {
-            this.logBuffer = new StringBuffer(execution.getLog());
-        } else {
-            this.logBuffer = new StringBuffer();
-        }
     }
 
     /**
@@ -74,10 +68,7 @@ public class ExecutionContext {
      */
     public String getLog() {
 
-        if (logBuffer != null && logBuffer.length() > 0) {
-            return logBuffer.toString();
-        }
-        return null;
+        return executionPersistence.getLog(execution.getJobId(), execution.getId()).getLog();
     }
 
     /**
@@ -210,44 +201,43 @@ public class ExecutionContext {
 
     protected void appendLog(String message, boolean timestamp, String mode) {
 
-        if (logBuffer != null) {
-            if (logBuffer.length() > 0) {
-                logBuffer.append(System.lineSeparator());
-            }
-            if (timestamp) {
-                DateTimeFormatter logTimeFormat = DateTimeFormatter.ofPattern(StaticConfig.LOG_TIME_FORMATTER);
-                logBuffer.append(WorkhorseUtil.timestamp().format(logTimeFormat));
-                logBuffer.append(" ");
-            }
-            switch (mode) {
-                case "i":
-                    if (StaticConfig.LOG_INFO_MARKER != null) {
-                        logBuffer.append(StaticConfig.LOG_INFO_MARKER);
-                        logBuffer.append(" ");
-                    }
-                    break;
-                case "w":
-                    if (StaticConfig.LOG_WARN_MARKER != null) {
-                        logBuffer.append(StaticConfig.LOG_WARN_MARKER);
-                        logBuffer.append(" ");
-                    }
-                    break;
-                case "e":
-                    if (StaticConfig.LOG_ERROR_MARKER != null) {
-                        logBuffer.append(StaticConfig.LOG_ERROR_MARKER);
-                        logBuffer.append(" ");
-                    }
-                    break;
-                default:
-                    break;
-            }
-            logBuffer.append(message);
-
-            if (executionPersistence != null) {
-                executionPersistence.log(getJobId(), getExecutionId(), message);
-            }
-
+        if (executionPersistence == null) {
+            return;
         }
+
+        String marker = "";
+        String time = "";
+
+        if (timestamp) {
+
+            DateTimeFormatter logTimeFormat = DateTimeFormatter.ofPattern(StaticConfig.LOG_TIME_FORMATTER);
+            time = WorkhorseUtil.timestamp().format(logTimeFormat) + " ";
+        }
+        switch (mode) {
+            case "i":
+                if (StaticConfig.LOG_INFO_MARKER != null) {
+
+                    marker = time + StaticConfig.LOG_INFO_MARKER + " ";
+                }
+                break;
+            case "w":
+                if (StaticConfig.LOG_WARN_MARKER != null) {
+
+                    marker = time + StaticConfig.LOG_WARN_MARKER + " ";
+                }
+                break;
+            case "e":
+                if (StaticConfig.LOG_ERROR_MARKER != null) {
+
+                    marker = time + StaticConfig.LOG_ERROR_MARKER + " ";
+                }
+                break;
+            default:
+                break;
+        }
+
+        String log = marker + message;
+        executionPersistence.log(getJobId(), getExecutionId(), log);
     }
 
 }

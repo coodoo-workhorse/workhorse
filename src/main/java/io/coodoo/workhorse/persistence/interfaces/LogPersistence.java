@@ -17,7 +17,7 @@ public interface LogPersistence {
     /**
      * Update a log
      * 
-     * @param logId           Id of the log to retrieve
+     * @param logId Id of the log to retrieve
      * @param workhorseLog log
      * @return the updated log
      */

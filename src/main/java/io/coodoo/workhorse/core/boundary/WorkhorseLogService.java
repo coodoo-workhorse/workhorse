@@ -58,8 +58,7 @@ public class WorkhorseLogService {
      * @param message
      * @return
      */
-    public WorkhorseLog logChange(Long jobId, JobStatus jobStatus, String changeParameter, Object changeOld,
-            Object changeNew, String message) {
+    public WorkhorseLog logChange(Long jobId, JobStatus jobStatus, String changeParameter, Object changeOld, Object changeNew, String message) {
 
         String co = changeOld == null ? "" : changeOld.toString();
         String cn = changeNew == null ? "" : changeNew.toString();
@@ -83,8 +82,8 @@ public class WorkhorseLogService {
      * @param stacktrace
      * @return
      */
-    public WorkhorseLog createLog(String message, Long jobId, JobStatus jobStatus, boolean byUser,
-            String changeParameter, String changeOld, String changeNew, String stacktrace) {
+    public WorkhorseLog createLog(String message, Long jobId, JobStatus jobStatus, boolean byUser, String changeParameter, String changeOld, String changeNew,
+                    String stacktrace) {
 
         WorkhorseLog workhorseLog = new WorkhorseLog();
         workhorseLog.setMessage(message);
@@ -120,19 +119,18 @@ public class WorkhorseLogService {
     public void logException(@Observes JobErrorEvent jobErrorPayload) {
 
         String message = jobErrorPayload.getMessage() != null ? jobErrorPayload.getMessage()
-                : WorkhorseUtil.getMessagesFromException(jobErrorPayload.getThrowable());
+                        : WorkhorseUtil.getMessagesFromException(jobErrorPayload.getThrowable());
 
         createLog(message, jobErrorPayload.getJobId(), jobErrorPayload.getJobStatus(), false, null, null, null,
-                WorkhorseUtil.stacktraceToString(jobErrorPayload.getThrowable()));
+                        WorkhorseUtil.stacktraceToString(jobErrorPayload.getThrowable()));
     }
 
     /**
      * Logs a text message
      * 
      * @param message text to log
-     * @param jobId   optional: belonging {@link Job}-ID
-     * @param byUser  <code>true</code> if author is a user, <code>false</code> if
-     *                author is the system
+     * @param jobId optional: belonging {@link Job}-ID
+     * @param byUser <code>true</code> if author is a user, <code>false</code> if author is the system
      * @return the resulting log entry
      */
     public WorkhorseLog logMessage(String message, Long jobId, boolean byUser) {

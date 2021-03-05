@@ -353,7 +353,7 @@ public class WorkhorseController {
 
     }
 
-    public synchronized Execution handleFailedExecution(Job job, Long executionId, Exception exception, Long duration, BaseWorker worker, String executionLog) {
+    public synchronized Execution handleFailedExecution(Job job, Long executionId, Exception exception, Long duration, BaseWorker worker) {
         Execution failedExecution = executionPersistence.getById(job.getId(), executionId);
         Execution retryExecution = null;
 
@@ -368,11 +368,6 @@ public class WorkhorseController {
         failedExecution.setEndedAt(LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)));
         failedExecution.setDuration(duration);
 
-        failedExecution.setLog(executionLog);
-        failedExecution.setFailMessage(WorkhorseUtil.getMessagesFromException(exception));
-        failedExecution.setFailStacktrace(WorkhorseUtil.stacktraceToString(exception));
-
-        // createExecutionLog(executionId, executionLog, exception);
         executionPersistence.log(job.getId(), executionId, WorkhorseUtil.getMessagesFromException(exception), WorkhorseUtil.stacktraceToString(exception));
 
         if (retryExecution == null) {

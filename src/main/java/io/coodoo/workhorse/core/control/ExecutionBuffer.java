@@ -25,8 +25,7 @@ import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
 
 /**
- * Class that is used as buffer that contains a subset of executions and their
- * metadata like the corresponding {@link JobThread}
+ * Class that is used as buffer that contains a subset of executions and their metadata like the corresponding {@link JobThread}
  * 
  * @author coodoo GmbH (coodoo.io)
  */
@@ -99,8 +98,8 @@ public class ExecutionBuffer {
 
         if (sizeMemoryQueue > 0 || sizePriorityMemoryQueue > 0) {
 
-            log.trace("Clearing job execution queue with {} elements and {} priority elements for job: {}",
-                    executions.get(job.getId()).size(), priorityExecutions.get(job.getId()).size(), job.getName());
+            log.trace("Clearing job execution queue with {} elements and {} priority elements for job: {}", executions.get(job.getId()).size(),
+                            priorityExecutions.get(job.getId()).size(), job.getName());
 
             executions.get(job.getId()).clear();
             priorityExecutions.get(job.getId()).clear();
@@ -211,10 +210,8 @@ public class ExecutionBuffer {
     }
 
     /**
-     * This function check, if a job execution can be process. The existence of a
-     * ExecutionQueueBuffer for the given <code>jobId</code> is checked. It will be
-     * check, if the ExecutionQueueBuffer do not contain the given
-     * <code>executionId</code>
+     * This function check, if a job execution can be process. The existence of a ExecutionQueueBuffer for the given <code>jobId</code> is checked. It will be
+     * check, if the ExecutionQueueBuffer do not contain the given <code>executionId</code>
      * 
      * @param jobId
      * @param executionId
@@ -222,13 +219,12 @@ public class ExecutionBuffer {
      */
     public boolean isAddable(Long jobId, Long executionId) {
 
-        if (runningExecutions.get(jobId) == null || executions.get(jobId) == null
-                || priorityExecutions.get(jobId) == null) {
+        if (runningExecutions.get(jobId) == null || executions.get(jobId) == null || priorityExecutions.get(jobId) == null) {
             log.error("They are not ExecutionQueue for the job with Id {} ", jobId);
             return false;
         }
         if (runningExecutions.get(jobId).contains(executionId) || executions.get(jobId).contains(executionId)
-                || priorityExecutions.get(jobId).contains(executionId)) {
+                        || priorityExecutions.get(jobId).contains(executionId)) {
             return false;
         }
         return true;
@@ -333,8 +329,7 @@ public class ExecutionBuffer {
             info.setThreadCount(jobThreadCounts.get(jobId));
         }
         if (jobStartTimes != null && jobStartTimes.get(jobId) != null) {
-            info.setThreadStartTime(LocalDateTime.ofInstant(Instant.ofEpochMilli(jobStartTimes.get(jobId)),
-                    ZoneId.of(StaticConfig.TIME_ZONE)));
+            info.setThreadStartTime(LocalDateTime.ofInstant(Instant.ofEpochMilli(jobStartTimes.get(jobId)), ZoneId.of(StaticConfig.TIME_ZONE)));
         }
         // if (pausedJobs != null && pausedJobs.get(jobId) != null) {
         // info.setPaused(pausedJobs.get(jobId));

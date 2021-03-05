@@ -56,8 +56,7 @@ public class Job extends BaseEntity {
     private int minutesUntilCleanUp;
 
     /**
-     * If a job has the uniqueInqueue set <code>true</code>, Two or more job
-     * execution with the same parameters are not authorised
+     * If a job has the uniqueInqueue set <code>true</code>, Two or more job execution with the same parameters are not authorised
      */
     private Boolean uniqueQueued;
 
@@ -164,9 +163,8 @@ public class Job extends BaseEntity {
 
     @Override
     public String toString() {
-        return "Job [Id=" + id + ", description=" + description + ", name=" + name + ", parametersClassName="
-                + parametersClassName + ", schedule=" + schedule + ", status=" + status + ", threads=" + threads
-                + ", workerClassName=" + workerClassName + "]";
+        return "Job [Id=" + id + ", description=" + description + ", name=" + name + ", parametersClassName=" + parametersClassName + ", schedule=" + schedule
+                        + ", status=" + status + ", threads=" + threads + ", workerClassName=" + workerClassName + "]";
     }
 
 }

@@ -40,8 +40,7 @@ public abstract class WorkhorseConfigBuilder {
     }
 
     /**
-     * Set the minimum amount of executions per job to load into the intern buffer
-     * before the processing begins.
+     * Set the minimum amount of executions per job to load into the intern buffer before the processing begins.
      * 
      * @param bufferMin the minimum amount of executions
      * @return the builder to set another configuration
@@ -63,13 +62,11 @@ public abstract class WorkhorseConfigBuilder {
     }
 
     /**
-     * Set the polling interval in seconds at which the intern buffer is loaded,
-     * when new executions are pushed by the persistence.
+     * Set the polling interval in seconds at which the intern buffer is loaded, when new executions are pushed by the persistence.
      * 
      * This is used as fallback mechanism to support the persistence.
      * 
-     * @param bufferPushFallbackPollInterval the polling interval, that is used,
-     *                                       when the persistence can push events.
+     * @param bufferPushFallbackPollInterval the polling interval, that is used, when the persistence can push events.
      * @return the builder to set another configuration
      */
     public WorkhorseConfigBuilder bufferPushFallbackPollInterval(int bufferPushFallbackPollInterval) {
@@ -78,11 +75,10 @@ public abstract class WorkhorseConfigBuilder {
     }
 
     /***
-     * Set how long an execution can be held in the persistence before being
-     * automatically deleted
+     * Set how long an execution can be held in the persistence before being automatically deleted
      * 
      * @param timeUntilCleanup duration before being deleted
-     * @param chronoUnit       kind of time (seconds, minutes, hours ...)
+     * @param chronoUnit kind of time (seconds, minutes, hours ...)
      * @return the builder to set another configuration
      */
     public WorkhorseConfigBuilder timesUntilCleanup(long timeUntilCleanup, ChronoUnit chronoUnit) {
@@ -92,13 +88,11 @@ public abstract class WorkhorseConfigBuilder {
     }
 
     /**
-     * Set the duration in seconds after which an execution in status
-     * {@link ExecutionStatus#RUNNING} is considered as in timeout.
+     * Set the duration in seconds after which an execution in status {@link ExecutionStatus#RUNNING} is considered as in timeout.
      * 
      * If set to 0 the value is ignored
      * 
-     * @param executionTimeout the duration after which an running execution is
-     *                         considered as in timout.
+     * @param executionTimeout the duration after which an running execution is considered as in timout.
      * @return the builder to set another configuration
      */
     public WorkhorseConfigBuilder executionTimeout(int executionTimeout) {
@@ -107,9 +101,8 @@ public abstract class WorkhorseConfigBuilder {
     }
 
     /**
-     * Set the status that executions, that are stuck in status
-     * {@link ExecutionStatus#RUNNING} for {@link WorkhorseConfig#executionTimeout}
-     * seconds have to get to be cured.
+     * Set the status that executions, that are stuck in status {@link ExecutionStatus#RUNNING} for {@link WorkhorseConfig#executionTimeout} seconds have to get
+     * to be cured.
      * 
      * @param executionTimeoutStatus status that the execution will get.
      * @return the builder to set another configuration

@@ -105,9 +105,6 @@ public class JobThread {
                         TimeUnit.MILLISECONDS.sleep(minMillisPerExecution - duration);
                     }
 
-                    String executionLog = executionContext.getLog();
-                    execution.setLog(executionLog);
-                    executionPersistence.update(execution);
                     workhorseController.setExecutionStatusToFinished(execution);
 
                     log.trace("Execution {}, duration: {} was successfull", execution.getId(), execution.getDuration());
@@ -132,10 +129,8 @@ public class JobThread {
                     executionBuffer.removeRunningExecution(jobId, execution.getId());
                     long duration = System.currentTimeMillis() - millisAtStart;
 
-                    String executionLog = executionContext.getLog();
-
                     // create a new Job Execution to retry this fail.
-                    execution = workhorseController.handleFailedExecution(job, execution.getId(), e, duration, workerInstance, executionLog);
+                    execution = workhorseController.handleFailedExecution(job, execution.getId(), e, duration, workerInstance);
 
                     if (execution == null) {
                         break executionLoop; // Do not retry
@@ -214,6 +209,7 @@ public class JobThread {
         }
 
         return nextInChain;
+
     }
 
     public void stop() {

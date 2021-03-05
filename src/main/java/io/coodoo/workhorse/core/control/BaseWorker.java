@@ -58,38 +58,34 @@ public abstract class BaseWorker {
      * 
      * @param executionId ID of current job execution that is finished
      */
-    public void onFinished(Long executionId) {
-    }
+    public void onFinished(Long executionId) {}
 
     /**
      * The job engine will call this callback method after the last job execution of a batch is finished. <br>
      * <i>If needed, this method can be overwritten to react on a finished batch.</i>
      * 
-     * @param batchId     batch ID
+     * @param batchId batch ID
      * @param executionId ID of last job execution of a batch that is finished
      */
-    public void onFinishedBatch(Long batchId, Long executionId) {
-    }
+    public void onFinishedBatch(Long batchId, Long executionId) {}
 
     /**
      * The job engine will call this callback method after the last job execution of a chain is finished. <br>
      * <i>If needed, this method can be overwritten to react on a finished chain.</i>
      * 
-     * @param chainId     chain ID
+     * @param chainId chain ID
      * @param executionId ID of last job execution of a chain that is finished
      */
-    public void onFinishedChain(Long chainId, Long executionId) {
-    }
+    public void onFinishedChain(Long chainId, Long executionId) {}
 
     /**
      * The job engine will call this callback method after the job execution has failed and there will be a retry of the failed job execution. <br>
      * <i>If needed, this method can be overwritten to react on a retry job execution.</i>
      * 
      * @param failedExecutionId ID of current job execution that has failed
-     * @param retryExecutionId  ID of new job execution that that will retry the failed one
+     * @param retryExecutionId ID of new job execution that that will retry the failed one
      */
-    public void onRetry(Long failedExecutionId, Long retryExecutionId) {
-    }
+    public void onRetry(Long failedExecutionId, Long retryExecutionId) {}
 
     /**
      * The job engine will call this callback method after the job execution has failed. <br>
@@ -97,28 +93,25 @@ public abstract class BaseWorker {
      * 
      * @param executionId ID of current job execution that has failed
      */
-    public void onFailed(Long executionId) {
-    }
+    public void onFailed(Long executionId) {}
 
     /**
      * The job engine will call this callback method after a batch has failed. <br>
      * <i>If needed, this method can be overwritten to react on a failed batch.</i>
      * 
-     * @param batchId     chain ID
+     * @param batchId chain ID
      * @param executionId ID of last job execution of a batch that has failed
      */
-    public void onFailedBatch(Long batchId, Long executionId) {
-    }
+    public void onFailedBatch(Long batchId, Long executionId) {}
 
     /**
      * The job engine will call this callback method after a chain has failed. <br>
      * <i>If needed, this method can be overwritten to react on a failed chain.</i>
      * 
-     * @param chainId     chain ID
+     * @param chainId chain ID
      * @param executionId ID of last job execution of a chain that has failed
      */
-    public void onFailedChain(Long chainId, Long executionId) {
-    }
+    public void onFailedChain(Long chainId, Long executionId) {}
 
     public Long createExecution() {
         return createExecution(null, null, null, null, null, null, null).getId();
@@ -161,7 +154,7 @@ public abstract class BaseWorker {
      * Calculates the timestamp of the given delay from now ({@link #timestamp()})
      * 
      * @param delayValue delay value, e.g. <tt>30</tt>
-     * @param delayUnit  delay unit, e.g. {@link ChronoUnit#MINUTES}
+     * @param delayUnit delay unit, e.g. {@link ChronoUnit#MINUTES}
      * @return delay as timestamp
      */
     public LocalDateTime delayToMaturity(Long delayValue, ChronoUnit delayUnit) {
@@ -216,7 +209,7 @@ public abstract class BaseWorker {
      * Example: <code>[22:06:42.680] Step 3 complete</code> <br>
      * <i>CAUTION: This will only work in the context of the doWork method!</i>
      * 
-     * @param logger  server log logger
+     * @param logger server log logger
      * @param message text to log
      */
     protected void logInfo(Logger logger, String message) {
@@ -244,7 +237,7 @@ public abstract class BaseWorker {
      * Example: <code>[22:06:42.680] [WARN] Well thats suspicious...</code> <br>
      * <i>CAUTION: This will only work in the context of the doWork method!</i>
      * 
-     * @param logger  server log logger
+     * @param logger server log logger
      * @param message text to log
      */
     protected void logWarn(Logger logger, String message) {
@@ -272,7 +265,7 @@ public abstract class BaseWorker {
      * Example: <code>[22:06:42.680] [ERROR] Dafuq was that?!?!</code> <br>
      * <i>CAUTION: This will only work in the context of the doWork method!</i>
      * 
-     * @param logger  server log logger
+     * @param logger server log logger
      * @param message text to log
      */
     protected void logError(Logger logger, String message) {
@@ -287,8 +280,8 @@ public abstract class BaseWorker {
      * Example: <code>[22:06:42.680] [ERROR] Dafuq was that?!?!</code> <br>
      * <i>CAUTION: This will only work in the context of the doWork method!</i>
      * 
-     * @param logger    server log logger
-     * @param message   text to log
+     * @param logger server log logger
+     * @param message text to log
      * @param throwable cause of error
      */
     protected void logError(Logger logger, String message, Throwable throwable) {

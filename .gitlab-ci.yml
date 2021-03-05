@@ -49,6 +49,7 @@ build:
   tags:
     - Java
   script:
+    - mvn $MAVEN_CLI_OPTS spotless:check
     - mvn $MAVEN_CLI_OPTS clean compile
 
 
