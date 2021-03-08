@@ -1,5 +1,7 @@
 package io.coodoo.workhorse.core.control;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -14,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import io.coodoo.workhorse.core.boundary.ExecutionContext;
 import io.coodoo.workhorse.core.control.event.AllExecutionsDoneEvent;
 import io.coodoo.workhorse.core.entity.Execution;
+import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
@@ -48,6 +51,7 @@ public class JobThread {
     private boolean stopMe;
     private Execution runningExecution;
     private Thread thread;
+    private List<Execution> chainedExecutions = new ArrayList<>();
 
     private static final Logger log = LoggerFactory.getLogger(JobThread.class);
 
@@ -116,13 +120,28 @@ public class JobThread {
                         workerInstance.onFinishedBatch(execution.getBatchId(), execution.getId());
                     }
 
-                    Execution nextInChain = handleChainedExecution(jobId, execution, workerInstance);
-                    if (nextInChain != null) {
-                        execution = nextInChain;
+                    if (execution.getChainId() != null) {
+
+                        if (chainedExecutions.isEmpty()) {
+                            chainedExecutions = executionPersistence.getChain(jobId, execution.getChainId(), ExecutionStatus.QUEUED);
+                            if (chainedExecutions.isEmpty()) {
+                                workerInstance.onFinishedChain(execution.getChainId(), execution.getId());
+                                break executionLoop;
+                            }
+                        }
+                        execution = chainedExecutions.remove(0);
                         runningExecution = execution;
-                        log.trace("This execution, Id: {} of the chain {} will be process as next.", execution.getId(), nextInChain.getChainId());
+                        log.trace("This execution, Id: {} of the chain {} will be process as next.", execution.getId(), execution.getChainId());
                         continue executionLoop;
                     }
+
+                    // Execution nextInChain = handleChainedExecution(jobId, execution, workerInstance);
+                    // if (nextInChain != null) {
+                    // execution = nextInChain;
+                    // runningExecution = execution;
+                    // log.trace("This execution, Id: {} of the chain {} will be process as next.", execution.getId(), nextInChain.getChainId());
+                    // continue executionLoop;
+                    // }
 
                     break executionLoop;
                 } catch (Exception e) {

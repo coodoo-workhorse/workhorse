@@ -141,7 +141,7 @@ public class Workhorse {
                         executionDistributor(execution);
                     }, delayInSeconds, TimeUnit.SECONDS);
                     // Only the head of a chainExecution may integrate the executionBuffer
-                } else if (execution.getChainedPreviousExecutionId() == null) {
+                } else {
                     executionDistributor(execution);
                 }
             } else {
@@ -222,7 +222,7 @@ public class Workhorse {
         try {
             lock.lock();
 
-            if (Boolean.TRUE.equals(execution.isPriority())) {
+            if (execution.isPriority()) {
                 executionBuffer.addPriorityExecution(jobId, execution.getId());
             } else {
                 executionBuffer.addExecution(jobId, execution.getId());

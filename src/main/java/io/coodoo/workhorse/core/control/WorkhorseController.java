@@ -338,7 +338,7 @@ public class WorkhorseController {
         retryExecution.setPlannedFor(failedExecution.getPlannedFor());
         retryExecution.setChainId(failedExecution.getChainId());
         retryExecution.setChainedNextExecutionId(failedExecution.getChainedNextExecutionId());
-        retryExecution.setChainedPreviousExecutionId(failedExecution.getChainedPreviousExecutionId());
+        // retryExecution.setChainedPreviousExecutionId(failedExecution.getChainedPreviousExecutionId());
         retryExecution.setParameters(failedExecution.getParameters());
         retryExecution.setParametersHash(failedExecution.getParametersHash());
 
