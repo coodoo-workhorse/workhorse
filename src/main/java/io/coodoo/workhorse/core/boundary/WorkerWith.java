@@ -95,7 +95,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * @return job execution ID
      */
     public Long createExecution(T parameters) {
-        return createExecution(parameters, false, null, null, null, null, null).getId();
+        return createExecution(parameters, false, null, null, null, null).getId();
     }
 
     /**
@@ -113,7 +113,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
      */
     @Deprecated
     public Long createExecution(T parameters, Boolean priority, LocalDateTime plannedFor) {
-        return createExecution(parameters, priority, plannedFor, null, null, null, null).getId();
+        return createExecution(parameters, priority, plannedFor, null, null, null).getId();
     }
 
     /**
@@ -132,7 +132,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
      */
     @Deprecated
     public Long createExecution(T parameters, Boolean priority, Long delayValue, ChronoUnit delayUnit) {
-        return createExecution(parameters, priority, WorkhorseUtil.delayToMaturity(delayValue, delayUnit), null, null, null, null).getId();
+        return createExecution(parameters, priority, WorkhorseUtil.delayToMaturity(delayValue, delayUnit), null, null, null).getId();
     }
 
     /**
@@ -194,7 +194,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
      */
     @Deprecated
     public Long createBatchExecutions(List<T> parametersList) {
-        return createBatchExecutions(parametersList, false, null);
+        return createBatchExecutions(parametersList, false, null, null);
     }
 
     /**
@@ -206,21 +206,21 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * @return batch ID
      */
     @Deprecated
-    public Long createBatchExecutions(List<T> parametersList, Boolean priority, LocalDateTime plannedFor) {
+    public Long createBatchExecutions(List<T> parametersList, Boolean priority, LocalDateTime plannedFor, LocalDateTime expiresAt) {
 
         Long batchId = null;
 
         for (T parameters : parametersList) {
             if (batchId == null) { // start of batch
 
-                Execution execution = createExecution(parameters, priority, plannedFor, null, -1L, null, null);
+                Execution execution = createExecution(parameters, priority, plannedFor, expiresAt, -1L, null);
                 // Use the Id of the first added job execution in Batch as BatchId.
                 execution.setBatchId(execution.getId());
                 workhorseController.updateExecution(execution);
 
                 batchId = execution.getId();
             } else { // now that we have the batch id, all the beloning executions can have it!
-                createExecution(parameters, priority, plannedFor, null, batchId, null, null);
+                createExecution(parameters, priority, plannedFor, expiresAt, batchId, null);
             }
         }
         return batchId;
@@ -235,7 +235,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
      */
     @Deprecated
     public Long createChainedExecutions(List<T> parametersList) {
-        return createChainedExecutions(parametersList, false, null);
+        return createChainedExecutions(parametersList, false, null, null);
     }
 
     /**
@@ -245,31 +245,25 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * @param parametersList list of needed parameters to do the job in the order of the execution chain
      * @param priority priority queuing
      * @param plannedFor specified time for the execution
+     * @param expiresAt specified time up to which the execution will be canceled
      * @return chain ID
      */
     @Deprecated
-    public Long createChainedExecutions(List<T> parametersList, Boolean priority, LocalDateTime plannedFor) {
+    public Long createChainedExecutions(List<T> parametersList, Boolean priority, LocalDateTime plannedFor, LocalDateTime expiresAt) {
 
         Long chainId = null;
-        Long jobId = getJob().getId();
-        Long chainedPreviousExecutionId = null;
 
-        for (T parameters : parametersList) {
+        for (T parameter : parametersList) {
             if (chainId == null) { // start of chain
 
-                Execution execution = createExecution(parameters, priority, plannedFor, null, null, -1L, null);
+                Execution execution = createExecution(parameter, priority, plannedFor, expiresAt, null, -1L);
                 execution.setChainId(execution.getId());
                 workhorseController.updateExecution(execution);
 
                 chainId = execution.getId();
-                chainedPreviousExecutionId = execution.getId();
-                continue;
+            } else { // now that we have the chain id, all the beloning executions can have it!
+                createExecution(parameter, priority, plannedFor, expiresAt, null, chainId);
             }
-            Execution execution = createExecution(parameters, priority, plannedFor, null, null, chainId, chainedPreviousExecutionId);
-            chainedPreviousExecutionId = execution.getId();
-
-            workhorseController.addExecutionAtEndOfChain(jobId, chainId, execution);
-
         }
         return chainId;
     }
@@ -385,14 +379,14 @@ public abstract class WorkerWith<T> extends BaseWorker {
             for (T parameter : parametersList) {
                 if (batchId == null) { // start of batch
 
-                    Execution execution = createExecution(parameter, priority, plannedFor, null, -1L, null, null);
+                    Execution execution = createExecution(parameter, priority, plannedFor, expiresAt, -1L, null);
                     // Use the Id of the first added job execution in Batch as BatchId.
                     execution.setBatchId(execution.getId());
                     workhorseController.updateExecution(execution);
 
                     batchId = execution.getId();
                 } else { // now that we have the batch id, all the beloning executions can have it!
-                    createExecution(parameter, priority, plannedFor, null, batchId, null, null);
+                    createExecution(parameter, priority, plannedFor, expiresAt, batchId, null);
                 }
             }
             return batchId;
@@ -407,25 +401,18 @@ public abstract class WorkerWith<T> extends BaseWorker {
         public Long createChain(List<T> parametersList) {
 
             Long chainId = null;
-            Long jobId = getJob().getId();
-            Long chainedPreviousExecutionId = null;
 
             for (T parameter : parametersList) {
                 if (chainId == null) { // start of chain
 
-                    Execution execution = createExecution(parameter, priority, plannedFor, null, null, -1L, null);
+                    Execution execution = createExecution(parameter, priority, plannedFor, expiresAt, null, -1L);
                     execution.setChainId(execution.getId());
                     workhorseController.updateExecution(execution);
 
                     chainId = execution.getId();
-                    chainedPreviousExecutionId = execution.getId();
-                    continue;
+                } else { // now that we have the chain id, all the beloning executions can have it!
+                    createExecution(parameter, priority, plannedFor, expiresAt, null, chainId);
                 }
-                Execution execution = createExecution(parameter, priority, plannedFor, null, null, chainId, chainedPreviousExecutionId);
-                chainedPreviousExecutionId = execution.getId();
-
-                workhorseController.addExecutionAtEndOfChain(jobId, chainId, execution);
-
             }
             return chainId;
         }
@@ -436,7 +423,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
          * @return execution ID
          */
         public Long create(T parameters) {
-            return createExecution(parameters, priority, plannedFor, expiresAt, null, null, null).getId();
+            return createExecution(parameters, priority, plannedFor, expiresAt, null, null).getId();
         }
     }
 

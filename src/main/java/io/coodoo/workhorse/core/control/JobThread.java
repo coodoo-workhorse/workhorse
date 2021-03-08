@@ -119,7 +119,7 @@ public class JobThread {
                     if (executionPersistence.isBatchFinished(jobId, execution.getBatchId())) {
                         workerInstance.onFinishedBatch(execution.getBatchId(), execution.getId());
                     }
-
+                    // Handle chained execution
                     if (execution.getChainId() != null) {
 
                         if (chainedExecutions.isEmpty()) {
@@ -134,14 +134,6 @@ public class JobThread {
                         log.trace("This execution, Id: {} of the chain {} will be process as next.", execution.getId(), execution.getChainId());
                         continue executionLoop;
                     }
-
-                    // Execution nextInChain = handleChainedExecution(jobId, execution, workerInstance);
-                    // if (nextInChain != null) {
-                    // execution = nextInChain;
-                    // runningExecution = execution;
-                    // log.trace("This execution, Id: {} of the chain {} will be process as next.", execution.getId(), nextInChain.getChainId());
-                    // continue executionLoop;
-                    // }
 
                     break executionLoop;
                 } catch (Exception e) {
@@ -215,20 +207,6 @@ public class JobThread {
         }
 
         return execution;
-    }
-
-    private Execution handleChainedExecution(Long jobId, Execution execution, BaseWorker workerInstance) {
-        Long chainId = execution.getChainId();
-        Execution nextInChain = null;
-        if (chainId != null) {
-            nextInChain = executionPersistence.getNextQueuedExecutionInChain(jobId, chainId, execution);
-            if (nextInChain == null) {
-                workerInstance.onFinishedChain(chainId, execution.getId());
-            }
-        }
-
-        return nextInChain;
-
     }
 
     public void stop() {

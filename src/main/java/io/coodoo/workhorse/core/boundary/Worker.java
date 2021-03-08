@@ -34,7 +34,7 @@ public abstract class Worker extends BaseWorker {
      * @return execution ID
      */
     public Long createExecution(Execution execution) {
-        return createExecution(null, execution.isPriority(), execution.getPlannedFor(), execution.getExpiresAt(), null, null, null).getId();
+        return createExecution(null, execution.isPriority(), execution.getPlannedFor(), execution.getExpiresAt(), null, null).getId();
     }
 
     /**
@@ -51,7 +51,7 @@ public abstract class Worker extends BaseWorker {
      */
     @Deprecated
     public Long createExecution(Boolean priority, LocalDateTime plannedFor) {
-        return createExecution(null, priority, plannedFor, null, null, null, null).getId();
+        return createExecution(null, priority, plannedFor, null, null, null).getId();
 
     }
 
@@ -70,7 +70,7 @@ public abstract class Worker extends BaseWorker {
      */
     @Deprecated
     public Long createExecution(Boolean priority, Long delayValue, ChronoUnit delayUnit) {
-        return createExecution(null, priority, WorkhorseUtil.delayToMaturity(delayValue, delayUnit), null, null, null, null).getId();
+        return createExecution(null, priority, WorkhorseUtil.delayToMaturity(delayValue, delayUnit), null, null, null).getId();
 
     }
 
@@ -87,7 +87,7 @@ public abstract class Worker extends BaseWorker {
      */
     @Deprecated
     public Long createPriorityExecution() {
-        return createExecution(null, true, null, null, null, null, null).getId();
+        return createExecution(null, true, null, null, null, null).getId();
     }
 
     /**
@@ -103,7 +103,7 @@ public abstract class Worker extends BaseWorker {
      */
     @Deprecated
     public Long createDelayedExecution(Long delayValue, ChronoUnit delayUnit) {
-        return createExecution(null, false, WorkhorseUtil.delayToMaturity(delayValue, delayUnit), null, null, null, null).getId();
+        return createExecution(null, false, WorkhorseUtil.delayToMaturity(delayValue, delayUnit), null, null, null).getId();
     }
 
     /**
@@ -118,7 +118,7 @@ public abstract class Worker extends BaseWorker {
      */
     @Deprecated
     public Long createPlannedExecution(LocalDateTime plannedFor) {
-        return createExecution(null, false, plannedFor, null, null, null, null).getId();
+        return createExecution(null, false, plannedFor, null, null, null).getId();
     }
 
     /**
@@ -133,7 +133,7 @@ public abstract class Worker extends BaseWorker {
      */
     @Deprecated
     public Long createToExpireExecution(LocalDateTime expiresAt) {
-        return createExecution(null, false, null, expiresAt, null, null, null).getId();
+        return createExecution(null, false, null, expiresAt, null, null).getId();
     }
 
     /**
@@ -238,7 +238,7 @@ public abstract class Worker extends BaseWorker {
          * @return execution ID
          */
         public Long create() {
-            return createExecution(null, priority, plannedFor, expiresAt, null, null, null).getId();
+            return createExecution(null, priority, plannedFor, expiresAt, null, null).getId();
         }
     }
 }

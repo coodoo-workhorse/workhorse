@@ -92,7 +92,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
             if (execution.getJobId().equals(jobId) && (execution.getStatus() == ExecutionStatus.QUEUED || execution.getStatus() == ExecutionStatus.PLANNED)
                             && (execution.getPlannedFor() == null || execution.getPlannedFor().isBefore(currentTimeStamp))
-                            && executions.size() < limit.intValue()) {
+                            && (execution.getChainId() == null || execution.getId().equals(execution.getChainId())) && executions.size() < limit.intValue()) {
 
                 executions.add(execution);
             }
@@ -125,39 +125,6 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
             execution.setFailStatus(failStatus);
         }
         return update(execution);
-    }
-
-    @Override
-    public Execution addExecutionAtEndOfChain(Long jobId, Long chainId, Execution execution) {
-        for (Execution executionFromMemory : memoryPersistence.getExecutions().values()) {
-            if (executionFromMemory.getJobId().equals(jobId) && chainId.equals(executionFromMemory.getChainId())
-                            && executionFromMemory.getChainedNextExecutionId() == null) {
-                executionFromMemory.setChainedNextExecutionId(execution.getId());
-                return execution;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public Execution getNextQueuedExecutionInChain(Long jobId, Long chainId, Execution execution) {
-        Execution chainedNextExecution = getById(jobId, execution.getChainedNextExecutionId());
-        // Long previousExecutionId = execution.getId();
-        // if (chainedNextExecution == null) {
-        // for (Execution executionFromMemory : memoryPersistence.getExecutions().values()) {
-        // if (executionFromMemory != null && chainId.equals(executionFromMemory.getChainId())
-        // && previousExecutionId.equals(executionFromMemory.getChainedPreviousExecutionId())
-        // && ExecutionStatus.QUEUED.equals(executionFromMemory.getStatus())) {
-        // log.trace("From Peristennce. Next Job Execution In Chain : {}", executionFromMemory);
-        // return executionFromMemory;
-        // }
-        // }
-        // } else {
-        // if (chainedNextExecution.getStatus() == ExecutionStatus.QUEUED) {
-        // return chainedNextExecution;
-        // }
-        // }
-        return null;
     }
 
     @Override

@@ -132,7 +132,13 @@ public class Workhorse {
         log.trace("New Execution pushed: {}", newExecutionEvent);
         if (executionBuffer.getNumberOfExecution(newExecutionEvent.jobId) < StaticConfig.BUFFER_MAX) {
             Execution execution = executionPersistence.getById(newExecutionEvent.jobId, newExecutionEvent.executionId);
-            if (execution != null) {
+            if (execution == null) {
+                log.error("No execution found for executionId: {} ", newExecutionEvent.executionId);
+                return;
+            }
+
+            // Only the head of a chainExecution may integrate the executionBuffer
+            if (execution.getChainId() == null || execution.getId().equals(execution.getChainId())) {
                 if (ExecutionStatus.PLANNED.equals(execution.getStatus()) && execution.getPlannedFor() != null) {
                     long delayInSeconds = ChronoUnit.SECONDS.between(WorkhorseUtil.timestamp(), execution.getPlannedFor());
 
@@ -140,12 +146,10 @@ public class Workhorse {
                     scheduledExecutorService.schedule(() -> {
                         executionDistributor(execution);
                     }, delayInSeconds, TimeUnit.SECONDS);
-                    // Only the head of a chainExecution may integrate the executionBuffer
+
                 } else {
                     executionDistributor(execution);
                 }
-            } else {
-                log.error("No execution found for executionId: {} ", newExecutionEvent.executionId);
             }
         }
     }

@@ -112,7 +112,7 @@ public interface ExecutionPersistence {
     List<Execution> getChain(Long jobId, Long chainId);
 
     /**
-     * Retrieve all execution of an chainedExecution filter by {@link ExecutionStatus}
+     * Retrieve all execution of an chainedExecution filtered by {@link ExecutionStatus}
      * 
      * @param jobId Id of the corresponding job
      * @param chainId Id of the chainedExecution
@@ -137,24 +137,6 @@ public interface ExecutionPersistence {
      * @return
      */
     List<Execution> getFailedBatchExecutions(Long jobId, Long batchId);
-
-    /**
-     * Optional. Set the Id the given job execution <code>execution</code> at end of the chained Execution with Id <code>chainId</code> .
-     * 
-     * @param jobId Id of the corresponding job
-     * @param chainId Id of the chained execution
-     * @param execution Job execution to set at end of the chain.
-     * @return Last job execution of the chain.
-     */
-    Execution addExecutionAtEndOfChain(Long jobId, Long chainId, Execution execution);
-
-    /**
-     * @param jobId Id of the corresponding job
-     * @param chainId Id of the chained execution
-     * @param execution Job execution whose next execution have to be found.
-     * @return Next job execution of the chain
-     */
-    Execution getNextQueuedExecutionInChain(Long jobId, Long chainId, Execution execution);
 
     /**
      * Check whether there is already an execution with these parameters and whether it has the status QUEUED. If so, return this.

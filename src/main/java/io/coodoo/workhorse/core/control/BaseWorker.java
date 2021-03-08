@@ -121,18 +121,16 @@ public abstract class BaseWorker {
      * @return execution ID
      */
     public Long createExecution() {
-        return createExecution(null, null, null, null, null, null, null).getId();
+        return createExecution(null, null, null, null, null, null).getId();
     }
 
-    protected Execution createExecution(Object parameters, Boolean priority, LocalDateTime plannedFor, LocalDateTime expiresAt, Long batchId, Long chainId,
-                    Long chainedPreviousExecutionId) {
+    protected Execution createExecution(Object parameters, Boolean priority, LocalDateTime plannedFor, LocalDateTime expiresAt, Long batchId, Long chainId) {
         Long jobId = getJob().getId();
         boolean uniqueQueued = getJob().isUniqueQueued();
 
         String parametersAsJson = WorkhorseUtil.parametersToJson(parameters);
 
-        return workhorseController.createExecution(jobId, parametersAsJson, priority, plannedFor, expiresAt, batchId, chainId, chainedPreviousExecutionId,
-                        uniqueQueued);
+        return workhorseController.createExecution(jobId, parametersAsJson, priority, plannedFor, expiresAt, batchId, chainId, uniqueQueued);
 
     }
 
