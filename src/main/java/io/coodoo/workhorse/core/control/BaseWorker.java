@@ -2,7 +2,6 @@ package io.coodoo.workhorse.core.control;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 
 import javax.inject.Inject;
 
@@ -113,6 +112,14 @@ public abstract class BaseWorker {
      */
     public void onFailedChain(Long chainId, Long executionId) {}
 
+    /**
+     * <i>This is an access point to get the job engine started with a new job execution.</i><br>
+     * <br>
+     * 
+     * This creates a {@link Execution} object that gets added to the job engine to be executed as soon as possible.
+     * 
+     * @return execution ID
+     */
     public Long createExecution() {
         return createExecution(null, null, null, null, null, null, null).getId();
     }
@@ -148,22 +155,6 @@ public abstract class BaseWorker {
      */
     public LocalDateTime timestamp() {
         return LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE));
-    }
-
-    /**
-     * Calculates the timestamp of the given delay from now ({@link #timestamp()})
-     * 
-     * @param delayValue delay value, e.g. <tt>30</tt>
-     * @param delayUnit delay unit, e.g. {@link ChronoUnit#MINUTES}
-     * @return delay as timestamp
-     */
-    public LocalDateTime delayToMaturity(Long delayValue, ChronoUnit delayUnit) {
-
-        LocalDateTime plannedFor = null;
-        if (delayValue != null && delayUnit != null) {
-            plannedFor = timestamp().plus(delayValue, delayUnit);
-        }
-        return plannedFor;
     }
 
     /**

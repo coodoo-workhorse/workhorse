@@ -1,8 +1,15 @@
 package io.coodoo.workhorse.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import org.junit.Test;
+
+import io.coodoo.workhorse.core.control.StaticConfig;
 
 public class WorkhorseUtilTest {
 
@@ -128,6 +135,38 @@ public class WorkhorseUtilTest {
         String result = WorkhorseUtil.getMessagesFromException(exception);
 
         assertEquals("a | b | c", result);
+    }
+
+    @Test
+    public void testDelayToMaturity() throws Exception {
+        StaticConfig.TIME_ZONE = "UTC";
+        LocalDateTime result = WorkhorseUtil.delayToMaturity(4L, ChronoUnit.SECONDS);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    public void testDelayToMaturity_parameters_null() throws Exception {
+
+        LocalDateTime result = WorkhorseUtil.delayToMaturity(null, null);
+
+        assertNull(result);
+    }
+
+    @Test
+    public void testDelayToMaturity_delayValue_null() throws Exception {
+
+        LocalDateTime result = WorkhorseUtil.delayToMaturity(null, ChronoUnit.SECONDS);
+
+        assertNull(result);
+    }
+
+    @Test
+    public void testDelayToMaturity_chronoUnit_null() throws Exception {
+
+        LocalDateTime result = WorkhorseUtil.delayToMaturity(4L, null);
+
+        assertNull(result);
     }
 
 }
