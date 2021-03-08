@@ -29,7 +29,7 @@ public abstract class Worker extends BaseWorker {
      * 
      * This creates a {@link Execution} object that gets added to the job engine to be executed as soon as possible.
      * 
-     * @param priority   priority queuing
+     * @param priority priority queuing
      * @param plannedFor specified time for the execution
      * @return execution ID
      */
@@ -44,9 +44,9 @@ public abstract class Worker extends BaseWorker {
      * 
      * This creates a {@link Execution} object that gets added to the job engine to be executed as soon as possible.
      * 
-     * @param priority   priority queuing
+     * @param priority priority queuing
      * @param delayValue time to wait
-     * @param delayUnit  what kind of time to wait
+     * @param delayUnit what kind of time to wait
      * @return execution ID
      */
     public Long createExecution(Boolean priority, Long delayValue, ChronoUnit delayUnit) {
@@ -64,7 +64,7 @@ public abstract class Worker extends BaseWorker {
      * This creates a {@link Execution} object that gets added to the job engine after the given delay.
      * 
      * @param delayValue time to wait
-     * @param delayUnit  what kind of time to wait
+     * @param delayUnit what kind of time to wait
      * @return execution ID
      */
     public Long createDelayedExecution(Long delayValue, ChronoUnit delayUnit) {

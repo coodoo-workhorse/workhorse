@@ -105,7 +105,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * This creates a {@link Execution} object that gets added to the job engine to be executed as soon as possible.
      * 
      * @param parameters needed parameters to do the job
-     * @param priority   priority queuing
+     * @param priority priority queuing
      * @param plannedFor specified time for the execution
      * @return job execution ID
      */
@@ -120,9 +120,9 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * This creates a {@link Execution} object that gets added to the job engine to be executed as soon as possible.
      * 
      * @param parameters needed parameters to do the job
-     * @param priority   priority queuing
+     * @param priority priority queuing
      * @param delayValue time to wait
-     * @param delayUnit  what kind of time to wait
+     * @param delayUnit what kind of time to wait
      * @return job execution ID
      */
     public Long createExecution(T parameters, Boolean priority, Long delayValue, ChronoUnit delayUnit) {
@@ -148,7 +148,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * 
      * @param parameters needed parameters to do the job
      * @param delayValue time to wait
-     * @param delayUnit  what kind of time to wait
+     * @param delayUnit what kind of time to wait
      * @return job execution ID
      */
     public Long createDelayedExecution(T parameters, Long delayValue, ChronoUnit delayUnit) {
@@ -182,8 +182,8 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * This creates a batch of {@link Execution} objects
      * 
      * @param parametersList list of needed parameters to do the batch
-     * @param priority       priority queuing
-     * @param plannedFor     specified time for the execution
+     * @param priority priority queuing
+     * @param plannedFor specified time for the execution
      * @return batch ID
      */
     public Long createBatchExecutions(List<T> parametersList, Boolean priority, LocalDateTime plannedFor) {
@@ -220,8 +220,8 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * This creates a chain of {@link Execution} objects, so when the first one gets executed it will bring all its chained friends.
      * 
      * @param parametersList list of needed parameters to do the job in the order of the execution chain
-     * @param priority       priority queuing
-     * @param plannedFor     specified time for the execution
+     * @param priority priority queuing
+     * @param plannedFor specified time for the execution
      * @return chain ID
      */
     public Long createChainedExecutions(List<T> parametersList, Boolean priority, LocalDateTime plannedFor) {

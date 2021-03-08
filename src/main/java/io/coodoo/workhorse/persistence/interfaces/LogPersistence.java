@@ -9,26 +9,26 @@ public interface LogPersistence {
     /**
      * Get the log with given Id
      * 
-     * @param id Id of the log to retrieve
+     * @param logId Id of the log to retrieve
      * @return WorkhorseLog
      */
-    WorkhorseLog get(Long id);
+    WorkhorseLog get(Long logId);
 
     /**
      * Update a log
      * 
-     * @param id           Id of the log to retrieve
+     * @param logId Id of the log to retrieve
      * @param workhorseLog log
      * @return the updated log
      */
-    WorkhorseLog update(Long id, WorkhorseLog workhorseLog);
+    WorkhorseLog update(Long logId, WorkhorseLog workhorseLog);
 
     /**
      * Delete a log
      * 
-     * @param id Id of the log to delete
+     * @param logId Id of the log to delete
      */
-    WorkhorseLog delete(Long id);
+    WorkhorseLog delete(Long logId);
 
     /**
      * Create a new log

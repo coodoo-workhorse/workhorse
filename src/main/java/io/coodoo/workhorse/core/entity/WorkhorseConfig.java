@@ -3,16 +3,14 @@ package io.coodoo.workhorse.core.entity;
 import java.time.ZoneId;
 
 /**
- * The class defines all the configurations that can be applied to Workhorse to
- * adapt it for multiples usage.
+ * The class defines all the configurations that can be applied to Workhorse to adapt it for multiples usage.
  * 
  * @author coodoo GmbH (coodoo.io)
  */
 public abstract class WorkhorseConfig {
 
     /**
-     * ZoneId for LocalDateTime instance creation. The default setting is that
-     * defined by the system.
+     * ZoneId for LocalDateTime instance creation. The default setting is that defined by the system.
      */
     protected String timeZone = ZoneId.systemDefault().getId();
 
@@ -32,40 +30,33 @@ public abstract class WorkhorseConfig {
     protected int bufferPollInterval = 5;
 
     /**
-     * Polling interval in seconds at which the intern buffer is loaded, that is
-     * used as fallback mechanism when new Executions are pushed by the persistence
+     * Polling interval in seconds at which the intern buffer is loaded, that is used as fallback mechanism when new Executions are pushed by the persistence
      */
     protected int bufferPushFallbackPollInterval = 120;
 
     /**
-     * Number of minutes an execution can be held in the persistence before being
-     * automatically deleted.
+     * Number of minutes an execution can be held in the persistence before being automatically deleted.
      * 
      * If set to 0, no cleanup is performed.
      */
     protected long minutesUntilCleanup = 2;
 
     /**
-     * Duration in seconds after which an EXECUTION in status
-     * {@link ExecutionStatus#RUNNING} is consider in timeout.(if set to 0 the value
-     * is ignored)
+     * Duration in seconds after which an EXECUTION in status {@link ExecutionStatus#RUNNING} is consider in timeout.(if set to 0 the value is ignored)
      */
     protected int executionTimeout = 120;
 
     /**
      * 
-     * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and
-     * doesn't change for {@link WorkhorseConfig#executionTimeout} seconds, it is in
+     * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and doesn't change for {@link WorkhorseConfig#executionTimeout} seconds, it is in
      * timeout!
      * 
-     * <code>executionTimeoutStatus</code> defines which status this execution in
-     * timeout have to get.
+     * <code>executionTimeoutStatus</code> defines which status this execution in timeout have to get.
      */
     protected ExecutionStatus executionTimeoutStatus = ExecutionStatus.ABORTED;
 
     /**
-     * Log change pattern. Placeholder <code>%s</code> for changeParameter,
-     * changeOld and changeNew in this order <br>
+     * Log change pattern. Placeholder <code>%s</code> for changeParameter, changeOld and changeNew in this order <br>
      * Default is <code>Changed %s from '%s' to '%s'</code>
      */
     protected String logChange = "%s changed from '%s' to '%s'";
@@ -203,12 +194,11 @@ public abstract class WorkhorseConfig {
 
     @Override
     public String toString() {
-        return "WorkhorseConfig [bufferMax=" + bufferMax + ", bufferMin=" + bufferMin + ", bufferPollInterval="
-                + bufferPollInterval + ", bufferPushFallbackPollInterval=" + bufferPushFallbackPollInterval
-                + ", executionTimeout=" + executionTimeout + ", executionTimeoutStatus=" + executionTimeoutStatus
-                + ", logChange=" + logChange + ", logErrorMarker=" + logErrorMarker + ", logInfoMarker=" + logInfoMarker
-                + ", logTimeFormat=" + logTimeFormat + ", logWarnMarker=" + logWarnMarker + ", minutesUntilCleanup="
-                + minutesUntilCleanup + ", timeZone=" + timeZone + "]";
+        return "WorkhorseConfig [bufferMax=" + bufferMax + ", bufferMin=" + bufferMin + ", bufferPollInterval=" + bufferPollInterval
+                        + ", bufferPushFallbackPollInterval=" + bufferPushFallbackPollInterval + ", executionTimeout=" + executionTimeout
+                        + ", executionTimeoutStatus=" + executionTimeoutStatus + ", logChange=" + logChange + ", logErrorMarker=" + logErrorMarker
+                        + ", logInfoMarker=" + logInfoMarker + ", logTimeFormat=" + logTimeFormat + ", logWarnMarker=" + logWarnMarker
+                        + ", minutesUntilCleanup=" + minutesUntilCleanup + ", timeZone=" + timeZone + "]";
     }
 
 }

@@ -49,33 +49,28 @@ public @interface InitialJobConfig {
     int threads() default JOB_CONFIG_THREADS;
 
     /**
-     * @return Limit of execution throughput per minute. Default is null (no
-     *         limitation)
+     * @return Limit of execution throughput per minute. Default is null (no limitation)
      */
     int maxPerMinute() default JOB_CONFIG_MAX_PER_MINUTE;
 
     /**
-     * @return Number of retries after the job faild by an exception. Default value
-     *         is 0 (no retries).
+     * @return Number of retries after the job faild by an exception. Default value is 0 (no retries).
      */
     int failRetries() default JOB_CONFIG_FAIL_RETRIES;
 
     /**
-     * @return Delay to start a retry after a failed job exception. Default is 4000
-     *         milliseconds.
+     * @return Delay to start a retry after a failed job exception. Default is 4000 milliseconds.
      */
     int retryDelay() default JOB_CONFIG_RETRY_DELAY;
 
     /**
-     * @return Number of minutes after the job executions get deleted. Default is 30
-     *         minutes, if set to 0 no job execution will get deleted.
+     * @return Number of minutes after the job executions get deleted. Default is 30 minutes, if set to 0 no job execution will get deleted.
      */
     int minutesUntilCleanUp() default JOB_CONFIG_MINUTES_UNTIL_CLEANUP;
 
     /**
-     * @return If <code>true</code> (default) a new job execution will only be added
-     *         and saved into the queue if no other job with the same parameters
-     *         exists in queue.
+     * @return If <code>true</code> (default) a new job execution will only be added and saved into the queue if no other job with the same parameters exists in
+     *         queue.
      */
     boolean uniqueQueued() default JOB_CONFIG_UNIQUE_IN_QUEUE;
 }

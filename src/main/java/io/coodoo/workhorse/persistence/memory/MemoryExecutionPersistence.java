@@ -20,6 +20,7 @@ import io.coodoo.workhorse.core.control.StaticConfig;
 import io.coodoo.workhorse.core.control.event.NewExecutionEvent;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
+import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.util.WorkhorseUtil;
@@ -36,6 +37,8 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     Event<NewExecutionEvent> newExecutionEventEvent;
 
     private AtomicLong executionId = new AtomicLong(0);
+
+    private AtomicLong executionLogId = new AtomicLong(0);
 
     @Override
     public Execution getById(Long jobId, Long id) {
@@ -103,28 +106,25 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
     @Override
     public Execution update(Execution execution) {
+
+        execution.setUpdatedAt(WorkhorseUtil.timestamp());
+
         if (memoryPersistence.getExecutions().put(execution.getId(), execution) == null) {
             return null;
         }
         return execution;
-
     }
 
     @Override
-    public Execution updateStatus(Long jobId, Long id, ExecutionStatus status, ExecutionFailStatus failStatus) {
+    public Execution updateStatus(Long jobId, Long executionId, ExecutionStatus status, ExecutionFailStatus failStatus) {
 
-        Execution execution = memoryPersistence.getExecutions().get(id);
+        Execution execution = memoryPersistence.getExecutions().get(executionId);
 
         execution.setStatus(status);
         if (failStatus != null) {
             execution.setFailStatus(failStatus);
         }
-        execution.setUpdatedAt(WorkhorseUtil.timestamp());
-
-        if (memoryPersistence.getExecutions().put(id, execution) == null) {
-            return null;
-        }
-        return execution;
+        return update(execution);
     }
 
     @Override
@@ -223,8 +223,9 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     }
 
     @Override
-    public void delete(Long jobId, Long id) {
-        memoryPersistence.getExecutions().remove(id);
+    public void delete(Long jobId, Long executionId) {
+        memoryPersistence.getExecutionLogs().remove(executionId);
+        memoryPersistence.getExecutions().remove(executionId);
     }
 
     @Override
@@ -269,6 +270,54 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
             }
         }
         return executions;
+    }
+
+    @Override
+    public ExecutionLog getLog(Long jobId, Long executionId) {
+        return memoryPersistence.getExecutionLogs().get(executionId);
+    }
+
+    @Override
+    public void log(Long jobId, Long executionId, String log) {
+
+        ExecutionLog executionLog = memoryPersistence.getExecutionLogs().get(executionId);
+
+        if (executionLog == null) {
+
+            executionLog = new ExecutionLog();
+            executionLog.setId(executionId);
+            executionLog.setExecutionId(executionId);
+            executionLog.setCreatedAt(WorkhorseUtil.timestamp());
+            executionLog.setLog(log);
+
+        } else {
+
+            executionLog.setLog(executionLog.getLog() + System.lineSeparator() + log);
+            executionLog.setUpdatedAt(WorkhorseUtil.timestamp());
+        }
+
+        memoryPersistence.getExecutionLogs().put(executionId, executionLog);
+    }
+
+    @Override
+    public void log(Long jobId, Long executionId, String error, String stacktrace) {
+
+        ExecutionLog executionLog = memoryPersistence.getExecutionLogs().get(executionId);
+
+        if (executionLog == null) {
+
+            executionLog = new ExecutionLog();
+            executionLog.setId(executionId);
+            executionLog.setExecutionId(executionId);
+            executionLog.setCreatedAt(WorkhorseUtil.timestamp());
+        } else {
+            executionLog.setUpdatedAt(WorkhorseUtil.timestamp());
+        }
+
+        executionLog.setError(error);
+        executionLog.setStacktrace(stacktrace);
+
+        memoryPersistence.getExecutionLogs().put(executionId, executionLog);
     }
 
 }

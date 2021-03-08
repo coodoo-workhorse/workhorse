@@ -15,11 +15,13 @@ import io.coodoo.workhorse.core.control.JobScheduler;
 import io.coodoo.workhorse.core.control.Workhorse;
 import io.coodoo.workhorse.core.control.WorkhorseConfigController;
 import io.coodoo.workhorse.core.control.WorkhorseController;
-import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.entity.Execution;
+import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
+import io.coodoo.workhorse.core.entity.WorkhorseConfigBuilder;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
 import io.coodoo.workhorse.persistence.PersistenceManager;
 import io.coodoo.workhorse.persistence.memory.MemoryConfig;
@@ -145,6 +147,18 @@ public class WorkhorseService {
      */
     public Execution getExecutionById(Long jobId, Long executionId) {
         return workhorseController.getExecutionById(jobId, executionId);
+    }
+
+    /**
+     * Retrieves a {@link ExecutionLog} of the correspnding executionId
+     * 
+     * @param jobId ID of the correspnding job
+     * @param executionId ID of the correspnding execution
+     * @return the log of the execution
+     */
+    public ExecutionLog getExecutionLog(Long jobId, Long executionId) {
+        return workhorseController.getExecutionLog(jobId, executionId);
+
     }
 
     /**
@@ -309,9 +323,14 @@ public class WorkhorseService {
     /**
      * Get the execution times defined by {@link Job#getSchedule()}
      * 
+     * <<<<<<< HEAD
+     * 
      * @param schedule CRON Expression
      * @param startTime start time for this request (if <tt>null</tt> then current time is used)
-     * @param endTime end time for this request (if <tt>null</tt> then current time plus 1 day is used)
+     * @param endTime end time for this request (if <tt>null</tt> then current time plus 1 day is used) =======
+     * @param schedule CRON Expression
+     * @param startTime start time for this request (if <tt>null</tt> then current time is used)
+     * @param endTime end time for this request (if <tt>null</tt> then current time plus 1 day is used) >>>>>>> master
      * @return List of {@link LocalDateTime} representing the execution times of a scheduled job between the <tt>startTime</tt> and <tt>endTime</tt>
      */
     public List<LocalDateTime> getScheduledTimes(String schedule, LocalDateTime startTime, LocalDateTime endTime) {

@@ -24,14 +24,13 @@ public class WorkhorseUtil {
 
     private static ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
-    private WorkhorseUtil() {
-    }
+    private WorkhorseUtil() {}
 
     /**
      * Maps a JSON to the corresponding Java class
      * 
-     * @param <T>             corresponding Java class
-     * @param parametersJson  JSON string
+     * @param <T> corresponding Java class
+     * @param parametersJson JSON string
      * @param parametersClass corresponding Java class
      * @return Java class <tt>T</tt> object as defined in JSON string
      */
@@ -77,8 +76,7 @@ public class WorkhorseUtil {
      * @return Stack trace as String (using line breaks)
      */
     public static String stacktraceToString(Throwable throwable) {
-        try (StringWriter stringWriter = new StringWriter();
-                PrintWriter printWriter = new PrintWriter(stringWriter, true)) {
+        try (StringWriter stringWriter = new StringWriter(); PrintWriter printWriter = new PrintWriter(stringWriter, true)) {
             throwable.printStackTrace(printWriter);
             printWriter.flush();
             stringWriter.flush();
@@ -90,8 +88,7 @@ public class WorkhorseUtil {
     }
 
     /**
-     * Combines all messages an exception contains to a joined message. Equals
-     * messages will not repeat themselves and in case there is no message, the root
+     * Combines all messages an exception contains to a joined message. Equals messages will not repeat themselves and in case there is no message, the root
      * exception name is the message e.g. "NullPointerException".
      * 
      * @param throwable Exception

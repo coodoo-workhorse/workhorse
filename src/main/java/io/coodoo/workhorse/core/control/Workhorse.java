@@ -104,7 +104,6 @@ public class Workhorse {
      * poll the Execution with an given intervall
      */
     void poll() {
-        log.info("Poll start");
         for (Job job : jobPersistence.getAllByStatus(JobStatus.ACTIVE)) {
 
             if (executionBuffer.getNumberOfExecution(job.getId()) < StaticConfig.BUFFER_MIN) {

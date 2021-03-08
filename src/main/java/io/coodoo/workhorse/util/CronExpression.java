@@ -122,9 +122,12 @@ import java.util.regex.Pattern;
 public class CronExpression {
 
     enum CronFieldType {
-        SECOND(0, 59, null), MINUTE(0, 59, null), HOUR(0, 23, null), DAY_OF_MONTH(1, 31, null), MONTH(1, 12,
-                        Arrays.asList("JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC")), DAY_OF_WEEK(1, 7,
-                                        Arrays.asList("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"));
+        SECOND(0, 59, null),
+        MINUTE(0, 59, null),
+        HOUR(0, 23, null),
+        DAY_OF_MONTH(1, 31, null),
+        MONTH(1, 12, Arrays.asList("JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC")),
+        DAY_OF_WEEK(1, 7, Arrays.asList("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"));
 
         final int from, to;
         final List<String> names;

@@ -5,18 +5,23 @@ import java.util.List;
 
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
+import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
+import io.coodoo.workhorse.core.entity.Job;
 
+/**
+ * @author coodoo GmbH (coodoo.io)
+ */
 public interface ExecutionPersistence {
 
     /**
      * Retrieves the job execution by given Id of a job and id of job execution
      * 
      * @param jobId Id of the job
-     * @param id Id of the job execution
+     * @param executionId Id of the job execution
      * @return A job execution
      */
-    Execution getById(Long jobId, Long id);
+    Execution getById(Long jobId, Long executionId);
 
     /**
      * Retrieves a limited list of job executions of the given job
@@ -54,9 +59,9 @@ public interface ExecutionPersistence {
      * Delete a job execution by <code>jobId</code> and <code>id</code> of the execution
      * 
      * @param jobId Id of the job
-     * @param id Id of the job execution
+     * @param executionId Id of the job execution
      */
-    void delete(Long jobId, Long id);
+    void delete(Long jobId, Long executionId);
 
     /**
      * Update a job execution
@@ -71,12 +76,12 @@ public interface ExecutionPersistence {
      * Update the status of an execution
      * 
      * @param jobId ID of the corresponding job
-     * @param id ID of the execution
+     * @param executionId ID of the execution
      * @param status New Status to set
      * @param failStatus Specific status of a failed execution
      * @return the updated execution
      */
-    Execution updateStatus(Long jobId, Long id, ExecutionStatus status, ExecutionFailStatus failStatus);
+    Execution updateStatus(Long jobId, Long executionId, ExecutionStatus status, ExecutionFailStatus failStatus);
 
     /**
      * Given the Id of the corresponent job <code>jobId</code> and the limit date <code>preDate</code>, delete all job executions where
@@ -176,6 +181,33 @@ public interface ExecutionPersistence {
      * @return list of Executions to abort
      */
     List<Execution> findTimeoutExecutions(LocalDateTime time);
+
+    /**
+     * Get a {@link ExecutionLog}
+     * 
+     * @param executionId ID of the corresponding {@link Execution}
+     * @return {@link ExecutionLog}
+     */
+    ExecutionLog getLog(Long jobId, Long executionId);
+
+    /**
+     * Adds a message to the log as a new line.
+     * 
+     * @param jobId ID of the corresponding {@link Job}
+     * @param executionId ID of corresponding {@link Execution}
+     * @param log message to log.
+     */
+    void log(Long jobId, Long executionId, String log);
+
+    /**
+     * Add an error message and stacktrace to the log.
+     * 
+     * @param jobId Id of the corresponding {@link Job}
+     * @param executionId ID of corresponding {@link Execution}
+     * @param error error message
+     * @param stacktrace stacktrace of the {@link Execution}
+     */
+    void log(Long jobId, Long executionId, String error, String stacktrace);
 
     /**
      * 

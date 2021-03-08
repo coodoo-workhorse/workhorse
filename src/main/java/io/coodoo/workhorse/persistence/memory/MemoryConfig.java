@@ -3,8 +3,7 @@ package io.coodoo.workhorse.persistence.memory;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 
 /**
- * A class to access the {@link WorkhorseConfig} configurations defined by the
- * Memory Persistence.
+ * A class to access the {@link WorkhorseConfig} configurations defined by the Memory Persistence.
  * 
  * @author coodoo GmbH (coodoo.io)
  */

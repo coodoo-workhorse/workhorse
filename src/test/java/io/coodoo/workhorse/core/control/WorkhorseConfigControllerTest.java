@@ -66,8 +66,7 @@ public class WorkhorseConfigControllerTest {
         Long bufferMax = 0L;
 
         exceptionRule.expect(RuntimeException.class);
-        exceptionRule.expectMessage(
-                "The max amount of executions to load into the memory buffer per job must be higher than 0!");
+        exceptionRule.expectMessage("The max amount of executions to load into the memory buffer per job must be higher than 0!");
 
         classUnderTest.updateBufferMax(workhorseConfig, bufferMax);
 
@@ -83,8 +82,7 @@ public class WorkhorseConfigControllerTest {
         classUnderTest.updateBufferMax(workhorseConfig, bufferMax);
 
         // if nothing has changed, there will be no log and no restart
-        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(),
-                anyObject(), anyString());
+        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(), anyObject(), anyString());
     }
 
     @Test
@@ -96,9 +94,8 @@ public class WorkhorseConfigControllerTest {
 
         classUnderTest.updateBufferMax(workhorseConfig, bufferMax);
 
-        verify(workhorseLogService).logChange(null, null,
-                "Max amount of executions to load into the memory buffer per job",
-                workhorseConfigDefaults.getBufferMax(), bufferMax, null);
+        verify(workhorseLogService).logChange(null, null, "Max amount of executions to load into the memory buffer per job",
+                        workhorseConfigDefaults.getBufferMax(), bufferMax, null);
     }
 
     @Test
@@ -120,8 +117,7 @@ public class WorkhorseConfigControllerTest {
         int bufferMin = 0;
 
         exceptionRule.expect(RuntimeException.class);
-        exceptionRule.expectMessage(
-                "The min amount of executions in memory buffer before the poller gets to add more must be higher than 0!");
+        exceptionRule.expectMessage("The min amount of executions in memory buffer before the poller gets to add more must be higher than 0!");
 
         classUnderTest.updateBufferMin(workhorseConfig, bufferMin);
     }
@@ -136,9 +132,8 @@ public class WorkhorseConfigControllerTest {
 
         classUnderTest.updateBufferMin(workhorseConfig, bufferMin);
 
-        verify(workhorseLogService).logChange(null, null,
-                "Min amount of executions in memory buffer before the poller gets to add more",
-                workhorseConfigDefaults.getBufferMin(), bufferMin, null);
+        verify(workhorseLogService).logChange(null, null, "Min amount of executions in memory buffer before the poller gets to add more",
+                        workhorseConfigDefaults.getBufferMin(), bufferMin, null);
     }
 
     @Test
@@ -151,8 +146,7 @@ public class WorkhorseConfigControllerTest {
         classUnderTest.updateBufferMin(workhorseConfig, bufferMin);
 
         // if nothing has changed, there will be no log and no restart
-        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(),
-                anyObject(), anyString());
+        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(), anyObject(), anyString());
     }
 
     @Test
@@ -193,8 +187,7 @@ public class WorkhorseConfigControllerTest {
         classUnderTest.updateBufferPollInterval(workhorseConfig, bufferPollInterval);
 
         // if nothing has changed, there will be no log and no restart
-        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(),
-                anyObject(), anyString());
+        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(), anyObject(), anyString());
         verify(workhorse, never()).isRunning();
     }
 
@@ -286,8 +279,7 @@ public class WorkhorseConfigControllerTest {
 
         classUnderTest.updateBufferPollInterval(workhorseConfig, bufferPollInterval);
 
-        verify(workhorseLogService).logChange(null, null, "Buffer poller interval",
-                workhorseConfigDefaults.getBufferPollInterval(), bufferPollInterval, null);
+        verify(workhorseLogService).logChange(null, null, "Buffer poller interval", workhorseConfigDefaults.getBufferPollInterval(), bufferPollInterval, null);
     }
 
     @Test
@@ -339,8 +331,7 @@ public class WorkhorseConfigControllerTest {
         classUnderTest.updateBufferPushFallbackPollInterval(workhorseConfig, bufferPushFallbackPollInterval);
 
         // if nothing has changed, there will be no log and no restart
-        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(),
-                anyObject(), anyString());
+        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(), anyObject(), anyString());
         verify(workhorse, never()).isRunning();
     }
 
@@ -397,8 +388,7 @@ public class WorkhorseConfigControllerTest {
         classUnderTest.updateTimeZone(workhorseConfig, timeZone);
 
         // if nothing has changed, there will be no log and no restart
-        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(),
-                anyObject(), anyString());
+        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(), anyObject(), anyString());
 
     }
 
@@ -427,8 +417,8 @@ public class WorkhorseConfigControllerTest {
 
         classUnderTest.updateTimeZone(workhorseConfig, timeZone);
 
-        verify(workhorseLogService).logChange(null, null, "Time zone", workhorseConfigDefaults.getTimeZone(),
-                systemDefault.getId(), "System default time-zone is used: " + systemDefault);
+        verify(workhorseLogService).logChange(null, null, "Time zone", workhorseConfigDefaults.getTimeZone(), systemDefault.getId(),
+                        "System default time-zone is used: " + systemDefault);
 
     }
 
@@ -454,8 +444,7 @@ public class WorkhorseConfigControllerTest {
 
         classUnderTest.updateTimeZone(workhorseConfig, timeZone);
 
-        verify(workhorseLogService).logChange(null, null, "Time zone", workhorseConfigDefaults.getTimeZone(), timeZone,
-                null);
+        verify(workhorseLogService).logChange(null, null, "Time zone", workhorseConfigDefaults.getTimeZone(), timeZone, null);
     }
 
     @Test
@@ -492,8 +481,7 @@ public class WorkhorseConfigControllerTest {
 
         classUnderTest.updateLogChange(workhorseConfig, logChange);
 
-        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(),
-                anyObject(), anyString());
+        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(), anyObject(), anyString());
 
     }
 
@@ -542,8 +530,7 @@ public class WorkhorseConfigControllerTest {
 
         classUnderTest.updateLogInfoMarker(workhorseConfig, logInfoMarker);
 
-        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(),
-                anyObject(), anyString());
+        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(), anyObject(), anyString());
     }
 
     @Test
@@ -567,8 +554,7 @@ public class WorkhorseConfigControllerTest {
 
         classUnderTest.updateLogWarnMarker(workhorseConfig, logWarnMarker);
 
-        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(),
-                anyObject(), anyString());
+        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(), anyObject(), anyString());
     }
 
     @Test
@@ -593,8 +579,7 @@ public class WorkhorseConfigControllerTest {
 
         classUnderTest.updateLogErrorMarker(workhorseConfig, logErrorMarker);
 
-        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(),
-                anyObject(), anyString());
+        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(), anyObject(), anyString());
 
     }
 
@@ -632,16 +617,14 @@ public class WorkhorseConfigControllerTest {
 
         classUnderTest.updateLogTimeFormatter(workhorseConfig, logTimeFormat);
 
-        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(),
-                anyObject(), anyString());
+        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(), anyObject(), anyString());
 
     }
 
     @Test
     public void testGetWorkhorseConfig() throws Exception {
 
-        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(100L).bufferMinimumSize(3)
-                .bufferPollInterval(4).build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(100L).bufferMinimumSize(3).bufferPollInterval(4).build();
 
         when(configPersistence.get()).thenReturn(workhorseConfig);
 
@@ -667,9 +650,8 @@ public class WorkhorseConfigControllerTest {
         int bufferMix = 3;
         int bufferPollInterval = 4;
         int bufferPushFallbackPollInterval = 60;
-        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(bufferMax)
-                .bufferMinimumSize(bufferMix).bufferPollInterval(bufferPollInterval)
-                .bufferPushFallbackPollInterval(bufferPushFallbackPollInterval).build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(bufferMax).bufferMinimumSize(bufferMix)
+                        .bufferPollInterval(bufferPollInterval).bufferPushFallbackPollInterval(bufferPushFallbackPollInterval).build();
 
         when(configPersistence.get()).thenReturn(workhorseConfigDefaults);
 
@@ -688,15 +670,13 @@ public class WorkhorseConfigControllerTest {
         int bufferMix = 3;
         int bufferPollInterval = 4;
         int bufferPushFallbackPollInterval = 60;
-        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(bufferMax)
-                .bufferMinimumSize(bufferMix).bufferPollInterval(bufferPollInterval)
-                .bufferPushFallbackPollInterval(bufferPushFallbackPollInterval).build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(bufferMax).bufferMinimumSize(bufferMix)
+                        .bufferPollInterval(bufferPollInterval).bufferPushFallbackPollInterval(bufferPushFallbackPollInterval).build();
 
         when(configPersistence.get()).thenReturn(workhorseConfigDefaults);
 
         exceptionRule.expect(RuntimeException.class);
-        exceptionRule.expectMessage(
-                "The max amount of executions to load into the memory buffer per job must be higher than 0!");
+        exceptionRule.expectMessage("The max amount of executions to load into the memory buffer per job must be higher than 0!");
 
         classUnderTest.updateWorkhorseConfig(workhorseConfig);
 
@@ -711,10 +691,9 @@ public class WorkhorseConfigControllerTest {
         int bufferPushFallbackPollInterval = 60;
         int executionTimeout = 1000;
         String timeZone = "UTC";
-        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(bufferMax)
-                .bufferMinimumSize(bufferMix).bufferPollInterval(bufferPollInterval)
-                .bufferPushFallbackPollInterval(bufferPushFallbackPollInterval).executionTimeout(executionTimeout)
-                .timeZone(timeZone).build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(bufferMax).bufferMinimumSize(bufferMix)
+                        .bufferPollInterval(bufferPollInterval).bufferPushFallbackPollInterval(bufferPushFallbackPollInterval)
+                        .executionTimeout(executionTimeout).timeZone(timeZone).build();
 
         when(configPersistence.get()).thenReturn(workhorseConfig);
         classUnderTest.initializeStaticConfig(workhorseConfig);
@@ -781,8 +760,7 @@ public class WorkhorseConfigControllerTest {
 
         String message = "MinutesUntilCleanup is set to '0', so the cleanup is off!";
 
-        verify(workhorseLogService).logChange(null, null, "minutesUntilCleanup",
-                workhorseConfigDefault.getMinutesUntilCleanup(), minutesUntilCleanup, message);
+        verify(workhorseLogService).logChange(null, null, "minutesUntilCleanup", workhorseConfigDefault.getMinutesUntilCleanup(), minutesUntilCleanup, message);
     }
 
     @Test
@@ -809,8 +787,7 @@ public class WorkhorseConfigControllerTest {
 
         classUnderTest.updateExecutionTimeout(workhorseConfig, executionTimeout);
 
-        verify(workhorseLogService).logChange(null, null, "Execution timeout",
-                workhorseConfigDefault.getExecutionTimeout(), executionTimeout, null);
+        verify(workhorseLogService).logChange(null, null, "Execution timeout", workhorseConfigDefault.getExecutionTimeout(), executionTimeout, null);
     }
 
     @Test
@@ -851,8 +828,7 @@ public class WorkhorseConfigControllerTest {
 
         String message = "Execution timeout is set to '0', so the hunt is off!";
 
-        verify(workhorseLogService).logChange(null, null, "Execution timeout",
-                workhorseConfigDefault.getExecutionTimeout(), executionTimeout, message);
+        verify(workhorseLogService).logChange(null, null, "Execution timeout", workhorseConfigDefault.getExecutionTimeout(), executionTimeout, message);
     }
 
 }

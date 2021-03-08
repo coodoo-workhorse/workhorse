@@ -1,6 +1,5 @@
 package io.coodoo.workhorse.core.control;
 
-import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -15,13 +14,11 @@ import org.slf4j.LoggerFactory;
 import io.coodoo.workhorse.core.boundary.ExecutionContext;
 import io.coodoo.workhorse.core.control.event.AllExecutionsDoneEvent;
 import io.coodoo.workhorse.core.entity.Execution;
-import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.ExecutionQualifier;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
-import io.coodoo.workhorse.util.WorkhorseUtil;
 
 /**
  * Class that executes all executions of the a given job.
@@ -108,10 +105,6 @@ public class JobThread {
                         TimeUnit.MILLISECONDS.sleep(minMillisPerExecution - duration);
                     }
 
-                    String executionLog = executionContext.getLog();
-
-                    execution.setLog(executionLog);
-                    executionPersistence.update(execution);
                     workhorseController.setExecutionStatusToFinished(execution);
 
                     log.trace("Execution {}, duration: {} was successfull", execution.getId(), execution.getDuration());
@@ -136,10 +129,8 @@ public class JobThread {
                     executionBuffer.removeRunningExecution(jobId, execution.getId());
                     long duration = System.currentTimeMillis() - millisAtStart;
 
-                    String executionLog = executionContext.getLog();
-
                     // create a new Job Execution to retry this fail.
-                    execution = workhorseController.handleFailedExecution(job, execution.getId(), e, duration, workerInstance, executionLog);
+                    execution = workhorseController.handleFailedExecution(job, execution.getId(), e, duration, workerInstance);
 
                     if (execution == null) {
                         break executionLoop; // Do not retry
@@ -218,6 +209,7 @@ public class JobThread {
         }
 
         return nextInChain;
+
     }
 
     public void stop() {

@@ -23,6 +23,7 @@ import io.coodoo.workhorse.core.control.event.JobErrorEvent;
 import io.coodoo.workhorse.core.entity.ErrorType;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
+import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
@@ -352,7 +353,7 @@ public class WorkhorseController {
 
     }
 
-    public synchronized Execution handleFailedExecution(Job job, Long executionId, Exception exception, Long duration, BaseWorker worker, String executionLog) {
+    public synchronized Execution handleFailedExecution(Job job, Long executionId, Exception exception, Long duration, BaseWorker worker) {
         Execution failedExecution = executionPersistence.getById(job.getId(), executionId);
         Execution retryExecution = null;
 
@@ -367,9 +368,7 @@ public class WorkhorseController {
         failedExecution.setEndedAt(LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)));
         failedExecution.setDuration(duration);
 
-        failedExecution.setLog(executionLog);
-        failedExecution.setFailMessage(WorkhorseUtil.getMessagesFromException(exception));
-        failedExecution.setFailStacktrace(WorkhorseUtil.stacktraceToString(exception));
+        executionPersistence.log(job.getId(), executionId, WorkhorseUtil.getMessagesFromException(exception), WorkhorseUtil.stacktraceToString(exception));
 
         if (retryExecution == null) {
             worker.onFailed(executionId);
@@ -497,6 +496,11 @@ public class WorkhorseController {
 
     public List<Execution> getchain(Long jobId, Long chainId) {
         return executionPersistence.getChain(jobId, chainId);
+    }
+
+    public ExecutionLog getExecutionLog(Long jobId, Long executionId) {
+
+        return executionPersistence.getLog(jobId, executionId);
     }
 
     public List<Execution> getExecutions(Long jobId) {
