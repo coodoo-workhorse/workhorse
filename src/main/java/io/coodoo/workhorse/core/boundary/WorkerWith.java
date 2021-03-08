@@ -95,7 +95,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * @return job execution ID
      */
     public Long createExecution(T parameters) {
-        return createExecution(parameters, false, null);
+        return createExecution(parameters, false, null, null, null, null, null).getId();
     }
 
     /**
@@ -105,65 +105,94 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * This creates a {@link Execution} object that gets added to the job engine to be executed as soon as possible.
      * 
      * @param parameters needed parameters to do the job
-     * @param priority priority queuing
-     * @param plannedFor specified time for the execution
+     * @param execution {@link Execution} object that gets added to the job engine
      * @return job execution ID
      */
+    public Long createExecution(T parameters, Execution execution) {
+        return createExecution(parameters, execution.isPriority(), execution.getPlannedFor(), execution.getExpiresAt(), null, null, null).getId();
+    }
+
+    /**
+     * @deprecated please use the {@link Execution#builder()}
+     * 
+     *             <i>This is an access point to get the job engine started with a new job with job parameters.</i><br>
+     *             <br>
+     * 
+     *             This creates a {@link Execution} object that gets added to the job engine to be executed as soon as possible.
+     * 
+     * @param parameters needed parameters to do the job
+     * @param priority priority queuing
+     * @param plannedFor specified time for the execution
+     * @return execution ID
+     */
+    @Deprecated
     public Long createExecution(T parameters, Boolean priority, LocalDateTime plannedFor) {
         return createExecution(parameters, priority, plannedFor, null, null, null, null).getId();
     }
 
     /**
-     * <i>This is an access point to get the job engine started with a new job with job parameters.</i><br>
-     * <br>
+     * @deprecated please use the {@link Execution#builder()}
      * 
-     * This creates a {@link Execution} object that gets added to the job engine to be executed as soon as possible.
+     *             <i>This is an access point to get the job engine started with a new job with job parameters.</i><br>
+     *             <br>
+     * 
+     *             This creates a {@link Execution} object that gets added to the job engine to be executed as soon as possible.
      * 
      * @param parameters needed parameters to do the job
      * @param priority priority queuing
      * @param delayValue time to wait
      * @param delayUnit what kind of time to wait
-     * @return job execution ID
+     * @return execution ID
      */
+    @Deprecated
     public Long createExecution(T parameters, Boolean priority, Long delayValue, ChronoUnit delayUnit) {
         return createExecution(parameters, priority, delayToMaturity(delayValue, delayUnit), null, null, null, null).getId();
     }
 
     /**
-     * <i>Convenience method to create a job execution</i><br>
-     * <br>
-     * This creates a {@link Execution} object that gets added to the priority queue of the job engine to be treated first class.
+     * @deprecated please use the {@link Execution#builder()}
+     * 
+     *             <i>Convenience method to create a job execution</i><br>
+     *             <br>
+     *             This creates a {@link Execution} object that gets added to the priority queue of the job engine to be treated first class.
      * 
      * @param parameters needed parameters to do the job
-     * @return job execution ID
+     * @return execution ID
      */
+    @Deprecated
     public Long createPriorityExecution(T parameters) {
         return createExecution(parameters, true, null);
     }
 
     /**
-     * <i>Convenience method to create a job execution</i><br>
-     * <br>
-     * This creates a {@link Execution} object that gets added to the job engine after the given delay.
+     * @deprecated please use the {@link Execution#builder()}
+     * 
+     *             <i>Convenience method to create a job execution</i><br>
+     *             <br>
+     *             This creates a {@link Execution} object that gets added to the job engine after the given delay.
      * 
      * @param parameters needed parameters to do the job
      * @param delayValue time to wait
      * @param delayUnit what kind of time to wait
-     * @return job execution ID
+     * @return execution ID
      */
+    @Deprecated
     public Long createDelayedExecution(T parameters, Long delayValue, ChronoUnit delayUnit) {
         return createExecution(parameters, false, delayValue, delayUnit);
     }
 
     /**
-     * <i>Convenience method to create a job execution</i><br>
-     * <br>
-     * This creates a {@link Execution} object that gets added to the job engine at a specified time.
+     * @deprecated please use the {@link Execution#builder()}
+     * 
+     *             <i>Convenience method to create a job execution</i><br>
+     *             <br>
+     *             This creates a {@link Execution} object that gets added to the job engine at a specified time.
      * 
      * @param parameters needed parameters to do the job
      * @param plannedFor specified time for the execution
-     * @return job execution ID
+     * @return execution ID
      */
+    @Deprecated
     public Long createPlannedExecution(T parameters, LocalDateTime plannedFor) {
         return createExecution(parameters, false, plannedFor);
     }

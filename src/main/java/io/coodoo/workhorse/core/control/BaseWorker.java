@@ -113,6 +113,14 @@ public abstract class BaseWorker {
      */
     public void onFailedChain(Long chainId, Long executionId) {}
 
+    /**
+     * <i>This is an access point to get the job engine started with a new job execution.</i><br>
+     * <br>
+     * 
+     * This creates a {@link Execution} object that gets added to the job engine to be executed as soon as possible.
+     * 
+     * @return execution ID
+     */
     public Long createExecution() {
         return createExecution(null, null, null, null, null, null, null).getId();
     }

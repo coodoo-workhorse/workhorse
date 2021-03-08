@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,6 +61,22 @@ public class WorkhorseUtil {
         } catch (IOException e) {
             throw new RuntimeException("Parameter object could not be mapped to json", e);
         }
+    }
+
+    /**
+     * Calculates the timestamp of the given delay from now ({@link #timestamp()})
+     * 
+     * @param delayValue delay value, e.g. <tt>30</tt>
+     * @param delayUnit delay unit, e.g. {@link ChronoUnit#MINUTES}
+     * @return delay as timestamp
+     */
+    public static LocalDateTime delayToMaturity(Long delayValue, ChronoUnit delayUnit) {
+
+        LocalDateTime plannedFor = null;
+        if (delayValue != null && delayUnit != null) {
+            plannedFor = timestamp().plus(delayValue, delayUnit);
+        }
+        return plannedFor;
     }
 
     /**
