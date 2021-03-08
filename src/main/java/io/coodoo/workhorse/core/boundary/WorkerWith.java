@@ -113,7 +113,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
     }
 
     /**
-     * @deprecated please use the {@link Execution#builder()}
+     * @deprecated please use the {@link WorkerWith#execution()}
      * 
      *             <i>This is an access point to get the job engine started with a new job with job parameters.</i><br>
      *             <br>
@@ -131,7 +131,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
     }
 
     /**
-     * @deprecated please use the {@link Execution#builder()}
+     * @deprecated please use the {@link WorkerWith#execution()}
      * 
      *             <i>This is an access point to get the job engine started with a new job with job parameters.</i><br>
      *             <br>
@@ -146,11 +146,11 @@ public abstract class WorkerWith<T> extends BaseWorker {
      */
     @Deprecated
     public Long createExecution(T parameters, Boolean priority, Long delayValue, ChronoUnit delayUnit) {
-        return createExecution(parameters, priority, delayToMaturity(delayValue, delayUnit), null, null, null, null).getId();
+        return createExecution(parameters, priority, WorkhorseUtil.delayToMaturity(delayValue, delayUnit), null, null, null, null).getId();
     }
 
     /**
-     * @deprecated please use the {@link Execution#builder()}
+     * @deprecated please use the {@link WorkerWith#execution()}
      * 
      *             <i>Convenience method to create a job execution</i><br>
      *             <br>
@@ -165,7 +165,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
     }
 
     /**
-     * @deprecated please use the {@link Execution#builder()}
+     * @deprecated please use the {@link WorkerWith#execution()}
      * 
      *             <i>Convenience method to create a job execution</i><br>
      *             <br>
@@ -182,7 +182,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
     }
 
     /**
-     * @deprecated please use the {@link Execution#builder()}
+     * @deprecated please use the {@link WorkerWith#execution()}.
      * 
      *             <i>Convenience method to create a job execution</i><br>
      *             <br>
@@ -198,23 +198,28 @@ public abstract class WorkerWith<T> extends BaseWorker {
     }
 
     /**
-     * This creates a batch of {@link Execution} objects
+     * @deprecated please use the {@link WorkerWith#execution()}
+     * 
+     * 
+     *             This creates a batch of {@link Execution} objects
      * 
      * @param parametersList list of needed parameters to do the batch
      * @return batch ID
      */
+    @Deprecated
     public Long createBatchExecutions(List<T> parametersList) {
         return createBatchExecutions(parametersList, false, null);
     }
 
     /**
-     * This creates a batch of {@link Execution} objects
+     * @deprecated please use the {@link WorkerWith#execution()} This creates a batch of {@link Execution} objects
      * 
      * @param parametersList list of needed parameters to do the batch
      * @param priority priority queuing
      * @param plannedFor specified time for the execution
      * @return batch ID
      */
+    @Deprecated
     public Long createBatchExecutions(List<T> parametersList, Boolean priority, LocalDateTime plannedFor) {
 
         Long batchId = null;
@@ -236,23 +241,27 @@ public abstract class WorkerWith<T> extends BaseWorker {
     }
 
     /**
-     * This creates a chain of {@link Execution} objects, so when the first one gets executed it will bring all its chained friends.
+     * @deprecated please use the {@link WorkerWith#execution()} This creates a chain of {@link Execution} objects, so when the first one gets executed it will
+     *             bring all its chained friends.
      * 
      * @param parametersList list of needed parameters to do the job in the order of the execution chain
      * @return chain ID
      */
+    @Deprecated
     public Long createChainedExecutions(List<T> parametersList) {
         return createChainedExecutions(parametersList, false, null);
     }
 
     /**
-     * This creates a chain of {@link Execution} objects, so when the first one gets executed it will bring all its chained friends.
+     * @deprecated please use the {@link WorkerWith#execution()} This creates a chain of {@link Execution} objects, so when the first one gets executed it will
+     *             bring all its chained friends.
      * 
      * @param parametersList list of needed parameters to do the job in the order of the execution chain
      * @param priority priority queuing
      * @param plannedFor specified time for the execution
      * @return chain ID
      */
+    @Deprecated
     public Long createChainedExecutions(List<T> parametersList, Boolean priority, LocalDateTime plannedFor) {
 
         Long chainId = null;
@@ -277,6 +286,172 @@ public abstract class WorkerWith<T> extends BaseWorker {
 
         }
         return chainId;
+    }
+
+    /**
+     * Create a builder to instantiate attributes of an execution
+     * 
+     * <pre>
+     * Example: {
+     *     A params = new A();
+     *     execution().create(params);
+     * 
+     *     execution().prioritize().create(params);
+     * 
+     *     List<A> paramsList = new ArrayList<>();
+     *     execution().delayedFor(3L, ChronoUnit.SECONDS).createBatch(paramsList);
+     * }
+     * </pre>
+     * 
+     * @return the builder
+     */
+    public Builder execution() {
+        return new Builder();
+    }
+
+    public class Builder {
+
+        private boolean priority;
+        private LocalDateTime plannedFor;
+        private LocalDateTime expiresAt;
+
+        /**
+         * Prioritize an execution over others of the worker class
+         * 
+         * @return the builder to set another feature
+         */
+        public Builder prioritize() {
+            this.priority = true;
+            return this;
+        }
+
+        /**
+         * Plan the processing of an execution to a given timestamp
+         * 
+         * @param plannedFor plannedFor specified time for the execution
+         * @return the builder to set another feature
+         */
+        public Builder plannedFor(LocalDateTime plannedFor) {
+            this.plannedFor = plannedFor;
+            return this;
+        }
+
+        /**
+         * Delay the processing of an execution for a given amount of time
+         * 
+         * <pre>
+         * Example:
+         * {@code 
+         * delayedFor(3L, ChronoUnit.SECONDS)
+         * }
+         * </pre>
+         * 
+         * @param delayValue time to wait
+         * @param delayUnit what kind of time to wait
+         * @return the builder to set another feature
+         */
+        public Builder delayedFor(Long delayValue, ChronoUnit delayUnit) {
+            this.plannedFor = WorkhorseUtil.delayToMaturity(delayValue, delayUnit);
+            return this;
+        }
+
+        /**
+         * Define a timestamp up to which the execution will expire (cancel), if not being processed
+         * 
+         * @param expiresAt specified time to cancel the execution
+         * @return the builder to set another feature
+         */
+        public Builder expiresAt(LocalDateTime expiresAt) {
+            this.expiresAt = expiresAt;
+            return this;
+        }
+
+        /**
+         * Define an period of time before the execution is expired (cancel), if not being processed
+         * 
+         * <pre>
+         * Example:
+         * {@code 
+         * expiresAt(3L, ChronoUnit.SECONDS)
+         * }
+         * </pre>
+         * 
+         * @param expiresValue time to observe
+         * @param expiresUnit what kind of time to observe
+         * @return the builder to set another feature
+         */
+        public Builder expiresAt(Long expiresValue, ChronoUnit expiresUnit) {
+
+            this.expiresAt = WorkhorseUtil.delayToMaturity(expiresValue, expiresUnit);
+            return this;
+        }
+
+        /**
+         * This creates a batch of {@link Execution} objects
+         * 
+         * @param parametersList list of needed parameters to do the batch
+         * @return batch ID
+         */
+        public Long createBatch(List<T> parametersList) {
+
+            Long batchId = null;
+
+            for (T parameter : parametersList) {
+                if (batchId == null) { // start of batch
+
+                    Execution execution = createExecution(parameter, priority, plannedFor, null, -1L, null, null);
+                    // Use the Id of the first added job execution in Batch as BatchId.
+                    execution.setBatchId(execution.getId());
+                    workhorseController.updateExecution(execution);
+
+                    batchId = execution.getId();
+                } else { // now that we have the batch id, all the beloning executions can have it!
+                    createExecution(parameter, priority, plannedFor, null, batchId, null, null);
+                }
+            }
+            return batchId;
+        }
+
+        /**
+         * This creates a chain of {@link Execution} objects, so when the first one gets executed it will bring all its chained friends.
+         * 
+         * @param parametersList list of needed parameters to do the job in the order of the execution chain
+         * @return chain ID
+         */
+        public Long createChain(List<T> parametersList) {
+
+            Long chainId = null;
+            Long jobId = getJob().getId();
+            Long chainedPreviousExecutionId = null;
+
+            for (T parameter : parametersList) {
+                if (chainId == null) { // start of chain
+
+                    Execution execution = createExecution(parameter, priority, plannedFor, null, null, -1L, null);
+                    execution.setChainId(execution.getId());
+                    workhorseController.updateExecution(execution);
+
+                    chainId = execution.getId();
+                    chainedPreviousExecutionId = execution.getId();
+                    continue;
+                }
+                Execution execution = createExecution(parameter, priority, plannedFor, null, null, chainId, chainedPreviousExecutionId);
+                chainedPreviousExecutionId = execution.getId();
+
+                workhorseController.addExecutionAtEndOfChain(jobId, chainId, execution);
+
+            }
+            return chainId;
+        }
+
+        /**
+         * Create an execution with the defined attributes.
+         * 
+         * @return execution ID
+         */
+        public Long create(T parameters) {
+            return createExecution(parameters, priority, plannedFor, expiresAt, null, null, null).getId();
+        }
     }
 
 }

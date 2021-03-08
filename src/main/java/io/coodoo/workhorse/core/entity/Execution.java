@@ -1,9 +1,6 @@
 package io.coodoo.workhorse.core.entity;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-
-import io.coodoo.workhorse.util.WorkhorseUtil;
 
 /**
  * <p>
@@ -279,52 +276,12 @@ public class Execution extends BaseEntity {
         this.failRetryExecutionId = failRetryExecutionId;
     }
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
     @Override
     public String toString() {
         return "Execution [ID=" + id + ", batchId=" + batchId + ", chainId=" + chainId + ", duration=" + duration + ", endedAt=" + endedAt + ", expiresAt="
                         + expiresAt + ", failRetry=" + failRetry + ", failRetryExecutionId=" + failRetryExecutionId + ", failStatus=" + failStatus + ", jobId="
                         + jobId + ", parameters=" + parameters + ", parametersHash=" + parametersHash + ", plannedFor=" + plannedFor + ", priority=" + priority
                         + ", startedAt=" + startedAt + ", status=" + status + "]";
-    }
-
-    public static class Builder {
-        private Execution execution = new Execution();
-
-        public Builder() {}
-
-        public Builder prioritize(boolean isPrioritize) {
-            execution.setPriority(isPrioritize);
-            return this;
-        }
-
-        public Builder plannedFor(LocalDateTime plannedFor) {
-            execution.setPlannedFor(plannedFor);
-            return this;
-        }
-
-        public Builder delayedFor(Long delayValue, ChronoUnit delayUnit) {
-            execution.setPlannedFor(WorkhorseUtil.delayToMaturity(delayValue, delayUnit));
-            return this;
-        }
-
-        public Builder expiresAt(LocalDateTime expiresAt) {
-            execution.setExpiresAt(expiresAt);
-            return this;
-        }
-
-        public Builder parameters(Object parameters) {
-            String parametersAsJson = WorkhorseUtil.parametersToJson(parameters);
-            execution.setParameters(parametersAsJson);
-            return this;
-        }
-
-        public Execution build() {
-            return this.execution;
-        }
     }
 
 }

@@ -2,7 +2,6 @@ package io.coodoo.workhorse.core.control;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 
 import javax.inject.Inject;
 
@@ -156,22 +155,6 @@ public abstract class BaseWorker {
      */
     public LocalDateTime timestamp() {
         return LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE));
-    }
-
-    /**
-     * Calculates the timestamp of the given delay from now ({@link #timestamp()})
-     * 
-     * @param delayValue delay value, e.g. <tt>30</tt>
-     * @param delayUnit delay unit, e.g. {@link ChronoUnit#MINUTES}
-     * @return delay as timestamp
-     */
-    public LocalDateTime delayToMaturity(Long delayValue, ChronoUnit delayUnit) {
-
-        LocalDateTime plannedFor = null;
-        if (delayValue != null && delayUnit != null) {
-            plannedFor = timestamp().plus(delayValue, delayUnit);
-        }
-        return plannedFor;
     }
 
     /**
