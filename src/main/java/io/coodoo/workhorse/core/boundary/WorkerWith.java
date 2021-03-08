@@ -87,7 +87,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
     }
 
     /**
-     * <i>Convenience method to create a job execution</i><br>
+     * <i>Convenience method to create an execution</i><br>
      * <br>
      * This creates a {@link Execution} object that gets added to the job engine with default options.
      * 
@@ -99,23 +99,9 @@ public abstract class WorkerWith<T> extends BaseWorker {
     }
 
     /**
-     * <i>This is an access point to get the job engine started with a new job with job parameters.</i><br>
-     * <br>
-     * 
-     * This creates a {@link Execution} object that gets added to the job engine to be executed as soon as possible.
-     * 
-     * @param parameters needed parameters to do the job
-     * @param execution {@link Execution} object that gets added to the job engine
-     * @return job execution ID
-     */
-    public Long createExecution(T parameters, Execution execution) {
-        return createExecution(parameters, execution.isPriority(), execution.getPlannedFor(), execution.getExpiresAt(), null, null, null).getId();
-    }
-
-    /**
      * @deprecated please use the {@link WorkerWith#execution()}
      * 
-     *             <i>This is an access point to get the job engine started with a new job with job parameters.</i><br>
+     *             <i>Convenience method to create an execution.</i><br>
      *             <br>
      * 
      *             This creates a {@link Execution} object that gets added to the job engine to be executed as soon as possible.
@@ -133,7 +119,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
     /**
      * @deprecated please use the {@link WorkerWith#execution()}
      * 
-     *             <i>This is an access point to get the job engine started with a new job with job parameters.</i><br>
+     *             <i>Convenience method to create an execution</i><br>
      *             <br>
      * 
      *             This creates a {@link Execution} object that gets added to the job engine to be executed as soon as possible.
@@ -152,7 +138,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
     /**
      * @deprecated please use the {@link WorkerWith#execution()}
      * 
-     *             <i>Convenience method to create a job execution</i><br>
+     *             <i>Convenience method to create an execution</i><br>
      *             <br>
      *             This creates a {@link Execution} object that gets added to the priority queue of the job engine to be treated first class.
      * 
@@ -167,7 +153,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
     /**
      * @deprecated please use the {@link WorkerWith#execution()}
      * 
-     *             <i>Convenience method to create a job execution</i><br>
+     *             <i>Convenience method to create an execution</i><br>
      *             <br>
      *             This creates a {@link Execution} object that gets added to the job engine after the given delay.
      * 
@@ -184,7 +170,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
     /**
      * @deprecated please use the {@link WorkerWith#execution()}.
      * 
-     *             <i>Convenience method to create a job execution</i><br>
+     *             <i>Convenience method to create an execution</i><br>
      *             <br>
      *             This creates a {@link Execution} object that gets added to the job engine at a specified time.
      * 
