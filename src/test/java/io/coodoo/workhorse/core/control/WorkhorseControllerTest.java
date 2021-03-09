@@ -18,6 +18,8 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.enterprise.event.Event;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -27,6 +29,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
+import io.coodoo.workhorse.core.control.event.JobErrorEvent;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
@@ -39,6 +42,9 @@ public class WorkhorseControllerTest {
 
     @Mock
     WorkhorseLogService workhorseLogService;
+
+    @Mock
+    Event<JobErrorEvent> jobErrorEvent;
 
     @InjectMocks
     WorkhorseController classUnderTest;
