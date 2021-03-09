@@ -172,10 +172,17 @@ public class WorkhorseController {
         Job persistedJob = jobPersistence.persist(job);
 
         if (persistedJob == null || persistedJob.getId() == null) {
-            throw new RuntimeException("The job " + job + " couldn't be persisited by the persisitence.");
+            JobErrorEvent jobErrorMessage = new JobErrorEvent(new Throwable(ErrorType.ERROR_BY_JOB_PERSIST.getMessage()),
+                            ErrorType.ERROR_BY_JOB_PERSIST.getMessage(), null, null);
+
+            jobErrorEvent.fireAsync(jobErrorMessage);
+
+            workhorseLogService.logException(jobErrorMessage);
+
+            throw new RuntimeException("The job " + job + " couldn't be persisited by the persisitence " + jobPersistence.getPersistenceName());
         }
 
-        log.trace("Job created: {}", persistedJob);
+        log.trace("Created {}", persistedJob);
     }
 
     /**
@@ -321,6 +328,12 @@ public class WorkhorseController {
         Execution persistedExecution = executionPersistence.persist(execution);
 
         if (persistedExecution == null || persistedExecution.getId() == null) {
+            JobErrorEvent jobErrorMessage = new JobErrorEvent(new Throwable(ErrorType.ERROR_BY_EXECUTION_PERSIST.getMessage()),
+                            ErrorType.ERROR_BY_EXECUTION_PERSIST.getMessage(), execution.getJobId(), null);
+
+            jobErrorEvent.fireAsync(jobErrorMessage);
+            workhorseLogService.logException(jobErrorMessage);
+
             throw new RuntimeException("The execution " + execution + " couldn't be persisited by the persisitence.");
         }
         log.trace("Execution successfully created: {}", persistedExecution);
