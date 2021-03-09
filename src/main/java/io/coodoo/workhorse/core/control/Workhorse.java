@@ -136,20 +136,14 @@ public class Workhorse {
                 log.error("No execution found for executionId: {} ", newExecutionEvent.executionId);
                 return;
             }
-
-            // Only the head of a chainExecution may integrate the executionBuffer
-            if (execution.getChainId() == null || execution.getId().equals(execution.getChainId())) {
-                if (ExecutionStatus.PLANNED.equals(execution.getStatus()) && execution.getPlannedFor() != null) {
-                    long delayInSeconds = ChronoUnit.SECONDS.between(WorkhorseUtil.timestamp(), execution.getPlannedFor());
-
-                    log.trace("Execution : {} will be process in {} seconds", execution, delayInSeconds);
-                    scheduledExecutorService.schedule(() -> {
-                        executionDistributor(execution);
-                    }, delayInSeconds, TimeUnit.SECONDS);
-
-                } else {
+            if (execution.getStatus() == ExecutionStatus.PLANNED) {
+                long delayInSeconds = ChronoUnit.SECONDS.between(WorkhorseUtil.timestamp(), execution.getPlannedFor());
+                scheduledExecutorService.schedule(() -> {
                     executionDistributor(execution);
-                }
+                }, delayInSeconds, TimeUnit.SECONDS);
+                log.trace("Execution : {} will be process in {} seconds", execution, delayInSeconds);
+            } else {
+                executionDistributor(execution);
             }
         }
     }
@@ -193,6 +187,11 @@ public class Workhorse {
      * @return true if the mapping was successful and false otherwise
      */
     public boolean executionDistributor(Execution execution) {
+
+        if (execution.getChainId() != null && !execution.getId().equals(execution.getChainId())) {
+            // Only the head of a chainExecution may integrate the executionBuffer
+            return false;
+        }
 
         switch (execution.getStatus()) {
             // Execution in status PLANNED have to be updated to QUEUED before being added to the buffer.

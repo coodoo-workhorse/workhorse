@@ -193,20 +193,6 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     }
 
     @Override
-    public List<Execution> getChain(Long jobId, Long chainId, ExecutionStatus executionStatus) {
-        List<Execution> executions = new ArrayList<>();
-        for (Execution execution : memoryPersistence.getExecutions().values()) {
-            if (Objects.equals(execution.getChainId(), chainId) && executionStatus.equals(execution.getStatus())) {
-                executions.add(execution);
-            }
-        }
-
-        Comparator<Execution> sortByPriority = (Execution e1, Execution e2) -> e1.getCreatedAt().compareTo(e2.getCreatedAt());
-        Collections.sort(executions, sortByPriority);
-        return executions;
-    }
-
-    @Override
     public void delete(Long jobId, Long executionId) {
         memoryPersistence.getExecutionLogs().remove(executionId);
         memoryPersistence.getExecutions().remove(executionId);

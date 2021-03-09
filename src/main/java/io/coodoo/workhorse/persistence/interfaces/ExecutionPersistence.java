@@ -112,15 +112,6 @@ public interface ExecutionPersistence {
     List<Execution> getChain(Long jobId, Long chainId);
 
     /**
-     * Retrieve all execution of an chainedExecution filtered by {@link ExecutionStatus}
-     * 
-     * @param jobId Id of the corresponding job
-     * @param chainId Id of the chainedExecution
-     * @return List of all job executions of the chainedExecution
-     */
-    List<Execution> getChain(Long jobId, Long chainId, ExecutionStatus executionStatus);
-
-    /**
      * Get the first found job execution of the Batch.
      * 
      * @param jobId Id of the corresponding job
