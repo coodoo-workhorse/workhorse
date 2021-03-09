@@ -132,20 +132,18 @@ public class Workhorse {
         log.trace("New Execution pushed: {}", newExecutionEvent);
         if (executionBuffer.getNumberOfExecution(newExecutionEvent.jobId) < StaticConfig.BUFFER_MAX) {
             Execution execution = executionPersistence.getById(newExecutionEvent.jobId, newExecutionEvent.executionId);
-            if (execution != null) {
-                if (ExecutionStatus.PLANNED.equals(execution.getStatus()) && execution.getPlannedFor() != null) {
-                    long delayInSeconds = ChronoUnit.SECONDS.between(WorkhorseUtil.timestamp(), execution.getPlannedFor());
-
-                    log.trace("Execution : {} will be process in {} seconds", execution, delayInSeconds);
-                    scheduledExecutorService.schedule(() -> {
-                        executionDistributor(execution);
-                    }, delayInSeconds, TimeUnit.SECONDS);
-                    // Only the head of a chainExecution may integrate the executionBuffer
-                } else if (execution.getChainedPreviousExecutionId() == null) {
-                    executionDistributor(execution);
-                }
-            } else {
+            if (execution == null) {
                 log.error("No execution found for executionId: {} ", newExecutionEvent.executionId);
+                return;
+            }
+            if (execution.getStatus() == ExecutionStatus.PLANNED) {
+                long delayInSeconds = ChronoUnit.SECONDS.between(WorkhorseUtil.timestamp(), execution.getPlannedFor());
+                scheduledExecutorService.schedule(() -> {
+                    executionDistributor(execution);
+                }, delayInSeconds, TimeUnit.SECONDS);
+                log.trace("Execution : {} will be process in {} seconds", execution, delayInSeconds);
+            } else {
+                executionDistributor(execution);
             }
         }
     }
@@ -190,6 +188,11 @@ public class Workhorse {
      */
     public boolean executionDistributor(Execution execution) {
 
+        if (execution.getChainId() != null && !execution.getId().equals(execution.getChainId())) {
+            // Only the head of a chainExecution may integrate the executionBuffer
+            return false;
+        }
+
         switch (execution.getStatus()) {
             // Execution in status PLANNED have to be updated to QUEUED before being added to the buffer.
             case PLANNED:
@@ -222,7 +225,7 @@ public class Workhorse {
         try {
             lock.lock();
 
-            if (Boolean.TRUE.equals(execution.isPriority())) {
+            if (execution.isPriority()) {
                 executionBuffer.addPriorityExecution(jobId, execution.getId());
             } else {
                 executionBuffer.addExecution(jobId, execution.getId());

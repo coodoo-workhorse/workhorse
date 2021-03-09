@@ -208,7 +208,7 @@ public class WorkhorseControllerTest {
         LocalDateTime expiresAt = null;
         Long batchId = null;
         Long chainId = null;
-        Long chainedPreviousExecutionId = null;
+
         boolean uniqueQueued = false;
 
         Execution newexecution = new Execution();
@@ -220,8 +220,7 @@ public class WorkhorseControllerTest {
 
         when(executionPersistence.persist(anyObject())).thenReturn(newexecution);
 
-        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, chainedPreviousExecutionId,
-                        uniqueQueued);
+        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, uniqueQueued);
 
         verify(executionPersistence, never()).getFirstCreatedByJobIdAndParametersHash(jobId, parameters.hashCode());
 
@@ -240,7 +239,7 @@ public class WorkhorseControllerTest {
         LocalDateTime expiresAt = null;
         Long batchId = null;
         Long chainId = null;
-        Long chainedPreviousExecutionId = null;
+
         boolean uniqueQueued = true;
 
         Execution newexecution = new Execution();
@@ -252,7 +251,7 @@ public class WorkhorseControllerTest {
 
         when(executionPersistence.persist(anyObject())).thenReturn(newexecution);
 
-        classUnderTest.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, chainedPreviousExecutionId, uniqueQueued);
+        classUnderTest.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, uniqueQueued);
 
         verify(executionPersistence).getFirstCreatedByJobIdAndParametersHash(jobId, parameters.hashCode());
 
@@ -269,7 +268,6 @@ public class WorkhorseControllerTest {
         LocalDateTime expiresAt = null;
         Long batchId = null;
         Long chainId = null;
-        Long chainedPreviousExecutionId = null;
         boolean uniqueQueued = true;
 
         Execution foundExecution = new Execution();
@@ -284,8 +282,7 @@ public class WorkhorseControllerTest {
 
         when(executionPersistence.persist(anyObject())).thenReturn(newexecution);
 
-        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, chainedPreviousExecutionId,
-                        uniqueQueued);
+        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, uniqueQueued);
 
         // check if the search after an execution with given parameter succeed
         verify(executionPersistence).getFirstCreatedByJobIdAndParametersHash(jobId, parameters.hashCode());
@@ -307,7 +304,6 @@ public class WorkhorseControllerTest {
         LocalDateTime expiresAt = null;
         Long batchId = null;
         Long chainId = null;
-        Long chainedPreviousExecutionId = null;
         boolean uniqueQueued = true;
 
         Execution newexecution = new Execution();
@@ -318,8 +314,7 @@ public class WorkhorseControllerTest {
 
         when(executionPersistence.persist(anyObject())).thenReturn(newexecution);
 
-        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, chainedPreviousExecutionId,
-                        uniqueQueued);
+        Execution execution = classUnderTest.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, uniqueQueued);
 
         verify(executionPersistence).getFirstCreatedByJobIdAndParametersHash(jobId, null);
 
@@ -346,7 +341,7 @@ public class WorkhorseControllerTest {
 
         when(executionPersistence.persist(anyObject())).thenReturn(newexecution);
 
-        Execution execution = classUnderTest.createExecution(jobId, parameters, false, null, null, null, null, null, uniqueQueued);
+        Execution execution = classUnderTest.createExecution(jobId, parameters, false, null, null, null, null, uniqueQueued);
 
         verify(executionPersistence).getFirstCreatedByJobIdAndParametersHash(jobId, null);
 
@@ -374,7 +369,7 @@ public class WorkhorseControllerTest {
 
         when(executionPersistence.persist(anyObject())).thenReturn(newexecution);
 
-        Execution execution = classUnderTest.createExecution(jobId, parameters, false, null, null, null, null, null, uniqueQueued);
+        Execution execution = classUnderTest.createExecution(jobId, parameters, false, null, null, null, null, uniqueQueued);
 
         verify(executionPersistence).getFirstCreatedByJobIdAndParametersHash(jobId, null);
 
@@ -401,7 +396,7 @@ public class WorkhorseControllerTest {
 
         when(executionPersistence.persist(anyObject())).thenReturn(newexecution);
 
-        Execution execution = classUnderTest.createExecution(jobId, null, priority, null, null, null, null, null, false);
+        Execution execution = classUnderTest.createExecution(jobId, null, priority, null, null, null, null, false);
 
         verify(executionPersistence).persist(anyObject());
         assertFalse(execution.isPriority());
@@ -427,7 +422,7 @@ public class WorkhorseControllerTest {
 
         when(executionPersistence.persist(anyObject())).thenReturn(newexecution);
 
-        Execution persistedExecution = classUnderTest.createExecution(jobId, parameters, false, null, null, null, chainId, null, false);
+        Execution persistedExecution = classUnderTest.createExecution(jobId, parameters, false, null, null, chainId, null, false);
 
         verify(executionPersistence).persist(anyObject());
         assertNotNull(persistedExecution);
@@ -453,8 +448,7 @@ public class WorkhorseControllerTest {
         newexecution.setStatus(ExecutionStatus.PLANNED);
 
         when(executionPersistence.persist(anyObject())).thenReturn(newexecution);
-
-        Execution persistedExecution = classUnderTest.createExecution(jobId, null, false, plannedFor, null, null, null, null, false);
+        Execution persistedExecution = classUnderTest.createExecution(jobId, null, false, plannedFor, null, null, null, false);
 
         verify(executionPersistence).persist(anyObject());
         assertNotNull(persistedExecution);
@@ -481,7 +475,7 @@ public class WorkhorseControllerTest {
 
         when(executionPersistence.persist(anyObject())).thenReturn(newexecution);
 
-        Execution persistedExecution = classUnderTest.createExecution(jobId, null, false, plannedFor, null, null, null, null, false);
+        Execution persistedExecution = classUnderTest.createExecution(jobId, null, false, plannedFor, null, null, null, false);
 
         verify(executionPersistence).persist(anyObject());
         assertNotNull(persistedExecution);
@@ -504,8 +498,7 @@ public class WorkhorseControllerTest {
         exceptionRule.expect(RuntimeException.class);
         exceptionRule.expectMessage("The execution " + newexecution + " couldn't be persisited by the persisitence.");
 
-        classUnderTest.createExecution(jobId, null, false, null, null, null, null, null, false);
-
+        classUnderTest.createExecution(jobId, null, false, null, null, null, null, false);
     }
 
     @Test
@@ -523,8 +516,7 @@ public class WorkhorseControllerTest {
         exceptionRule.expect(RuntimeException.class);
         exceptionRule.expectMessage("The execution " + newexecution + " couldn't be persisited by the persisitence.");
 
-        classUnderTest.createExecution(jobId, null, false, null, null, null, null, null, false);
-
+        classUnderTest.createExecution(jobId, null, false, null, null, null, null, false);
     }
 
 }

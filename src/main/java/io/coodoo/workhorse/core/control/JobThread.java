@@ -1,5 +1,7 @@
 package io.coodoo.workhorse.core.control;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -11,7 +13,6 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.coodoo.workhorse.core.boundary.ExecutionContext;
 import io.coodoo.workhorse.core.control.event.AllExecutionsDoneEvent;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.Job;
@@ -48,6 +49,8 @@ public class JobThread {
     private boolean stopMe;
     private Execution runningExecution;
     private Thread thread;
+    private List<Execution> chainedExecutions = new ArrayList<>();
+    private Long chainId = null;
 
     private static final Logger log = LoggerFactory.getLogger(JobThread.class);
 
@@ -86,8 +89,6 @@ public class JobThread {
 
                 long millisAtStart = System.currentTimeMillis();
 
-                ExecutionContext executionContext = workerInstance.getExecutionContext();
-
                 log.trace("On Running Job Execution: {}", runningExecution);
 
                 try {
@@ -116,11 +117,25 @@ public class JobThread {
                         workerInstance.onFinishedBatch(execution.getBatchId(), execution.getId());
                     }
 
-                    Execution nextInChain = handleChainedExecution(jobId, execution, workerInstance);
-                    if (nextInChain != null) {
-                        execution = nextInChain;
+                    // Handle chained execution
+                    if (execution.getChainId() != null) {
+                        if (chainId == null) {
+                            // chain is about to start
+                            chainId = execution.getChainId();
+                            chainedExecutions = executionPersistence.getChain(jobId, execution.getChainId());
+                        } else {
+                            if (chainedExecutions.isEmpty()) {
+                                // chain is all done
+                                chainId = null;
+                                workerInstance.onFinishedChain(execution.getChainId(), execution.getId());
+                                break executionLoop;
+                            }
+                        }
+                        // "remove" gets me the element...
+                        execution = chainedExecutions.remove(0);
+                        log.trace("This execution, Id: {} of the chain {} will be process as next.", execution.getId(), execution.getChainId());
+
                         runningExecution = execution;
-                        log.trace("This execution, Id: {} of the chain {} will be process as next.", execution.getId(), nextInChain.getChainId());
                         continue executionLoop;
                     }
 
@@ -196,20 +211,6 @@ public class JobThread {
         }
 
         return execution;
-    }
-
-    private Execution handleChainedExecution(Long jobId, Execution execution, BaseWorker workerInstance) {
-        Long chainId = execution.getChainId();
-        Execution nextInChain = null;
-        if (chainId != null) {
-            nextInChain = executionPersistence.getNextQueuedExecutionInChain(jobId, chainId, execution);
-            if (nextInChain == null) {
-                workerInstance.onFinishedChain(chainId, execution.getId());
-            }
-        }
-
-        return nextInChain;
-
     }
 
     public void stop() {

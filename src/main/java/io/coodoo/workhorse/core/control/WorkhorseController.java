@@ -277,12 +277,11 @@ public class WorkhorseController {
      * @param expiresAt If expiresAt is given, the execution have to be process before this time. Otherwise the execution is cancelled.
      * @param batchId Id to refer to a group of executions to handle as a single entity.
      * @param chainId Id to refer to a group of executions to process by an order.
-     * @param chainedPreviousExecutionId Id to the previous execution to process, if the execution belong to a chained Execution.
      * @param uniqueQueued
      * @return the created Job Execution
      */
     public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime plannedFor, LocalDateTime expiresAt, Long batchId,
-                    Long chainId, Long chainedPreviousExecutionId, boolean uniqueQueued) {
+                    Long chainId, boolean uniqueQueued) {
 
         Integer parametersHash = null;
         if (parameters != null) {
@@ -319,11 +318,6 @@ public class WorkhorseController {
         execution.setExpiresAt(expiresAt);
         execution.setBatchId(batchId);
         execution.setChainId(chainId);
-        execution.setChainedPreviousExecutionId(chainedPreviousExecutionId);
-
-        if (chainId != null) {
-            execution.setChainedNextExecutionId(-1L);
-        }
 
         Execution persistedExecution = executionPersistence.persist(execution);
 
@@ -356,8 +350,6 @@ public class WorkhorseController {
         retryExecution.setPriority(failedExecution.isPriority());
         retryExecution.setPlannedFor(failedExecution.getPlannedFor());
         retryExecution.setChainId(failedExecution.getChainId());
-        retryExecution.setChainedNextExecutionId(failedExecution.getChainedNextExecutionId());
-        retryExecution.setChainedPreviousExecutionId(failedExecution.getChainedPreviousExecutionId());
         retryExecution.setParameters(failedExecution.getParameters());
         retryExecution.setParametersHash(failedExecution.getParametersHash());
 
@@ -611,10 +603,6 @@ public class WorkhorseController {
 
     public void deleteExecution(Long jobId, Long executionId) {
         executionPersistence.delete(jobId, executionId);
-    }
-
-    public void addExecutionAtEndOfChain(Long jobId, Long chainId, Execution execution) {
-        executionPersistence.addExecutionAtEndOfChain(jobId, chainId, execution);
     }
 
     /**
