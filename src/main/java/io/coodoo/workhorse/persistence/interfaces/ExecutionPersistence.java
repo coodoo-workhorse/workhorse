@@ -52,8 +52,9 @@ public interface ExecutionPersistence {
      * Create a new job execution
      * 
      * @param execution execution to create
+     * @return new persisted execution
      */
-    void persist(Execution execution);
+    Execution persist(Execution execution);
 
     /**
      * Delete a job execution by <code>jobId</code> and <code>id</code> of the execution

@@ -169,9 +169,13 @@ public class WorkhorseController {
             log.error("Could not read parameters class name of job {}", job.getName());
         }
 
-        jobPersistence.persist(job);
+        Job persistedJob = jobPersistence.persist(job);
 
-        log.trace("Job created: {}", job);
+        if (persistedJob == null || persistedJob.getId() == null) {
+            throw new RuntimeException("The job " + job + " couldn't be persisited by the persisitence.");
+        }
+
+        log.trace("Job created: {}", persistedJob);
     }
 
     /**
@@ -259,7 +263,7 @@ public class WorkhorseController {
     /**
      * create a Job Execution
      * 
-     * @param jobId Id of the correspondant JOB
+     * @param jobId Id of the corresponding job
      * @param parameters parameters of the execution
      * @param priority if <code>true</code> the execution will be process before other execution. Otherwise the execution will be process in order of add.
      * @param plannedFor If a plannedFor is given, the job execution will not be executed before this time.
@@ -314,11 +318,13 @@ public class WorkhorseController {
             execution.setChainedNextExecutionId(-1L);
         }
 
-        // TODO Prüfen, ob die Persistence eine Id zurückgibt. Wenn nicht, dann die
-        // ganze Engine abbrechen, wenn keine Id zurückgegeben wird.
-        executionPersistence.persist(execution);
-        log.trace("Execution successfully created: {}", execution);
-        return execution;
+        Execution persistedExecution = executionPersistence.persist(execution);
+
+        if (persistedExecution == null || persistedExecution.getId() == null) {
+            throw new RuntimeException("The execution " + execution + " couldn't be persisited by the persisitence.");
+        }
+        log.trace("Execution successfully created: {}", persistedExecution);
+        return persistedExecution;
 
     }
 

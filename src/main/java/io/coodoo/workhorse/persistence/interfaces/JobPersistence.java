@@ -72,8 +72,9 @@ public interface JobPersistence {
      * persist a Job in storage. The id of the job have to be set by the persistence.
      * 
      * @param job
+     * @return new persisted job
      */
-    void persist(Job job);
+    Job persist(Job job);
 
     /**
      * Update the job given by Id

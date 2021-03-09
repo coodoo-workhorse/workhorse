@@ -96,9 +96,12 @@ public class WorkhorseLogService {
         workhorseLog.setHostName(WorkhorseUtil.getHostName());
         workhorseLog.setStacktrace(stacktrace);
 
-        logPersistence.persist(workhorseLog);
+        WorkhorseLog persistedWorkhorseLog = logPersistence.persist(workhorseLog);
+        if (persistedWorkhorseLog == null || persistedWorkhorseLog.getId() == null) {
+            throw new RuntimeException("The workhorseLog " + workhorseLog + " couldn't be persisited by the persisitence.");
+        }
         log.info("Created log : {} ", workhorseLog);
-        return workhorseLog;
+        return persistedWorkhorseLog;
     }
 
     /**
