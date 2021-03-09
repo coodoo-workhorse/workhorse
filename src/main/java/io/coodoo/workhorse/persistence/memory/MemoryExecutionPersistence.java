@@ -46,13 +46,14 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     }
 
     @Override
-    public void persist(Execution execution) {
+    public Execution persist(Execution execution) {
         Long id = executionId.getAndIncrement();
         execution.setId(id);
         execution.setCreatedAt(WorkhorseUtil.timestamp());
         memoryPersistence.getExecutions().put(id, execution);
 
         newExecutionEventEvent.fireAsync(new NewExecutionEvent(execution.getJobId(), execution.getId()));
+        return execution;
     }
 
     @Override

@@ -44,26 +44,12 @@ public class MemoryLogPersistence implements LogPersistence {
         return workhorseLog;
     }
 
-    // FIXME
-    // TODO
     @Override
     public List<WorkhorseLog> getAll(int limit) {
-        List<WorkhorseLog> result = new ArrayList<>();
         List<WorkhorseLog> workhorseLogs = new ArrayList<>();
         workhorseLogs.addAll(memoryPersistence.getWorkhorseLog().values());
-        // Long index = incId.get();
-        // int count = 0;
 
-        // JobEngineLog workhorseLog = memoryService.workhorseLog.get(index);
-        // while (workhorseLog != null && count <= limit) {
-
-        // result.add(workhorseLog);
-        // count++;
-        // index--;
-        // workhorseLog = memoryService.workhorseLog.get(index);
-        // }
-
-        return workhorseLogs;
+        return workhorseLogs.subList(0, limit);
 
     }
 

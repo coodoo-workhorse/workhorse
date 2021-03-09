@@ -38,12 +38,12 @@ public class MemoryJobPersistence implements JobPersistence {
     }
 
     @Override
-    public void persist(Job job) {
+    public Job persist(Job job) {
         Long id = incId.getAndIncrement();
         job.setId(id);
         job.setCreatedAt(WorkhorseUtil.timestamp());
         memoryPersistence.getJobs().put(id, job);
-
+        return job;
     }
 
     @Override
