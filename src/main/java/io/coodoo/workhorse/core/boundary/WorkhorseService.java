@@ -196,8 +196,7 @@ public class WorkhorseService {
 
     public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime plannedFor, LocalDateTime expiresAt, Long batchId,
                     Long chainId, Long chainedPreviousExecutionId, boolean uniqueQueued) {
-        return workhorseController.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, chainedPreviousExecutionId,
-                        uniqueQueued);
+        return workhorseController.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, uniqueQueued);
     }
 
     public Execution updateExecution(Long jobId, Long executionId, ExecutionStatus status, String parameters, boolean priority, LocalDateTime plannedFor,

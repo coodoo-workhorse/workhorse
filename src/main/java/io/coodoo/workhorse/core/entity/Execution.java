@@ -72,16 +72,6 @@ public class Execution extends BaseEntity {
     private Long chainId;
 
     /**
-     * Id to the previous execution to process, if the execution belong to a chained Execution.
-     */
-    private Long chainedPreviousExecutionId;
-
-    /**
-     * Id to the next execution to process, if the execution belong to a chained Execution.
-     */
-    private Long chainedNextExecutionId;
-
-    /**
      * Parameters as JSON to process the execution
      */
     private String parameters;
@@ -220,14 +210,6 @@ public class Execution extends BaseEntity {
         this.endedAt = endedAt;
     }
 
-    public Long getChainedNextExecutionId() {
-        return chainedNextExecutionId;
-    }
-
-    public void setChainedNextExecutionId(Long chainedNextExecutionId) {
-        this.chainedNextExecutionId = chainedNextExecutionId;
-    }
-
     public Integer getParametersHash() {
         return parametersHash;
     }
@@ -250,14 +232,6 @@ public class Execution extends BaseEntity {
 
     public void setFailStacktrace(String failStacktrace) {
         this.failStacktrace = failStacktrace;
-    }
-
-    public Long getChainedPreviousExecutionId() {
-        return chainedPreviousExecutionId;
-    }
-
-    public void setChainedPreviousExecutionId(Long chainedPreviousExecutionId) {
-        this.chainedPreviousExecutionId = chainedPreviousExecutionId;
     }
 
     public int getFailRetry() {
