@@ -34,7 +34,7 @@ public abstract class WorkhorseConfigBuilder {
      * @param bufferMax the maximum amount of executions
      * @return the builder to set another configuration
      */
-    public WorkhorseConfigBuilder bufferMaximumSize(Long bufferMax) {
+    public WorkhorseConfigBuilder bufferMaximumSize(int bufferMax) {
         workhorseConfig.setBufferMax(bufferMax);
         return this;
     }

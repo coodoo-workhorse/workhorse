@@ -17,7 +17,7 @@ public abstract class WorkhorseConfig {
     /**
      * Max amount of executions to load into the intern buffer per job
      */
-    protected Long bufferMax = 1000L;
+    protected int bufferMax = 1000;
 
     /**
      * Min amount of executions in intern buffer before the processing begins
@@ -96,11 +96,11 @@ public abstract class WorkhorseConfig {
         this.timeZone = timeZone;
     }
 
-    public Long getBufferMax() {
+    public int getBufferMax() {
         return bufferMax;
     }
 
-    public void setBufferMax(Long bufferMax) {
+    public void setBufferMax(int bufferMax) {
         this.bufferMax = bufferMax;
     }
 

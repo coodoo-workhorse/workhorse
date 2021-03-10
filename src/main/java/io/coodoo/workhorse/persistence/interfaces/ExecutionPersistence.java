@@ -39,7 +39,7 @@ public interface ExecutionPersistence {
      * @param jobId Id of the job
      * @return List of executions order by <code>priority</code> and <code>createdAt</code>
      */
-    List<Execution> pollNextExecutions(Long jobId, Long limit);
+    List<Execution> pollNextExecutions(Long jobId, int limit);
 
     /**
      * Count the number of job executions

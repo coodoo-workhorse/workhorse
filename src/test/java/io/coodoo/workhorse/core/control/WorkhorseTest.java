@@ -55,7 +55,7 @@ public class WorkhorseTest {
 
         long jobId = 1L;
         long executionId = 4L;
-        StaticConfig.BUFFER_MAX = 4L;
+        StaticConfig.BUFFER_MAX = 4;
 
         Execution execution = new Execution();
         execution.setId(executionId);
@@ -103,7 +103,7 @@ public class WorkhorseTest {
 
         long jobId = 1L;
         long executionId = 4L;
-        StaticConfig.BUFFER_MAX = 4L;
+        StaticConfig.BUFFER_MAX = 4;
         StaticConfig.TIME_ZONE = "UTC";
 
         Execution execution = new Execution();
@@ -132,7 +132,7 @@ public class WorkhorseTest {
 
         long jobId = 1L;
         long executionId = 4L;
-        StaticConfig.BUFFER_MAX = 4L;
+        StaticConfig.BUFFER_MAX = 4;
         StaticConfig.TIME_ZONE = "UTC";
 
         // Logger log = mock(Logger.class);

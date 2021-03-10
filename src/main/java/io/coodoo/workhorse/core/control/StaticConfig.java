@@ -28,7 +28,7 @@ public final class StaticConfig {
     /**
      * Max amount of executions to load into the memory buffer per job
      */
-    public static Long BUFFER_MAX;
+    public static int BUFFER_MAX;
 
     /**
      * Min amount of executions in memory buffer before the poller gets to add more

@@ -50,7 +50,7 @@ public class WorkhorseConfigControllerTest {
     public void testUpdateBufferMax() {
 
         WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
-        Long bufferMax = 1L;
+        int bufferMax = 1;
 
         classUnderTest.updateBufferMax(workhorseConfig, bufferMax);
 
@@ -63,7 +63,7 @@ public class WorkhorseConfigControllerTest {
     public void testUpdateBufferMax_tooLow() throws Exception {
 
         WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
-        Long bufferMax = 0L;
+        int bufferMax = 0;
 
         exceptionRule.expect(RuntimeException.class);
         exceptionRule.expectMessage("The max amount of executions to load into the memory buffer per job must be higher than 0!");
@@ -76,7 +76,7 @@ public class WorkhorseConfigControllerTest {
     public void testUpdateBufferMax_dontUpdateIfEquals() throws Exception {
 
         WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
-        Long bufferMax = 50L;
+        int bufferMax = 50;
 
         workhorseConfig.setBufferMax(bufferMax);
         classUnderTest.updateBufferMax(workhorseConfig, bufferMax);
@@ -90,7 +90,7 @@ public class WorkhorseConfigControllerTest {
 
         WorkhorseConfig workhorseConfigDefaults = new MemoryConfigBuilder().build();
         WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
-        Long bufferMax = 50L;
+        int bufferMax = 50;
 
         classUnderTest.updateBufferMax(workhorseConfig, bufferMax);
 
@@ -624,7 +624,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testGetWorkhorseConfig() throws Exception {
 
-        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(100L).bufferMinimumSize(3).bufferPollInterval(4).build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().bufferMaximumSize(100).bufferMinimumSize(3).bufferPollInterval(4).build();
 
         when(configPersistence.get()).thenReturn(workhorseConfig);
 
@@ -646,7 +646,7 @@ public class WorkhorseConfigControllerTest {
     public void testUpdateWorkhorseConfig() throws Exception {
 
         WorkhorseConfig workhorseConfigDefaults = new MemoryConfigBuilder().build();
-        Long bufferMax = 100L;
+        int bufferMax = 100;
         int bufferMix = 3;
         int bufferPollInterval = 4;
         int bufferPushFallbackPollInterval = 60;
@@ -666,7 +666,7 @@ public class WorkhorseConfigControllerTest {
 
         WorkhorseConfig workhorseConfigDefaults = new MemoryConfigBuilder().build();
 
-        Long bufferMax = 0L;
+        int bufferMax = 0;
         int bufferMix = 3;
         int bufferPollInterval = 4;
         int bufferPushFallbackPollInterval = 60;
@@ -685,7 +685,7 @@ public class WorkhorseConfigControllerTest {
     @Test
     public void testInitializeStaticConfig() throws Exception {
 
-        Long bufferMax = 100L;
+        int bufferMax = 100;
         int bufferMix = 3;
         int bufferPollInterval = 4;
         int bufferPushFallbackPollInterval = 60;

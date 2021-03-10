@@ -182,12 +182,12 @@ public class WorkhorseConfigController {
 
     }
 
-    protected void updateBufferMax(WorkhorseConfig workhorseConfig, Long bufferMax) {
+    protected void updateBufferMax(WorkhorseConfig workhorseConfig, int bufferMax) {
 
         if (bufferMax < 1) {
             throw new RuntimeException("The max amount of executions to load into the memory buffer per job must be higher than 0!");
         }
-        if (!workhorseConfig.getBufferMax().equals(bufferMax)) {
+        if (workhorseConfig.getBufferMax() != bufferMax) {
 
             StaticConfig.BUFFER_MAX = bufferMax;
             workhorseLogService.logChange(null, null, "Max amount of executions to load into the memory buffer per job", workhorseConfig.getBufferMax(),

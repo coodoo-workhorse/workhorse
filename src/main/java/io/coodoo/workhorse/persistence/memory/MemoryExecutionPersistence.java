@@ -84,7 +84,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     }
 
     @Override
-    public List<Execution> pollNextExecutions(Long jobId, Long limit) {
+    public List<Execution> pollNextExecutions(Long jobId, int limit) {
 
         List<Execution> executions = new ArrayList<>();
         LocalDateTime currentTimeStamp = LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE));
@@ -93,7 +93,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
             if (execution.getJobId().equals(jobId) && (execution.getStatus() == ExecutionStatus.QUEUED || execution.getStatus() == ExecutionStatus.PLANNED)
                             && (execution.getPlannedFor() == null || execution.getPlannedFor().isBefore(currentTimeStamp))
-                            && (execution.getChainId() == null || execution.getId().equals(execution.getChainId())) && executions.size() < limit.intValue()) {
+                            && (execution.getChainId() == null || execution.getId().equals(execution.getChainId())) && executions.size() < limit) {
 
                 executions.add(execution);
             }
