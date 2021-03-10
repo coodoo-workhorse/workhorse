@@ -79,9 +79,9 @@ public interface JobPersistence {
     /**
      * Update the job given by Id
      * 
-     * @param job
+     * @return updated job
      */
-    void update(Job job);
+    Job update(Job job);
 
     /**
      * rollback fonction to initialize the connection with the persistence

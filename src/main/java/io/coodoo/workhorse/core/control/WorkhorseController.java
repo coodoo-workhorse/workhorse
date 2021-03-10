@@ -489,7 +489,7 @@ public class WorkhorseController {
             workhorseLogService.logChange(jobId, status, "Minutes until cleanup", job.getMinutesUntilCleanUp(), minutesUntilCleanUp, null);
             job.setMinutesUntilCleanUp(minutesUntilCleanUp);
         }
-        if (!Objects.equals(job.isUniqueQueued(), uniqueQueued)) {
+        if (job.isUniqueQueued() != uniqueQueued) {
             workhorseLogService.logChange(jobId, status, "Unique in status queued", job.isUniqueQueued(), uniqueQueued, null);
             job.setUniqueQueued(uniqueQueued);
         }
