@@ -10,7 +10,10 @@ import javax.inject.Inject;
 
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
+import io.coodoo.workhorse.persistence.interfaces.listing.Metadata;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
 @ApplicationScoped
@@ -113,6 +116,14 @@ public class MemoryJobPersistence implements JobPersistence {
     @Override
     public void connect(Object... params) {
         // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public ListingResult<Job> getJobListing(ListingParameters listingParameters) {
+        List<Job> jobs = getAll();
+
+        return new ListingResult<Job>(jobs, new Metadata(Long.valueOf(listingParameters.getLimit()), listingParameters));
 
     }
 }

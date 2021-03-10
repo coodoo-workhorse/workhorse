@@ -16,6 +16,8 @@ import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.core.entity.WorkhorseLog;
 import io.coodoo.workhorse.persistence.interfaces.LogPersistence;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.LogQualifier;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
@@ -45,6 +47,16 @@ public class WorkhorseLogService {
 
     public List<WorkhorseLog> getAllLogs(int limit) {
         return logPersistence.getAll(limit);
+    }
+
+    /**
+     * Get the listing result of logs
+     * 
+     * @param listingParameters defines the listing queue. It contains optional query parameters as described above
+     * @return list of logs
+     */
+    ListingResult<WorkhorseLog> getWorkhorseLogListing(ListingParameters listingParameters) {
+        return logPersistence.getWorkhorseLogListing(listingParameters);
     }
 
     /**

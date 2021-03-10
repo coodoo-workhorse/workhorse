@@ -23,6 +23,8 @@ import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
 @ApplicationScoped
@@ -37,8 +39,6 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     Event<NewExecutionEvent> newExecutionEventEvent;
 
     private AtomicLong executionId = new AtomicLong(0);
-
-    private AtomicLong executionLogId = new AtomicLong(0);
 
     @Override
     public Execution getById(Long jobId, Long id) {
@@ -289,6 +289,12 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
         executionLog.setStacktrace(stacktrace);
 
         memoryPersistence.getExecutionLogs().put(executionId, executionLog);
+    }
+
+    @Override
+    public ListingResult<Execution> getExecutionListing(ListingParameters listingParameters) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

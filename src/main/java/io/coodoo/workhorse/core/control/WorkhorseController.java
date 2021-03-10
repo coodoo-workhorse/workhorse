@@ -29,6 +29,8 @@ import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.ExecutionQualifier;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
 import io.coodoo.workhorse.util.WorkhorseUtil;
@@ -413,6 +415,26 @@ public class WorkhorseController {
         LocalDateTime time = LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)).minusMinutes(minMinutesOld);
 
         return executionPersistence.deleteOlderExecutions(jobId, time);
+    }
+
+    /**
+     * Get the listing result of execution
+     * 
+     * @param listingParameters defines the listing queue. It contains optional query parameters as described above
+     * @return list of execution
+     */
+    public ListingResult<Execution> getExecutionListing(ListingParameters listingParameters) {
+        return executionPersistence.getExecutionListing(listingParameters);
+    }
+
+    /**
+     * Get the listing result of jobs
+     * 
+     * @param listingParameters defines the listing queue. It contains optional query parameters as described above
+     * @return list of jobs
+     */
+    public ListingResult<Job> getJobListing(ListingParameters listingParameters) {
+        return jobPersistence.getJobListing(listingParameters);
     }
 
     public List<Job> getAllJobs() {
