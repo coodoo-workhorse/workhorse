@@ -82,11 +82,6 @@ public class Execution extends BaseEntity {
     private Integer parametersHash;
 
     /**
-     * Log info about the execution
-     */
-    private String log;
-
-    /**
      * Number of retries
      */
     private int failRetry;
@@ -95,16 +90,6 @@ public class Execution extends BaseEntity {
      * Id of the failed Execution that should be retry
      */
     private Long failRetryExecutionId;
-
-    /**
-     * The exception message, if the job execution ends in an exception.
-     */
-    private String failMessage;
-
-    /**
-     * The exception stacktrace, if the job execution ends in an exception.
-     */
-    private String failStacktrace;
 
     public Long getJobId() {
         return jobId;
@@ -170,14 +155,6 @@ public class Execution extends BaseEntity {
         this.chainId = chainId;
     }
 
-    public String getLog() {
-        return log;
-    }
-
-    public void setLog(String log) {
-        this.log = log;
-    }
-
     public ExecutionStatus getStatus() {
         return status;
     }
@@ -216,22 +193,6 @@ public class Execution extends BaseEntity {
 
     public void setParametersHash(Integer parametersHash) {
         this.parametersHash = parametersHash;
-    }
-
-    public String getFailMessage() {
-        return failMessage;
-    }
-
-    public void setFailMessage(String failMessage) {
-        this.failMessage = failMessage;
-    }
-
-    public String getFailStacktrace() {
-        return failStacktrace;
-    }
-
-    public void setFailStacktrace(String failStacktrace) {
-        this.failStacktrace = failStacktrace;
     }
 
     public int getFailRetry() {
