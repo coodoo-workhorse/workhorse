@@ -24,6 +24,8 @@ import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.entity.WorkhorseConfigBuilder;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
 import io.coodoo.workhorse.persistence.PersistenceManager;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 import io.coodoo.workhorse.persistence.memory.MemoryConfig;
 import io.coodoo.workhorse.persistence.memory.MemoryConfigBuilder;
 import io.coodoo.workhorse.util.CronExpression;
@@ -124,6 +126,26 @@ public class WorkhorseService {
      */
     public List<Job> getAllJobs() {
         return workhorseController.getAllJobs();
+    }
+
+    /**
+     * Get the listing result of execution
+     * 
+     * @param listingParameters defines the listing queue. It contains optional query parameters as described above
+     * @return list of execution
+     */
+    ListingResult<Execution> getExecutionListing(ListingParameters listingParameters) {
+        return workhorseController.getExecutionListing(listingParameters);
+    }
+
+    /**
+     * Get the listing result of jobs
+     * 
+     * @param listingParameters defines the listing queue. It contains optional query parameters as described above
+     * @return list of jobs
+     */
+    ListingResult<Job> getJobListing(ListingParameters listingParameters) {
+        return workhorseController.getJobListing(listingParameters);
     }
 
     /**

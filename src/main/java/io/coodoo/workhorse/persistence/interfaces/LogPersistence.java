@@ -3,6 +3,8 @@ package io.coodoo.workhorse.persistence.interfaces;
 import java.util.List;
 
 import io.coodoo.workhorse.core.entity.WorkhorseLog;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 
 public interface LogPersistence {
 
@@ -45,6 +47,14 @@ public interface LogPersistence {
      * @return List of logs
      */
     List<WorkhorseLog> getAll(int limit);
+
+    /**
+     * Get the listing result of logs
+     * 
+     * @param listingParameters defines the listing queue. It contains optional query parameters as described above
+     * @return list of logs
+     */
+    ListingResult<WorkhorseLog> getWorkhorseLogListing(ListingParameters listingParameters);
 
     /**
      * Delete all log of the given job

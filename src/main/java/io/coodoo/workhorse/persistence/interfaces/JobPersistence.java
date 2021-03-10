@@ -4,6 +4,8 @@ import java.util.List;
 
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 
 public interface JobPersistence {
 
@@ -37,6 +39,14 @@ public interface JobPersistence {
      * @return List of all Jobs
      */
     List<Job> getAll();
+
+    /**
+     * Get the listing result of jobs
+     * 
+     * @param listingParameters defines the listing queue. It contains optional query parameters as described above
+     * @return list of jobs
+     */
+    ListingResult<Job> getJobListing(ListingParameters listingParameters);
 
     /**
      * Get all jobs filtered by a given status

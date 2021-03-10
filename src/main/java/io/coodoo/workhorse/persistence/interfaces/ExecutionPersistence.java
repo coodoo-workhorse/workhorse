@@ -8,6 +8,8 @@ import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 
 /**
  * @author coodoo GmbH (coodoo.io)
@@ -31,6 +33,14 @@ public interface ExecutionPersistence {
      * @return a list of <code>limit</code> job execution
      */
     List<Execution> getByJobId(Long jobId, Long limit);
+
+    /**
+     * Get the listing result of execution
+     * 
+     * @param listingParameters defines the listing queue. It contains optional query parameters as described above
+     * @return list of execution
+     */
+    ListingResult<Execution> getExecutionListing(ListingParameters listingParameters);
 
     /**
      * Retrieves the next queued executions and the planned executions that have to be process now with given JobId, order by priority and createdAt. Executions

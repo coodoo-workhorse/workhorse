@@ -9,6 +9,9 @@ import javax.inject.Inject;
 
 import io.coodoo.workhorse.core.entity.WorkhorseLog;
 import io.coodoo.workhorse.persistence.interfaces.LogPersistence;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
+import io.coodoo.workhorse.persistence.interfaces.listing.Metadata;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
 @ApplicationScoped
@@ -75,6 +78,14 @@ public class MemoryLogPersistence implements LogPersistence {
     public void connect(Object... params) {
         // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    public ListingResult<WorkhorseLog> getWorkhorseLogListing(ListingParameters listingParameters) {
+
+        List<WorkhorseLog> workhorseLogs = getAll(listingParameters.getLimit());
+
+        return new ListingResult<WorkhorseLog>(workhorseLogs, new Metadata(Long.valueOf(listingParameters.getLimit()), listingParameters));
     }
 
 }
