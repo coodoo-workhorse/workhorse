@@ -48,7 +48,8 @@ public class MemoryLogPersistence implements LogPersistence {
     public List<WorkhorseLog> getAll(int limit) {
         List<WorkhorseLog> workhorseLogs = new ArrayList<>();
         workhorseLogs.addAll(memoryPersistence.getWorkhorseLog().values());
-
+        int logSize = workhorseLogs.size();
+        limit = limit > logSize ? logSize : limit;
         return workhorseLogs.subList(0, limit);
 
     }
