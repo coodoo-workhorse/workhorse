@@ -187,6 +187,10 @@ public class WorkhorseController {
         log.trace("Created {}", persistedJob);
     }
 
+    public void deleteJob(Long jobId) {
+        jobPersistence.deleteJob(jobId);
+    }
+
     /**
      * retrieves the parameter's name of a Job from current workspace as String.
      * 
@@ -420,11 +424,12 @@ public class WorkhorseController {
     /**
      * Get the listing result of execution
      * 
+     * @param jobId Id of the corresponding job
      * @param listingParameters defines the listing queue. It contains optional query parameters as described above
      * @return list of execution
      */
-    public ListingResult<Execution> getExecutionListing(ListingParameters listingParameters) {
-        return executionPersistence.getExecutionListing(listingParameters);
+    public ListingResult<Execution> getExecutionListing(Long jobId, ListingParameters listingParameters) {
+        return executionPersistence.getExecutionListing(jobId, listingParameters);
     }
 
     /**

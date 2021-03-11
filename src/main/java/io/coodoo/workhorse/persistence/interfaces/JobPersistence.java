@@ -93,6 +93,8 @@ public interface JobPersistence {
      */
     Job update(Job job);
 
+    void deleteJob(Long jobId);
+
     /**
      * rollback fonction to initialize the connection with the persistence
      */

@@ -37,10 +37,11 @@ public interface ExecutionPersistence {
     /**
      * Get the listing result of execution
      * 
+     * @param jobId Id of the job
      * @param listingParameters defines the listing queue. It contains optional query parameters as described above
      * @return list of execution
      */
-    ListingResult<Execution> getExecutionListing(ListingParameters listingParameters);
+    ListingResult<Execution> getExecutionListing(Long jobId, ListingParameters listingParameters);
 
     /**
      * Retrieves the next queued executions and the planned executions that have to be process now with given JobId, order by priority and createdAt. Executions
@@ -50,13 +51,6 @@ public interface ExecutionPersistence {
      * @return List of executions order by <code>priority</code> and <code>createdAt</code>
      */
     List<Execution> pollNextExecutions(Long jobId, int limit);
-
-    /**
-     * Count the number of job executions
-     * 
-     * @return
-     */
-    Long count();
 
     /**
      * Create a new job execution
@@ -121,24 +115,6 @@ public interface ExecutionPersistence {
      * @return List of all job executions of the chainedExecution
      */
     List<Execution> getChain(Long jobId, Long chainId);
-
-    /**
-     * Get the first found job execution of the Batch.
-     * 
-     * @param jobId Id of the corresponding job
-     * @param BatchId Id of the batchExecution
-     * @return the found job executon
-     */
-    Execution getQueuedBatchExecution(Long jobId, Long batchId);
-
-    /**
-     * Get all Failed job executions of a batchExecution
-     * 
-     * @param jobId Id of the corresponding job
-     * @param BatchId Id of the batchExecution
-     * @return
-     */
-    List<Execution> getFailedBatchExecutions(Long jobId, Long batchId);
 
     /**
      * Check whether there is already an execution with these parameters and whether it has the status QUEUED. If so, return this.
