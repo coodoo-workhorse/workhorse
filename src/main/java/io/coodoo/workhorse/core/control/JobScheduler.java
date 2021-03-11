@@ -117,8 +117,7 @@ public class JobScheduler {
         try {
             workhorseController.triggerScheduledExecutionCreation(job);
         } catch (Exception exception) {
-            log.error("Timeout failed for job {}. Exception : {}", job.getName(), exception);
-            exception.printStackTrace();
+            log.error("Timeout failed for job {}.", job.getName(), exception);
         }
     }
 
