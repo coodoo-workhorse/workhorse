@@ -46,7 +46,7 @@ public class Job extends BaseEntity {
     /**
      * Max number of execution per minute
      */
-    private int maxPerMinute;
+    private Integer maxPerMinute;
 
     /**
      * number of retries for a failed execution
@@ -129,11 +129,11 @@ public class Job extends BaseEntity {
         this.threads = threads;
     }
 
-    public int getMaxPerMinute() {
+    public Integer getMaxPerMinute() {
         return maxPerMinute;
     }
 
-    public void setMaxPerMinute(int maxPerMinute) {
+    public void setMaxPerMinute(Integer maxPerMinute) {
         this.maxPerMinute = maxPerMinute;
     }
 
