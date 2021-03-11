@@ -1,8 +1,6 @@
 package io.coodoo.workhorse.persistence.interfaces.listing;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author coodoo GmbH (coodoo.io)
@@ -13,20 +11,8 @@ public class ListingResult<T> {
 
     private List<T> results;
 
-    private Map<String, List<Term>> terms = new HashMap<>();
-
-    private Map<String, Stats> stats = new HashMap<>();
-
     public ListingResult(List<T> result, Metadata metadata) {
         super();
-        this.metadata = metadata;
-        this.results = result;
-    }
-
-    public ListingResult(List<T> result, Map<String, List<Term>> terms, Map<String, Stats> stats, Metadata metadata) {
-        super();
-        this.terms = terms;
-        this.stats = stats;
         this.metadata = metadata;
         this.results = result;
     }
@@ -47,24 +33,16 @@ public class ListingResult<T> {
         this.results = result;
     }
 
-    public Map<String, List<Term>> getTerms() {
-        return terms;
-    }
-
-    public void setTerms(Map<String, List<Term>> terms) {
-        this.terms = terms;
-    }
-
-    public Map<String, Stats> getStats() {
-        return stats;
-    }
-
-    public void setStats(Map<String, Stats> stats) {
-        this.stats = stats;
-    }
-
     @Override
     public String toString() {
-        return "ListingResult [metadata=" + metadata + ", results=" + results + ", terms=" + terms + ", stats=" + stats + "]";
+        final int maxLen = 10;
+        StringBuilder builder = new StringBuilder();
+        builder.append("ListingResult [metadata=");
+        builder.append(metadata);
+        builder.append(", results=");
+        builder.append(results != null ? results.subList(0, Math.min(results.size(), maxLen)) : null);
+        builder.append("]");
+        return builder.toString();
     }
+
 }

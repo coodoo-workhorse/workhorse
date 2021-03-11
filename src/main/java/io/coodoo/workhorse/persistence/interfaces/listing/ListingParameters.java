@@ -10,6 +10,21 @@ import java.util.Map;
  */
 public class ListingParameters {
 
+    /**
+     * Default index for pagination
+     */
+    public static int DEFAULT_INDEX = 0;
+
+    /**
+     * Default current page number for pagination
+     */
+    public static int DEFAULT_PAGE = 1;
+
+    /**
+     * Default limit of results per page for pagination
+     */
+    public static int DEFAULT_LIMIT = 20;
+
     private Integer index;
 
     private Integer page;
@@ -21,10 +36,6 @@ public class ListingParameters {
     private String filter;
 
     private Map<String, String> filterAttributes = new HashMap<>();
-
-    private Map<String, String> termsAttributes = new HashMap<>();
-
-    private Map<String, String> statsAttributes = new HashMap<>();
 
     public ListingParameters() {}
 
@@ -65,7 +76,7 @@ public class ListingParameters {
         }
         // could not calculate the index -> use default
         if (index == null || index < 0) {
-            return ListingConfig.DEFAULT_INDEX;
+            return DEFAULT_INDEX;
         }
         return index;
     }
@@ -87,7 +98,7 @@ public class ListingParameters {
         }
         // no valid page number given -> use default
         if (page == null || page < 1) {
-            return ListingConfig.DEFAULT_PAGE;
+            return DEFAULT_PAGE;
         }
         return page;
     }
@@ -105,7 +116,7 @@ public class ListingParameters {
     public Integer getLimit() {
         // no limit given -> use default
         if (limit == null) {
-            return ListingConfig.DEFAULT_LIMIT;
+            return DEFAULT_LIMIT;
         }
         return limit;
     }
@@ -160,45 +171,6 @@ public class ListingParameters {
     }
 
     /**
-     * Adds a terms aggregation for a specific field
-     * 
-     * You can get a term aggregation (count on groups) for every attribute in your targeted entity class. Therefore you just have to pass the attribute name
-     * and a limit `ListingParameters` using `addTermsAttributes()`.
-     * 
-     * 
-     * @param fieldName target field for the terms aggregation
-     * @param size terms aggregation size
-     */
-    public void addTermsAttributes(String fieldName, String size) {
-
-        termsAttributes.put(fieldName, size);
-
-    }
-
-    /**
-     * Adds a stats aggregation for a specific field
-     * 
-     * You can get the minimum, maximum, average, sum and count for every attribute in your targeted entity class. One by one or all together the result is
-     * delivered in a Stats-Object. Therefore you just have to pass the attribute name and a limit `ListingParameters` using `addStatsAttributes()`.
-     * 
-     * @param fieldName target field for the stats aggregation
-     * @param operation stats aggregation operation
-     *        <ul>
-     *        <li><code>"count"</code></li>
-     *        <li><code>"min"</code></li>
-     *        <li><code>"max"</code></li>
-     *        <li><code>"avg"</code></li>
-     *        <li><code>"sum"</code></li>
-     *        <li>Everything else will get you all aggregation operations</li>
-     *        </ul>
-     */
-    public void addStatsAttributes(String fieldName, String operation) {
-
-        statsAttributes.put(fieldName, operation);
-
-    }
-
-    /**
      * @return Map of attribute specific filters
      */
     public Map<String, String> getFilterAttributes() {
@@ -210,26 +182,4 @@ public class ListingParameters {
         this.filterAttributes = filterAttributes;
     }
 
-    /**
-     * @return Map of attribute specific aggregations
-     */
-    public Map<String, String> getTermsAttributes() {
-
-        return termsAttributes;
-    }
-
-    public void setTermsAttributes(Map<String, String> termsAttributes) {
-        this.termsAttributes = termsAttributes;
-    }
-
-    /**
-     * @return Map of attribute stats aggregations
-     */
-    public Map<String, String> getStatsAttributes() {
-        return statsAttributes;
-    }
-
-    public void setStatsAttributes(Map<String, String> statsAttributes) {
-        this.statsAttributes = statsAttributes;
-    }
 }

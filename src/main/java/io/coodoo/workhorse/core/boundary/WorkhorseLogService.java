@@ -55,7 +55,7 @@ public class WorkhorseLogService {
      * @param listingParameters defines the listing queue. It contains optional query parameters as described above
      * @return list of logs
      */
-    ListingResult<WorkhorseLog> getWorkhorseLogListing(ListingParameters listingParameters) {
+    public ListingResult<WorkhorseLog> getWorkhorseLogListing(ListingParameters listingParameters) {
         return logPersistence.getWorkhorseLogListing(listingParameters);
     }
 

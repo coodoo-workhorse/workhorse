@@ -134,7 +134,7 @@ public class WorkhorseService {
      * @param listingParameters defines the listing queue. It contains optional query parameters as described above
      * @return list of execution
      */
-    ListingResult<Execution> getExecutionListing(ListingParameters listingParameters) {
+    public ListingResult<Execution> getExecutionListing(ListingParameters listingParameters) {
         return workhorseController.getExecutionListing(listingParameters);
     }
 
@@ -144,7 +144,7 @@ public class WorkhorseService {
      * @param listingParameters defines the listing queue. It contains optional query parameters as described above
      * @return list of jobs
      */
-    ListingResult<Job> getJobListing(ListingParameters listingParameters) {
+    public ListingResult<Job> getJobListing(ListingParameters listingParameters) {
         return workhorseController.getJobListing(listingParameters);
     }
 
