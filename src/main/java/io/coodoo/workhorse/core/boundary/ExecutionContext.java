@@ -201,7 +201,8 @@ public class ExecutionContext {
 
     protected void appendLog(String message, boolean timestamp, String mode) {
 
-        if (executionPersistence == null) {
+        // If the execution context is used in a custom service it can be invoked without an execution present.
+        if (executionPersistence == null || execution == null || execution.getId() == null) {
             return;
         }
 
@@ -209,10 +210,10 @@ public class ExecutionContext {
         String time = "";
 
         if (timestamp) {
-
             DateTimeFormatter logTimeFormat = DateTimeFormatter.ofPattern(StaticConfig.LOG_TIME_FORMATTER);
             time = WorkhorseUtil.timestamp().format(logTimeFormat) + " ";
         }
+
         switch (mode) {
             case "i":
                 if (StaticConfig.LOG_INFO_MARKER != null) {

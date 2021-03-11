@@ -222,7 +222,8 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
         for (Execution execution : memoryPersistence.getExecutions().values()) {
             if (jobId.equals(execution.getJobId()) && ExecutionStatus.QUEUED.equals(execution.getStatus())
-                            && parameterHash.equals(execution.getParametersHash())) {
+                            && (parameterHash == null && execution.getParametersHash() == null)
+                            || (parameterHash != null && parameterHash.equals(execution.getParametersHash()))) {
                 return execution;
             }
         }
