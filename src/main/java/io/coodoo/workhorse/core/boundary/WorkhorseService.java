@@ -62,11 +62,16 @@ public class WorkhorseService {
     @Inject
     JobScheduler jobScheduler;
 
+    WorkhorseConfig currentWorkhorseConfig = null;
+
     /**
      * Start Workhorse. The default persistence is Memory.
      */
     public void start() {
-        start(new MemoryConfigBuilder().build());
+        if (currentWorkhorseConfig == null) {
+            currentWorkhorseConfig = new MemoryConfigBuilder().build();
+        }
+        start(currentWorkhorseConfig);
     }
 
     /**
@@ -78,12 +83,15 @@ public class WorkhorseService {
      * 
      * <code>start(new MemoryConfigBuilder().build())</code>
      * 
-     * @param workhorseConfig Configuration of the chosen persistence.
+     * @param workhorseConfig Configuration of the chosen persistence (this can only be done once and is final).
      */
     public void start(WorkhorseConfig workhorseConfig) {
-        persistenceManager.initializePersistence(workhorseConfig);
-        workhorseConfigController.initializeStaticConfig(workhorseConfig);
-        workhorseController.loadWorkers();
+        if (!persistenceManager.isInitialized()) {
+            currentWorkhorseConfig = workhorseConfig;
+            persistenceManager.initializePersistence(workhorseConfig);
+            workhorseConfigController.initializeStaticConfig(workhorseConfig);
+            workhorseController.loadWorkers();
+        }
         executionBuffer.initialize();
         workhorse.start();
         jobScheduler.startScheduler();
