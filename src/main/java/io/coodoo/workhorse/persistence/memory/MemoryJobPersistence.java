@@ -1,6 +1,8 @@
 package io.coodoo.workhorse.persistence.memory;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,8 +15,10 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
-import io.coodoo.workhorse.core.entity.ExecutionStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.coodoo.workhorse.core.control.StaticConfig;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
@@ -26,6 +30,13 @@ import io.coodoo.workhorse.util.WorkhorseUtil;
 @ApplicationScoped
 public class MemoryJobPersistence implements JobPersistence {
 
+    private static final String DESC = "-";
+    private static final String ASC = "+";
+    private static final String GT = ">";
+    private static final String LT = "<";
+
+    private static Logger log = LoggerFactory.getLogger(MemoryJobPersistence.class);
+
     @Inject
     MemoryPersistence memoryPersistence;
 
@@ -33,22 +44,11 @@ public class MemoryJobPersistence implements JobPersistence {
 
     @Override
     public Job get(Long jobId) {
-        return memoryPersistence.getJobDataMap().get(jobId).job;
+        return memoryPersistence.getJobs().get(jobId);
     }
 
     @Override
     public ListingResult<Job> getJobListing(ListingParameters listingParameters) {
-
-        JobData jobData = memoryPersistence.getJobDataMap().get(jobId);
-
-        if (listingParameters.getFilterAttributes().isEmpty()) {
-
-            Metadata metadata = new Metadata(new Long(jobData.executions.size()), listingParameters);
-            List<Long> ids = jobData.orderedIds.subList(metadata.getStartIndex(), metadata.getEndIndex());
-            List<Job> result = ids.stream().map(id -> jobData.executions.get(id)).collect(Collectors.toList());
-
-            return new ListingResult<Job>(result, metadata);
-        }
 
         List<Predicate<Job>> allPredicates = new ArrayList<Predicate<Job>>();
 
@@ -57,58 +57,45 @@ public class MemoryJobPersistence implements JobPersistence {
             try {
                 for (String value : rawvalue.split("|")) {
                     switch (key) {
-                        case "status":
-                            ExecutionStatus status = ExecutionStatus.valueOf(value);
-                            allPredicates.add(execution -> execution.getStatus().equals(status));
-                            break;
-                        case "failStatus":
-                            ExecutionFailStatus failStatus = ExecutionFailStatus.valueOf(value);
-                            allPredicates.add(execution -> execution.getFailStatus().equals(failStatus));
-                            break;
                         case "id":
-                            allPredicates.add(execution -> execution.getId().equals(new Long(value)));
+                            allPredicates.add(job -> job.getId().equals(new Long(value)));
                             break;
-                        case "batchId":
-                            allPredicates.add(execution -> execution.getBatchId().equals(new Long(value)));
+                        case "name":
+                            allPredicates.add(job -> job.getName().matches(".*" + value + ".*"));
                             break;
-                        case "chainId":
-                            allPredicates.add(execution -> execution.getChainId().equals(new Long(value)));
+                        case "description":
+                            allPredicates.add(job -> job.getDescription().matches(".*" + value + ".*"));
                             break;
-                        case "startedAt":
-                            if (value.startsWith(LT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(LT, ""));
-                                allPredicates.add(execution -> timestamp.isAfter(execution.getStartedAt()));
-                            } else if (value.startsWith(GT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(GT, ""));
-                                allPredicates.add(execution -> timestamp.isBefore(execution.getStartedAt()));
-                            }
+                        case "workerClassName":
+                            allPredicates.add(job -> job.getWorkerClassName().matches(".*" + value + ".*"));
                             break;
-                        case "endedAt":
-                            if (value.startsWith(LT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(LT, ""));
-                                allPredicates.add(execution -> timestamp.isAfter(execution.getEndedAt()));
-                            } else if (value.startsWith(GT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(GT, ""));
-                                allPredicates.add(execution -> timestamp.isBefore(execution.getEndedAt()));
-                            }
+                        case "parametersClassName":
+                            allPredicates.add(job -> job.getParametersClassName().matches(".*" + value + ".*"));
                             break;
-                        case "plannedFor":
-                            if (value.startsWith(LT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(LT, ""));
-                                allPredicates.add(execution -> timestamp.isAfter(execution.getPlannedFor()));
-                            } else if (value.startsWith(GT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(GT, ""));
-                                allPredicates.add(execution -> timestamp.isBefore(execution.getPlannedFor()));
-                            }
+                        case "status":
+                            JobStatus status = JobStatus.valueOf(value);
+                            allPredicates.add(job -> job.getStatus().equals(status));
                             break;
-                        case "expiresAt":
-                            if (value.startsWith(LT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(LT, ""));
-                                allPredicates.add(execution -> timestamp.isAfter(execution.getExpiresAt()));
-                            } else if (value.startsWith(GT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(GT, ""));
-                                allPredicates.add(execution -> timestamp.isBefore(execution.getExpiresAt()));
-                            }
+                        case "threads":
+                            allPredicates.add(job -> job.getThreads() == new Integer(value).intValue());
+                            break;
+                        case "maxPerMinute":
+                            allPredicates.add(job -> Objects.equals(job.getMaxPerMinute(), new Integer(value)));
+                            break;
+                        case "failRetries":
+                            allPredicates.add(job -> job.getFailRetries() == new Integer(value).intValue());
+                            break;
+                        case "retryDelay":
+                            allPredicates.add(job -> job.getRetryDelay() == new Integer(value).intValue());
+                            break;
+                        case "minutesUntilCleanUp":
+                            allPredicates.add(job -> job.getMinutesUntilCleanUp() == new Integer(value).intValue());
+                            break;
+                        case "uniqueQueued":
+                            allPredicates.add(job -> job.isUniqueQueued() == new Boolean(value));
+                            break;
+                        case "schedule":
+                            allPredicates.add(job -> job.getSchedule().matches(".*" + value + ".*"));
                             break;
                         case "createdAt":
                             if (value.startsWith(LT)) {
@@ -128,112 +115,106 @@ public class MemoryJobPersistence implements JobPersistence {
                                 allPredicates.add(execution -> timestamp.isBefore(execution.getUpdatedAt()));
                             }
                             break;
-                        case "failRetryExecutionId":
-                            allPredicates.add(execution -> execution.getFailRetryExecutionId().equals(new Long(value)));
-                            break;
-                        case "parameters":
-                            allPredicates.add(execution -> execution.getParameters().matches(".*" + value + ".*"));
-                            break;
-                        case "parameterHash":
-                            if (value != null && !value.isEmpty()) {
-                                allPredicates.add(execution -> execution.getParametersHash().equals(new Integer(value)));
-                            } else {
-                                allPredicates.add(execution -> execution.getParametersHash() == null);
-                            }
-                            break;
-                        case "failRetry":
-                            allPredicates.add(execution -> execution.getFailRetry() == new Integer(value).intValue());
-                            break;
                         default:
                             break;
                     }
                 }
             } catch (Exception e) {
-                log.warn("Execution filter {} with value {} is invalid: {}", key, rawvalue, e.getMessage());
+                log.warn("Job filter {} with value {} is invalid: {}", key, rawvalue, e.getMessage());
             }
         }
 
-        // TOOD mit orderIds abgleichen
-        List<Job> filteredList =
-                        jobData.executions.values().stream().filter(allPredicates.stream().reduce(x -> true, Predicate::and)).collect(Collectors.toList());
+        List<Job> filteredList = memoryPersistence.getJobs().values().stream().filter(allPredicates.stream().reduce(x -> true, Predicate::and))
+                        .collect(Collectors.toList());
 
         String sort = listingParameters.getSortAttribute();
+        boolean asc = true;
         if (sort != null && !sort.isEmpty()) {
-            boolean asc = true;
             if (sort.startsWith(ASC)) {
                 sort = sort.replace(ASC, "");
             } else if (sort.startsWith(DESC)) {
                 sort = sort.replace(DESC, "");
                 asc = false;
             }
-            switch (sort) {
-                case "jobId":
-                    filteredList.sort(Comparator.comparing(execution -> execution.getId()));
-                    break;
-                case "status":
-                    filteredList.sort(Comparator.comparing(execution -> execution.getStatus()));
-                    break;
-                case "failStatus":
-                    filteredList.sort(Comparator.comparing(execution -> execution.getFailStatus()));
-                    break;
-                case "startedAt":
-                    filteredList.sort(Comparator.comparing(execution -> execution.getStartedAt()));
-                    break;
-                case "endedAt":
-                    filteredList.sort(Comparator.comparing(execution -> execution.getEndedAt()));
-                    break;
-                case "duration":
-                    filteredList.sort(Comparator.comparing(execution -> execution.getDuration()));
-                    break;
-                case "priority":
-                    filteredList.sort(Comparator.comparing(execution -> execution.isPriority()));
-                    break;
-                case "plannedFor":
-                    filteredList.sort(Comparator.comparing(execution -> execution.getPlannedFor()));
-                    break;
-                case "expiresAt":
-                    filteredList.sort(Comparator.comparing(execution -> execution.getExpiresAt()));
-                    break;
-                case "batchId":
-                    filteredList.sort(Comparator.comparing(execution -> execution.getBatchId()));
-                    break;
-                case "chainId":
-                    filteredList.sort(Comparator.comparing(execution -> execution.getChainId()));
-                    break;
-                case "parameters":
-                    filteredList.sort(Comparator.comparing(execution -> execution.getParameters()));
-                    break;
-                case "parametersHash":
-                    filteredList.sort(Comparator.comparing(execution -> execution.getParametersHash()));
-                    break;
-                case "failRetry":
-                    filteredList.sort(Comparator.comparing(execution -> execution.getFailRetry()));
-                    break;
-                case "failRetryExecutionId":
-                    filteredList.sort(Comparator.comparing(execution -> execution.getFailRetryExecutionId()));
-                    break;
-                default:
-                    break;
-            }
-            if (!asc) {
-                Collections.reverse(filteredList);
-            }
+        } else {
+            sort = "status";
         }
-
+        switch (sort) {
+            case "id":
+                filteredList.sort(Comparator.comparing(job -> job.getId()));
+                break;
+            case "name":
+                filteredList.sort(Comparator.comparing(job -> job.getName()));
+                break;
+            case "description":
+                filteredList.sort(Comparator.comparing(job -> job.getDescription()));
+                break;
+            case "workerClassName":
+                filteredList.sort(Comparator.comparing(job -> job.getWorkerClassName()));
+                break;
+            case "parametersClassName":
+                filteredList.sort(Comparator.comparing(job -> job.getParametersClassName()));
+                break;
+            case "status":
+                filteredList.sort(Comparator.comparing(job -> job.getStatus()));
+                break;
+            case "threads":
+                filteredList.sort(Comparator.comparing(job -> job.getThreads()));
+                break;
+            case "maxPerMinute":
+                filteredList.sort(Comparator.comparing(job -> job.getMaxPerMinute()));
+                break;
+            case "failRetries":
+                filteredList.sort(Comparator.comparing(job -> job.getFailRetries()));
+                break;
+            case "retryDelay":
+                filteredList.sort(Comparator.comparing(job -> job.getRetryDelay()));
+                break;
+            case "minutesUntilCleanUp":
+                filteredList.sort(Comparator.comparing(job -> job.getMinutesUntilCleanUp()));
+                break;
+            case "uniqueQueued":
+                filteredList.sort(Comparator.comparing(job -> job.isUniqueQueued()));
+                break;
+            case "schedule":
+                filteredList.sort(Comparator.comparing(job -> job.getSchedule()));
+                break;
+            case "createdAt":
+                filteredList.sort(Comparator.comparing(job -> job.getCreatedAt()));
+                break;
+            case "updatedAt":
+                filteredList.sort(Comparator.comparing(job -> job.getUpdatedAt()));
+                break;
+            default:
+                break;
+        }
+        if (!asc) {
+            Collections.reverse(filteredList);
+        }
         Metadata metadata = new Metadata(new Long(filteredList.size()), listingParameters);
         List<Job> result = filteredList.subList(metadata.getStartIndex(), metadata.getEndIndex());
-
         return new ListingResult<Job>(result, metadata);
+    }
+
+    private String toIso8601(LocalDateTime timestamp) {
+        return timestamp.atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toString();
+    }
+
+    private LocalDateTime fromIso8601(String timestamp) {
+        return ZonedDateTime.parse(timestamp).toLocalDateTime();
     }
 
     @Override
     public Job getByWorkerClassName(String jobClassName) {
-        for (Job job : memoryPersistence.getJobs().values()) {
-            if (job.getWorkerClassName().equals(jobClassName)) {
-                return job;
-            }
+
+        ListingParameters listingParameters = new ListingParameters(1);
+        listingParameters.addFilterAttributes("workerClassName", jobClassName);
+        ListingResult<Job> listingResult = getJobListing(listingParameters);
+
+        if (listingResult.getResults().isEmpty()) {
+            return null;
         }
-        return null;
+        return listingResult.getResults().get(0);
     }
 
     @Override
@@ -243,7 +224,8 @@ public class MemoryJobPersistence implements JobPersistence {
         job.setId(jobId);
         job.setCreatedAt(WorkhorseUtil.timestamp());
 
-        JobData jobData = new JobData(job);
+        memoryPersistence.getJobs().put(jobId, job);
+        JobData jobData = new JobData();
         memoryPersistence.getJobDataMap().put(job.getId(), jobData);
         return job;
     }
@@ -251,8 +233,8 @@ public class MemoryJobPersistence implements JobPersistence {
     @Override
     public Job update(Job job) {
 
-        memoryPersistence.getJobDataMap().get(job.getId()).job = job;
         job.setUpdatedAt(WorkhorseUtil.timestamp());
+        memoryPersistence.getJobs().put(job.getId(), job);
         return job;
     }
 
@@ -263,9 +245,7 @@ public class MemoryJobPersistence implements JobPersistence {
 
     @Override
     public List<Job> getAll() {
-        List<Job> result = new ArrayList<>();
-        result.addAll(memoryPersistence.getJobs().values());
-        return result;
+        return new ArrayList<>(memoryPersistence.getJobs().values());
     }
 
     @Override
@@ -280,38 +260,35 @@ public class MemoryJobPersistence implements JobPersistence {
 
     @Override
     public Job getByName(String jobName) {
-        for (Job job : memoryPersistence.getJobs().values()) {
-            if (Objects.equals(job.getName(), jobName)) {
-                return job;
-            }
+
+        ListingParameters listingParameters = new ListingParameters(1);
+        listingParameters.addFilterAttributes("name", jobName);
+        ListingResult<Job> listingResult = getJobListing(listingParameters);
+
+        if (listingResult.getResults().isEmpty()) {
+            return null;
         }
-        return null;
+        return listingResult.getResults().get(0);
     }
 
     @Override
     public List<Job> getAllByStatus(JobStatus jobStatus) {
-        List<Job> result = new ArrayList<>();
 
-        for (Job job : memoryPersistence.getJobs().values()) {
-            if (Objects.equals(job.getStatus(), jobStatus)) {
-                result.add(job);
-            }
-        }
+        ListingParameters listingParameters = new ListingParameters(0);
+        listingParameters.addFilterAttributes("status", jobStatus);
+        ListingResult<Job> listingResult = getJobListing(listingParameters);
 
-        return result;
+        return listingResult.getResults();
     }
 
     @Override
     public List<Job> getAllScheduled() {
-        List<Job> result = new ArrayList<>();
 
-        for (Job job : memoryPersistence.getJobs().values()) {
-            if (job.getSchedule() != null && !job.getSchedule().isEmpty()) {
-                result.add(job);
-            }
-        }
+        ListingParameters listingParameters = new ListingParameters(0);
+        listingParameters.addFilterAttributes("schedule", " "); // jeder schedule sollte min ein leerzeichen haben...
+        ListingResult<Job> listingResult = getJobListing(listingParameters);
 
-        return result;
+        return listingResult.getResults();
     }
 
     @Override

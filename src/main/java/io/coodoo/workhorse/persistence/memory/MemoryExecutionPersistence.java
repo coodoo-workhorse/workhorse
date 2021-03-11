@@ -61,10 +61,10 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
         if (listingParameters.getFilterAttributes().isEmpty()) {
 
+            // TODO sort?!
             Metadata metadata = new Metadata(new Long(jobData.executions.size()), listingParameters);
             List<Long> ids = jobData.orderedIds.subList(metadata.getStartIndex(), metadata.getEndIndex());
             List<Execution> result = ids.stream().map(id -> jobData.executions.get(id)).collect(Collectors.toList());
-
             return new ListingResult<Execution>(result, metadata);
         }
 
@@ -175,6 +175,15 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
         List<Execution> filteredList =
                         jobData.executions.values().stream().filter(allPredicates.stream().reduce(x -> true, Predicate::and)).collect(Collectors.toList());
 
+        sort(listingParameters, filteredList);
+
+        Metadata metadata = new Metadata(new Long(filteredList.size()), listingParameters);
+        List<Execution> result = filteredList.subList(metadata.getStartIndex(), metadata.getEndIndex());
+
+        return new ListingResult<Execution>(result, metadata);
+    }
+
+    private void sort(ListingParameters listingParameters, List<Execution> filteredList) {
         String sort = listingParameters.getSortAttribute();
         if (sort != null && !sort.isEmpty()) {
             boolean asc = true;
@@ -185,8 +194,11 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
                 asc = false;
             }
             switch (sort) {
-                case "jobId":
+                case "id":
                     filteredList.sort(Comparator.comparing(execution -> execution.getId()));
+                    break;
+                case "jobId":
+                    filteredList.sort(Comparator.comparing(execution -> execution.getJobId()));
                     break;
                 case "status":
                     filteredList.sort(Comparator.comparing(execution -> execution.getStatus()));
@@ -230,6 +242,12 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
                 case "failRetryExecutionId":
                     filteredList.sort(Comparator.comparing(execution -> execution.getFailRetryExecutionId()));
                     break;
+                case "createdAt":
+                    filteredList.sort(Comparator.comparing(execution -> execution.getCreatedAt()));
+                    break;
+                case "updatedAt":
+                    filteredList.sort(Comparator.comparing(execution -> execution.getUpdatedAt()));
+                    break;
                 default:
                     break;
             }
@@ -237,11 +255,6 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
                 Collections.reverse(filteredList);
             }
         }
-
-        Metadata metadata = new Metadata(new Long(filteredList.size()), listingParameters);
-        List<Execution> result = filteredList.subList(metadata.getStartIndex(), metadata.getEndIndex());
-
-        return new ListingResult<Execution>(result, metadata);
     }
 
     private String toIso8601(LocalDateTime timestamp) {

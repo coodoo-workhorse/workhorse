@@ -18,10 +18,9 @@ public class MemoryPersistence {
 
     private WorkhorseConfig workhorseConfig;
     private Map<Long, WorkhorseLog> workhorseLog = new ConcurrentHashMap<>();
+    private Map<Long, Job> jobs = new ConcurrentHashMap<>();
     private Map<Long, JobData> jobDataMap = new ConcurrentHashMap<>();
 
-    @Deprecated
-    private Map<Long, Job> jobs = new ConcurrentHashMap<>();
     @Deprecated
     private Map<Long, Execution> executions = new ConcurrentHashMap<>();
     @Deprecated
@@ -54,7 +53,6 @@ public class MemoryPersistence {
         return executions;
     }
 
-    @Deprecated
     public Map<Long, Job> getJobs() {
         return jobs;
     }
