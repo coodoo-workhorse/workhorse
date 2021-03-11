@@ -142,8 +142,8 @@ public class WorkhorseService {
      * @param listingParameters defines the listing queue. It contains optional query parameters as described above
      * @return list of execution
      */
-    public ListingResult<Execution> getExecutionListing(ListingParameters listingParameters) {
-        return workhorseController.getExecutionListing(listingParameters);
+    public ListingResult<Execution> getExecutionListing(Long jobId, ListingParameters listingParameters) {
+        return workhorseController.getExecutionListing(jobId, listingParameters);
     }
 
     /**
@@ -222,6 +222,10 @@ public class WorkhorseService {
         jobScheduler.start(job);
         return job;
 
+    }
+
+    public void deleteJob(Long jobId) {
+        workhorseController.deleteJob(jobId);
     }
 
     public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime plannedFor, LocalDateTime expiresAt, Long batchId,

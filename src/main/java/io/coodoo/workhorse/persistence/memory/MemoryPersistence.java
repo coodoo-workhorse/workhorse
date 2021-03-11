@@ -16,15 +16,23 @@ public class MemoryPersistence {
 
     public static final String NAME = "MEMORY";
 
+    private WorkhorseConfig workhorseConfig;
+    private Map<Long, WorkhorseLog> workhorseLog = new ConcurrentHashMap<>();
+    private Map<Long, Job> jobs = new ConcurrentHashMap<>();
+    private Map<Long, JobData> jobDataMap = new ConcurrentHashMap<>();
+
+    @Deprecated
+    private Map<Long, Execution> executions = new ConcurrentHashMap<>();
+    @Deprecated
     private Map<Long, ExecutionLog> executionLogs = new ConcurrentHashMap<>();
 
-    private Map<Long, Execution> executions = new ConcurrentHashMap<>();
+    public Map<Long, JobData> getJobDataMap() {
+        return jobDataMap;
+    }
 
-    private Map<Long, Job> jobs = new ConcurrentHashMap<>();
-
-    private Map<Long, WorkhorseLog> workhorseLog = new ConcurrentHashMap<>();
-
-    private WorkhorseConfig workhorseConfig;
+    public void setJobDataMap(Map<Long, JobData> jobDataMap) {
+        this.jobDataMap = jobDataMap;
+    }
 
     public synchronized WorkhorseConfig getWorkhorseConfig() {
         return workhorseConfig;
@@ -35,10 +43,12 @@ public class MemoryPersistence {
         return workhorseConfig;
     }
 
+    @Deprecated
     public Map<Long, ExecutionLog> getExecutionLogs() {
         return executionLogs;
     }
 
+    @Deprecated
     public Map<Long, Execution> getExecutions() {
         return executions;
     }
