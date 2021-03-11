@@ -79,7 +79,7 @@ public class JobThread {
             }
 
             int minMillisPerExecution = 0;
-            if (job.getMaxPerMinute() > 0 && job.getMaxPerMinute() <= 60000) {
+            if (job.getMaxPerMinute() != null && job.getMaxPerMinute() > 0 && job.getMaxPerMinute() <= 60000) {
                 minMillisPerExecution = 60000 / job.getMaxPerMinute();
             }
 
