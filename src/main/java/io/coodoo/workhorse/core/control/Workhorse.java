@@ -260,7 +260,6 @@ public class Workhorse {
         Job job = jobPersistence.get(jobId);
 
         if (!JobStatus.ACTIVE.equals(job.getStatus())) {
-            log.error("The job {} is not ACTIVE ", job);
             return;
         }
 
