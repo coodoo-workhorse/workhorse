@@ -1,8 +1,6 @@
 package io.coodoo.workhorse.persistence.memory;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -18,7 +16,6 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.coodoo.workhorse.core.control.StaticConfig;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
@@ -29,11 +26,6 @@ import io.coodoo.workhorse.util.WorkhorseUtil;
 
 @ApplicationScoped
 public class MemoryJobPersistence implements JobPersistence {
-
-    private static final String DESC = "-";
-    private static final String ASC = "+";
-    private static final String GT = ">";
-    private static final String LT = "<";
 
     private static Logger log = LoggerFactory.getLogger(MemoryJobPersistence.class);
 
@@ -98,20 +90,20 @@ public class MemoryJobPersistence implements JobPersistence {
                             allPredicates.add(job -> job.getSchedule().matches(".*" + value + ".*"));
                             break;
                         case "createdAt":
-                            if (value.startsWith(LT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(LT, ""));
+                            if (value.startsWith(MemoryListingUtil.LT)) {
+                                LocalDateTime timestamp = MemoryListingUtil.fromIso8601(value.replace(MemoryListingUtil.LT, ""));
                                 allPredicates.add(execution -> timestamp.isAfter(execution.getCreatedAt()));
-                            } else if (value.startsWith(GT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(GT, ""));
+                            } else if (value.startsWith(MemoryListingUtil.GT)) {
+                                LocalDateTime timestamp = MemoryListingUtil.fromIso8601(value.replace(MemoryListingUtil.GT, ""));
                                 allPredicates.add(execution -> timestamp.isBefore(execution.getCreatedAt()));
                             }
                             break;
                         case "updatedAt":
-                            if (value.startsWith(LT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(LT, ""));
+                            if (value.startsWith(MemoryListingUtil.LT)) {
+                                LocalDateTime timestamp = MemoryListingUtil.fromIso8601(value.replace(MemoryListingUtil.LT, ""));
                                 allPredicates.add(execution -> timestamp.isAfter(execution.getUpdatedAt()));
-                            } else if (value.startsWith(GT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(GT, ""));
+                            } else if (value.startsWith(MemoryListingUtil.GT)) {
+                                LocalDateTime timestamp = MemoryListingUtil.fromIso8601(value.replace(MemoryListingUtil.GT, ""));
                                 allPredicates.add(execution -> timestamp.isBefore(execution.getUpdatedAt()));
                             }
                             break;
@@ -130,10 +122,10 @@ public class MemoryJobPersistence implements JobPersistence {
         String sort = listingParameters.getSortAttribute();
         boolean asc = true;
         if (sort != null && !sort.isEmpty()) {
-            if (sort.startsWith(ASC)) {
-                sort = sort.replace(ASC, "");
-            } else if (sort.startsWith(DESC)) {
-                sort = sort.replace(DESC, "");
+            if (sort.startsWith(MemoryListingUtil.ASC)) {
+                sort = sort.replace(MemoryListingUtil.ASC, "");
+            } else if (sort.startsWith(MemoryListingUtil.DESC)) {
+                sort = sort.replace(MemoryListingUtil.DESC, "");
                 asc = false;
             }
         } else {
@@ -192,16 +184,8 @@ public class MemoryJobPersistence implements JobPersistence {
             Collections.reverse(filteredList);
         }
         Metadata metadata = new Metadata(new Long(filteredList.size()), listingParameters);
-        List<Job> result = filteredList.subList(metadata.getStartIndex(), metadata.getEndIndex());
+        List<Job> result = filteredList.subList(metadata.getStartIndex() - 1, metadata.getEndIndex() - 1);
         return new ListingResult<Job>(result, metadata);
-    }
-
-    private String toIso8601(LocalDateTime timestamp) {
-        return timestamp.atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toString();
-    }
-
-    private LocalDateTime fromIso8601(String timestamp) {
-        return ZonedDateTime.parse(timestamp).toLocalDateTime();
     }
 
     @Override

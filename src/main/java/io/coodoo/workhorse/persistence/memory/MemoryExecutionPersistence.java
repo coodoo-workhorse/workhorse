@@ -2,7 +2,6 @@ package io.coodoo.workhorse.persistence.memory;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,11 +32,6 @@ import io.coodoo.workhorse.util.WorkhorseUtil;
 @ApplicationScoped
 public class MemoryExecutionPersistence implements ExecutionPersistence {
 
-    private static final String DESC = "-";
-    private static final String ASC = "+";
-    private static final String GT = ">";
-    private static final String LT = "<";
-
     private static Logger log = LoggerFactory.getLogger(MemoryExecutionPersistence.class);
 
     @Inject
@@ -63,7 +57,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
             // TODO sort?!
             Metadata metadata = new Metadata(new Long(jobData.executions.size()), listingParameters);
-            List<Long> ids = jobData.orderedIds.subList(metadata.getStartIndex(), metadata.getEndIndex());
+            List<Long> ids = jobData.orderedIds.subList(metadata.getStartIndex() - 1, metadata.getEndIndex() - 1);
             List<Execution> result = ids.stream().map(id -> jobData.executions.get(id)).collect(Collectors.toList());
             return new ListingResult<Execution>(result, metadata);
         }
@@ -93,56 +87,56 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
                             allPredicates.add(execution -> execution.getChainId().equals(new Long(value)));
                             break;
                         case "startedAt":
-                            if (value.startsWith(LT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(LT, ""));
+                            if (value.startsWith(MemoryListingUtil.LT)) {
+                                LocalDateTime timestamp = MemoryListingUtil.fromIso8601(value.replace(MemoryListingUtil.LT, ""));
                                 allPredicates.add(execution -> timestamp.isAfter(execution.getStartedAt()));
-                            } else if (value.startsWith(GT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(GT, ""));
+                            } else if (value.startsWith(MemoryListingUtil.GT)) {
+                                LocalDateTime timestamp = MemoryListingUtil.fromIso8601(value.replace(MemoryListingUtil.GT, ""));
                                 allPredicates.add(execution -> timestamp.isBefore(execution.getStartedAt()));
                             }
                             break;
                         case "endedAt":
-                            if (value.startsWith(LT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(LT, ""));
+                            if (value.startsWith(MemoryListingUtil.LT)) {
+                                LocalDateTime timestamp = MemoryListingUtil.fromIso8601(value.replace(MemoryListingUtil.LT, ""));
                                 allPredicates.add(execution -> timestamp.isAfter(execution.getEndedAt()));
-                            } else if (value.startsWith(GT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(GT, ""));
+                            } else if (value.startsWith(MemoryListingUtil.GT)) {
+                                LocalDateTime timestamp = MemoryListingUtil.fromIso8601(value.replace(MemoryListingUtil.GT, ""));
                                 allPredicates.add(execution -> timestamp.isBefore(execution.getEndedAt()));
                             }
                             break;
                         case "plannedFor":
-                            if (value.startsWith(LT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(LT, ""));
+                            if (value.startsWith(MemoryListingUtil.LT)) {
+                                LocalDateTime timestamp = MemoryListingUtil.fromIso8601(value.replace(MemoryListingUtil.LT, ""));
                                 allPredicates.add(execution -> timestamp.isAfter(execution.getPlannedFor()));
-                            } else if (value.startsWith(GT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(GT, ""));
+                            } else if (value.startsWith(MemoryListingUtil.GT)) {
+                                LocalDateTime timestamp = MemoryListingUtil.fromIso8601(value.replace(MemoryListingUtil.GT, ""));
                                 allPredicates.add(execution -> timestamp.isBefore(execution.getPlannedFor()));
                             }
                             break;
                         case "expiresAt":
-                            if (value.startsWith(LT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(LT, ""));
+                            if (value.startsWith(MemoryListingUtil.LT)) {
+                                LocalDateTime timestamp = MemoryListingUtil.fromIso8601(value.replace(MemoryListingUtil.LT, ""));
                                 allPredicates.add(execution -> timestamp.isAfter(execution.getExpiresAt()));
-                            } else if (value.startsWith(GT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(GT, ""));
+                            } else if (value.startsWith(MemoryListingUtil.GT)) {
+                                LocalDateTime timestamp = MemoryListingUtil.fromIso8601(value.replace(MemoryListingUtil.GT, ""));
                                 allPredicates.add(execution -> timestamp.isBefore(execution.getExpiresAt()));
                             }
                             break;
                         case "createdAt":
-                            if (value.startsWith(LT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(LT, ""));
+                            if (value.startsWith(MemoryListingUtil.LT)) {
+                                LocalDateTime timestamp = MemoryListingUtil.fromIso8601(value.replace(MemoryListingUtil.LT, ""));
                                 allPredicates.add(execution -> timestamp.isAfter(execution.getCreatedAt()));
-                            } else if (value.startsWith(GT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(GT, ""));
+                            } else if (value.startsWith(MemoryListingUtil.GT)) {
+                                LocalDateTime timestamp = MemoryListingUtil.fromIso8601(value.replace(MemoryListingUtil.GT, ""));
                                 allPredicates.add(execution -> timestamp.isBefore(execution.getCreatedAt()));
                             }
                             break;
                         case "updatedAt":
-                            if (value.startsWith(LT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(LT, ""));
+                            if (value.startsWith(MemoryListingUtil.LT)) {
+                                LocalDateTime timestamp = MemoryListingUtil.fromIso8601(value.replace(MemoryListingUtil.LT, ""));
                                 allPredicates.add(execution -> timestamp.isAfter(execution.getUpdatedAt()));
-                            } else if (value.startsWith(GT)) {
-                                LocalDateTime timestamp = fromIso8601(value.replace(GT, ""));
+                            } else if (value.startsWith(MemoryListingUtil.GT)) {
+                                LocalDateTime timestamp = MemoryListingUtil.fromIso8601(value.replace(MemoryListingUtil.GT, ""));
                                 allPredicates.add(execution -> timestamp.isBefore(execution.getUpdatedAt()));
                             }
                             break;
@@ -178,7 +172,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
         sort(listingParameters, filteredList);
 
         Metadata metadata = new Metadata(new Long(filteredList.size()), listingParameters);
-        List<Execution> result = filteredList.subList(metadata.getStartIndex(), metadata.getEndIndex());
+        List<Execution> result = filteredList.subList(metadata.getStartIndex() - 1, metadata.getEndIndex() - 1);
 
         return new ListingResult<Execution>(result, metadata);
     }
@@ -187,10 +181,10 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
         String sort = listingParameters.getSortAttribute();
         if (sort != null && !sort.isEmpty()) {
             boolean asc = true;
-            if (sort.startsWith(ASC)) {
-                sort = sort.replace(ASC, "");
-            } else if (sort.startsWith(DESC)) {
-                sort = sort.replace(DESC, "");
+            if (sort.startsWith(MemoryListingUtil.ASC)) {
+                sort = sort.replace(MemoryListingUtil.ASC, "");
+            } else if (sort.startsWith(MemoryListingUtil.DESC)) {
+                sort = sort.replace(MemoryListingUtil.DESC, "");
                 asc = false;
             }
             switch (sort) {
@@ -255,14 +249,6 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
                 Collections.reverse(filteredList);
             }
         }
-    }
-
-    private String toIso8601(LocalDateTime timestamp) {
-        return timestamp.atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toString();
-    }
-
-    private LocalDateTime fromIso8601(String timestamp) {
-        return ZonedDateTime.parse(timestamp).toLocalDateTime();
     }
 
     @Override
@@ -398,7 +384,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
         ListingParameters listingParameters = new ListingParameters(0);
         listingParameters.addFilterAttributes("chainId", chainId);
-        listingParameters.setSortAttribute(DESC + "createdAt");
+        listingParameters.setSortAttribute(MemoryListingUtil.DESC + "createdAt");
 
         return getExecutionListing(jobId, listingParameters).getResults();
     }
@@ -416,7 +402,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     public int deleteOlderExecutions(Long jobId, LocalDateTime preDate) {
 
         ListingParameters listingParameters = new ListingParameters(0);
-        listingParameters.addFilterAttributes("createdAt", GT + toIso8601(preDate));
+        listingParameters.addFilterAttributes("createdAt", MemoryListingUtil.GT + MemoryListingUtil.toIso8601(preDate));
 
         ListingResult<Execution> executionListing = getExecutionListing(jobId, listingParameters);
 
@@ -450,7 +436,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
             ListingParameters listingParameters = new ListingParameters(0);
             listingParameters.addFilterAttributes("status", ExecutionStatus.RUNNING);
-            listingParameters.addFilterAttributes("startedAt", LT + toIso8601(time));
+            listingParameters.addFilterAttributes("startedAt", MemoryListingUtil.LT + MemoryListingUtil.toIso8601(time));
 
             ListingResult<Execution> executionListing = getExecutionListing(jobId, listingParameters);
 
