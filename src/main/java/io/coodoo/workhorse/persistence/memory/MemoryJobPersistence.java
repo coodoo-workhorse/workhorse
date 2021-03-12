@@ -47,7 +47,7 @@ public class MemoryJobPersistence implements JobPersistence {
         for (String key : listingParameters.getFilterAttributes().keySet()) {
             String rawvalue = listingParameters.getFilterAttributes().get(key);
             try {
-                for (String value : rawvalue.split("|")) {
+                for (String value : rawvalue.split("\\|", -1)) {
                     switch (key) {
                         case "id":
                             allPredicates.add(job -> job.getId().equals(new Long(value)));

@@ -67,7 +67,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
         for (String key : listingParameters.getFilterAttributes().keySet()) {
             String rawvalue = listingParameters.getFilterAttributes().get(key);
             try {
-                for (String value : rawvalue.split("|")) {
+                for (String value : rawvalue.split("\\|", -1)) {
                     switch (key) {
                         case "status":
                             ExecutionStatus status = ExecutionStatus.valueOf(value);
