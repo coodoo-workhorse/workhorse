@@ -50,7 +50,7 @@ public class ExecutionCleanupWorker extends Worker {
                 minOneJobCleanupFailed = true;
                 firstException = e;
                 failedJobInfo = job.getName() + " (ID " + job.getId() + ")";
-                logError(logger, "Could not delete executions for job (ID " + job.getId() + ") ': " + e.getMessage(), e);
+                logError(logger, "Could not delete executions for job (ID " + job.getId() + "): " + e.getMessage(), e);
             }
         }
         logInfo(logger, "Finished execution cleanup. Deleted " + deletedSum + " job executions");

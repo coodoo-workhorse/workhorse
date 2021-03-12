@@ -216,7 +216,7 @@ public class WorkhorseController {
      * @throws ClassNotFoundException
      * @throws Exception
      */
-    public BaseWorker getWorker(Job job) throws ClassNotFoundException {
+    private BaseWorker getWorker(Job job) throws ClassNotFoundException {
         for (BaseWorker worker : workerInstances) {
             if (job.getWorkerClassName().equals(worker.getWorkerClass().getName())) {
                 return worker;

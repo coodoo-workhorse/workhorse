@@ -8,6 +8,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.ObservesAsync;
+import javax.enterprise.inject.Any;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -28,6 +30,10 @@ import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
  */
 @Dependent
 public class JobThread {
+
+    @Inject
+    @Any
+    Instance<BaseWorker> workerInstances;
 
     @Inject
     @ExecutionQualifier
@@ -54,6 +60,17 @@ public class JobThread {
 
     private static final Logger log = LoggerFactory.getLogger(JobThread.class);
 
+    private BaseWorker getWorker(Job job) throws ClassNotFoundException {
+        for (BaseWorker worker : workerInstances) {
+            if (job.getWorkerClassName().equals(worker.getWorkerClass().getName())) {
+                return worker;
+            }
+        }
+
+        log.error("No worker class {} found for {} ({})", job.getWorkerClassName(), job.getName(), job.getId());
+        throw new ClassNotFoundException(job.getWorkerClassName());
+    }
+
     public Long execute(@ObservesAsync Job job) throws Exception {
 
         long t1 = System.currentTimeMillis();
@@ -64,7 +81,7 @@ public class JobThread {
 
         executionBuffer.addJobThreads(jobId, this);
 
-        final BaseWorker workerInstance = workhorseController.getWorker(job);
+        final BaseWorker workerInstance = getWorker(job);
 
         while (true) {
             if (this.stopMe) {
