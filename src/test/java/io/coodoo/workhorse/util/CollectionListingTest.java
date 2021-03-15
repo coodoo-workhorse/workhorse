@@ -20,8 +20,6 @@ import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
-import io.coodoo.workhorse.util.CollectionListing;
-import io.coodoo.workhorse.util.WorkhorseUtil;
 
 public class CollectionListingTest {
 
