@@ -181,7 +181,9 @@ public class Job extends BaseEntity {
     public String toString() {
         final int maxLen = 10;
         StringBuilder builder = new StringBuilder();
-        builder.append("Job [name=");
+        builder.append("Job [id=");
+        builder.append(id);
+        builder.append(", name=");
         builder.append(name);
         builder.append(", description=");
         builder.append(description);
@@ -207,6 +209,10 @@ public class Job extends BaseEntity {
         builder.append(uniqueQueued);
         builder.append(", schedule=");
         builder.append(schedule);
+        builder.append(", createdAt=");
+        builder.append(createdAt);
+        builder.append(", updatedAt=");
+        builder.append(updatedAt);
         builder.append("]");
         return builder.toString();
     }
