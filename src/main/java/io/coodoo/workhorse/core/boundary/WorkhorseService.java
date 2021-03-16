@@ -86,12 +86,14 @@ public class WorkhorseService {
      * @param workhorseConfig Configuration of the chosen persistence (this can only be done once and is final).
      */
     public void start(WorkhorseConfig workhorseConfig) {
+        // Check if the persistence is already initialized. If so the engine is already living but paused und should now start again.
         if (!persistenceManager.isInitialized()) {
             currentWorkhorseConfig = workhorseConfig;
             persistenceManager.initializePersistence(workhorseConfig);
             workhorseConfigController.initializeStaticConfig(workhorseConfig);
             workhorseController.loadWorkers();
         }
+        
         executionBuffer.initialize();
         workhorse.start();
         jobScheduler.startScheduler();

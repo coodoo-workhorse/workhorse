@@ -71,6 +71,9 @@ public class Workhorse {
 
     protected ScheduledExecutorService scheduledExecutorService;
 
+    /**
+     * Stores the poll scheduler object. There is always one instance of this scheduler if the engine is active.
+     */
     protected ScheduledFuture<?> scheduledFuture;
 
     @PostConstruct
@@ -84,6 +87,7 @@ public class Workhorse {
      * @param usePusher May the pusher to be use instead of the poller ?
      */
     public void start() {
+        // Check if the engine is already started. If so stop first and start again.
         if (scheduledFuture != null) {
             stop();
         }
@@ -91,7 +95,7 @@ public class Workhorse {
         if (executionPersistence.isPusherAvailable()) {
             scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0, StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL, TimeUnit.SECONDS);
 
-            log.trace("Job queue pusher started with a {} seconds interval", StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL);
+            log.trace("Job queue pusher started. Backup poller started with a {} seconds interval", StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL);
 
         } else {
             scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0, StaticConfig.BUFFER_POLL_INTERVAL, TimeUnit.SECONDS);
@@ -194,7 +198,8 @@ public class Workhorse {
         }
 
         switch (execution.getStatus()) {
-            // Execution in status PLANNED have to be updated to QUEUED before being added to the buffer.
+            // Execution in status PLANNED have to be updated to QUEUED before being added
+            // to the buffer.
             case PLANNED:
                 workhorseController.updateExecutionStatus(execution.getJobId(), execution.getId(), ExecutionStatus.QUEUED);
             case QUEUED:
