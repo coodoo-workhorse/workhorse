@@ -371,9 +371,19 @@ public class WorkhorseController {
             retryExecution.setFailRetryExecutionId(failedExecution.getId());
         }
 
-        executionPersistence.persist(retryExecution);
-        return retryExecution;
+        Execution persistedExecution = executionPersistence.persist(retryExecution);
 
+        if (persistedExecution == null || persistedExecution.getId() == null) {
+            JobErrorEvent jobErrorMessage = new JobErrorEvent(new Throwable(ErrorType.ERROR_BY_EXECUTION_PERSIST.getMessage()),
+                            ErrorType.ERROR_BY_EXECUTION_PERSIST.getMessage(), retryExecution.getJobId(), null);
+
+            jobErrorEvent.fireAsync(jobErrorMessage);
+            workhorseLogService.logException(jobErrorMessage);
+
+            throw new RuntimeException("The execution " + retryExecution + " couldn't be persisited by the persisitence.");
+        }
+        log.trace("Execution successfully created: {}", persistedExecution);
+        return persistedExecution;
     }
 
     public synchronized Execution handleFailedExecution(Job job, Long executionId, Exception exception, Long duration, BaseWorker worker) {

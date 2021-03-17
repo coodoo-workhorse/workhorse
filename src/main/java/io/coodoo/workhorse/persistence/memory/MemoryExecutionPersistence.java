@@ -44,6 +44,16 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     @Override
     public Execution getById(Long jobId, Long executionId) {
 
+        if (jobId == null) {
+            Execution execution = null;
+            for (Long id : memoryPersistence.getJobs().keySet()) {
+                Execution foundexecution = memoryPersistence.getJobDataMap().get(id).executions.get(executionId);
+                if (foundexecution != null) {
+                    execution = foundexecution;
+                }
+            }
+            return execution;
+        }
         return memoryPersistence.getJobDataMap().get(jobId).executions.get(executionId);
     }
 
