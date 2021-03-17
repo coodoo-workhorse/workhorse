@@ -82,7 +82,7 @@ public class WorkhorseController {
             }
             workerClasses.add(workerclass);
         }
-        
+
         // check if persisted job can be mapped a Worker class
         for (Job job : jobPersistence.getAll()) {
             String workerClassName = job.getWorkerClassName();
@@ -90,7 +90,7 @@ public class WorkhorseController {
             try {
                 workerOfDbJob = getWorker(job);
             } catch (Exception exception) {
-                
+
                 job.setStatus(JobStatus.ERROR);
                 log.error("[{}] Worker class not found ({})", workerClassName, job.getName());
                 jobErrorEvent.fire(new JobErrorEvent(exception, ErrorType.ERROR_BY_FOUND_JOB_WORKER.getMessage(), job.getId(), job.getStatus()));
@@ -122,7 +122,8 @@ public class WorkhorseController {
 
             // The Objects-Class is null-safe and can handle Worker-classes without Parameters
             if (!Objects.equals(parametersClassName, job.getParametersClassName())) {
-                log.info("Parameters class name of job worker {} changed from {} to {}", job.getWorkerClassName(), job.getParametersClassName(), parametersClassName);
+                log.info("Parameters class name of job worker {} changed from {} to {}", job.getWorkerClassName(), job.getParametersClassName(),
+                                parametersClassName);
                 workhorseLogService.logChange(job.getId(), job.getStatus(), "Parameters class", job.getParametersClassName(), parametersClassName, null);
 
                 job.setParametersClassName(parametersClassName);

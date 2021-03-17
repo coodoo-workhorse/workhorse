@@ -93,7 +93,7 @@ public class WorkhorseService {
             workhorseConfigController.initializeStaticConfig(workhorseConfig);
             workhorseController.loadWorkers();
         }
-        
+
         executionBuffer.initialize();
         workhorse.start();
         jobScheduler.startScheduler();
