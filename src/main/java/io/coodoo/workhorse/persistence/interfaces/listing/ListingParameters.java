@@ -166,8 +166,9 @@ public class ListingParameters {
      */
     public void addFilterAttributes(String attribute, Object value) {
 
-        filterAttributes.put(attribute, value.toString());
-
+        if (value != null) {
+            filterAttributes.put(attribute, value.toString());
+        }
     }
 
     /**

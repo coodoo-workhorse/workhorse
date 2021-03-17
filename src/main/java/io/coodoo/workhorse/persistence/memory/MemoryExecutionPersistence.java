@@ -187,7 +187,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
         ListingParameters listingParameters = new ListingParameters(0);
         listingParameters.addFilterAttributes("chainId", chainId);
-        listingParameters.setSortAttribute(CollectionListing.SORT_DESC + "createdAt");
+        listingParameters.setSortAttribute(CollectionListing.SORT_ASC + "createdAt");
 
         return getExecutionListing(jobId, listingParameters).getResults();
     }
@@ -207,7 +207,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
         long millis = preDate.atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toInstant().toEpochMilli();
 
         ListingParameters listingParameters = new ListingParameters(0);
-        listingParameters.addFilterAttributes("createdAt", CollectionListing.OPERATOR_GT + millis);
+        listingParameters.addFilterAttributes("createdAt", CollectionListing.OPERATOR_LT + millis);
 
         ListingResult<Execution> executionListing = getExecutionListing(jobId, listingParameters);
 
