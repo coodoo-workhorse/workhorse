@@ -539,9 +539,7 @@ public class WorkhorseController {
 
         log.trace("Job updated: {}", job);
 
-        jobPersistence.update(job);
-
-        return job;
+        return jobPersistence.update(job);
     }
 
     public List<Execution> getBatch(Long jobId, Long batchId) {
