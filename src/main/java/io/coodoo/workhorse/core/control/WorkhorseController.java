@@ -4,6 +4,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -147,6 +149,14 @@ public class WorkhorseController {
             }
 
             job.setDescription(initialJobConfig.description());
+
+            // Convert the string of tags to a list of them
+            if (!initialJobConfig.tags().isEmpty()) {
+                List<String> tagsList = new ArrayList<>(Arrays.asList(initialJobConfig.tags().split(",")));
+                tagsList.removeAll(Collections.singleton(null));
+                tagsList.removeAll(Collections.singleton(""));
+                job.setTags(tagsList);
+            }
 
             job.setWorkerClassName(workerClass.getName());
             job.setSchedule(initialJobConfig.schedule());
