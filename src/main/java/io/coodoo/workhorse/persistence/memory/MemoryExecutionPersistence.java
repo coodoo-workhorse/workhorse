@@ -22,6 +22,8 @@ import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
+import io.coodoo.workhorse.core.entity.Job;
+import io.coodoo.workhorse.core.entity.JobExecutionStatusSummary;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
@@ -310,6 +312,31 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
         executionLog.setStacktrace(stacktrace);
 
         jobData.executionLogs.put(executionId, executionLog);
+    }
+
+    @Override
+    public List<JobExecutionStatusSummary> getJobExecutionStatusSummaries(ExecutionStatus status, LocalDateTime since) {
+
+        List<JobExecutionStatusSummary> result = new ArrayList<>();
+
+        for (Job job : memoryPersistence.getJobs().values()) {
+
+            ListingParameters listingParameters = new ListingParameters(0);
+            listingParameters.addFilterAttributes("status", status);
+
+            if (since != null) {
+                long millis = since.atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toInstant().toEpochMilli();
+                listingParameters.addFilterAttributes("createdAt", CollectionListing.OPERATOR_GT + millis);
+            }
+
+            int count = getExecutionListing(job.getId(), listingParameters).getResults().size();
+            // Only job with executions in the given status are considered
+            if (count > 0) {
+                result.add(new JobExecutionStatusSummary(status, Long.valueOf(count), job));
+            }
+
+        }
+        return result;
     }
 
 }

@@ -8,6 +8,7 @@ import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
+import io.coodoo.workhorse.core.entity.JobExecutionStatusSummary;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 
@@ -150,6 +151,15 @@ public interface ExecutionPersistence {
      * @return list of Executions to abort
      */
     List<Execution> findTimeoutExecutions(LocalDateTime time);
+
+    /**
+     * Get all jobs, whose executions are in the given status
+     * 
+     * @param status status of execution
+     * @param since only executions that have been created after this timestamp have to be returned. If null, it is no more considered
+     * @return list of job
+     */
+    List<JobExecutionStatusSummary> getJobExecutionStatusSummaries(ExecutionStatus status, LocalDateTime since);
 
     /**
      * Get a {@link ExecutionLog}

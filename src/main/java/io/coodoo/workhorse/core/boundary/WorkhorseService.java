@@ -19,6 +19,7 @@ import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
+import io.coodoo.workhorse.core.entity.JobExecutionStatusSummary;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.entity.WorkhorseConfigBuilder;
@@ -402,6 +403,17 @@ public class WorkhorseService {
 
     public void triggerScheduledExecutionCreation(Job job) throws ClassNotFoundException {
         workhorseController.triggerScheduledExecutionCreation(job);
+    }
+
+    /**
+     * Get all jobs, whose executions are in the given status
+     * 
+     * @param status status of executions
+     * @param since only executions that have been created after this timestamp have to be returned. If null, it is no more considered
+     * @return list of job
+     */
+    public List<JobExecutionStatusSummary> getJobExecutionStatusSummaries(ExecutionStatus status, LocalDateTime since) {
+        return workhorseController.getJobExecutionStatusSummaries(status, since);
     }
 
 }

@@ -28,6 +28,7 @@ import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
+import io.coodoo.workhorse.core.entity.JobExecutionStatusSummary;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
@@ -654,6 +655,17 @@ public class WorkhorseController {
 
     public void deleteExecution(Long jobId, Long executionId) {
         executionPersistence.delete(jobId, executionId);
+    }
+
+    /**
+     * Get all jobs, whose executions are in the given status
+     * 
+     * @param status status of execution
+     * @param since only executions that have been created after this timestamp have to be returned. If null, it is no more considered
+     * @return list of job
+     */
+    public List<JobExecutionStatusSummary> getJobExecutionStatusSummaries(ExecutionStatus status, LocalDateTime since) {
+        return executionPersistence.getJobExecutionStatusSummaries(status, since);
     }
 
     /**
