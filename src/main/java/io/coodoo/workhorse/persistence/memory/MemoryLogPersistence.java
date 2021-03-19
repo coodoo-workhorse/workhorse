@@ -37,6 +37,7 @@ public class MemoryLogPersistence implements LogPersistence {
 
     @Override
     public WorkhorseLog update(Long id, WorkhorseLog workhorseLog) {
+        workhorseLog.setUpdatedAt(WorkhorseUtil.timestamp());
         memoryPersistence.getWorkhorseLog().put(id, workhorseLog);
         return workhorseLog;
     }
