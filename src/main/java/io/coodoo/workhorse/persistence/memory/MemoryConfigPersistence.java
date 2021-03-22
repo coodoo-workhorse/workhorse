@@ -33,4 +33,10 @@ public class MemoryConfigPersistence implements ConfigPersistence {
         return MemoryPersistence.NAME;
     }
 
+    @Override
+    public String getPersistenceVersion() {
+
+        return "Memory_Persistence_22032020_1130";
+    }
+
 }

@@ -29,4 +29,11 @@ public interface ConfigPersistence {
      */
     String getPersistenceName();
 
+    /**
+     * Get the version of the used Persistence
+     * 
+     * @return
+     */
+    String getPersistenceVersion();
+
 }

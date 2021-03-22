@@ -132,6 +132,7 @@ public class PersistenceManager {
                 log.info("ConfigPersistence: {} - {}", configPersistence.getPersistenceName(), configPersistence.getClass());
                 log.trace("End of configPersistence initialization");
                 configPersistence.connect(persistenceConfiguration);
+                log.info("Persistence version: {}", configPersistence.getPersistenceVersion());
                 return configPersistence;
             }
         }
