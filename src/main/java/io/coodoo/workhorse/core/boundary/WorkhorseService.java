@@ -66,7 +66,36 @@ public class WorkhorseService {
     WorkhorseConfig currentWorkhorseConfig = null;
 
     /**
-     * Start Workhorse. The default persistence is Memory.
+     * Initialize the persistence to use. The default persistence is Memory.
+     */
+    public void init() {
+
+        currentWorkhorseConfig = new MemoryConfigBuilder().build();
+
+        init(currentWorkhorseConfig);
+    }
+
+    /**
+     * Initialize the persistence to use
+     * 
+     * The configuration can be built by using the builder that extends {@link WorkhorseConfigBuilder} of the chosen persisitence.
+     * 
+     * For example, if you want to use the default persistence {@link MemoryConfig} use the builder as follow:
+     * 
+     * <code>init(new MemoryConfigBuilder().build())</code>
+     * 
+     * @param workhorseConfig Configuration of the chosen persistence (this can only be done once and is final).
+     */
+    public void init(WorkhorseConfig workhorseConfig) {
+
+        currentWorkhorseConfig = workhorseConfig;
+        persistenceManager.initializePersistence(workhorseConfig);
+        workhorseConfigController.initializeStaticConfig(workhorseConfig);
+
+    }
+
+    /**
+     * Start Workhorse.
      */
     public void start() {
         if (currentWorkhorseConfig == null) {
@@ -92,9 +121,9 @@ public class WorkhorseService {
             currentWorkhorseConfig = workhorseConfig;
             persistenceManager.initializePersistence(workhorseConfig);
             workhorseConfigController.initializeStaticConfig(workhorseConfig);
-            workhorseController.loadWorkers();
         }
 
+        workhorseController.loadWorkers();
         executionBuffer.initialize();
         workhorse.start();
         jobScheduler.startScheduler();

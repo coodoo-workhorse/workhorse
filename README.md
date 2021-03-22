@@ -88,13 +88,15 @@ public void performHelloWorld() {
 }
 ```
 
-Now you have to start up Workhorse using the method `start()` of the `WorkhorseService` somewhere in your application. There is also a `stop()` method to halt that beast.
+Now you have to start up Workhorse. The method `init()` of the `WorkhorseService` allows you to define which persistence you want to use. After it just call the method `start()` of the `WorkhorseService` somewhere in your application. There is also a `stop()` method to halt that beast.
 
 ```java
 @Inject
 WorkhorseService workhorseService;
 
 public void init() {
+    workhorseService.init(new MemoryConfig());
+    
     workhorseService.start();
 }
 ```
