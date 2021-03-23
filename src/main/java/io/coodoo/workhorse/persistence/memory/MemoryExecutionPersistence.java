@@ -83,7 +83,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
     @Override
     public String getPersistenceName() {
-        return MemoryPersistence.NAME;
+        return MemoryConfig.NAME;
     }
 
     @Override

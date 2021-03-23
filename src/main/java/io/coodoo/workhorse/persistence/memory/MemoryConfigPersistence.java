@@ -30,13 +30,12 @@ public class MemoryConfigPersistence implements ConfigPersistence {
 
     @Override
     public String getPersistenceName() {
-        return MemoryPersistence.NAME;
+        return MemoryConfig.NAME;
     }
 
     @Override
     public String getPersistenceVersion() {
-
-        return "2.0.0-RC2-SNAPSHOT";
+        return MemoryConfig.VERSION;
     }
 
 }

@@ -80,7 +80,7 @@ public class MemoryLogPersistence implements LogPersistence {
 
     @Override
     public String getPersistenceName() {
-        return MemoryPersistence.NAME;
+        return MemoryConfig.NAME;
     }
 
     @Override

@@ -14,8 +14,6 @@ import io.coodoo.workhorse.core.entity.WorkhorseLog;
 @ApplicationScoped
 public class MemoryPersistence {
 
-    public static final String NAME = "MEMORY";
-
     private WorkhorseConfig workhorseConfig;
     private Map<Long, WorkhorseLog> workhorseLog = new ConcurrentHashMap<>();
     private Map<Long, Job> jobs = new ConcurrentHashMap<>();

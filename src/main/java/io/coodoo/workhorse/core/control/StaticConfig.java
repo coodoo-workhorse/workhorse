@@ -2,7 +2,7 @@ package io.coodoo.workhorse.core.control;
 
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
-import io.coodoo.workhorse.persistence.memory.MemoryPersistence;
+import io.coodoo.workhorse.persistence.memory.MemoryConfig;
 
 /**
  * FOR INTERNAL USAGE ONLY!
@@ -16,9 +16,9 @@ public final class StaticConfig {
     private StaticConfig() {}
 
     /**
-     * Name of the peristence (Default is {@link MemoryPersistence})
+     * Name of the peristence (Default is {@link MemoryConfig})
      */
-    public static String PERSISTENCE_NAME = MemoryPersistence.NAME;
+    public static String PERSISTENCE_NAME = MemoryConfig.NAME;
 
     /**
      * ZoneId Object time zone for LocalDateTime instance creation. Default is UTC

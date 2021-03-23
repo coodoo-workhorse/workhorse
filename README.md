@@ -18,7 +18,7 @@
   - [Planned jobs](#planned-jobs)
   - [Priority jobs](#priority-jobs)
 - [Features](#features)
-  - [Unique in status queued](#unique-in-status-queue)
+  - [Unique in status queued](#unique-in-status-queued)
   - [Throughput control](#throughput-control)
   - [Execution context](#execution-context)
   - [Retry on failed](#retry-on-failed)

@@ -88,6 +88,13 @@ public abstract class WorkhorseConfig {
      */
     public abstract String getPersistenceName();
 
+    /**
+     * Retrieves the version of the persistence that extends the class WorkhorseConfig.
+     * 
+     * @return the version of the persistence
+     */
+    public abstract String getPersistenceVersion();
+
     public String getTimeZone() {
         return timeZone;
     }
