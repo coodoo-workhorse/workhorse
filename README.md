@@ -47,7 +47,7 @@ Add the following dependency to your project ([published on Maven Central](https
    <dependency>
        <groupId>io.coodoo</groupId>
        <artifactId>workhorse</artifactId>
-       <version>2.0.0-RC1-SNAPSHOT</version>
+       <version>2.0.0-RC2-SNAPSHOT</version>
    </dependency>
    ```
    

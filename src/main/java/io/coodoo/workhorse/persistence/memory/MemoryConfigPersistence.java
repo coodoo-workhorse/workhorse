@@ -36,7 +36,7 @@ public class MemoryConfigPersistence implements ConfigPersistence {
     @Override
     public String getPersistenceVersion() {
 
-        return "Memory_Persistence_23032020_1040";
+        return "2.0.0-RC2-SNAPSHOT";
     }
 
 }
