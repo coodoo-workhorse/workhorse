@@ -2,14 +2,18 @@ package io.coodoo.workhorse.core.control;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.enterprise.context.Dependent;
+import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.ObservesAsync;
 import javax.enterprise.inject.Any;
-import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -32,8 +36,7 @@ import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
 public class JobThread {
 
     @Inject
-    @Any
-    Instance<BaseWorker> workerInstances;
+    BeanManager beanManager;
 
     @Inject
     @ExecutionQualifier
@@ -61,10 +64,14 @@ public class JobThread {
     private static final Logger log = LoggerFactory.getLogger(JobThread.class);
 
     private BaseWorker getWorker(Job job) throws ClassNotFoundException {
-        for (BaseWorker worker : workerInstances) {
-            if (job.getWorkerClassName().equals(worker.getWorkerClass().getName())) {
-                return worker;
+        Set<Bean<?>> beans = beanManager.getBeans(BaseWorker.class, new AnnotationLiteral<Any>() {});
+        for (Bean<?> bean : beans) {
+            Class<?> workerclass = bean.getBeanClass();
+            if (job.getWorkerClassName().equals(workerclass.getName())) {
+                CreationalContext<?> creationalContext = beanManager.createCreationalContext(bean);
+                return (BaseWorker) beanManager.getReference(bean, bean.getBeanClass(), creationalContext);
             }
+
         }
 
         log.error("No worker class {} found for {} ({})", job.getWorkerClassName(), job.getName(), job.getId());
@@ -140,6 +147,7 @@ public class JobThread {
                             // chain is about to start
                             chainId = execution.getChainId();
                             chainedExecutions = executionPersistence.getChain(jobId, execution.getChainId());
+                            chainedExecutions.removeIf(exe -> exe.getId().equals(chainId));
                         } else {
                             if (chainedExecutions.isEmpty()) {
                                 // chain is all done

@@ -110,7 +110,7 @@ public class WorkhorseConfigController {
         log.info("Initialized: {}", workhorseConfig);
         workhorseLogService.logMessage("Initial config set: " + workhorseConfig, null, false);
 
-        log.info("The current build of workhorse is: workhorse_22032021_1630 ");
+        log.info("The current build of workhorse is: workhorse_23032021_1040 ");
 
         log.info("");
         log.info("#     # ####### ######  #    # #     # ####### ######   #####  #######");

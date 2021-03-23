@@ -8,11 +8,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Event;
 import javax.enterprise.inject.Any;
-import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -49,8 +53,7 @@ public class WorkhorseController {
     private static final Logger log = LoggerFactory.getLogger(WorkhorseController.class);
 
     @Inject
-    @Any
-    Instance<BaseWorker> workerInstances;
+    BeanManager beanManager;
 
     @Inject
     @JobQualifier
@@ -76,11 +79,12 @@ public class WorkhorseController {
         log.info("Initializing Workhorse Jobs...");
 
         // check whether new worker exists and must be created and persisted
-        for (BaseWorker worker : workerInstances) {
-            Class<?> workerclass = worker.getWorkerClass();
+        Set<Bean<?>> beans = beanManager.getBeans(BaseWorker.class, new AnnotationLiteral<Any>() {});
+        for (Bean<?> bean : beans) {
+            Class<?> workerclass = bean.getBeanClass();
             Job job = jobPersistence.getByWorkerClassName(workerclass.getName());
             if (job == null) {
-                job = createJob(worker);
+                job = createJob(workerclass);
                 log.info("[{}] Job and Worker created and Configuration persisted ({})", job.getWorkerClassName(), job.getName());
             }
             workerClasses.add(workerclass);
@@ -136,10 +140,8 @@ public class WorkhorseController {
         }
     }
 
-    private Job createJob(BaseWorker worker) {
+    private Job createJob(Class<?> workerClass) {
         Job job = new Job();
-
-        Class<? extends BaseWorker> workerClass = worker.getWorkerClass();
 
         if (workerClass.isAnnotationPresent(InitialJobConfig.class)) {
             InitialJobConfig initialJobConfig = workerClass.getAnnotation(InitialJobConfig.class);
@@ -185,7 +187,7 @@ public class WorkhorseController {
             job.setMinutesUntilCleanUp(InitialJobConfig.JOB_CONFIG_MINUTES_UNTIL_CLEANUP);
         }
 
-        String parameterClassName = getWorkerParameterName(worker);
+        String parameterClassName = getWorkerParameterName(workerClass);
         job.setParametersClassName(parameterClassName);
 
         Job persistedJob = jobPersistence.persist(job);
@@ -226,6 +228,26 @@ public class WorkhorseController {
     }
 
     /**
+     * Retrieves the name of the parameter of a worker that extends the class {@link WorkerWith}.
+     * 
+     * @param worker class of the worker
+     * @return name of the parameter
+     */
+    public String getWorkerParameterName(Class<?> worker) {
+        Object workerInstance;
+        try {
+            workerInstance = worker.newInstance();
+            if (workerInstance instanceof WorkerWith) {
+                return ((WorkerWith) workerInstance).getParametersClassName();
+            }
+        } catch (InstantiationException | IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
      * retrieves the Worker of a Job.
      * 
      * @param job
@@ -234,10 +256,14 @@ public class WorkhorseController {
      * @throws Exception
      */
     private BaseWorker getWorker(Job job) throws ClassNotFoundException {
-        for (BaseWorker worker : workerInstances) {
-            if (job.getWorkerClassName().equals(worker.getWorkerClass().getName())) {
-                return worker;
+        Set<Bean<?>> beans = beanManager.getBeans(BaseWorker.class, new AnnotationLiteral<Any>() {});
+        for (Bean<?> bean : beans) {
+            Class<?> workerclass = bean.getBeanClass();
+            if (job.getWorkerClassName().equals(workerclass.getName())) {
+                CreationalContext<?> creationalContext = beanManager.createCreationalContext(bean);
+                return (BaseWorker) beanManager.getReference(bean, bean.getBeanClass(), creationalContext);
             }
+
         }
 
         log.error("No Worker class found for {}", job);
@@ -249,22 +275,6 @@ public class WorkhorseController {
         jobErrorEvent.fire(new JobErrorEvent(new ClassNotFoundException(), ErrorType.NO_JOB_WORKER_FOUND.getMessage(), job.getId(), job.getStatus()));
         throw new ClassNotFoundException();
 
-    }
-
-    /**
-     * retrieves a worker by his class name
-     * 
-     * @param className
-     * @return
-     */
-    public Class<? extends BaseWorker> getWorkerByClassName(String className) {
-        for (BaseWorker worker : workerInstances) {
-            Class<? extends BaseWorker> workerclass = worker.getWorkerClass();
-            if (workerclass.getName().equals(className)) {
-                return workerclass;
-            }
-        }
-        return null;
     }
 
     /**

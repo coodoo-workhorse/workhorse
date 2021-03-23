@@ -170,7 +170,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     @Override
     public boolean abortChain(Long jobId, Long chainId) {
 
-        ListingParameters listingParameters = new ListingParameters(1);
+        ListingParameters listingParameters = new ListingParameters(0);
         listingParameters.addFilterAttributes("status", ExecutionStatus.QUEUED);
         listingParameters.addFilterAttributes("chainId", chainId);
 
