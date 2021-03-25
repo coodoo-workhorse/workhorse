@@ -81,11 +81,11 @@ public class ExecutionBuffer {
     }
 
     /**
-     * Stop the execution of jobs of the given Job
+     * Clean up the buffer of a job, that contents executions to process.
      * 
-     * @param job to cancel
+     * @param job job, which buffer has to be cleaned
      */
-    public void cancelProcess(Job job) {
+    public void clearMemoryQueue(Job job) {
         log.trace("The Processing of the job {} will be cancel", job);
 
         if (!executions.containsKey(job.getId()) || !priorityExecutions.containsKey(job.getId())) {
@@ -104,12 +104,21 @@ public class ExecutionBuffer {
             executions.get(job.getId()).clear();
             priorityExecutions.get(job.getId()).clear();
         }
+    }
 
+    /**
+     * Stop the execution of jobs of the given Job
+     * 
+     * @param job to cancel
+     */
+    public void cancelProcess(Job job) {
+
+        clearMemoryQueue(job);
         stopAllJobThread(job);
     }
 
     /**
-     * Stop all thread linked with a given job
+     * Stop all thread linked to a given job
      * 
      * @param job
      */
@@ -136,7 +145,7 @@ public class ExecutionBuffer {
 
         for (CompletionStage<Job> completion : completionStages.get(job.getId())) {
 
-            // Stop the thread
+            // Stop the thread. The thread is not really stopped. The link with the thread is just broken.
             completion.toCompletableFuture().cancel(true);
         }
 

@@ -102,9 +102,9 @@ public class JobScheduler {
         if (scheduledFuture != null) {
             scheduledFuture.cancel(false);
 
-            log.trace("Schedule stopped for Job {} ", job);
+            log.info("Schedule stopped for Job {} ", job.getName());
         } else {
-            log.trace("No scheduled execution found for the given job {} ", job);
+            log.info("No scheduled execution found for the given job {} ", job.getName());
         }
 
     }

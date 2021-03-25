@@ -130,13 +130,12 @@ public class WorkhorseService {
     }
 
     /**
-     * Stop the Workhorse
+     * Stop Workhorse
      */
     public void stop() {
         workhorse.stop();
         for (Job job : getAllScheduledJobs()) {
             jobScheduler.stop(job);
-            executionBuffer.cancelProcess(job);
         }
         executionBuffer.clear();
     }
@@ -244,7 +243,7 @@ public class WorkhorseService {
 
         jobScheduler.stop(job);
         // workhorse.stop(); maybe we don t need. To proove
-        executionBuffer.cancelProcess(job);
+        executionBuffer.clearMemoryQueue(job);
 
         workhorseController.updateJob(jobId, name, description, workerClassName, schedule, status, threads, maxPerMinute, failRetries, retryDelay,
                         daysUntilCleanUp, uniqueQueued);
@@ -339,7 +338,7 @@ public class WorkhorseService {
         if (job.getSchedule() != null && !job.getSchedule().isEmpty()) {
             jobScheduler.stop(job);
         }
-        executionBuffer.cancelProcess(job);
+        executionBuffer.clearMemoryQueue(job);
     }
 
     /**
