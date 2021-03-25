@@ -137,10 +137,10 @@ public class WorkhorseService {
      */
     public void stop() {
         workhorse.stop();
-        for (Job job : getAllScheduledJobs()) {
-            jobScheduler.stop(job);
-        }
-        executionBuffer.clear();
+
+        jobScheduler.stopScheduler();
+
+        executionBuffer.clearMemoryQueue();
     }
 
     /**
