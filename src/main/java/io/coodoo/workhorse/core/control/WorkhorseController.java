@@ -40,6 +40,7 @@ import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.ExecutionQualifier;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
+import io.coodoo.workhorse.util.CronExpression;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
 /**
@@ -84,13 +85,17 @@ public class WorkhorseController {
             Class<?> workerclass = bean.getBeanClass();
             Job job = jobPersistence.getByWorkerClassName(workerclass.getName());
             if (job == null) {
-                job = createJob(workerclass);
-                log.info("[{}] Job and Worker created and Configuration persisted ({})", job.getWorkerClassName(), job.getName());
+                try {
+                    job = createJob(workerclass);
+                    log.info("[{}] Job and Worker created and Configuration persisted ({})", job.getWorkerClassName(), job.getName());
+                } catch (RuntimeException runtimeException) {
+                    log.error(runtimeException.getMessage());
+                }
             }
             workerClasses.add(workerclass);
         }
 
-        // check if persisted job can be mapped a Worker class
+        // check if persisted jobs can be mapped a with a worker class
         for (Job job : jobPersistence.getAll()) {
             String workerClassName = job.getWorkerClassName();
             BaseWorker workerOfDbJob;
@@ -162,8 +167,23 @@ public class WorkhorseController {
             }
 
             job.setWorkerClassName(workerClass.getName());
-            job.setSchedule(initialJobConfig.schedule());
             job.setStatus(initialJobConfig.status());
+
+            // Set the defined schedule
+            String schedule = initialJobConfig.schedule();
+            if (schedule != null && !schedule.isEmpty()) {
+
+                try {
+                    // Try to interpret the schedule as cron-syntax
+                    CronExpression cron = new CronExpression(schedule);
+                    job.setSchedule(schedule);
+
+                } catch (RuntimeException runtimeException) {
+
+                    throw new RuntimeException(
+                                    "The job with worker's name " + workerClass.getName() + " could not be created due to invalid schedule: " + schedule);
+                }
+            }
             job.setThreads(initialJobConfig.threads());
 
             if (initialJobConfig.maxPerMinute() != InitialJobConfig.JOB_CONFIG_MAX_PER_MINUTE) {
