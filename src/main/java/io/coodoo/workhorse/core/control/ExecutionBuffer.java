@@ -81,6 +81,16 @@ public class ExecutionBuffer {
     }
 
     /**
+     * Clean up the buffers of all jobs.
+     * 
+     */
+    public void clearMemoryQueue() {
+        for (Job job : workhorseController.getAllJobsByStatus(JobStatus.ACTIVE)) {
+            clearMemoryQueue(job);
+        }
+    }
+
+    /**
      * Clean up the buffer of a job, that contents executions to process.
      * 
      * @param job job, which buffer has to be cleaned
