@@ -248,6 +248,16 @@ public class WorkhorseController {
     }
 
     /**
+     * Get a job by the worker's classname
+     * 
+     * @param workerClassName
+     * @return the founded job
+     */
+    public Job getByWorkerClassName(String workerClassName) {
+        return jobPersistence.getByWorkerClassName(workerClassName);
+    }
+
+    /**
      * retrieves the Worker of a Job.
      * 
      * @param job

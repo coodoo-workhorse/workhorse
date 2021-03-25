@@ -8,11 +8,11 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 
 import io.coodoo.workhorse.core.boundary.ExecutionContext;
+import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
-import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
-import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
+import io.coodoo.workhorse.core.entity.WorkhorseLog;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
 /**
@@ -23,14 +23,13 @@ import io.coodoo.workhorse.util.WorkhorseUtil;
 public abstract class BaseWorker {
 
     @Inject
-    @JobQualifier
-    protected JobPersistence jobPersistence;
-
-    @Inject
     protected WorkhorseController workhorseController;
 
     @Inject
     protected ExecutionContext executionContext;
+
+    @Inject
+    protected WorkhorseLogService workhorseLogService;
 
     private Job job;
 
@@ -136,7 +135,7 @@ public abstract class BaseWorker {
 
     public Job getJob() {
         if (job == null) {
-            job = jobPersistence.getByWorkerClassName(getClass().getName());
+            job = workhorseController.getByWorkerClassName(getClass().getName());
         }
         return job;
     }
@@ -275,6 +274,16 @@ public abstract class BaseWorker {
      */
     protected void logError(Logger logger, String message, Throwable throwable) {
         executionContext.logError(logger, message, throwable);
+    }
+
+    /**
+     * Logs a text message directly to the job
+     * 
+     * @param message text to log
+     * @return the resulting log entry
+     */
+    public WorkhorseLog logOnJob(String message) {
+        return workhorseLogService.logMessage(message, getJob().getId(), false);
     }
 
     /**

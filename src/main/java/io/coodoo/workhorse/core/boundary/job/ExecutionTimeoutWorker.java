@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.coodoo.workhorse.core.boundary.Worker;
-import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
 import io.coodoo.workhorse.core.boundary.annotation.InitialJobConfig;
 import io.coodoo.workhorse.core.control.StaticConfig;
 import io.coodoo.workhorse.core.entity.Execution;
@@ -32,9 +31,6 @@ public class ExecutionTimeoutWorker extends Worker {
     @Inject
     @ExecutionQualifier
     ExecutionPersistence executionPersistence;
-
-    @Inject
-    WorkhorseLogService workhorseLogService;
 
     @Override
     public void doWork() throws Exception {
