@@ -1,6 +1,7 @@
 package io.coodoo.workhorse.core.boundary;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,6 +128,8 @@ public class WorkhorseService {
         executionBuffer.initialize();
         workhorse.start();
         jobScheduler.startScheduler();
+
+        log.info("Workhorse is running...");
     }
 
     /**
@@ -441,6 +444,12 @@ public class WorkhorseService {
      * @return list of job
      */
     public List<JobExecutionStatusSummary> getJobExecutionStatusSummaries(ExecutionStatus status, LocalDateTime since) {
+        if (ExecutionStatus.FAILED.equals(status) && since == null) {
+            // TODO remove this if since can be set by frontend ui
+            LocalDateTime lt = LocalDateTime.now();
+            lt.minus(24, ChronoUnit.HOURS);
+            since = lt;
+        }
         return workhorseController.getJobExecutionStatusSummaries(status, since);
     }
 
