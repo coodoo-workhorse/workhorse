@@ -143,7 +143,7 @@ public class HelloWorldWorker extends WorkerWith<String> {
 ### On demand jobs
 This is the default job, that is executed based on the position in the queue.
 
-You just have to call `createExecution()` on your job worker instance. It returns the `ID` of the resulting execution so you can log or track it afterwards.
+You just have to call `createExecution()` on your job worker instance. It returns the unique `ID` of the resulting execution so you can log or track it afterwards.
 
 ```java
 @Inject
