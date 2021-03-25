@@ -447,8 +447,7 @@ public class WorkhorseService {
         if (ExecutionStatus.FAILED.equals(status) && since == null) {
             // TODO remove this if since can be set by frontend ui
             LocalDateTime lt = LocalDateTime.now();
-            lt.minus(24, ChronoUnit.HOURS);
-            since = lt;
+            since = lt.minus(24, ChronoUnit.HOURS);
         }
         return workhorseController.getJobExecutionStatusSummaries(status, since);
     }
