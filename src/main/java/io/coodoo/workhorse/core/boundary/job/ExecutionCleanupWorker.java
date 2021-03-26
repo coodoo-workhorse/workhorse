@@ -44,7 +44,7 @@ public class ExecutionCleanupWorker extends Worker {
         for (Job job : jobs) {
             try {
                 int deleted = workhorseController.deleteOlderExecutions(job.getId(), job.getMinutesUntilCleanUp());
-                logInfo(logger, String.format("%7d | %4d | %6d | %s", deleted, job.getMinutesUntilCleanUp(), job.getId(), job.getName()));
+                logInfo(logger, String.format("%7d | %6d | %6d | %s", deleted, job.getMinutesUntilCleanUp(), job.getId(), job.getName()));
                 deletedSum += deleted;
             } catch (Exception e) {
                 minOneJobCleanupFailed = true;

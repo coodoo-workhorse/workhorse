@@ -156,7 +156,7 @@ public interface ExecutionPersistence {
      * Get all jobs, whose executions are in the given status
      * 
      * @param status status of execution
-     * @param since only executions that have been created after this timestamp have to be returned. If null, it is no more considered
+     * @param since only executions that have been created after this timestamp have to be returned. If null it will be ignored.
      * @return list of job
      */
     List<JobExecutionStatusSummary> getJobExecutionStatusSummaries(ExecutionStatus status, LocalDateTime since);
