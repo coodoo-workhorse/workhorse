@@ -180,8 +180,16 @@ public class WorkhorseController {
 
                 } catch (RuntimeException runtimeException) {
 
-                    throw new RuntimeException(
-                                    "The job with worker's name " + workerClass.getName() + " could not be created due to invalid schedule: " + schedule);
+                    String exceptionMessage = "The job with worker's name " + workerClass.getName() + " could not be created due to invalid schedule: "
+                                    + schedule + "\n" + runtimeException.getMessage();
+
+                    JobErrorEvent jobErrorMessage = new JobErrorEvent(new RuntimeException(exceptionMessage), exceptionMessage, null, null);
+
+                    jobErrorEvent.fireAsync(jobErrorMessage);
+
+                    workhorseLogService.logException(jobErrorMessage);
+
+                    throw new RuntimeException(exceptionMessage);
                 }
             }
             job.setThreads(initialJobConfig.threads());
@@ -213,14 +221,14 @@ public class WorkhorseController {
         Job persistedJob = jobPersistence.persist(job);
 
         if (persistedJob == null || persistedJob.getId() == null) {
-            JobErrorEvent jobErrorMessage = new JobErrorEvent(new Throwable(ErrorType.ERROR_BY_JOB_PERSIST.getMessage()),
-                            ErrorType.ERROR_BY_JOB_PERSIST.getMessage(), null, null);
+            String exceptionMessage = "The job " + job + " couldn't be persisited by the persisitence " + jobPersistence.getPersistenceName();
+            JobErrorEvent jobErrorMessage = new JobErrorEvent(new RuntimeException(exceptionMessage), exceptionMessage, null, null);
 
             jobErrorEvent.fireAsync(jobErrorMessage);
 
             workhorseLogService.logException(jobErrorMessage);
 
-            throw new RuntimeException("The job " + job + " couldn't be persisited by the persisitence " + jobPersistence.getPersistenceName());
+            throw new RuntimeException(exceptionMessage);
         }
 
         log.trace("Created {}", persistedJob);
