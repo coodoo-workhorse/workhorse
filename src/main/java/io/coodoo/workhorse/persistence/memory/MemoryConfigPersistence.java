@@ -9,6 +9,8 @@ import io.coodoo.workhorse.persistence.interfaces.ConfigPersistence;
 @ApplicationScoped
 public class MemoryConfigPersistence implements ConfigPersistence {
 
+    private static MemoryConfig memoryConfig = new MemoryConfig();
+
     @Inject
     MemoryPersistence memoryPersistence;
 
@@ -35,7 +37,7 @@ public class MemoryConfigPersistence implements ConfigPersistence {
 
     @Override
     public String getPersistenceVersion() {
-        return MemoryConfig.VERSION;
+        return memoryConfig.getPersistenceVersion();
     }
 
 }

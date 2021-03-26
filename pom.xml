@@ -12,6 +12,14 @@
 		<name>coodoo GmbH</name>
 		<url>https://coodoo.io</url>
 	</organization>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<failOnMissingWebXml>false</failOnMissingWebXml>
+   		<timestamp>${maven.build.timestamp}</timestamp>
+   		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
+	</properties>
 	<developers>
 		<developer>
 			<name>Markus Kühle</name>
@@ -139,6 +147,15 @@
 	</profiles>
 	<build>
 		<finalName>workhorse</finalName>
+		<resources>
+		   <resource>
+		      <directory>src/main/resources</directory>
+		      <filtering>true</filtering>
+		      <includes>
+					<include>version.txt</include>
+				</includes>
+		   </resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -241,12 +258,6 @@
 			<url>https://gitlab.coodoo.io/api/v4/projects/${env.CI_PROJECT_ID}/packages/maven</url>
 		</repository>
 	</distributionManagement>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<failOnMissingWebXml>false</failOnMissingWebXml>
-	</properties>
 	<scm>
 		<connection>scm:git:git@github.com/coodoo-io/workhorse.git</connection>
 		<url>scm:git:git@github.com:coodoo-io/workhorse.git</url>
