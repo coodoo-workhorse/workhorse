@@ -1,6 +1,7 @@
 package io.coodoo.workhorse.core.boundary;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,18 +128,19 @@ public class WorkhorseService {
         executionBuffer.initialize();
         workhorse.start();
         jobScheduler.startScheduler();
+
+        log.info("Workhorse is running...");
     }
 
     /**
-     * Stop the Workhorse
+     * Stop Workhorse
      */
     public void stop() {
         workhorse.stop();
-        for (Job job : getAllScheduledJobs()) {
-            jobScheduler.stop(job);
-            executionBuffer.cancelProcess(job);
-        }
-        executionBuffer.clear();
+
+        jobScheduler.stopScheduler();
+
+        executionBuffer.clearMemoryQueue();
     }
 
     /**
@@ -244,7 +246,7 @@ public class WorkhorseService {
 
         jobScheduler.stop(job);
         // workhorse.stop(); maybe we don t need. To proove
-        executionBuffer.cancelProcess(job);
+        executionBuffer.clearMemoryQueue(job);
 
         workhorseController.updateJob(jobId, name, description, workerClassName, schedule, status, threads, maxPerMinute, failRetries, retryDelay,
                         daysUntilCleanUp, uniqueQueued);
@@ -339,7 +341,7 @@ public class WorkhorseService {
         if (job.getSchedule() != null && !job.getSchedule().isEmpty()) {
             jobScheduler.stop(job);
         }
-        executionBuffer.cancelProcess(job);
+        executionBuffer.clearMemoryQueue(job);
     }
 
     /**
@@ -442,6 +444,11 @@ public class WorkhorseService {
      * @return list of job
      */
     public List<JobExecutionStatusSummary> getJobExecutionStatusSummaries(ExecutionStatus status, LocalDateTime since) {
+        if (ExecutionStatus.FAILED.equals(status) && since == null) {
+            // TODO remove this if since can be set by frontend ui
+            LocalDateTime lt = LocalDateTime.now();
+            since = lt.minus(24, ChronoUnit.HOURS);
+        }
         return workhorseController.getJobExecutionStatusSummaries(status, since);
     }
 

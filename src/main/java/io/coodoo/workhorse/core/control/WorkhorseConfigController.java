@@ -106,11 +106,11 @@ public class WorkhorseConfigController {
         StaticConfig.LOG_ERROR_MARKER = workhorseConfig.getLogErrorMarker();
 
         configPersistence.update(workhorseConfig);
-        log.info(" Created config: {}", workhorseConfig);
+        log.info("Created config: {}", workhorseConfig);
         log.info("Initialized: {}", workhorseConfig);
         workhorseLogService.logMessage("Initial config set: " + workhorseConfig, null, false);
 
-        log.info("The current build of workhorse is: workhorse_23032021_1040 ");
+        log.info("The current build of workhorse is: workhorse_25032021_2118 ");
 
         log.info("");
         log.info("#     # ####### ######  #    # #     # ####### ######   #####  #######");
