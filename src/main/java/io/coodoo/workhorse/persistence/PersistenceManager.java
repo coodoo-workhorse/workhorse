@@ -80,7 +80,9 @@ public class PersistenceManager {
             log.warn("The persistence configuration can not be null. The default persistence {} is used", configuration);
         }
 
-        initializeJobEngineConfigPersistence(configuration);
+        log.info("Initialize Persistence: {} {}", configuration.getPersistenceName(), configuration.getPersistenceVersion());
+
+        initializeConfigPersistence(configuration);
         initializeJobPersistence(configuration);
         initializeExecutionPersistence(configuration);
         initializeLogPersistence(configuration);
@@ -93,13 +95,11 @@ public class PersistenceManager {
     }
 
     protected JobPersistence initializeJobPersistence(WorkhorseConfig persistenceConfiguration) {
-        log.trace("Start of JobPersistence initialization");
+        log.trace("JobPersistence initialization");
         for (JobPersistence jobPersistenceInstance : jobPersistenceInstances) {
             if (jobPersistenceInstance != null && jobPersistenceInstance.getPersistenceName().equals(persistenceConfiguration.getPersistenceName())) {
                 jobPersistence = jobPersistenceInstance;
-                log.info("JobPersistence: {} - {}", jobPersistence.getPersistenceName(), jobPersistence.getClass());
-
-                log.trace("End of JobPersistence initialization");
+                logFoundPersistence(JobPersistence.class, jobPersistence.getClass());
                 jobPersistence.connect();
                 return jobPersistence;
             }
@@ -108,14 +108,12 @@ public class PersistenceManager {
     }
 
     protected ExecutionPersistence initializeExecutionPersistence(WorkhorseConfig persistenceConfiguration) {
-        log.trace("Start of ExecutionPersistence initialization");
+        log.trace("ExecutionPersistence initialization");
         for (ExecutionPersistence executionPersistenceInstance : executionPersistenceInstances) {
             if (executionPersistenceInstance != null
                             && executionPersistenceInstance.getPersistenceName().equals(persistenceConfiguration.getPersistenceName())) {
                 executionPersistence = executionPersistenceInstance;
-
-                log.info("ExecutionPersistence: {} - {}", executionPersistence.getPersistenceName(), executionPersistence.getClass());
-                log.trace("End of ExecutionPersistence initialization");
+                logFoundPersistence(ExecutionPersistence.class, executionPersistence.getClass());
                 executionPersistence.connect();
                 return executionPersistence;
             }
@@ -123,16 +121,14 @@ public class PersistenceManager {
         return null;
     }
 
-    protected ConfigPersistence initializeJobEngineConfigPersistence(WorkhorseConfig persistenceConfiguration) {
-        log.trace("Start of ExecutionPersistence initialization");
+    protected ConfigPersistence initializeConfigPersistence(WorkhorseConfig persistenceConfiguration) {
+        log.trace("ExecutionPersistence initialization");
         for (ConfigPersistence configPersistenceInstance : configPersistenceInstances) {
             if (configPersistenceInstance != null && configPersistenceInstance.getPersistenceName().equals(persistenceConfiguration.getPersistenceName())) {
                 configPersistence = configPersistenceInstance;
 
-                log.info("ConfigPersistence: {} - {}", configPersistence.getPersistenceName(), configPersistence.getClass());
-                log.trace("End of configPersistence initialization");
+                logFoundPersistence(ConfigPersistence.class, configPersistence.getClass());
                 configPersistence.connect(persistenceConfiguration);
-                log.info("Persistence version: {}", configPersistence.getPersistenceVersion());
                 return configPersistence;
             }
         }
@@ -140,13 +136,12 @@ public class PersistenceManager {
     }
 
     protected LogPersistence initializeLogPersistence(WorkhorseConfig persistenceConfiguration) {
-        log.trace("Start of LogPersistence initialization");
+        log.trace("LogPersistence initialization");
         for (LogPersistence logPersistenceInstance : logPersistenceInstances) {
             if (logPersistenceInstance != null && logPersistenceInstance.getPersistenceName().equals(persistenceConfiguration.getPersistenceName())) {
                 logPersistence = logPersistenceInstance;
+                logFoundPersistence(LogPersistence.class, logPersistence.getClass());
 
-                log.info("LogPersistence: {} - {}", logPersistence.getPersistenceName(), logPersistence.getClass());
-                log.trace("End of LogPersistence initialization");
                 logPersistence.connect();
                 return logPersistence;
             }
@@ -155,4 +150,9 @@ public class PersistenceManager {
 
     }
 
+    private void logFoundPersistence(Class<?> persistenceInterface, Class<?> persistenceImplementation) {
+        String intName = persistenceInterface.getSimpleName();
+        String implName = persistenceImplementation.getName();
+        log.info("{} --> {}", intName, implName);
+    }
 }

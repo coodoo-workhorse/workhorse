@@ -145,7 +145,7 @@ public class Workhorse {
                 scheduledExecutorService.schedule(() -> {
                     executionDistributor(execution);
                 }, delayInSeconds, TimeUnit.SECONDS);
-                log.trace("Execution : {} will be process in {} seconds", execution, delayInSeconds);
+                log.trace("Execution {} will be process in {} seconds", execution.getId(), delayInSeconds);
             } else {
                 executionDistributor(execution);
             }

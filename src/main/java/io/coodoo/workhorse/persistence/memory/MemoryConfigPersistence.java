@@ -5,11 +5,10 @@ import javax.inject.Inject;
 
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.interfaces.ConfigPersistence;
+import io.coodoo.workhorse.util.WorkhorseUtil;
 
 @ApplicationScoped
 public class MemoryConfigPersistence implements ConfigPersistence {
-
-    private static MemoryConfig memoryConfig = new MemoryConfig();
 
     @Inject
     MemoryPersistence memoryPersistence;
@@ -37,7 +36,7 @@ public class MemoryConfigPersistence implements ConfigPersistence {
 
     @Override
     public String getPersistenceVersion() {
-        return memoryConfig.getPersistenceVersion();
+        return WorkhorseUtil.getVersion();
     }
 
 }
