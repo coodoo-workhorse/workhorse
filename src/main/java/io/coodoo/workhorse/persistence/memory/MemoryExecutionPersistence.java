@@ -361,15 +361,14 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
             return null;
         }
 
+        ListingParameters listingParameters = new ListingParameters(0);
+
+        long fromMillis = from.atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toInstant().toEpochMilli();
+        long toMillis = to.atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toInstant().toEpochMilli();
+
+        listingParameters.addFilterAttributes("createdAt", fromMillis + CollectionListing.OPERATOR_TO + toMillis);
+
         for (Job job : jobs) {
-
-            ListingParameters listingParameters = new ListingParameters(0);
-
-            long fromMillis = from.atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toInstant().toEpochMilli();
-            listingParameters.addFilterAttributes("createdAt", CollectionListing.OPERATOR_GT + fromMillis);
-
-            long toMillis = to.atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toInstant().toEpochMilli();
-            listingParameters.addFilterAttributes("createdAt", CollectionListing.OPERATOR_LT + toMillis);
 
             listingParameters.addFilterAttributes("status", ExecutionStatus.PLANNED);
             countPlanned = countPlanned + getExecutionListing(job.getId(), listingParameters).getResults().size();
