@@ -80,7 +80,7 @@ public class WorkhorseUtil {
     }
 
     /**
-     * @return Current Time by zone defined in {@link JobEngineConfig#TIME_ZONE}
+     * @return Current Time by zone defined in {@link WorkhorseConfig#TIME_ZONE}
      */
     public static LocalDateTime timestamp() {
         return LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE));
