@@ -318,6 +318,35 @@ public class WorkhorseService {
     }
 
     /**
+     * You can redo an {@link Execution} in status {@link ExecutionStatus#FINISHED}, {@link ExecutionStatus#FAILED} and {@link ExecutionStatus#ABORTED}, but all
+     * meta data like timestamps and logs of this execution will be gone!
+     * 
+     * @param executionId ID of the {@link Execution} you wish to redo
+     * @return cleared out {@link Execution} in status {@link ExecutionStatus#QUEUED}
+     */
+    public Execution redoJobExecution(Long jobId, Long executionId) {
+
+        Execution execution = getExecutionById(jobId, executionId);
+        if (ExecutionStatus.QUEUED == execution.getStatus() || ExecutionStatus.RUNNING == execution.getStatus()) {
+            log.warn("Can't redo Execution in status {}: {}", execution.getStatus(), execution);
+            return execution;
+        }
+
+        log.info("Redo {} {}", execution.getStatus(), execution);
+
+        execution.setPlannedFor(WorkhorseUtil.timestamp());
+        execution.setStatus(ExecutionStatus.QUEUED);
+        execution.setStartedAt(null);
+        execution.setEndedAt(null);
+        execution.setDuration(null);
+        execution.setFailRetry(0);
+        execution.setFailRetryExecutionId(null);
+
+        workhorseController.appendExecutionLog(jobId, executionId, "The execution will be retried.");
+        return workhorseController.updateExecution(execution);
+    }
+
+    /**
      * <i>Activate a job.</i><br>
      * <br>
      * The executions of this job can again be processed by the job engine

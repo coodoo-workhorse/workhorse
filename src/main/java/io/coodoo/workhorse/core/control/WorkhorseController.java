@@ -614,6 +614,10 @@ public class WorkhorseController {
         return executionPersistence.getLog(jobId, executionId);
     }
 
+    public void appendExecutionLog(Long jobId, Long executionId, String log) {
+        executionPersistence.log(jobId, executionId, log);
+    }
+
     public List<Execution> getExecutions(Long jobId) {
         return executionPersistence.getByJobId(jobId, 100L);
     }
