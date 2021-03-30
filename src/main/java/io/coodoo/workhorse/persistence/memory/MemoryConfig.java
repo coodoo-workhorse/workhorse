@@ -1,6 +1,7 @@
 package io.coodoo.workhorse.persistence.memory;
 
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
+import io.coodoo.workhorse.util.WorkhorseUtil;
 
 /**
  * A class to access the {@link WorkhorseConfig} configurations defined by the Memory Persistence.
@@ -10,7 +11,6 @@ import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 public class MemoryConfig extends WorkhorseConfig {
 
     public static final String NAME = "MEMORY";
-    public static final String VERSION = "2.0.0-RC2-SNAPSHOT";
 
     @Override
     public String getPersistenceName() {
@@ -19,6 +19,6 @@ public class MemoryConfig extends WorkhorseConfig {
 
     @Override
     public String getPersistenceVersion() {
-        return VERSION;
+        return WorkhorseUtil.getVersion();
     }
 }

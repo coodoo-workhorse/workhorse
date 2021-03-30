@@ -89,10 +89,26 @@ public class WorkhorseService {
      */
     public void init(WorkhorseConfig workhorseConfig) {
 
+        String version = WorkhorseUtil.getVersion();
+
+        log.info("hyyyyyyhdmNmhs++/+//+/+/+//+/+//+/oNm-                ");
+        log.info("dhyhdmNNdyo++//+/+////+/+//+/+//+/+omN/:/+++/-`       ");
+        log.info("hmNNdyo+////+//++++++///++/+/+//+//+hMNhso+oydmh:     ");
+        log.info("/++++//////+oydmmmmmNdyo+//+/+//++yNd/`       .oNd-   ");
+        log.info("//+/++++++omNs:``  ``:yNms++++/++yMo`           .dN-  ");
+        log.info("//+/+//++yNy.          .yNy+/+//oNh`   `::.      :Ny  ");
+        log.info("+/+/+///oNy`            `hNo/+//oNs    sMMm.     .Nd` ");
+        log.info("+/+/+///yM+      +mNs`   /My/+//+mm.   .oo-      +Mo  ");
+        log.info("+/+/+/+/sMo      /mms`   oMs/++/+oNm:          `oNy`  ");
+        log.info("//+/+///+dN/            /Nd+/+//+/+hNh+-`  ``:omm+    ");
+        log.info("//+/+//+/+hNy-`      `-yNh++/+//+/+++sdmmmmmmdmN/     ");
+        log.info("//+/+//+//+ohmmhsooshmmho+/+/+//+//////++++++++dN+    Workhorse");
+        log.info("+/+/+//+/////++ssyyss++/+//+/+//+/+/++/+/+///++yNMo   " + version);
+        log.info("//+////////////////////////+/+////////////+ohmNdshMs` ");
+
         currentWorkhorseConfig = workhorseConfig;
         persistenceManager.initializePersistence(workhorseConfig);
         workhorseConfigController.initializeStaticConfig(workhorseConfig);
-
     }
 
     /**
