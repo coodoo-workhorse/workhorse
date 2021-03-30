@@ -263,7 +263,7 @@ public class WorkhorseService {
     }
 
     public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime plannedFor, LocalDateTime expiresAt, Long batchId,
-                    Long chainId, Long chainedPreviousExecutionId, boolean uniqueQueued) {
+                    Long chainId, boolean uniqueQueued) {
         return workhorseController.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, uniqueQueued);
     }
 
