@@ -1,29 +1,35 @@
 package io.coodoo.workhorse.util;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import io.coodoo.workhorse.core.control.StaticConfig;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class WorkhorseUtil {
 
     private static Logger logger = LoggerFactory.getLogger(WorkhorseUtil.class);
 
     private static ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
+    private static String version = null;
 
     private WorkhorseUtil() {}
 
@@ -152,6 +158,35 @@ public class WorkhorseUtil {
             // at least put the exception name here
             messages.add(throwable.toString());
         }
+    }
+
+    /**
+     * Gets the current version from pom.xml via src/main/resources/version.txt
+     * 
+     * If it is a SNAPSHOT version, a timestamp gets appended.
+     */
+    public static String getVersion() {
+        if (version == null) {
+            try {
+                InputStream inputStream = WorkhorseUtil.class.getClassLoader().getResourceAsStream("version.txt");
+                InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+                BufferedReader reader = new BufferedReader(streamReader);
+                version = reader.readLine();
+                if (version == null) {
+                    version = "Unknown";
+                } else {
+                    if (version.endsWith("SNAPSHOT")) {
+                        String timestamp = reader.readLine();
+                        if (timestamp != null) {
+                            version += " (" + timestamp + ")";
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                version = "Unknown (" + e.getMessage() + ")";
+            }
+        }
+        return version;
     }
 
     /**

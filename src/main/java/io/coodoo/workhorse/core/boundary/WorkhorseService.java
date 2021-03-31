@@ -90,10 +90,26 @@ public class WorkhorseService {
      */
     public void init(WorkhorseConfig workhorseConfig) {
 
+        String version = WorkhorseUtil.getVersion();
+
+        log.info("hyyyyyyhdmNmhs++/+//+/+/+//+/+//+/oNm-                ");
+        log.info("dhyhdmNNdyo++//+/+////+/+//+/+//+/+omN/:/+++/-`       ");
+        log.info("hmNNdyo+////+//++++++///++/+/+//+//+hMNhso+oydmh:     ");
+        log.info("/++++//////+oydmmmmmNdyo+//+/+//++yNd/`       .oNd-   ");
+        log.info("//+/++++++omNs:``  ``:yNms++++/++yMo`           .dN-  ");
+        log.info("//+/+//++yNy.          .yNy+/+//oNh`   `::.      :Ny  ");
+        log.info("+/+/+///oNy`            `hNo/+//oNs    sMMm.     .Nd` ");
+        log.info("+/+/+///yM+      +mNs`   /My/+//+mm.   .oo-      +Mo  ");
+        log.info("+/+/+/+/sMo      /mms`   oMs/++/+oNm:          `oNy`  ");
+        log.info("//+/+///+dN/            /Nd+/+//+/+hNh+-`  ``:omm+    ");
+        log.info("//+/+//+/+hNy-`      `-yNh++/+//+/+++sdmmmmmmdmN/     ");
+        log.info("//+/+//+//+ohmmhsooshmmho+/+/+//+//////++++++++dN+    Workhorse");
+        log.info("+/+/+//+/////++ssyyss++/+//+/+//+/+/++/+/+///++yNMo   " + version);
+        log.info("//+////////////////////////+/+////////////+ohmNdshMs` ");
+
         currentWorkhorseConfig = workhorseConfig;
         persistenceManager.initializePersistence(workhorseConfig);
         workhorseConfigController.initializeStaticConfig(workhorseConfig);
-
     }
 
     /**
@@ -264,7 +280,7 @@ public class WorkhorseService {
     }
 
     public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime plannedFor, LocalDateTime expiresAt, Long batchId,
-                    Long chainId, Long chainedPreviousExecutionId, boolean uniqueQueued) {
+                    Long chainId, boolean uniqueQueued) {
         return workhorseController.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, uniqueQueued);
     }
 
@@ -300,6 +316,35 @@ public class WorkhorseService {
         log.info("Execution removed: {}", execution);
 
         workhorseController.deleteExecution(jobId, executionId);
+    }
+
+    /**
+     * You can redo an {@link Execution} in status {@link ExecutionStatus#FINISHED}, {@link ExecutionStatus#FAILED} and {@link ExecutionStatus#ABORTED}, but all
+     * meta data like timestamps and logs of this execution will be gone!
+     * 
+     * @param executionId ID of the {@link Execution} you wish to redo
+     * @return cleared out {@link Execution} in status {@link ExecutionStatus#QUEUED}
+     */
+    public Execution redoJobExecution(Long jobId, Long executionId) {
+
+        Execution execution = getExecutionById(jobId, executionId);
+        if (ExecutionStatus.QUEUED == execution.getStatus() || ExecutionStatus.RUNNING == execution.getStatus()) {
+            log.warn("Can't redo Execution in status {}: {}", execution.getStatus(), execution);
+            return execution;
+        }
+
+        log.info("Redo {} {}", execution.getStatus(), execution);
+
+        execution.setPlannedFor(WorkhorseUtil.timestamp());
+        execution.setStatus(ExecutionStatus.QUEUED);
+        execution.setStartedAt(null);
+        execution.setEndedAt(null);
+        execution.setDuration(null);
+        execution.setFailRetry(0);
+        execution.setFailRetryExecutionId(null);
+
+        workhorseController.appendExecutionLog(jobId, executionId, "The execution will be retried.");
+        return workhorseController.updateExecution(execution);
     }
 
     /**
