@@ -113,7 +113,7 @@ public class JobScheduler {
      * Start an execution after timeout
      */
     public void triggerScheduledExecutionCreation(Job job) {
-        log.trace("Timeout with Job: {} ", job);
+        log.info("Timeout with Job: {} ", job.getName());
         try {
             workhorseController.triggerScheduledExecutionCreation(job);
         } catch (Exception exception) {
