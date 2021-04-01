@@ -344,22 +344,20 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     public JobExecutionCount getJobExecutionCount(Long jobId, LocalDateTime from, LocalDateTime to) {
 
         Collection<Job> jobs = new ArrayList<>();
-        if (jobId != null) {
-            jobs.add(memoryPersistence.getJobs().get(jobId));
-        } else {
+
+        if (jobId == null) {
             jobs = memoryPersistence.getJobs().values();
+        } else {
+
+            jobs.add(memoryPersistence.getJobs().get(jobId));
         }
 
-        int countRunning = 0;
-        int countFinished = 0;
-        int countFailed = 0;
-        int countAbort = 0;
-        int countPlanned = 0;
-        int countQueued = 0;
-
-        if (from == null || to == null) {
-            return null;
-        }
+        Long countPlanned = 0L;
+        Long countRunning = 0L;
+        Long countFinished = 0L;
+        Long countFailed = 0L;
+        Long countAbort = 0L;
+        Long countQueued = 0L;
 
         ListingParameters listingParameters = new ListingParameters(0);
 
@@ -371,25 +369,25 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
         for (Job job : jobs) {
 
             listingParameters.addFilterAttributes("status", ExecutionStatus.PLANNED);
-            countPlanned = countPlanned + getExecutionListing(job.getId(), listingParameters).getResults().size();
+            countPlanned = countPlanned + getExecutionListing(job.getId(), listingParameters).getMetadata().getCount();
 
             listingParameters.addFilterAttributes("status", ExecutionStatus.QUEUED);
-            countQueued = countQueued + getExecutionListing(job.getId(), listingParameters).getResults().size();
+            countQueued = countQueued + getExecutionListing(job.getId(), listingParameters).getMetadata().getCount();
 
             listingParameters.addFilterAttributes("status", ExecutionStatus.RUNNING);
-            countRunning = countRunning + getExecutionListing(job.getId(), listingParameters).getResults().size();
+            countRunning = countRunning + getExecutionListing(job.getId(), listingParameters).getMetadata().getCount();
 
             listingParameters.addFilterAttributes("status", ExecutionStatus.FINISHED);
-            countFinished = countFinished + getExecutionListing(job.getId(), listingParameters).getResults().size();
+            countFinished = countFinished + getExecutionListing(job.getId(), listingParameters).getMetadata().getCount();
 
             listingParameters.addFilterAttributes("status", ExecutionStatus.FAILED);
-            countFailed = countFailed + getExecutionListing(job.getId(), listingParameters).getResults().size();
+            countFailed = countFailed + getExecutionListing(job.getId(), listingParameters).getMetadata().getCount();
 
             listingParameters.addFilterAttributes("status", ExecutionStatus.ABORTED);
-            countAbort = countAbort + getExecutionListing(job.getId(), listingParameters).getResults().size();
+            countAbort = countAbort + getExecutionListing(job.getId(), listingParameters).getMetadata().getCount();
         }
 
-        int total = countRunning + countFinished + countFailed + countAbort + countPlanned + countQueued;
+        Long total = countRunning + countFinished + countFailed + countAbort + countPlanned + countQueued;
 
         return new JobExecutionCount(jobId, from, to, total, countPlanned, countQueued, countRunning, countFinished, countFailed, countAbort);
     }
