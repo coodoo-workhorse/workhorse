@@ -193,6 +193,9 @@ public class WorkhorseService {
      * @return list of execution
      */
     public ListingResult<Execution> getExecutionListing(Long jobId, ListingParameters listingParameters) {
+        if (listingParameters.getSortAttribute() == null || listingParameters.getSortAttribute().isEmpty()) {
+            listingParameters.setSortAttribute("-createdAt");
+        }
         return workhorseController.getExecutionListing(jobId, listingParameters);
     }
 
