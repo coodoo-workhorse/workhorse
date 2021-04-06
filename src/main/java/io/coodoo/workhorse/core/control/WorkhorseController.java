@@ -32,6 +32,7 @@ import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
+import io.coodoo.workhorse.core.entity.JobExecutionCount;
 import io.coodoo.workhorse.core.entity.JobExecutionStatusSummary;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
@@ -718,6 +719,18 @@ public class WorkhorseController {
      */
     public List<JobExecutionStatusSummary> getJobExecutionStatusSummaries(ExecutionStatus status, LocalDateTime since) {
         return executionPersistence.getJobExecutionStatusSummaries(status, since);
+    }
+
+    /**
+     * Retrieves the counts of {@link Execution} by status for a specific job or for all jobs between a time interval
+     * 
+     * @param jobId ID of the corresponding job
+     * @param from only executions that were created after this timestamp are considered
+     * @param to only executions that were created before this timestamp are considered
+     * @return {@link JobExecutionCount}
+     */
+    public JobExecutionCount getJobExecutionCount(Long jobId, LocalDateTime from, LocalDateTime to) {
+        return executionPersistence.getJobExecutionCount(jobId, from, to);
     }
 
     /**

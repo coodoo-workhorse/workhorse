@@ -23,6 +23,7 @@ import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
+import io.coodoo.workhorse.core.entity.JobExecutionCount;
 import io.coodoo.workhorse.core.entity.JobExecutionStatusSummary;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
@@ -337,6 +338,58 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
 
         }
         return result;
+    }
+
+    @Override
+    public JobExecutionCount getJobExecutionCount(Long jobId, LocalDateTime from, LocalDateTime to) {
+
+        Collection<Job> jobs = new ArrayList<>();
+
+        if (jobId == null) {
+            jobs = memoryPersistence.getJobs().values();
+        } else {
+
+            jobs.add(memoryPersistence.getJobs().get(jobId));
+        }
+
+        Long countPlanned = 0L;
+        Long countRunning = 0L;
+        Long countFinished = 0L;
+        Long countFailed = 0L;
+        Long countAbort = 0L;
+        Long countQueued = 0L;
+
+        ListingParameters listingParameters = new ListingParameters(0);
+
+        long fromMillis = from.atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toInstant().toEpochMilli();
+        long toMillis = to.atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toInstant().toEpochMilli();
+
+        listingParameters.addFilterAttributes("createdAt", fromMillis + CollectionListing.OPERATOR_TO + toMillis);
+
+        for (Job job : jobs) {
+
+            listingParameters.addFilterAttributes("status", ExecutionStatus.PLANNED);
+            countPlanned = countPlanned + getExecutionListing(job.getId(), listingParameters).getMetadata().getCount();
+
+            listingParameters.addFilterAttributes("status", ExecutionStatus.QUEUED);
+            countQueued = countQueued + getExecutionListing(job.getId(), listingParameters).getMetadata().getCount();
+
+            listingParameters.addFilterAttributes("status", ExecutionStatus.RUNNING);
+            countRunning = countRunning + getExecutionListing(job.getId(), listingParameters).getMetadata().getCount();
+
+            listingParameters.addFilterAttributes("status", ExecutionStatus.FINISHED);
+            countFinished = countFinished + getExecutionListing(job.getId(), listingParameters).getMetadata().getCount();
+
+            listingParameters.addFilterAttributes("status", ExecutionStatus.FAILED);
+            countFailed = countFailed + getExecutionListing(job.getId(), listingParameters).getMetadata().getCount();
+
+            listingParameters.addFilterAttributes("status", ExecutionStatus.ABORTED);
+            countAbort = countAbort + getExecutionListing(job.getId(), listingParameters).getMetadata().getCount();
+        }
+
+        Long total = countRunning + countFinished + countFailed + countAbort + countPlanned + countQueued;
+
+        return new JobExecutionCount(jobId, from, to, total, countPlanned, countQueued, countRunning, countFinished, countFailed, countAbort);
     }
 
 }
