@@ -3,6 +3,7 @@ package io.coodoo.workhorse.core.control;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -12,6 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
+import javax.enterprise.event.NotificationOptions;
 import javax.enterprise.event.Observes;
 import javax.enterprise.event.ObservesAsync;
 import javax.inject.Inject;
@@ -71,6 +73,8 @@ public class Workhorse {
 
     protected ScheduledExecutorService scheduledExecutorService;
 
+    protected ExecutorService jobThreadExecutorService;
+
     /**
      * Stores the poll scheduler object. There is always one instance of this scheduler if the engine is active.
      */
@@ -79,6 +83,7 @@ public class Workhorse {
     @PostConstruct
     public void init() {
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        jobThreadExecutorService = Executors.newCachedThreadPool();
     }
 
     /**
@@ -268,8 +273,7 @@ public class Workhorse {
             return;
         }
 
-        CompletionStage<Job> completion = jobThreadManager.fireAsync(job);
-
+        CompletionStage<Job> completion = jobThreadManager.fireAsync(job, NotificationOptions.ofExecutor(jobThreadExecutorService));
         // Increment the number of created JobThread for the Job with the Id jobId
         executionBuffer.addRunningJobThreadCounts(jobId);
 
