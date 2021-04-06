@@ -179,6 +179,19 @@ public class WorkhorseService {
     }
 
     /**
+     * Update the configuration of the job engine
+     */
+    public void updateWorkhorseConfig(String timeZone, int bufferMax, int bufferMin, int bufferPollInterval, int bufferPushFallbackPollIntervall,
+                    long minutesUnitlCleanup, int executionTimeout, ExecutionStatus executionTimeoutStatus, String logChange, String logTimeFormat,
+                    String logInfoMarker, String logWarnMarker, String logErrorMarker) {
+
+        WorkhorseConfig config = new MemoryConfig(timeZone, bufferMax, bufferMin, bufferPollInterval, bufferPushFallbackPollIntervall, minutesUnitlCleanup,
+                        executionTimeout, executionTimeoutStatus, logChange, logTimeFormat, logInfoMarker, logWarnMarker, logErrorMarker);
+
+        workhorseConfigController.updateWorkhorseConfig(config);
+    }
+
+    /**
      * Retrieves all jobs
      * 
      * @return List of all Job
