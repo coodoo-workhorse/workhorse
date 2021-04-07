@@ -382,7 +382,7 @@ public class CollectionListing {
                         Object object = field.get(instance);
                         LocalDateTime value = (LocalDateTime) object;
                         if (value != null) {
-                            long valueMillis = value.atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toInstant().toEpochMilli();
+                            long valueMillis = WorkhorseUtil.toEpochMilli(value);
                             if (validDate(filter)) {
                                 Long ltMillis = parseDateTimeToMillis(filter, false);
                                 Long gtMillis = parseDateTimeToMillis(filter, true);
@@ -798,25 +798,25 @@ public class CollectionListing {
                             LocalDateTime date = LocalDateTime.of(year, month, day, 0, 0, 0).withNano(0);
                             if (end) {
 
-                                return date.plusDays(1).minus(1l, ChronoUnit.MILLIS).atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toInstant().toEpochMilli();
+                                return WorkhorseUtil.toEpochMilli(date.plusDays(1).minus(1l, ChronoUnit.MILLIS));
                             }
-                            return date.atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toInstant().toEpochMilli();
+                            return WorkhorseUtil.toEpochMilli(date);
                         }
                         // MM.YYYY
                         if (matcher.group(2) != null) {
                             Integer month = Integer.valueOf(matcher.group(2));
                             LocalDateTime date = LocalDateTime.of(year, month, 1, 0, 0, 0).withNano(0);
                             if (end) {
-                                return date.plusMonths(1).minus(1l, ChronoUnit.MILLIS).atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toInstant().toEpochMilli();
+                                return WorkhorseUtil.toEpochMilli(date.plusMonths(1).minus(1l, ChronoUnit.MILLIS));
                             }
-                            return date.atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toInstant().toEpochMilli();
+                            return WorkhorseUtil.toEpochMilli(date);
                         }
                         // YYYY
                         LocalDateTime date = LocalDateTime.of(year, 1, 1, 0, 0, 0).withNano(0);
                         if (end) {
-                            return date.plusYears(1).minus(1l, ChronoUnit.MILLIS).atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toInstant().toEpochMilli();
+                            return WorkhorseUtil.toEpochMilli(date.plusYears(1).minus(1l, ChronoUnit.MILLIS));
                         }
-                        return date.atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toInstant().toEpochMilli();
+                        return WorkhorseUtil.toEpochMilli(date);
                     } catch (NumberFormatException | DateTimeException e) {
                         return null;
                     }

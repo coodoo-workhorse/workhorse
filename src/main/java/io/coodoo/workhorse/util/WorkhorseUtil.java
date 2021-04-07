@@ -93,6 +93,19 @@ public class WorkhorseUtil {
     }
 
     /**
+     * Converts a {@link LocalDateTime} object to the number of milliseconds from the epoch of 1970-01-01T00:00:00Z.
+     * 
+     * @param localDateTime object to convert
+     * @return the number of milliseconds since the epoch of 1970-01-01T00:00:00Z
+     */
+    public static Long toEpochMilli(LocalDateTime localDateTime) {
+        if (localDateTime == null) {
+            return null;
+        }
+        return localDateTime.atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toInstant().toEpochMilli();
+    }
+
+    /**
      * Parses the stack trace of an exception into as String
      * 
      * @param throwable Exception

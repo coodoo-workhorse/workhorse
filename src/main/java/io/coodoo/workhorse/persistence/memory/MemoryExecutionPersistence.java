@@ -217,7 +217,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     @Override
     public int deleteOlderExecutions(Long jobId, LocalDateTime preDate) {
 
-        long millis = preDate.atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toInstant().toEpochMilli();
+        long millis = WorkhorseUtil.toEpochMilli(preDate);
 
         ListingParameters listingParameters = new ListingParameters(0);
         listingParameters.addFilterAttributes("createdAt", CollectionListing.OPERATOR_LT + millis);
@@ -249,7 +249,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     public List<Execution> findTimeoutExecutions(LocalDateTime time) {
 
         List<Execution> executions = new ArrayList<>();
-        long millis = time.atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toInstant().toEpochMilli();
+        long millis = WorkhorseUtil.toEpochMilli(time);
 
         for (Long jobId : memoryPersistence.getJobDataMap().keySet()) {
 
@@ -326,7 +326,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
             listingParameters.addFilterAttributes("status", status);
 
             if (since != null) {
-                long millis = since.atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toInstant().toEpochMilli();
+                long millis = WorkhorseUtil.toEpochMilli(since);
                 listingParameters.addFilterAttributes("createdAt", CollectionListing.OPERATOR_GT + millis);
             }
 
@@ -346,23 +346,22 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
         Collection<Job> jobs = new ArrayList<>();
 
         if (jobId == null) {
-            jobs = memoryPersistence.getJobs().values();
+            jobs.addAll(memoryPersistence.getJobs().values());
         } else {
-
             jobs.add(memoryPersistence.getJobs().get(jobId));
         }
 
-        Long countPlanned = 0L;
-        Long countRunning = 0L;
-        Long countFinished = 0L;
-        Long countFailed = 0L;
-        Long countAbort = 0L;
-        Long countQueued = 0L;
+        long countPlanned = 0L;
+        long countRunning = 0L;
+        long countFinished = 0L;
+        long countFailed = 0L;
+        long countAbort = 0L;
+        long countQueued = 0L;
 
         ListingParameters listingParameters = new ListingParameters(0);
 
-        long fromMillis = from.atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toInstant().toEpochMilli();
-        long toMillis = to.atZone(ZoneId.of(StaticConfig.TIME_ZONE)).toInstant().toEpochMilli();
+        long fromMillis = WorkhorseUtil.toEpochMilli(from);
+        long toMillis = WorkhorseUtil.toEpochMilli(to);
 
         listingParameters.addFilterAttributes("createdAt", fromMillis + CollectionListing.OPERATOR_TO + toMillis);
 
@@ -387,9 +386,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
             countAbort = countAbort + getExecutionListing(job.getId(), listingParameters).getMetadata().getCount();
         }
 
-        Long total = countRunning + countFinished + countFailed + countAbort + countPlanned + countQueued;
-
-        return new JobExecutionCount(jobId, from, to, total, countPlanned, countQueued, countRunning, countFinished, countFailed, countAbort);
+        return new JobExecutionCount(jobId, from, to, countPlanned, countQueued, countRunning, countFinished, countFailed, countAbort);
     }
 
 }

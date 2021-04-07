@@ -21,18 +21,19 @@ public class JobExecutionCount {
 
     public JobExecutionCount() {}
 
-    public JobExecutionCount(Long jobId, LocalDateTime from, LocalDateTime to, long total, long planned, long queued, long running, long finished, long failed,
+    public JobExecutionCount(Long jobId, LocalDateTime from, LocalDateTime to, long planned, long queued, long running, long finished, long failed,
                     long aborted) {
         this.jobId = jobId;
         this.from = from;
         this.to = to;
-        this.total = total;
         this.planned = planned;
         this.queued = queued;
         this.running = running;
         this.finished = finished;
         this.failed = failed;
         this.aborted = aborted;
+
+        this.total = planned + queued + running + finished + failed + aborted;
     }
 
     public Long getJobId() {

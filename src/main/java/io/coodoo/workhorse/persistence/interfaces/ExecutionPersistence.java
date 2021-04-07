@@ -165,7 +165,7 @@ public interface ExecutionPersistence {
     /**
      * Retrieves the counts of {@link Execution} by status for a specific job or for all jobs between a time interval
      * 
-     * @param jobId ID of the corresponding job
+     * @param jobId optional ID of the corresponding job. If <code>null</code>, the count is executed for all jobs.
      * @param from only executions that were created after this timestamp are considered
      * @param to only executions that were created before this timestamp are considered
      * @return {@link JobExecutionCount}

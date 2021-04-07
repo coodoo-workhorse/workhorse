@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 import org.junit.Test;
@@ -167,6 +168,26 @@ public class WorkhorseUtilTest {
         LocalDateTime result = WorkhorseUtil.delayToMaturity(4L, null);
 
         assertNull(result);
+    }
+
+    @Test
+    public void testToEpochMilli_parameters_null() throws Exception {
+        StaticConfig.TIME_ZONE = "UTC";
+        Long result = WorkhorseUtil.toEpochMilli(null);
+
+        assertNull(result);
+    }
+
+    @Test
+    public void testToEpochMilli_parameters() throws Exception {
+        StaticConfig.TIME_ZONE = "UTC";
+
+        LocalDateTime time = LocalDateTime.parse("07.04.2021  11:00:00", DateTimeFormatter.ofPattern("dd.MM.yyyy  HH:mm:ss"));
+
+        Long result = WorkhorseUtil.toEpochMilli(time);
+
+        assertNotNull(result);
+        assertEquals(Long.valueOf(1617793200000L), result);
     }
 
 }
