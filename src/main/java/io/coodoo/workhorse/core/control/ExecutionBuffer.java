@@ -269,6 +269,10 @@ public class ExecutionBuffer {
         jobStartTimes.remove(jobId);
     }
 
+    public Map<Long, Set<JobThread>> getJobThreads() {
+        return jobThreads;
+    }
+
     public Set<JobThread> getJobThreads(Long jobId) {
         log.trace("Number of Threads: {} ", jobThreads.get(jobId).size());
         return jobThreads.get(jobId);

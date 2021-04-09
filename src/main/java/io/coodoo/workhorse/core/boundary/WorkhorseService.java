@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -13,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import io.coodoo.workhorse.core.control.ExecutionBuffer;
 import io.coodoo.workhorse.core.control.JobScheduler;
+import io.coodoo.workhorse.core.control.JobThread;
 import io.coodoo.workhorse.core.control.Workhorse;
 import io.coodoo.workhorse.core.control.WorkhorseConfigController;
 import io.coodoo.workhorse.core.control.WorkhorseController;
@@ -547,6 +550,15 @@ public class WorkhorseService {
         }
 
         return workhorseController.getJobExecutionCount(jobId, from, to);
+    }
+
+    /**
+     * Retrieves the map between a job and their corresponding {@link JobThread} object
+     * 
+     * @return the map
+     */
+    public Map<Long, Set<JobThread>> getJobThreads() {
+        return executionBuffer.getJobThreads();
     }
 
 }
