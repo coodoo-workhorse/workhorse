@@ -146,7 +146,7 @@ public class WorkhorseController {
         }
     }
 
-    private Job createJob(Class<?> workerClass) {
+    protected Job createJob(Class<?> workerClass) {
         Job job = new Job();
 
         if (workerClass.isAnnotationPresent(InitialJobConfig.class)) {
@@ -222,7 +222,7 @@ public class WorkhorseController {
         Job persistedJob = jobPersistence.persist(job);
 
         if (persistedJob == null || persistedJob.getId() == null) {
-            String exceptionMessage = "The job " + job + " couldn't be persisited by the persisitence " + jobPersistence.getPersistenceName();
+            String exceptionMessage = "The job " + job.getName() + " couldn't be persisited by the persisitence " + jobPersistence.getPersistenceName();
             JobErrorEvent jobErrorMessage = new JobErrorEvent(new RuntimeException(exceptionMessage), exceptionMessage, null, null);
 
             jobErrorEvent.fireAsync(jobErrorMessage);

@@ -16,27 +16,89 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.enterprise.event.Event;
+import javax.enterprise.inject.spi.BeanManager;
 
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import io.coodoo.workhorse.core.boundary.Worker;
 import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
+import io.coodoo.workhorse.core.boundary.annotation.InitialJobConfig;
 import io.coodoo.workhorse.core.control.event.JobErrorEvent;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
+import io.coodoo.workhorse.core.entity.Job;
+import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
+import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WorkhorseControllerTest {
+
+    private final static String TEST_WORKER_WITH_INITIAL_JOB_CONFIG_NAME = "Test Worker with InitialJobConfig";
+    private final static int THREADS = 3;
+    private final static String SCHEDULE = "30 * * * * *";
+    private final static String NON_VALID_SCHEDULE = " ";
+    private final static String TAGS = "unit, test, java";
+    private final static int MAX_PER_MINUTE = 1000;
+
+    public class TestWorker extends Worker {
+        @Override
+        public void doWork() throws Exception {
+            return;
+        }
+    }
+
+    @InitialJobConfig(name = TEST_WORKER_WITH_INITIAL_JOB_CONFIG_NAME, threads = THREADS)
+    public class TestWorkerWithInitialConfig extends Worker {
+        @Override
+        public void doWork() throws Exception {
+            return;
+        }
+    }
+
+    @InitialJobConfig(schedule = SCHEDULE)
+    public class TestWorkerScheduler extends Worker {
+        @Override
+        public void doWork() throws Exception {
+            return;
+        }
+    }
+
+    @InitialJobConfig(schedule = NON_VALID_SCHEDULE)
+    public class TestWorkerNonValidScheduler extends Worker {
+        @Override
+        public void doWork() throws Exception {
+            return;
+        }
+    }
+
+    @InitialJobConfig(tags = TAGS)
+    public class TestWorkerWithTags extends Worker {
+        @Override
+        public void doWork() throws Exception {
+            return;
+        }
+    }
+
+    @InitialJobConfig(maxPerMinute = MAX_PER_MINUTE)
+    public class TestWorkerWithMaxPerMinute extends Worker {
+        @Override
+        public void doWork() throws Exception {
+            return;
+        }
+    }
 
     @Mock
     ExecutionPersistence executionPersistence;
@@ -45,7 +107,13 @@ public class WorkhorseControllerTest {
     WorkhorseLogService workhorseLogService;
 
     @Mock
+    JobPersistence jobPersistence;
+
+    @Mock
     Event<JobErrorEvent> jobErrorEvent;
+
+    @Mock
+    BeanManager beanManager;
 
     @InjectMocks
     WorkhorseController classUnderTest;
@@ -520,6 +588,166 @@ public class WorkhorseControllerTest {
         exceptionRule.expectMessage("The execution " + newexecution + " couldn't be persisited by the persisitence.");
 
         classUnderTest.createExecution(jobId, null, false, null, null, null, null, false);
+    }
+
+    @Test
+    public void testCreateJob() throws Exception {
+
+        Class<?> workerClass = TestWorker.class;
+
+        // Job with Id to bypass the trigger of exception
+        Job job = new Job();
+        job.setId(1L);
+        when(jobPersistence.persist(anyObject())).thenReturn(job);
+
+        classUnderTest.createJob(workerClass);
+
+        ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
+        verify(jobPersistence).persist(argument.capture());
+        assertEquals(workerClass.getSimpleName(), argument.getValue().getName());
+        assertEquals(workerClass.getName(), argument.getValue().getWorkerClassName());
+        assertEquals(InitialJobConfig.JOB_CONFIG_UNIQUE_IN_QUEUE, argument.getValue().isUniqueQueued());
+        assertEquals(JobStatus.ACTIVE, argument.getValue().getStatus());
+        assertEquals(InitialJobConfig.JOB_CONFIG_THREADS, argument.getValue().getThreads());
+        assertEquals(InitialJobConfig.JOB_CONFIG_MINUTES_UNTIL_CLEANUP, argument.getValue().getMinutesUntilCleanUp());
+        assertNull(argument.getValue().getSchedule());
+    }
+
+    @Test
+    public void testCreateJob_with_Exception() throws Exception {
+
+        Class<?> workerClass = TestWorker.class;
+        Job job = new Job();
+        job.setName(workerClass.getSimpleName());
+
+        String exceptionMessage = "The job " + job.getName() + " couldn't be persisited by the persisitence " + jobPersistence.getPersistenceName();
+
+        exceptionRule.expect(RuntimeException.class);
+        exceptionRule.expectMessage(exceptionMessage);
+
+        classUnderTest.createJob(workerClass);
+
+        ArgumentCaptor<JobErrorEvent> argument = ArgumentCaptor.forClass(JobErrorEvent.class);
+        verify(jobErrorEvent).fireAsync(argument.capture());
+        assertEquals(exceptionMessage, argument.getValue().getMessage());
+
+        ArgumentCaptor<JobErrorEvent> argument2 = ArgumentCaptor.forClass(JobErrorEvent.class);
+        verify(workhorseLogService).logException(argument2.capture());
+        assertEquals(exceptionMessage, argument2.getValue().getMessage());
+    }
+
+    @Test
+    public void testCreateJob_with_Exception2() throws Exception {
+
+        Class<?> workerClass = TestWorker.class;
+        Job job = new Job();
+        job.setName(workerClass.getSimpleName());
+
+        when(jobPersistence.persist(anyObject())).thenReturn(job);
+
+        String exceptionMessage = "The job " + job.getName() + " couldn't be persisited by the persisitence " + jobPersistence.getPersistenceName();
+
+        exceptionRule.expect(RuntimeException.class);
+        exceptionRule.expectMessage(exceptionMessage);
+
+        classUnderTest.createJob(workerClass);
+    }
+
+    @Test
+    public void testCreateJob_with_InitialJobConfig() throws Exception {
+
+        Class<?> workerClass = TestWorkerWithInitialConfig.class;
+
+        // Job with Id to bypass the trigger of exception
+        Job job = new Job();
+        job.setId(1L);
+        when(jobPersistence.persist(anyObject())).thenReturn(job);
+
+        classUnderTest.createJob(workerClass);
+
+        ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
+        verify(jobPersistence).persist(argument.capture());
+        assertEquals(TEST_WORKER_WITH_INITIAL_JOB_CONFIG_NAME, argument.getValue().getName());
+        assertEquals(THREADS, argument.getValue().getThreads());
+        assertEquals(workerClass.getName(), argument.getValue().getWorkerClassName());
+        assertEquals(InitialJobConfig.JOB_CONFIG_UNIQUE_IN_QUEUE, argument.getValue().isUniqueQueued());
+        assertEquals(JobStatus.ACTIVE, argument.getValue().getStatus());
+        assertEquals(InitialJobConfig.JOB_CONFIG_MINUTES_UNTIL_CLEANUP, argument.getValue().getMinutesUntilCleanUp());
+        assertNull(argument.getValue().getSchedule());
+    }
+
+    @Test
+    public void testCreateJob_with_schedule() throws Exception {
+
+        Class<?> workerClass = TestWorkerScheduler.class;
+
+        // Job with Id to bypass the trigger of exception
+        Job job = new Job();
+        job.setId(1L);
+        when(jobPersistence.persist(anyObject())).thenReturn(job);
+
+        classUnderTest.createJob(workerClass);
+
+        ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
+        verify(jobPersistence).persist(argument.capture());
+        assertEquals(SCHEDULE, argument.getValue().getSchedule());
+
+    }
+
+    @Test
+    public void testCreateJob_with_non_valid_schedule() throws Exception {
+
+        Class<?> workerClass = TestWorkerNonValidScheduler.class;
+
+        String exceptionMessage = "The job with worker's name " + workerClass.getName() + " could not be created due to invalid schedule: " + NON_VALID_SCHEDULE
+                        + "\n" + anyString();
+        exceptionRule.expect(RuntimeException.class);
+        exceptionRule.expectMessage(exceptionMessage);
+
+        classUnderTest.createJob(workerClass);
+
+    }
+
+    @Test
+    public void testCreateJob_with_tags() throws Exception {
+
+        Class<?> workerClass = TestWorkerWithTags.class;
+
+        // Job with Id to bypass the trigger of exception
+        Job job = new Job();
+        job.setId(1L);
+        when(jobPersistence.persist(anyObject())).thenReturn(job);
+
+        classUnderTest.createJob(workerClass);
+
+        List<String> tagsList = new ArrayList<>(Arrays.asList(TAGS.split(",")));
+
+        ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
+        verify(jobPersistence).persist(argument.capture());
+
+        assertEquals(tagsList.size(), argument.getValue().getTags().size());
+        assertEquals(tagsList.get(0), argument.getValue().getTags().get(0));
+        assertEquals(tagsList.get(1), argument.getValue().getTags().get(1));
+        assertEquals(tagsList.get(2), argument.getValue().getTags().get(2));
+
+    }
+
+    @Test
+    public void testCreateJob_with_MaxPerminute() throws Exception {
+
+        Class<?> workerClass = TestWorkerWithMaxPerMinute.class;
+
+        Job job = new Job();
+        job.setId(1L);
+        when(jobPersistence.persist(anyObject())).thenReturn(job);
+
+        classUnderTest.createJob(workerClass);
+
+        ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
+        verify(jobPersistence).persist(argument.capture());
+
+        assertEquals(MAX_PER_MINUTE, argument.getValue().getMaxPerMinute().intValue());
+
     }
 
 }
