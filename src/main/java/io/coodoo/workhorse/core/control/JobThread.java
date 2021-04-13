@@ -55,6 +55,7 @@ public class JobThread {
     @Inject
     Event<AllExecutionsDoneEvent> allExecutionsDoneEvent;
 
+    private Job job;
     private boolean stopMe;
     private Execution runningExecution;
     private Thread thread;
@@ -84,6 +85,7 @@ public class JobThread {
         thread = Thread.currentThread();
         log.trace("start of the Thread: {}", thread);
 
+        this.job = job;
         Long jobId = job.getId();
 
         executionBuffer.addJobThreads(jobId, this);
@@ -242,13 +244,29 @@ public class JobThread {
         this.stopMe = true;
     }
 
-    public Execution getActiveExecution() {
+    public Job getJob() {
+        return job;
+    }
+
+    public boolean isStopMe() {
+        return stopMe;
+    }
+
+    public Execution getRunningExecution() {
         return runningExecution;
+    }
+
+    public Thread getThread() {
+        return thread;
+    }
+
+    public Long getChainId() {
+        return chainId;
     }
 
     @Override
     public String toString() {
-        return "JobThread [runningExecution=" + runningExecution + ", stopMe=" + stopMe + ", thread=" + thread + "]";
+        return "JobThread [chainId=" + chainId + ", runningExecution=" + runningExecution + ", stopMe=" + stopMe + ", thread=" + thread + "]";
     }
 
 }
