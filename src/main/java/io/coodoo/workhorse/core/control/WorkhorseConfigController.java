@@ -16,6 +16,8 @@ import io.coodoo.workhorse.persistence.interfaces.qualifier.ConfigQualifier;
 import io.coodoo.workhorse.persistence.memory.MemoryConfigBuilder;
 
 /**
+ * Class to acces to {@link WorkhorseConfigController}
+ * 
  * @author coodoo GmbH (coodoo.io)
  */
 @ApplicationScoped

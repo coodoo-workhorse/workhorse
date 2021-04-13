@@ -126,18 +126,20 @@ public class WorkhorseService {
     }
 
     /**
+     * <p>
      * Start Workhorse with the configuration of a persistence.
+     * </p>
      * 
-     * The configuration can be built by using the builder that extends {@link WorkhorseConfigBuilder} of the chosen persisitence.
-     * 
+     * The configuration can be built by using the builder that extends {@link WorkhorseConfigBuilder} of the chosen persistence.
+     * <p>
      * For example, if you want to use the default persistence {@link MemoryConfig} use the builder as follow:
-     * 
+     * <p>
      * <code>start(new MemoryConfigBuilder().build())</code>
      * 
      * @param workhorseConfig Configuration of the chosen persistence (this can only be done once and is final).
      */
     public void start(WorkhorseConfig workhorseConfig) {
-        // Check if the persistence is already initialized. If so the engine is already living but paused und should now start again.
+        // Check if the persistence is already initialized. If so the engine is already living but paused and should now start again.
         if (!persistenceManager.isInitialized()) {
             currentWorkhorseConfig = workhorseConfig;
             persistenceManager.initializePersistence(workhorseConfig);
