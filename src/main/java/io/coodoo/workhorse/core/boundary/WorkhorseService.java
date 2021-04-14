@@ -104,7 +104,7 @@ public class WorkhorseService {
         log.info("//+/+///+dN/            /Nd+/+//+/+hNh+-`  ``:omm+    ");
         log.info("//+/+//+/+hNy-`      `-yNh++/+//+/+++sdmmmmmmdmN/     ");
         log.info("//+/+//+//+ohmmhsooshmmho+/+/+//+//////++++++++dN+    Workhorse");
-        log.info("+/+/+//+/////++ssyyss++/+//+/+//+/+/++/+/+///++yNMo   " + version);
+        log.info("+/+/+//+/////++ssyyss++/+//+/+//+/+/++/+/+///++yNMo   " + version + " : message to test, if Arend's stuff works.");
         log.info("//+////////////////////////+/+////////////+ohmNdshMs` ");
 
         currentWorkhorseConfig = workhorseConfig;
