@@ -38,9 +38,6 @@ public class WorkhorseLogService {
     @LogQualifier
     LogPersistence logPersistence;
 
-    @Inject
-    WorkhorseLogService workhorseLogService;
-
     public WorkhorseLog getLog(Long id) {
         return logPersistence.get(id);
     }
@@ -56,6 +53,10 @@ public class WorkhorseLogService {
      * @return list of logs
      */
     public ListingResult<WorkhorseLog> getWorkhorseLogListing(ListingParameters listingParameters) {
+        if (listingParameters.getSortAttribute() == null || listingParameters.getSortAttribute().isEmpty()) {
+            listingParameters.setSortAttribute("-createdAt");
+        }
+
         return logPersistence.getWorkhorseLogListing(listingParameters);
     }
 

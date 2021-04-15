@@ -297,6 +297,10 @@ public class WorkhorseService {
     }
 
     public void deleteJob(Long jobId) {
+        Job job = getJobById(jobId);
+
+        jobScheduler.stop(job);
+        executionBuffer.clearMemoryQueue(job);
         workhorseController.deleteJob(jobId);
     }
 

@@ -36,15 +36,18 @@ public class ExecutionCleanupWorker extends Worker {
 
         List<Job> jobs = workhorseService.getAllJobs();
         logInfo(logger, "Starting old execution cleanup of " + jobs.size() + " jobs");
-        logInfo(logger, "Deleted | Minutes | Job ID | Job Name");
+        logInfo(logger, "Deleted | Duration in ms | Job ID | Job Name");
 
         boolean minOneJobCleanupFailed = false;
         Exception firstException = null;
         String failedJobInfo = "";
         for (Job job : jobs) {
             try {
+                long millisAtStart = System.currentTimeMillis();
                 int deleted = workhorseController.deleteOlderExecutions(job.getId(), job.getMinutesUntilCleanUp());
-                logInfo(logger, String.format("%7d | %6d | %6d | %s", deleted, job.getMinutesUntilCleanUp(), job.getId(), job.getName()));
+                long duration = System.currentTimeMillis() - millisAtStart;
+
+                logInfo(logger, String.format("%7d | %13d | %6d | %s", deleted, duration, job.getId(), job.getName()));
                 deletedSum += deleted;
             } catch (Exception e) {
                 minOneJobCleanupFailed = true;
