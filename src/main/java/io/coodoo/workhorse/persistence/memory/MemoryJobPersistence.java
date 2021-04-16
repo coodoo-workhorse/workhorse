@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
+import io.coodoo.workhorse.core.entity.JobStatusCount;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
@@ -131,6 +132,31 @@ public class MemoryJobPersistence implements JobPersistence {
     @Override
     public Long countByStatus(JobStatus jobStatus) {
         return Long.valueOf(getAllByStatus(jobStatus).size());
+    }
+
+    @Override
+    public JobStatusCount getJobStatusCount() {
+
+        long countActive = 0L;
+        long countInactive = 0L;
+        long countError = 0L;
+        long countNoWorker = 0L;
+
+        ListingParameters listingParameters = new ListingParameters(0);
+
+        listingParameters.addFilterAttributes("status", JobStatus.ACTIVE);
+        countActive = countActive + getJobListing(listingParameters).getMetadata().getCount();
+
+        listingParameters.addFilterAttributes("status", JobStatus.INACTIVE);
+        countInactive = countInactive + getJobListing(listingParameters).getMetadata().getCount();
+
+        listingParameters.addFilterAttributes("status", JobStatus.NO_WORKER);
+        countNoWorker = countNoWorker + getJobListing(listingParameters).getMetadata().getCount();
+
+        listingParameters.addFilterAttributes("status", JobStatus.ERROR);
+        countError = countError + getJobListing(listingParameters).getMetadata().getCount();
+
+        return new JobStatusCount(countActive, countInactive, countNoWorker, countError);
     }
 
     @Override

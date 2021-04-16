@@ -35,6 +35,7 @@ import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobExecutionCount;
 import io.coodoo.workhorse.core.entity.JobExecutionStatusSummary;
 import io.coodoo.workhorse.core.entity.JobStatus;
+import io.coodoo.workhorse.core.entity.JobStatusCount;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
@@ -731,6 +732,15 @@ public class WorkhorseController {
      */
     public JobExecutionCount getJobExecutionCount(Long jobId, LocalDateTime from, LocalDateTime to) {
         return executionPersistence.getJobExecutionCount(jobId, from, to);
+    }
+
+    /**
+     * Get the count of jobs by status
+     * 
+     * @return JobStatusCount
+     */
+    public JobStatusCount getJobStatusCount() {
+        return jobPersistence.getJobStatusCount();
     }
 
     /**

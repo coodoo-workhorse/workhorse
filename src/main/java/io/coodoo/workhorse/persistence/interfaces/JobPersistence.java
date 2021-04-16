@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
+import io.coodoo.workhorse.core.entity.JobStatusCount;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 
@@ -62,6 +63,13 @@ public interface JobPersistence {
      * @return List of scheduled Job
      */
     List<Job> getAllScheduled();
+
+    /**
+     * Get the count of jobs by status
+     * 
+     * @return JobStatusCount
+     */
+    JobStatusCount getJobStatusCount();
 
     /**
      * Get the number of Job in storage

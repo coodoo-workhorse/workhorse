@@ -26,6 +26,7 @@ import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobExecutionCount;
 import io.coodoo.workhorse.core.entity.JobExecutionStatusSummary;
 import io.coodoo.workhorse.core.entity.JobStatus;
+import io.coodoo.workhorse.core.entity.JobStatusCount;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.entity.WorkhorseConfigBuilder;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
@@ -107,7 +108,7 @@ public class WorkhorseService {
         log.info("//+/+///+dN/            /Nd+/+//+/+hNh+-`  ``:omm+    ");
         log.info("//+/+//+/+hNy-`      `-yNh++/+//+/+++sdmmmmmmdmN/     ");
         log.info("//+/+//+//+ohmmhsooshmmho+/+/+//+//////++++++++dN+    Workhorse");
-        log.info("+/+/+//+/////++ssyyss++/+//+/+//+/+/++/+/+///++yNMo   " + version + " : message to test, if Arend's stuff works.");
+        log.info("+/+/+//+/////++ssyyss++/+//+/+//+/+/++/+/+///++yNMo   " + version);
         log.info("//+////////////////////////+/+////////////+ohmNdshMs` ");
 
         currentWorkhorseConfig = workhorseConfig;
@@ -226,6 +227,15 @@ public class WorkhorseService {
      */
     public ListingResult<Job> getJobListing(ListingParameters listingParameters) {
         return workhorseController.getJobListing(listingParameters);
+    }
+
+    /**
+     * Get the count of jobs by status
+     * 
+     * @return JobStatusCount
+     */
+    public JobStatusCount getJobStatusCount() {
+        return workhorseController.getJobStatusCount();
     }
 
     /**
