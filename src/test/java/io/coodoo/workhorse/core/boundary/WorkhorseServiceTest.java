@@ -1,6 +1,8 @@
 package io.coodoo.workhorse.core.boundary;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -21,6 +23,7 @@ import io.coodoo.workhorse.core.control.StaticConfig;
 import io.coodoo.workhorse.core.control.Workhorse;
 import io.coodoo.workhorse.core.control.WorkhorseConfigController;
 import io.coodoo.workhorse.core.control.WorkhorseController;
+import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobExecutionCount;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.PersistenceManager;
@@ -175,6 +178,35 @@ public class WorkhorseServiceTest {
         verify(executionBuffer).initialize();
         verify(workhorse).start();
         verify(jobScheduler).startScheduler();
+    }
+
+    @Test
+    public void testDeleteJob() throws Exception {
+
+        Long jobId = 1L;
+        Job job = new Job();
+        job.setId(jobId);
+
+        when(workhorseController.getJobById(jobId)).thenReturn(job);
+        classUnderTest.deleteJob(jobId);
+
+        verify(jobScheduler).stop(job);
+        verify(executionBuffer).clearMemoryQueue(job);
+        verify(workhorseController).deleteJob(jobId);
+    }
+
+    @Test
+    public void testDeleteJob_with_non_found_job() throws Exception {
+
+        Long jobId = 1L;
+        Job job = new Job();
+        job.setId(jobId);
+
+        classUnderTest.deleteJob(jobId);
+
+        verify(jobScheduler, times(0)).stop(anyObject());
+        verify(executionBuffer, times(0)).clearMemoryQueue(anyObject());
+        verify(workhorseController, times(0)).deleteJob(anyObject());
     }
 
 }

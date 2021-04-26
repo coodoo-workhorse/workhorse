@@ -306,12 +306,19 @@ public class WorkhorseService {
 
     }
 
+    /**
+     * Delete a job.
+     * 
+     * @param jobId ID of the job to delete
+     */
     public void deleteJob(Long jobId) {
         Job job = getJobById(jobId);
 
-        jobScheduler.stop(job);
-        executionBuffer.clearMemoryQueue(job);
-        workhorseController.deleteJob(jobId);
+        if (job != null) {
+            jobScheduler.stop(job);
+            executionBuffer.clearMemoryQueue(job);
+            workhorseController.deleteJob(jobId);
+        }
     }
 
     public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime plannedFor, LocalDateTime expiresAt, Long batchId,
