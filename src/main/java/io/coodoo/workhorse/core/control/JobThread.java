@@ -2,20 +2,16 @@ package io.coodoo.workhorse.core.control;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.enterprise.context.Dependent;
-import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.ObservesAsync;
-import javax.enterprise.inject.Any;
-import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Inject;
 
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +22,7 @@ import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.ExecutionQualifier;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
+import io.coodoo.workhorse.saas.WorkhorseRestClient;
 
 /**
  * Class that executes all executions of the a given job.
@@ -55,6 +52,10 @@ public class JobThread {
     @Inject
     Event<AllExecutionsDoneEvent> allExecutionsDoneEvent;
 
+    @Inject
+    @RestClient
+    WorkhorseRestClient workhorseRestClient;
+
     private Job job;
     private boolean stopMe;
     private Execution runningExecution;
@@ -63,21 +64,6 @@ public class JobThread {
     private Long chainId = null;
 
     private static final Logger log = LoggerFactory.getLogger(JobThread.class);
-
-    private BaseWorker getWorker(Job job) throws ClassNotFoundException {
-        Set<Bean<?>> beans = beanManager.getBeans(BaseWorker.class, new AnnotationLiteral<Any>() {});
-        for (Bean<?> bean : beans) {
-            Class<?> workerclass = bean.getBeanClass();
-            if (job.getWorkerClassName().equals(workerclass.getName())) {
-                CreationalContext<?> creationalContext = beanManager.createCreationalContext(bean);
-                return (BaseWorker) beanManager.getReference(bean, bean.getBeanClass(), creationalContext);
-            }
-
-        }
-
-        log.error("No worker class {} found for {} ({})", job.getWorkerClassName(), job.getName(), job.getId());
-        throw new ClassNotFoundException(job.getWorkerClassName());
-    }
 
     public Long execute(@ObservesAsync Job job) throws Exception {
 
@@ -90,7 +76,7 @@ public class JobThread {
 
         executionBuffer.addJobThreads(jobId, this);
 
-        final BaseWorker workerInstance = getWorker(job);
+        // final BaseWorker workerInstance = getWorker(job);
 
         while (true) {
             if (this.stopMe) {
@@ -122,7 +108,9 @@ public class JobThread {
                     workhorseController.setExecutionStatusToRunning(execution);
 
                     // mediterraneus
-                    workerInstance.doWork(execution);
+                    // workerInstance.doWork(execution);
+
+                    workhorseRestClient.doWork(job.getWorkerClassName(), job.getId(), execution.getId());
 
                     long duration = System.currentTimeMillis() - millisAtStart;
 
@@ -137,10 +125,10 @@ public class JobThread {
                     log.trace("Execution {}, duration: {} was successfull", execution.getId(), execution.getDuration());
                     executionBuffer.removeRunningExecution(jobId, execution.getId());
 
-                    workerInstance.onFinished(execution.getId());
+                    // workerInstance.onFinished(execution.getId());
 
                     if (executionPersistence.isBatchFinished(jobId, execution.getBatchId())) {
-                        workerInstance.onFinishedBatch(execution.getBatchId(), execution.getId());
+                        // workerInstance.onFinishedBatch(execution.getBatchId(), execution.getId());
                     }
 
                     // Handle chained execution
@@ -154,7 +142,7 @@ public class JobThread {
                             if (chainedExecutions.isEmpty()) {
                                 // chain is all done
                                 chainId = null;
-                                workerInstance.onFinishedChain(execution.getChainId(), execution.getId());
+                                // workerInstance.onFinishedChain(execution.getChainId(), execution.getId());
                                 break executionLoop;
                             }
                         }
@@ -172,7 +160,9 @@ public class JobThread {
                     long duration = System.currentTimeMillis() - millisAtStart;
 
                     // create a new Job Execution to retry this fail.
-                    execution = workhorseController.handleFailedExecution(job, execution.getId(), e, duration, workerInstance);
+                    // execution = workhorseController.handleFailedExecution(job, execution.getId(), e, duration, workerInstance);
+
+                    execution = workhorseController.handleFailedExecution(job, execution.getId(), e, duration, null);
 
                     if (execution == null) {
                         break executionLoop; // Do not retry

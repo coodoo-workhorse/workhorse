@@ -19,6 +19,7 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Inject;
 
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +43,7 @@ import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.ExecutionQualifier;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
+import io.coodoo.workhorse.saas.ClassMetadata;
 import io.coodoo.workhorse.util.CronExpression;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
@@ -71,6 +73,101 @@ public class WorkhorseController {
 
     @Inject
     Event<JobErrorEvent> jobErrorEvent;
+
+    // @Inject
+    // @RestClient
+    // WorkhorseRestClient workhorseRestClient;
+
+    /**
+     * Load all worker-Class of the classpath
+     */
+    public void loadWorkers(List<ClassMetadata> workerClasses) {
+
+        log.info("Initializing Workhorse Jobs...");
+
+        for (ClassMetadata workerclass : workerClasses) {
+
+            Job job = jobPersistence.getByWorkerClassName(workerclass.name);
+            if (job == null) {
+                try {
+                    job = createJob(workerclass);
+                    log.info("[{}] Job and Worker created and Configuration persisted ({})", job.getWorkerClassName(), job.getName());
+                } catch (RuntimeException runtimeException) {
+                    log.error(runtimeException.getMessage());
+                }
+            }
+        }
+
+        // check if persisted jobs can be mapped a with a worker class
+        for (Job job : jobPersistence.getAll()) {
+            String workerClassName = job.getWorkerClassName();
+            BaseWorker workerOfDbJob;
+
+            // try {
+            // workerOfDbJob = getWorker(workerClassName);
+            // } catch (Exception exception) {
+
+            // job.setStatus(JobStatus.ERROR);
+            // log.error("[{}] Worker class not found ({})", workerClassName, job.getName());
+            // jobErrorEvent.fire(new JobErrorEvent(exception, ErrorType.ERROR_BY_FOUND_JOB_WORKER.getMessage(), job.getId(), job.getStatus()));
+            // continue;
+            // }
+
+            boolean found = false;
+
+            for (ClassMetadata workerClass : workerClasses) {
+                if (job.getWorkerClassName().equals(workerClass.workerClassName)) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+
+                log.trace("JobStatus of Job {} updated from {} to {}", job, job.getStatus(), JobStatus.NO_WORKER);
+                job.setStatus(JobStatus.NO_WORKER);
+                jobPersistence.update(job);
+                log.error("No Worker Class found for Job: {}", job);
+                jobErrorEvent.fire(new JobErrorEvent(new Throwable(ErrorType.NO_JOB_WORKER_FOUND.getMessage()), ErrorType.NO_JOB_WORKER_FOUND.getMessage(),
+                                job.getId(), job.getStatus()));
+                continue;
+            }
+
+            // Class<?> workerClass = workerOfDbJob.getWorkerClass();
+            // if (!workerClasses.contains(workerClass)) {
+            // log.trace("JobStatus of Job {} updated from {} to {}", job, job.getStatus(), JobStatus.NO_WORKER);
+            // job.setStatus(JobStatus.NO_WORKER);
+            // jobPersistence.update(job);
+            // log.error("No Worker Class found for Job: {}", job);
+            // jobErrorEvent.fire(new JobErrorEvent(new Throwable(ErrorType.NO_JOB_WORKER_FOUND.getMessage()), ErrorType.NO_JOB_WORKER_FOUND.getMessage(),
+            // job.getId(), job.getStatus()));
+            // continue;
+            // }
+
+            // Maybe in an iteration before there was no worker and now the worker is available - set this job to inactive
+            if (job.getStatus().equals(JobStatus.NO_WORKER)) {
+                job.setStatus(JobStatus.INACTIVE);
+                jobPersistence.update(job);
+                log.info("JobStatus of Job {} updated from {} to {}", job, JobStatus.NO_WORKER, JobStatus.INACTIVE);
+                workhorseLogService.logChange(job.getId(), job.getStatus(), "Status", JobStatus.NO_WORKER, JobStatus.INACTIVE, "Worker class found.");
+
+            }
+
+            // Check if parameter class has changed
+            // String parametersClassName = getWorkerParameterName(workerOfDbJob);
+
+            // // The Objects-Class is null-safe and can handle Worker-classes without Parameters
+            // if (!Objects.equals(parametersClassName, job.getParametersClassName())) {
+            // log.info("Parameters class name of job worker {} changed from {} to {}", job.getWorkerClassName(), job.getParametersClassName(),
+            // parametersClassName);
+            // workhorseLogService.logChange(job.getId(), job.getStatus(), "Parameters class", job.getParametersClassName(), parametersClassName, null);
+
+            // job.setParametersClassName(parametersClassName);
+            // jobPersistence.update(job);
+            // }
+
+        }
+    }
 
     /**
      * Load all worker-Class of the classpath
@@ -145,6 +242,42 @@ public class WorkhorseController {
             }
 
         }
+    }
+
+    protected Job createJob(ClassMetadata workerClass) {
+
+        Job job = new Job();
+
+        job.setName(workerClass.name);
+        job.setWorkerClassName(workerClass.workerClassName);
+        job.setDescription(workerClass.description);
+        if (workerClass.status != null) {
+
+            job.setStatus(workerClass.status);
+        } else {
+            job.setStatus(JobStatus.ACTIVE);
+        }
+        job.setThreads(1);
+        job.setMaxPerMinute(workerClass.maxPerMinute);
+        job.setUniqueQueued(workerClass.uniqueQueued);
+
+        Job persistedJob = jobPersistence.persist(job);
+
+        if (persistedJob == null || persistedJob.getId() == null) {
+            String exceptionMessage = "The job " + job.getName() + " couldn't be persisited by the persisitence " + jobPersistence.getPersistenceName();
+            JobErrorEvent jobErrorMessage = new JobErrorEvent(new RuntimeException(exceptionMessage), exceptionMessage, null, null);
+
+            jobErrorEvent.fireAsync(jobErrorMessage);
+
+            workhorseLogService.logException(jobErrorMessage);
+
+            throw new RuntimeException(exceptionMessage);
+        }
+
+        log.trace("Created {}", persistedJob);
+
+        return job;
+
     }
 
     protected Job createJob(Class<?> workerClass) {
@@ -286,6 +419,10 @@ public class WorkhorseController {
     public Job getByWorkerClassName(String workerClassName) {
         return jobPersistence.getByWorkerClassName(workerClassName);
     }
+
+    // private BaseWorker getWorker(String workerClassName) {
+    // return workhorseRestClient.getWorker(workerClassName);
+    // }
 
     /**
      * retrieves the Worker of a Job.
@@ -464,14 +601,14 @@ public class WorkhorseController {
 
         executionPersistence.log(job.getId(), executionId, WorkhorseUtil.getMessagesFromException(exception), WorkhorseUtil.stacktraceToString(exception));
 
-        if (retryExecution == null) {
-            worker.onFailed(executionId);
-            if (failedExecution.getChainId() != null) {
-                worker.onFailedChain(failedExecution.getChainId(), executionId);
-            }
-        } else {
-            worker.onRetry(executionId, retryExecution.getId());
-        }
+        // if (retryExecution == null) {
+        // worker.onFailed(executionId);
+        // if (failedExecution.getChainId() != null) {
+        // worker.onFailedChain(failedExecution.getChainId(), executionId);
+        // }
+        // } else {
+        // worker.onRetry(executionId, retryExecution.getId());
+        // }
 
         executionPersistence.update(failedExecution);
 
@@ -655,6 +792,26 @@ public class WorkhorseController {
 
     public Execution updateExecutionStatus(Long jobId, Long executionId, ExecutionStatus executionStatus) {
         return executionPersistence.updateStatus(jobId, executionId, executionStatus, ExecutionFailStatus.NONE);
+    }
+
+    protected void exceptionTolarentUpdateExecutionStatus(Execution execution, ExecutionStatus status, ExecutionFailStatus failStatus) {
+
+        int count = 0;
+        int maxTries = 3;
+
+        while (true) {
+            try {
+                updateExecutionStatus(execution, status, failStatus);
+            } catch (Exception e) {
+
+                // Retry the update for maxTries times
+                updateExecutionStatus(execution, status, failStatus);
+                count = count + 1;
+                if (count == maxTries) {
+                    throw e;
+                }
+            }
+        }
     }
 
     /**

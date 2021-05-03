@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.coodoo</groupId>
 	<artifactId>workhorse</artifactId>
-	<version>2.0.0-RC2-SNAPSHOT</version>
+	<version>1.0.0-SAAS</version>
 	<packaging>jar</packaging>
 	<name>Workhorse</name>
 	<description>Java Job Engine for background jobs and business critical tasks</description>
@@ -17,9 +17,28 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<failOnMissingWebXml>false</failOnMissingWebXml>
-   		<timestamp>${maven.build.timestamp}</timestamp>
-   		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
+		<timestamp>${maven.build.timestamp}</timestamp>
+		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<!-- Quarkus properties-->
+		<compiler-plugin.version>3.8.1</compiler-plugin.version>
+		<quarkus-plugin.version>1.13.3.Final</quarkus-plugin.version>
+		<quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
+		<quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
+		<quarkus.platform.version>1.13.3.Final</quarkus.platform.version>
+		<surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
 	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>${quarkus.platform.group-id}</groupId>
+				<artifactId>${quarkus.platform.artifact-id}</artifactId>
+				<version>${quarkus.platform.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<developers>
 		<developer>
 			<name>Markus Kühle</name>
@@ -48,6 +67,35 @@
 		</license>
 	</licenses>
 	<dependencies>
+
+		<!-- Quarkus-->
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-rest-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-resteasy</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-arc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-rest-client-jackson</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-resteasy-jackson</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.coodoo</groupId>
+			<artifactId>coodoo-listing</artifactId>
+			<version>1.6.0</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.jboss.logging</groupId>
 			<artifactId>jboss-logging</artifactId>
@@ -148,13 +196,13 @@
 	<build>
 		<finalName>workhorse</finalName>
 		<resources>
-		   <resource>
-		      <directory>src/main/resources</directory>
-		      <filtering>true</filtering>
-		      <includes>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
 					<include>version.txt</include>
 				</includes>
-		   </resource>
+			</resource>
 		</resources>
 		<plugins>
 			<plugin>
@@ -242,13 +290,48 @@
 					</java>
 				</configuration>
 			</plugin>
+
+			<!-- Quarkus plugin-->
+
+			<plugin>
+				<groupId>io.quarkus</groupId>
+				<artifactId>quarkus-maven-plugin</artifactId>
+				<version>${quarkus-plugin.version}</version>
+				<extensions>true</extensions>
+				<executions>
+					<execution>
+						<goals>
+							<goal>build</goal>
+							<goal>generate-code</goal>
+							<goal>generate-code-tests</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${compiler-plugin.version}</version>
+				<configuration>
+					<parameters>${maven.compiler.parameters}</parameters>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${surefire-plugin.version}</version>
+				<configuration>
+					<systemPropertyVariables>
+						<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+						<maven.home>${maven.home}</maven.home>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<distributionManagement>
-<!-- 		<snapshotRepository> -->
-<!-- 			<id>ossrh</id> -->
-<!-- 			<url>https://oss.sonatype.org/content/repositories/snapshots</url> -->
-<!-- 		</snapshotRepository> -->
+		<!-- 		<snapshotRepository> -->
+		<!-- 			<id>ossrh</id> -->
+		<!-- 			<url>https://oss.sonatype.org/content/repositories/snapshots</url> -->
+		<!-- 		</snapshotRepository> -->
 		<snapshotRepository>
 			<id>gitlab-maven</id>
 			<url>https://gitlab.coodoo.io/api/v4/projects/${env.CI_PROJECT_ID}/packages/maven</url>
