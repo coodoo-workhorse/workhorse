@@ -22,6 +22,7 @@ import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.ExecutionQualifier;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.JobQualifier;
+import io.coodoo.workhorse.saas.DoWorkParameters;
 import io.coodoo.workhorse.saas.WorkhorseRestClient;
 
 /**
@@ -109,8 +110,8 @@ public class JobThread {
 
                     // mediterraneus
                     // workerInstance.doWork(execution);
-
-                    workhorseRestClient.doWork(job.getWorkerClassName(), job.getId(), execution.getId());
+                    DoWorkParameters params = new DoWorkParameters(job.getId(), execution.getId(), execution.getParameters());
+                    workhorseRestClient.doWork(job.getWorkerClassName(), params);
 
                     long duration = System.currentTimeMillis() - millisAtStart;
 

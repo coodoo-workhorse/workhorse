@@ -58,11 +58,11 @@ public class WorhorseAsSaasResource {
     @POST
     @Path("/start")
     public Response start(List<ClassMetadata> workerClasses) {
-        workhorseService.init();
 
         workhorseController.loadWorkers(workerClasses);
         executionBuffer.initialize();
         workhorse.start();
+
         // jobScheduler.startScheduler();
 
         log.info("Workhorse is running...");
@@ -80,6 +80,66 @@ public class WorhorseAsSaasResource {
             return null;
         }
         return workhorseService.createExecution(job.getId(), execution.getParameters(), execution.isPriority(), execution.getPlannedFor(),
-                        execution.getExpiresAt(), execution.getBatchId(), execution.getChainId(), false);
+                        execution.getExpiresAt(), execution.getBatchId(), execution.getChainId(), job.isUniqueQueued());
     }
+
+    @POST
+    @Path("//worker/{workerClassName}/batch-executions")
+    Long createBatchExecutions(@PathParam("workerClassName") String workerClassName, GroupExecutions groupExecutions) {
+
+        Job job = workhorseController.getByWorkerClassName(workerClassName);
+        log.info(" worker class name {}", workerClassName);
+        if (job == null) {
+            return null;
+        }
+
+        Long batchId = null;
+
+        for (String parameters : groupExecutions.getParametersList()) {
+            if (batchId == null) { // start of batch
+
+                Execution execution = workhorseService.createExecution(job.getId(), parameters, groupExecutions.getPriority(), groupExecutions.getPlannedFor(),
+                                groupExecutions.getExpiresAt(), -1L, null, job.isUniqueQueued());
+                // Use the Id of the first added job execution in Batch as BatchId.
+                execution.setBatchId(execution.getId());
+                workhorseController.updateExecution(execution);
+
+                batchId = execution.getId();
+            } else { // now that we have the batch id, all the beloning executions can have it!
+                workhorseService.createExecution(job.getId(), parameters, groupExecutions.getPriority(), groupExecutions.getPlannedFor(),
+                                groupExecutions.getExpiresAt(), batchId, null, job.isUniqueQueued());
+            }
+        }
+        return batchId;
+    }
+
+    @POST
+    @Path("/worker/{workerClassName}/chain-executions")
+    Long createChainedExecutions(@PathParam("workerClassName") String workerClassName, GroupExecutions groupExecutions) {
+
+        Job job = workhorseController.getByWorkerClassName(workerClassName);
+        log.info(" worker class name {}", workerClassName);
+        if (job == null) {
+            return null;
+        }
+
+        Long chainId = null;
+
+        for (String parameter : groupExecutions.getParametersList()) {
+            if (chainId == null) { // start of chain
+
+                Execution execution = workhorseService.createExecution(job.getId(), parameter, groupExecutions.getPriority(), groupExecutions.getPlannedFor(),
+                                groupExecutions.getExpiresAt(), null, -1L, job.isUniqueQueued());
+                execution.setChainId(execution.getId());
+                workhorseController.updateExecution(execution);
+
+                chainId = execution.getId();
+            } else { // now that we have the chain id, all the beloning executions can have it!
+                workhorseService.createExecution(job.getId(), parameter, groupExecutions.getPriority(), groupExecutions.getPlannedFor(),
+                                groupExecutions.getExpiresAt(), null, chainId, job.isUniqueQueued());
+            }
+        }
+        return chainId;
+    }
+
 }

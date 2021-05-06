@@ -1,6 +1,7 @@
 package io.coodoo.workhorse.saas;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -18,8 +19,8 @@ public interface WorkhorseRestClient {
     @Produces("application/json")
     BaseWorker getWorker(@PathParam("workerClassName") String workerClassName);
 
-    @GET
-    @Path("/do-work/{workerClassName}/job/{jobId}/execution/{executionId}")
+    @POST
+    @Path("/do-work/{workerClassName}")
     @Produces("application/json")
-    public void doWork(@PathParam("workerClassName") String workerClassName, @PathParam("jobId") Long jobId, @PathParam("executionId") Long executionId);
+    public void doWork(@PathParam("workerClassName") String workerClassName, DoWorkParameters params);
 }

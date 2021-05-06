@@ -101,28 +101,17 @@ public class WorkhorseController {
         // check if persisted jobs can be mapped a with a worker class
         for (Job job : jobPersistence.getAll()) {
             String workerClassName = job.getWorkerClassName();
-            BaseWorker workerOfDbJob;
-
-            // try {
-            // workerOfDbJob = getWorker(workerClassName);
-            // } catch (Exception exception) {
-
-            // job.setStatus(JobStatus.ERROR);
-            // log.error("[{}] Worker class not found ({})", workerClassName, job.getName());
-            // jobErrorEvent.fire(new JobErrorEvent(exception, ErrorType.ERROR_BY_FOUND_JOB_WORKER.getMessage(), job.getId(), job.getStatus()));
-            // continue;
-            // }
-
-            boolean found = false;
+            ClassMetadata workerOfDbJob = null;
 
             for (ClassMetadata workerClass : workerClasses) {
                 if (job.getWorkerClassName().equals(workerClass.workerClassName)) {
-                    found = true;
+
+                    workerOfDbJob = workerClass;
                     break;
                 }
             }
 
-            if (!found) {
+            if (workerOfDbJob == null) {
 
                 log.trace("JobStatus of Job {} updated from {} to {}", job, job.getStatus(), JobStatus.NO_WORKER);
                 job.setStatus(JobStatus.NO_WORKER);
@@ -132,17 +121,6 @@ public class WorkhorseController {
                                 job.getId(), job.getStatus()));
                 continue;
             }
-
-            // Class<?> workerClass = workerOfDbJob.getWorkerClass();
-            // if (!workerClasses.contains(workerClass)) {
-            // log.trace("JobStatus of Job {} updated from {} to {}", job, job.getStatus(), JobStatus.NO_WORKER);
-            // job.setStatus(JobStatus.NO_WORKER);
-            // jobPersistence.update(job);
-            // log.error("No Worker Class found for Job: {}", job);
-            // jobErrorEvent.fire(new JobErrorEvent(new Throwable(ErrorType.NO_JOB_WORKER_FOUND.getMessage()), ErrorType.NO_JOB_WORKER_FOUND.getMessage(),
-            // job.getId(), job.getStatus()));
-            // continue;
-            // }
 
             // Maybe in an iteration before there was no worker and now the worker is available - set this job to inactive
             if (job.getStatus().equals(JobStatus.NO_WORKER)) {
@@ -154,17 +132,17 @@ public class WorkhorseController {
             }
 
             // Check if parameter class has changed
-            // String parametersClassName = getWorkerParameterName(workerOfDbJob);
+            String parametersClassName = workerOfDbJob.parameterClassName;
 
-            // // The Objects-Class is null-safe and can handle Worker-classes without Parameters
-            // if (!Objects.equals(parametersClassName, job.getParametersClassName())) {
-            // log.info("Parameters class name of job worker {} changed from {} to {}", job.getWorkerClassName(), job.getParametersClassName(),
-            // parametersClassName);
-            // workhorseLogService.logChange(job.getId(), job.getStatus(), "Parameters class", job.getParametersClassName(), parametersClassName, null);
+            // The Objects-Class is null-safe and can handle Worker-classes without Parameters
+            if (!Objects.equals(parametersClassName, job.getParametersClassName())) {
+                log.info("Parameters class name of job worker {} changed from {} to {}", job.getWorkerClassName(), job.getParametersClassName(),
+                                parametersClassName);
+                workhorseLogService.logChange(job.getId(), job.getStatus(), "Parameters class", job.getParametersClassName(), parametersClassName, null);
 
-            // job.setParametersClassName(parametersClassName);
-            // jobPersistence.update(job);
-            // }
+                job.setParametersClassName(parametersClassName);
+                jobPersistence.update(job);
+            }
 
         }
     }
