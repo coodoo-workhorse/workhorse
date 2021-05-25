@@ -462,7 +462,7 @@ public class WorkhorseController {
         Execution retryExecution = null;
 
         if (failedExecution == null) {
-            String message = "The execution could not be found in the persistence: " + failedExecution;
+            String message = "The execution with ID: " + executionId + " of job: " + job.getName() + " could not be found in the persistence: ";
             log.error(message);
             workhorseLogService.logMessage(message, job.getId(), false);
             return null;
