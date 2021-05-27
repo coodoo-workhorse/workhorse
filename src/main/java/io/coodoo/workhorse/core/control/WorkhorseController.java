@@ -447,10 +447,27 @@ public class WorkhorseController {
         return persistedExecution;
     }
 
+    /***
+     * Handle a failed execution by creating another one, if permitted by configurations.
+     * 
+     * @param job correspondent job
+     * @param executionId ID of the execution that failed
+     * @param exception exception occurred during execution processing
+     * @param duration duration of the execution
+     * @param worker worker's instance
+     * @return new created clone execution
+     */
     public synchronized Execution handleFailedExecution(Job job, Long executionId, Exception exception, Long duration, BaseWorker worker) {
         Execution failedExecution = executionPersistence.getById(job.getId(), executionId);
         Execution retryExecution = null;
 
+        if (failedExecution == null) {
+            String message = "The execution with ID: " + executionId + " of job: " + job.getName() + " with JobID: " + job.getId()
+                            + " could not be found in the persistence.";
+            log.error(message);
+            workhorseLogService.logMessage(message, job.getId(), false);
+            return null;
+        }
         if (failedExecution.getFailRetry() < job.getFailRetries()) {
             retryExecution = createRetryExecution(failedExecution);
         } else if (failedExecution.getChainId() != null) {
