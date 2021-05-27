@@ -757,6 +757,7 @@ public class WorkhorseControllerTest {
 
         Job job = new Job();
         job.setId(1L);
+        job.setName("TestJob");
         Execution execution = new Execution();
         execution.setId(1L);
         Exception exception = new Exception();
@@ -766,7 +767,8 @@ public class WorkhorseControllerTest {
 
         Execution result = classUnderTest.handleFailedExecution(job, execution.getId(), exception, duration, null);
 
-        String message = "The execution with ID: " + execution.getId() + " of job: " + job.getName() + " could not be found in the persistence: ";
+        String message = "The execution with ID: " + execution.getId() + " of job: " + job.getName() + " with JobID: " + job.getId()
+                        + " could not be found in the persistence.";
         verify(workhorseLogService).logMessage(message, job.getId(), false);
         assertNull(result);
     }
