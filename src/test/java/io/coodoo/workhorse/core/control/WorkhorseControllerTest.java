@@ -9,6 +9,7 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,6 +43,7 @@ import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
+import io.coodoo.workhorse.util.WorkhorseUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WorkhorseControllerTest {
@@ -748,6 +750,128 @@ public class WorkhorseControllerTest {
 
         assertEquals(MAX_PER_MINUTE, argument.getValue().getMaxPerMinute().intValue());
 
+    }
+
+    @Test
+    public void testHandleFailedExecution_with_unexisting_execution() throws Exception {
+
+        Job job = new Job();
+        job.setId(1L);
+        Execution execution = new Execution();
+        execution.setId(1L);
+        Exception exception = new Exception();
+        Long duration = 50L;
+
+        when(executionPersistence.getById(job.getId(), execution.getId())).thenReturn(null);
+
+        Execution result = classUnderTest.handleFailedExecution(job, execution.getId(), exception, duration, null);
+
+        String message = "The execution with ID: " + execution.getId() + " of job: " + job.getName() + " could not be found in the persistence: ";
+        verify(workhorseLogService).logMessage(message, job.getId(), false);
+        assertNull(result);
+    }
+
+    @Test
+    public void testHandleFailedExecution_with_created_retry_execution() throws Exception {
+
+        StaticConfig.TIME_ZONE = "UTC";
+
+        Job job = new Job();
+        job.setId(1L);
+        job.setFailRetries(2);
+        Execution failedExecution = new Execution();
+        failedExecution.setId(1L);
+        failedExecution.setFailRetry(1);
+        Exception exception = new Exception();
+        Long duration = 50L;
+        Worker worker = new TestWorkerWithMaxPerMinute();
+
+        Execution retryExecution = new Execution();
+        retryExecution.setJobId(failedExecution.getJobId());
+        retryExecution.setFailRetry(failedExecution.getFailRetry() + 1);
+
+        Execution persistedExecution = new Execution();
+        persistedExecution.setId(2L);
+        persistedExecution.setJobId(retryExecution.getJobId());
+        persistedExecution.setFailRetry(retryExecution.getFailRetry() + 1);
+
+        when(executionPersistence.getById(job.getId(), failedExecution.getId())).thenReturn(failedExecution);
+
+        // anyObject() is used because the parameter to pass contains a timestamp.
+        when(executionPersistence.persist(anyObject())).thenReturn(persistedExecution);
+
+        Execution result = classUnderTest.handleFailedExecution(job, failedExecution.getId(), exception, duration, worker);
+
+        verify(executionPersistence).log(job.getId(), failedExecution.getId(), WorkhorseUtil.getMessagesFromException(exception),
+                        WorkhorseUtil.stacktraceToString(exception));
+
+        ArgumentCaptor<Execution> argument = ArgumentCaptor.forClass(Execution.class);
+        verify(executionPersistence).update(argument.capture());
+        assertEquals(ExecutionStatus.FAILED, argument.getValue().getStatus());
+        assertEquals(duration, argument.getValue().getDuration());
+
+        assertEquals(persistedExecution, result);
+    }
+
+    @Test
+    public void testHandleFailedExecution_without_created_retry_execution() throws Exception {
+
+        StaticConfig.TIME_ZONE = "UTC";
+
+        Job job = new Job();
+        job.setId(1L);
+        job.setFailRetries(2);
+        Execution failedExecution = new Execution();
+        failedExecution.setId(1L);
+        failedExecution.setFailRetry(3);
+        Exception exception = new Exception();
+        Long duration = 50L;
+        Worker worker = mock(TestWorkerWithMaxPerMinute.class);
+
+        when(executionPersistence.getById(job.getId(), failedExecution.getId())).thenReturn(failedExecution);
+
+        Execution result = classUnderTest.handleFailedExecution(job, failedExecution.getId(), exception, duration, worker);
+
+        verify(worker).onFailed(failedExecution.getId());
+
+        ArgumentCaptor<Execution> argument = ArgumentCaptor.forClass(Execution.class);
+        verify(executionPersistence).update(argument.capture());
+        assertEquals(ExecutionStatus.FAILED, argument.getValue().getStatus());
+        assertEquals(duration, argument.getValue().getDuration());
+
+        assertNull(result);
+    }
+
+    @Test
+    public void testHandleFailedExecution_with_abort_chain() throws Exception {
+
+        StaticConfig.TIME_ZONE = "UTC";
+
+        Job job = new Job();
+        job.setId(1L);
+        job.setFailRetries(2);
+        Execution failedExecution = new Execution();
+        failedExecution.setId(1L);
+        failedExecution.setChainId(1L);
+        failedExecution.setFailRetry(3);
+        Exception exception = new Exception();
+        Long duration = 50L;
+        Worker worker = mock(TestWorkerWithMaxPerMinute.class);
+
+        when(executionPersistence.getById(job.getId(), failedExecution.getId())).thenReturn(failedExecution);
+
+        Execution result = classUnderTest.handleFailedExecution(job, failedExecution.getId(), exception, duration, worker);
+
+        verify(executionPersistence).abortChain(job.getId(), failedExecution.getChainId());
+
+        verify(worker).onFailedChain(failedExecution.getChainId(), failedExecution.getId());
+
+        ArgumentCaptor<Execution> argument = ArgumentCaptor.forClass(Execution.class);
+        verify(executionPersistence).update(argument.capture());
+        assertEquals(ExecutionStatus.FAILED, argument.getValue().getStatus());
+        assertEquals(duration, argument.getValue().getDuration());
+
+        assertNull(result);
     }
 
 }
