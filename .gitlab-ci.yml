@@ -56,8 +56,8 @@ deploy:
     - echo "Import the GPG key"
     - echo  "$workhorse_gpg" | base64 -d > private.key
     - gpg --version
-    - PASSPHRASE=$(echo "$workhorse_passphrase" | base64 -d)
-    - OSS_PASSWORD=$(echo "$oss_password" | base64 -d)
+    - export PASSPHRASE=$(echo "$workhorse_passphrase" | base64 -d)
+    - export OSS_PASSWORD=$(echo "$oss_password" | base64 -d)
     - gpg --batch --import ./private.key
     - rm ./private.key
     # Release it
