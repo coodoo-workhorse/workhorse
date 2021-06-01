@@ -16,60 +16,49 @@ cache:
   paths:
     - .m2/repository
 
-stages:
-  - build
-  - test
-  - deploy
-
-#
-# BUILD PHASE
-#
-# Build-Jobs der drei Umgebungen (Branch, Develop, Staging) erzeugen ein "dist"-Verzeichnis, welches an die Deploy-Jobs weitergegeben wird
 before_script:
   - echo -e " Home:\        ${HOME}\n Pipeline:\     ${CI_PIPELINE_ID}\n Branch/Tag:\  ${CI_JOB_REF_NAME}\n Gitlab User:\ ${GITLAB_USER_NAME}\n Verzeichnis:\ `pwd`\n MAVEN_OPTS:\ ${MAVEN_OPTS}\n MAVEN_CLI_OPTS:\ ${MAVEN_CLI_OPTS}"
 
-.build-artifacts: &build-artifacts
-  stage: build
-  retry: 2
-  tags:
-    - Java
-  artifacts:
-    paths:
-      - target/workhorse.jar
-    expire_in: 1 hour
-  before_script:
-    - echo -e " Home:\        ${HOME}\n Pipeline:\     ${CI_PIPELINE_ID}\n Branch/Tag:\  ${CI_JOB_REF_NAME}\n Gitlab User:\ ${GITLAB_USER_NAME}\n Verzeichnis:\ `pwd`\n MAVEN_OPTS:\ ${MAVEN_OPTS}\n MAVEN_CLI_OPTS:\ ${MAVEN_CLI_OPTS}"
-    - mkdir -p maven-repository
-    - apk --update --no-cache add git
-    - apk --update --no-cache add grep
+stages:
+  - build
+  - deploy
 
-
-build:
+#
+# BUILD AND TEST PHASE
+#
+build & test:
   stage: build
+  except:
+    - master
   tags:
     - Java
   script:
     - mvn $MAVEN_CLI_OPTS spotless:check
     - mvn $MAVEN_CLI_OPTS clean compile
-
-
-test:
-  stage: test
-  tags:
-    - Java
-  script:
     - mvn $MAVEN_CLI_OPTS test
   artifacts:
+    paths:
+      - target/workhorse.jar
     reports:
       junit:
         - "target/surefire-reports/TEST-*.xml"
+    expire_in: 2 hour
 
 deploy:
-  stage: deploy 
+  stage: deploy
   tags:
     - Java
-  script:
-    - mvn $MAVEN_CLI_OPTS deploy -s ci_settings.xml
   only:
-    - master
-  
+    - tags
+  script:
+    # GPG stuff
+    - apk update && apk add gnupg
+    - echo "Import the GPG key"
+    - echo  "$workhorse_gpg" | base64 -d > private.key
+    - gpg --version
+    - PASSPHRASE=$(echo "$workhorse_passphrase" | base64 -d)
+    - OSS_PASSWORD=$(echo "$oss_password" | base64 -d)
+    - gpg --batch --import ./private.key
+    - rm ./private.key
+    # Release it
+    - mvn $MAVEN_CLI_OPTS -s release_settings.xml deploy -DskipTests -P release
