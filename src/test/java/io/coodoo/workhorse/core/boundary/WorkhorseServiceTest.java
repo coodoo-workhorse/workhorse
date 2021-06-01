@@ -25,6 +25,7 @@ import io.coodoo.workhorse.core.control.WorkhorseConfigController;
 import io.coodoo.workhorse.core.control.WorkhorseController;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobExecutionCount;
+import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.PersistenceManager;
 import io.coodoo.workhorse.persistence.memory.MemoryConfigBuilder;
@@ -207,6 +208,67 @@ public class WorkhorseServiceTest {
         verify(jobScheduler, times(0)).stop(anyObject());
         verify(executionBuffer, times(0)).clearMemoryQueue(anyObject());
         verify(workhorseController, times(0)).deleteJob(anyObject());
+    }
+
+    @Test
+    public void testUpdateJob_with_jobstatus_ACTIVE() throws Exception {
+
+        Long jobId = 1L;
+        JobStatus status = JobStatus.ACTIVE;
+
+        Job job = new Job();
+        job.setId(1L);
+        job.setStatus(JobStatus.ACTIVE);
+
+        when(workhorseController.getJobById(jobId)).thenReturn(job);
+        when(workhorseController.updateJob(jobId, null, null, null, null, status, 2, 1000, 1, 4, 30, false)).thenReturn(job);
+
+        classUnderTest.updateJob(jobId, null, null, null, null, status, 2, 1000, 1, 4, 30, false);
+
+        verify(executionBuffer).initialize(job);
+        verify(workhorse).poll(job);
+    }
+
+    @Test
+    public void testUpdateJob_with_jobstatus_and_Schedule_ACTIVE() throws Exception {
+
+        Long jobId = 1L;
+        JobStatus status = JobStatus.ACTIVE;
+        String schedule = "24 * * * * *";
+
+        Job job = new Job();
+        job.setId(jobId);
+        job.setStatus(status);
+        job.setSchedule(schedule);
+
+        when(workhorseController.getJobById(jobId)).thenReturn(job);
+        when(workhorseController.updateJob(jobId, null, null, null, schedule, status, 2, 1000, 1, 4, 30, false)).thenReturn(job);
+
+        classUnderTest.updateJob(jobId, null, null, null, schedule, status, 2, 1000, 1, 4, 30, false);
+
+        verify(executionBuffer).initialize(job);
+        verify(jobScheduler).start(job);
+        verify(workhorse).poll(job);
+    }
+
+    @Test
+    public void testUpdateJob_with_jobstatus_INACTIVE() throws Exception {
+
+        Long jobId = 1L;
+        JobStatus status = JobStatus.INACTIVE;
+
+        Job job = new Job();
+        job.setId(1L);
+        job.setStatus(JobStatus.INACTIVE);
+
+        when(workhorseController.getJobById(jobId)).thenReturn(job);
+        when(workhorseController.updateJob(jobId, null, null, null, null, status, 2, 1000, 1, 4, 30, false)).thenReturn(job);
+
+        classUnderTest.updateJob(jobId, null, null, null, null, status, 2, 1000, 1, 4, 30, false);
+
+        verify(executionBuffer, times(0)).initialize(job);
+        verify(jobScheduler, times(0)).start(job);
+        verify(workhorse, times(0)).poll(job);
     }
 
 }

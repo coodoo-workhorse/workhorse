@@ -110,23 +110,35 @@ public class Workhorse {
     }
 
     /**
-     * poll the Execution with an given intervall
+     * Poll a subset of {@link ExecutionStatus#QUEUED} and {@link ExecutionStatus#PLANNED} executions of all jobs on status {@link JobStatus#ACTIVE}.
      */
     void poll() {
         for (Job job : jobPersistence.getAllByStatus(JobStatus.ACTIVE)) {
-
-            if (executionBuffer.getNumberOfExecution(job.getId()) < StaticConfig.BUFFER_MIN) {
-                List<Execution> executions = executionPersistence.pollNextExecutions(job.getId(), StaticConfig.BUFFER_MAX);
-                for (Execution execution : executions) {
-                    if (execution == null) {
-                        continue;
-                    }
-                    executionDistributor(execution);
-                }
-            }
-            log.trace("Number of job execution in buffer: {}", executionBuffer.getNumberOfExecution(job.getId()));
+            poll(job);
         }
 
+    }
+
+    /**
+     * Poll a subset of {@link ExecutionStatus#QUEUED} and {@link ExecutionStatus#PLANNED} executions of a given {@link Job}
+     * 
+     * @param job job to consider
+     */
+    public void poll(Job job) {
+        if (!JobStatus.ACTIVE.equals(job.getStatus())) {
+            log.error("The status of the job is expected to be ACTIVE. But the given one is: {}", job.getStatus());
+            return;
+        }
+        if (executionBuffer.getNumberOfExecution(job.getId()) < StaticConfig.BUFFER_MIN) {
+            List<Execution> executions = executionPersistence.pollNextExecutions(job.getId(), StaticConfig.BUFFER_MAX);
+            for (Execution execution : executions) {
+                if (execution == null) {
+                    continue;
+                }
+                executionDistributor(execution);
+            }
+        }
+        log.trace("Number of job execution in buffer: {}", executionBuffer.getNumberOfExecution(job.getId()));
     }
 
     /**

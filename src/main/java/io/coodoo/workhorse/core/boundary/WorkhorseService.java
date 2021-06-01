@@ -283,27 +283,51 @@ public class WorkhorseService {
     }
 
     /**
-     * Update a job
+     * Update a {@link Job}
      * 
-     * @return Job
+     * @param jobId
+     * @param name the name of the job
+     * @param description the description about what the job do.
+     * @param workerClassName the name of the Class that the Job use as Parameter
+     * @param schedule the timstamp as cron-syntax to schedule the job
+     * @param status the status of the Job. <code>ACTIVE</code>, <code>NO_WORKER</code>
+     * @param threads the number of thread, that can process the job
+     * @param maxPerMinute the max number of execution per minute
+     * @param failRetries the number of retries for a failed execution
+     * @param retryDelay the duration to wait before a retry
+     * @param minutesUntilCleanUp the number of minutes before delete execution of this Job
+     * @param uniqueQueued if a job has the uniqueInqueue set <code>true</code>, Two or more job execution with the same parameters are not authorized
+     * 
+     * @return the updated job
      */
     public Job updateJob(Long jobId, String name, String description, String workerClassName, String schedule, JobStatus status, int threads,
-                    Integer maxPerMinute, int failRetries, int retryDelay, int daysUntilCleanUp, boolean uniqueQueued) {
+                    Integer maxPerMinute, int failRetries, int retryDelay, int minutesUntilCleanUp, boolean uniqueQueued) {
 
         Job job = getJobById(jobId);
 
         jobScheduler.stop(job);
-        // workhorse.stop(); maybe we don t need. To proove
         executionBuffer.clearMemoryQueue(job);
 
-        workhorseController.updateJob(jobId, name, description, workerClassName, schedule, status, threads, maxPerMinute, failRetries, retryDelay,
-                        daysUntilCleanUp, uniqueQueued);
+        Job updatedJob = workhorseController.updateJob(jobId, name, description, workerClassName, schedule, status, threads, maxPerMinute, failRetries,
+                        retryDelay, minutesUntilCleanUp, uniqueQueued);
+
+        if (JobStatus.ACTIVE.equals(updatedJob.getStatus())) {
+            startJob(updatedJob);
+        }
+        return updatedJob;
+
+    }
+
+    /**
+     * Start the processing of executions of a {@link Job}
+     * 
+     * @param job the job to start
+     */
+    public void startJob(Job job) {
 
         executionBuffer.initialize(job);
-        // workhorse.start();
         jobScheduler.start(job);
-        return job;
-
+        workhorse.poll(job);
     }
 
     /**
@@ -404,11 +428,10 @@ public class WorkhorseService {
         }
         log.info("Activate job {}", job.getName());
         job.setStatus(JobStatus.ACTIVE);
+
         workhorseController.update(job);
-        if (job.getSchedule() != null && !job.getSchedule().isEmpty()) {
-            jobScheduler.start(job);
-        }
-        executionBuffer.initialize(job);
+
+        startJob(job);
     }
 
     /**

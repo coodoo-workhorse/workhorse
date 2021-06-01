@@ -49,7 +49,7 @@ public class Job extends BaseEntity {
     private Integer maxPerMinute;
 
     /**
-     * number of retries for a failed execution
+     * Number of retries for a failed execution
      */
     private int failRetries;
 
