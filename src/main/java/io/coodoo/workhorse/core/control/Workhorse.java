@@ -283,14 +283,6 @@ public class Workhorse {
         // handle the fail of a JobThread
         completion.exceptionally(exception -> {
 
-            // A cancellationException means that this job thread has been cancelled due to an error in another job thread of this job
-            // It is the reason why the message is different.
-            if (exception.getCause().getClass().equals(CancellationException.class)) {
-                log.warn(ErrorType.JOB_THREAD_CANCELLED.getMessage());
-                jobErrorEvent.fire(new JobErrorEvent(exception, ErrorType.JOB_THREAD_CANCELLED.getMessage(), job.getId(), JobStatus.ERROR));
-                return job;
-            }
-
             log.error("Error in job thread - Process gets cancelled", exception);
             job.setStatus(JobStatus.ERROR);
             jobPersistence.update(job);
