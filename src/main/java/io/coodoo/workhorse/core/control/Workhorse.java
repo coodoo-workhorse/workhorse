@@ -2,7 +2,6 @@ package io.coodoo.workhorse.core.control;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
