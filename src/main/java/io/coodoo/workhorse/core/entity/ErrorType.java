@@ -4,6 +4,8 @@ public enum ErrorType {
 
     JOB_THREAD_ERROR("Error in job thread"),
 
+    JOB_THREAD_CANCELLED("Job thread cancelled"),
+
     NO_JOB_WORKER_FOUND("No Worker class found"),
 
     ERROR_BY_FOUND_JOB_WORKER("Can't handle Worker class found"),

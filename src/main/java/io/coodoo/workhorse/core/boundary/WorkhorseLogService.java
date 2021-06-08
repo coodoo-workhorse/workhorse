@@ -1,6 +1,7 @@
 package io.coodoo.workhorse.core.boundary;
 
 import java.util.List;
+import java.util.concurrent.CancellationException;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import io.coodoo.workhorse.core.control.StaticConfig;
 import io.coodoo.workhorse.core.control.WorkhorseController;
 import io.coodoo.workhorse.core.control.event.JobErrorEvent;
+import io.coodoo.workhorse.core.entity.ErrorType;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.core.entity.WorkhorseLog;
@@ -30,6 +32,8 @@ import io.coodoo.workhorse.util.WorkhorseUtil;
 public class WorkhorseLogService {
 
     private static final Logger log = LoggerFactory.getLogger(WorkhorseLogService.class);
+
+    private static final String JOB_THREAD_CANCELLED_MESSAGE = "This job thread has been cancelled due to an error in another job thread of this job.";
 
     @Inject
     WorkhorseController workhorseController;
@@ -134,11 +138,23 @@ public class WorkhorseLogService {
      */
     public void logException(@Observes JobErrorEvent jobErrorPayload) {
 
-        String message = jobErrorPayload.getMessage() != null ? jobErrorPayload.getMessage()
-                        : WorkhorseUtil.getMessagesFromException(jobErrorPayload.getThrowable());
+        String message;
+        String stacktrace;
+        if (jobErrorPayload.getThrowable().getClass().equals(CancellationException.class)) {
+            // A cancellationException means that this job thread has been cancelled due to an error in another job thread of this job
+            // It is the reason why the message is different.
+            log.warn(ErrorType.JOB_THREAD_CANCELLED.getMessage());
+            message = ErrorType.JOB_THREAD_CANCELLED.getMessage();
+            stacktrace = JOB_THREAD_CANCELLED_MESSAGE + System.lineSeparator() + WorkhorseUtil.stacktraceToString(jobErrorPayload.getThrowable());
 
-        createLog(message, jobErrorPayload.getJobId(), jobErrorPayload.getJobStatus(), false, null, null, null,
-                        WorkhorseUtil.stacktraceToString(jobErrorPayload.getThrowable()));
+        } else {
+            message = jobErrorPayload.getMessage() != null ? jobErrorPayload.getMessage()
+                            : WorkhorseUtil.getMessagesFromException(jobErrorPayload.getThrowable());
+
+            stacktrace = WorkhorseUtil.stacktraceToString(jobErrorPayload.getThrowable());
+        }
+
+        createLog(message, jobErrorPayload.getJobId(), jobErrorPayload.getJobStatus(), false, null, null, null, stacktrace);
     }
 
     /**

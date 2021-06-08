@@ -293,6 +293,7 @@ public class Workhorse {
 
         // handle the fail of a JobThread
         completion.exceptionally(exception -> {
+
             log.error("Error in job thread - Process gets cancelled", exception);
             job.setStatus(JobStatus.ERROR);
             jobPersistence.update(job);
