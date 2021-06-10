@@ -607,4 +607,14 @@ public class WorkhorseService {
         return executionBuffer.getJobThreads();
     }
 
+    /**
+     * Retrieves all {@link JobThread} of a {@link Job}
+     * 
+     * @param job
+     * @return a set of {@link JobThread}
+     */
+    public Set<JobThread> getJobThreads(Job job) {
+        return executionBuffer.getJobThreads().get(job.getId());
+    }
+
 }
