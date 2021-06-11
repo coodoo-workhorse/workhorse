@@ -108,7 +108,6 @@ public class WorkhorseConfigController {
         StaticConfig.LOG_ERROR_MARKER = workhorseConfig.getLogErrorMarker();
 
         configPersistence.update(workhorseConfig);
-        workhorseLogService.logMessage("Initial config set: " + workhorseConfig, null, false);
 
         return workhorseConfig;
     }

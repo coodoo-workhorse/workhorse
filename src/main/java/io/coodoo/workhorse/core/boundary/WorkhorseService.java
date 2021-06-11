@@ -140,6 +140,9 @@ public class WorkhorseService {
      * @param workhorseConfig Configuration of the chosen persistence (this can only be done once and is final).
      */
     public void start(WorkhorseConfig workhorseConfig) {
+
+        long ms = System.currentTimeMillis();
+
         // Check if the persistence is already initialized. If so the engine is already living but paused and should now start again.
         if (!persistenceManager.isInitialized()) {
             currentWorkhorseConfig = workhorseConfig;
@@ -152,18 +155,26 @@ public class WorkhorseService {
         workhorse.start();
         jobScheduler.startScheduler();
 
-        log.info("Workhorse is running...");
+        ms = System.currentTimeMillis() - ms;
+        String startMessage = "Workhorse " + WorkhorseUtil.getVersion() + " (Persistence: " + workhorseConfig.getPersistenceName() + " "
+                        + workhorseConfig.getPersistenceVersion() + ") started in " + ms + "ms";
+        workhorseLogService.logMessage(startMessage, null, true);
     }
 
     /**
      * Stop Workhorse
      */
     public void stop() {
+
+        long ms = System.currentTimeMillis();
+
         workhorse.stop();
-
         jobScheduler.stopScheduler();
-
         executionBuffer.clearMemoryQueue();
+
+        ms = System.currentTimeMillis() - ms;
+        String startMessage = "Workhorse stopped in " + ms + "ms";
+        workhorseLogService.logMessage(startMessage, null, true);
     }
 
     /**
