@@ -1,7 +1,10 @@
 package io.coodoo.workhorse.core.boundary;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,19 +40,22 @@ public class WorkhorseServiceTest {
     WorkhorseService classUnderTest;
 
     @Mock
-    WorkhorseController workhorseController;
-
-    @Mock
-    WorkhorseConfigController workhorseConfigController;
-
-    @Mock
-    PersistenceManager persistenceManager;
+    Workhorse workhorse;
 
     @Mock
     ExecutionBuffer executionBuffer;
 
     @Mock
-    Workhorse workhorse;
+    PersistenceManager persistenceManager;
+
+    @Mock
+    WorkhorseLogService workhorseLogService;
+
+    @Mock
+    WorkhorseController workhorseController;
+
+    @Mock
+    WorkhorseConfigController workhorseConfigController;
 
     @Mock
     JobScheduler jobScheduler;
@@ -129,6 +135,8 @@ public class WorkhorseServiceTest {
         verify(executionBuffer).initialize();
         verify(workhorse).start();
         verify(jobScheduler).startScheduler();
+
+        verify(workhorseLogService).logMessage(anyString(), anyLong(), anyBoolean());
     }
 
     @Test
@@ -144,6 +152,8 @@ public class WorkhorseServiceTest {
         verify(executionBuffer).initialize();
         verify(workhorse).start();
         verify(jobScheduler).startScheduler();
+
+        verify(workhorseLogService).logMessage(anyString(), anyLong(), anyBoolean());
     }
 
     @Test
@@ -162,6 +172,8 @@ public class WorkhorseServiceTest {
         verify(executionBuffer).initialize();
         verify(workhorse).start();
         verify(jobScheduler).startScheduler();
+
+        verify(workhorseLogService).logMessage(anyString(), anyLong(), anyBoolean());
     }
 
     @Test
@@ -179,6 +191,20 @@ public class WorkhorseServiceTest {
         verify(executionBuffer).initialize();
         verify(workhorse).start();
         verify(jobScheduler).startScheduler();
+
+        verify(workhorseLogService).logMessage(anyString(), anyLong(), anyBoolean());
+    }
+
+    @Test
+    public void testStop() throws Exception {
+
+        classUnderTest.stop();
+
+        verify(workhorse).stop();
+        verify(jobScheduler).stopScheduler();
+        verify(executionBuffer).clearMemoryQueue();
+
+        verify(workhorseLogService).logMessage(anyString(), anyLong(), anyBoolean());
     }
 
     @Test
