@@ -93,7 +93,7 @@ public class Workhorse {
      */
     public void start() {
         // Check if the engine is already started. If so stop first and start again.
-        if (scheduledFuture != null) {
+        if (isRunning()) {
             stop();
         }
 
@@ -147,7 +147,7 @@ public class Workhorse {
      * @param newExecutionEvent describes the newly persisted execution
      */
     public void push(@ObservesAsync NewExecutionEvent newExecutionEvent) {
-        if (!executionPersistence.isPusherAvailable() || scheduledFuture == null) {
+        if (!executionPersistence.isPusherAvailable() || !isRunning()) {
             return;
         }
         log.trace("New Execution pushed: {}", newExecutionEvent);
@@ -173,7 +173,7 @@ public class Workhorse {
      * Stop the poller/pusher process
      */
     public void stop() {
-        if (scheduledFuture != null) {
+        if (isRunning()) {
             scheduledFuture.cancel(false);
             scheduledFuture = null;
 
