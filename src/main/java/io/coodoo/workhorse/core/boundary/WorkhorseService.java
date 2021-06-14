@@ -356,9 +356,28 @@ public class WorkhorseService {
         }
     }
 
+    /**
+     * This version has to be deleted as soon as the corresponding resource-endpoint in the project Workhorse-ui-api get deleted.
+     */
+    @Deprecated
     public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime plannedFor, LocalDateTime expiresAt, Long batchId,
                     Long chainId, boolean uniqueQueued) {
-        return workhorseController.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, uniqueQueued);
+
+        Job job = getJobById(jobId);
+        if (job == null) {
+            return null;
+        }
+        return workhorseController.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, job.isUniqueQueued());
+    }
+
+    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime plannedFor, LocalDateTime expiresAt, Long batchId,
+                    Long chainId) {
+
+        Job job = getJobById(jobId);
+        if (job == null) {
+            return null;
+        }
+        return workhorseController.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, job.isUniqueQueued());
     }
 
     public Execution updateExecution(Long jobId, Long executionId, ExecutionStatus status, String parameters, boolean priority, LocalDateTime plannedFor,
