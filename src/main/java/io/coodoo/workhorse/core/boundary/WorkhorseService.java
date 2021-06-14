@@ -395,7 +395,7 @@ public class WorkhorseService {
 
         Job job = getJobById(jobId);
         if (job == null) {
-            return null;
+            throw new RuntimeException("No Job for JobId found");
         }
         return workhorseController.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, job.isUniqueQueued());
     }
