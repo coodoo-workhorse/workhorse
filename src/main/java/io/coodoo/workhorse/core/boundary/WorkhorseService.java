@@ -357,9 +357,9 @@ public class WorkhorseService {
     }
 
     /**
-     * This version must be deleted as soon as the corresponding resource endpoint in the Workhorse-ui-api project is deleted.
+     * @deprecated This version must be deleted as soon as the corresponding resource endpoint in the Workhorse-ui-api project is deleted.
      * 
-     * create an {@link Execution}
+     *             create an {@link Execution}
      * 
      * @param jobId Id of the corresponding job
      * @param parameters parameters of the execution
