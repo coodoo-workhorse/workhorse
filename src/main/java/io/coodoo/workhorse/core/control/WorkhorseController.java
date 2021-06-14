@@ -504,9 +504,9 @@ public class WorkhorseController {
      */
     public int deleteOlderExecutions(Long jobId, long minMinutesOld) {
 
-        // Is minMinutesOld negativ the global default value of minutesUntilCleanup is
+        // Is minMinutesOld == 0 the global default value of minutesUntilCleanup is
         // to use.
-        if (minMinutesOld < 0) {
+        if (minMinutesOld < 1) {
             minMinutesOld = StaticConfig.MINUTES_UNTIL_CLEANUP;
         }
 
