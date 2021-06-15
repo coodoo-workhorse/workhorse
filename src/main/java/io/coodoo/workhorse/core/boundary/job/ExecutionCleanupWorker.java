@@ -43,6 +43,10 @@ public class ExecutionCleanupWorker extends Worker {
         String failedJobInfo = "";
         for (Job job : jobs) {
             try {
+                if (job.getMinutesUntilCleanUp() < 1) {
+                    // In this case the cleanup of executions is disable for this job
+                    continue;
+                }
                 long millisAtStart = System.currentTimeMillis();
                 int deleted = workhorseController.deleteOlderExecutions(job.getId(), job.getMinutesUntilCleanUp());
                 long duration = System.currentTimeMillis() - millisAtStart;

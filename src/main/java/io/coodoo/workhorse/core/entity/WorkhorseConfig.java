@@ -39,7 +39,7 @@ public abstract class WorkhorseConfig {
      * 
      * If set to 0, no cleanup is performed.
      */
-    protected long minutesUntilCleanup = 2;
+    protected long minutesUntilCleanup = 30;
 
     /**
      * Duration in seconds after which an EXECUTION in status {@link ExecutionStatus#RUNNING} is consider in timeout.(if set to 0 the value is ignored)

@@ -504,10 +504,9 @@ public class WorkhorseController {
      */
     public int deleteOlderExecutions(Long jobId, long minMinutesOld) {
 
-        // Is minMinutesOld == 0 the global default value of minutesUntilCleanup is
-        // to use.
+        // In this case the cleanup of executions is disable for this job
         if (minMinutesOld < 1) {
-            minMinutesOld = StaticConfig.MINUTES_UNTIL_CLEANUP;
+            return 0;
         }
 
         LocalDateTime time = LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)).minusMinutes(minMinutesOld);

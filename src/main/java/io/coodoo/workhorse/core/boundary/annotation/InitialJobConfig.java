@@ -15,7 +15,7 @@ public @interface InitialJobConfig {
     public static final int JOB_CONFIG_MAX_PER_MINUTE = 0;
     public static final int JOB_CONFIG_FAIL_RETRIES = 0;
     public static final int JOB_CONFIG_RETRY_DELAY = 4000;
-    public static final int JOB_CONFIG_MINUTES_UNTIL_CLEANUP = 0;
+    public static final int JOB_CONFIG_MINUTES_UNTIL_CLEANUP = 30;
     public static final boolean JOB_CONFIG_UNIQUE_IN_QUEUE = false;
 
     /**
