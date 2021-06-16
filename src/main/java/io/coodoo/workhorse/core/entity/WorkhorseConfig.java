@@ -2,6 +2,8 @@ package io.coodoo.workhorse.core.entity;
 
 import java.time.ZoneId;
 
+import io.coodoo.workhorse.core.boundary.annotation.InitialJobConfig;
+
 /**
  * The class defines all the configurations that can be applied to Workhorse to adapt it for multiples usage.
  * 
@@ -39,7 +41,7 @@ public abstract class WorkhorseConfig {
      * 
      * If set to 0, no cleanup is performed.
      */
-    protected long minutesUntilCleanup = 30;
+    protected long minutesUntilCleanup = InitialJobConfig.JOB_CONFIG_MINUTES_UNTIL_CLEANUP;
 
     /**
      * Duration in seconds after which an EXECUTION in status {@link ExecutionStatus#RUNNING} is consider in timeout.(if set to 0 the value is ignored)

@@ -44,7 +44,7 @@ public class ExecutionCleanupWorker extends Worker {
         for (Job job : jobs) {
             try {
                 if (job.getMinutesUntilCleanUp() < 1) {
-                    // In this case the cleanup of executions is disable for this job
+                    // In this case the cleanup of executions is disabled for this job
                     continue;
                 }
                 long millisAtStart = System.currentTimeMillis();

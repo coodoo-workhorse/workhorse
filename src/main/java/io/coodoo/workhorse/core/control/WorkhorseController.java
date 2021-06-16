@@ -504,7 +504,7 @@ public class WorkhorseController {
      */
     public int deleteOlderExecutions(Long jobId, long minMinutesOld) {
 
-        // In this case the cleanup of executions is disable for this job
+        // In this case the cleanup of executions is disabled for this job
         if (minMinutesOld < 1) {
             return 0;
         }
