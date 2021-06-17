@@ -23,16 +23,16 @@ import io.coodoo.workhorse.util.CollectionListing;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
 /**
- * Hunt queued executions that are no longer executed.
+ * Check queued executions that are no longer executed.
  * 
  * This class is used until we find out why executions are not processed under load.
  */
 @ApplicationScoped
-@InitialJobConfig(name = "Hunt queued executions", schedule = "0 */5 * * * *", failRetries = 1,
-                description = "Hunt queued executions that are no longer executed.", tags = "system")
-public class HuntQueuedExecutionWorker extends Worker {
+@InitialJobConfig(name = "Check queued executions", schedule = "0 */5 * * * *", failRetries = 1,
+                description = "Check for stuck queued executions that are no longer executed.", tags = "System")
+public class CheckQueuedExecutionsWorker extends Worker {
 
-    private final Logger logger = LoggerFactory.getLogger(HuntQueuedExecutionWorker.class);
+    private final Logger logger = LoggerFactory.getLogger(CheckQueuedExecutionsWorker.class);
 
     private static final long MIN_NUMBER_OF_QUEUED_EXECUTION = 1000L;
 
@@ -45,7 +45,7 @@ public class HuntQueuedExecutionWorker extends Worker {
     public void doWork() throws Exception {
 
         logInfo(logger, "Starting check queued Execution.");
-        logInfo(logger, "Queued executions | Jobthreads | Job's name");
+        logInfo(logger, "Queued executions | Threads | Job's name");
 
         // Get only jobs with the status ACTIVE
         List<Job> activeJobs = workhorseController.getAllJobsByStatus(JobStatus.ACTIVE);
@@ -92,11 +92,11 @@ public class HuntQueuedExecutionWorker extends Worker {
 
             // If at least 2/3 conditions are reached, send an email.
             if ((areThereRunningExecutions + areThereJobThreads + areExecutionNewInQueue) >= 2) {
-                // Email senden !!
-                logger.warn("Hier stauen Executions. Sende mal eine E-Mail.");
+                // TODO Send Email !!
+                logWarn(logger, "Executions are no longer processed: " + job);
             }
 
-            logInfo(logger, String.format("%17d | %10d | %s", jobExecutionCount.getQueued(), jobThreads == null ? 0 : jobThreads.size(), job.getName()));
+            logInfo(logger, String.format("%17d | %7d | %s", jobExecutionCount.getQueued(), jobThreads == null ? 0 : jobThreads.size(), job.getName()));
 
         }
 

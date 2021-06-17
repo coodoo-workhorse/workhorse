@@ -17,7 +17,7 @@ import io.coodoo.workhorse.core.entity.Job;
 // TODO The repetition rate of this job must be able, to be updated by the persisitence.
 @ApplicationScoped
 @InitialJobConfig(name = "Execution Cleanup", schedule = "0 13 * * * *", failRetries = 1, description = "Deletes old executions from the persistence",
-                tags = "system")
+                tags = "System")
 public class ExecutionCleanupWorker extends Worker {
 
     private final Logger logger = LoggerFactory.getLogger(ExecutionCleanupWorker.class);

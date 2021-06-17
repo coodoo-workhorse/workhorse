@@ -3,6 +3,7 @@ package io.coodoo.workhorse.core.boundary;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -614,7 +615,14 @@ public class WorkhorseService {
      * @return a set of {@link JobThread}
      */
     public Set<JobThread> getJobThreads(Job job) {
-        return executionBuffer.getJobThreads().get(job.getId());
+
+        Set<JobThread> jobThreads = new HashSet<>();
+
+        if (job != null) {
+            jobThreads = executionBuffer.getJobThreads().get(job.getId());
+        }
+
+        return jobThreads;
     }
 
 }
