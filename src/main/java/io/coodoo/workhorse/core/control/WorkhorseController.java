@@ -341,7 +341,7 @@ public class WorkhorseController {
     }
 
     /**
-     * create a Job Execution
+     * create an {@link Execution}
      * 
      * @param jobId Id of the corresponding job
      * @param parameters parameters of the execution
@@ -350,8 +350,8 @@ public class WorkhorseController {
      * @param expiresAt If expiresAt is given, the execution have to be process before this time. Otherwise the execution is cancelled.
      * @param batchId Id to refer to a group of executions to handle as a single entity.
      * @param chainId Id to refer to a group of executions to process by an order.
-     * @param uniqueQueued
-     * @return the created Job Execution
+     * @param uniqueQueued if true then no more than one execution with specified paramters can be queued at the time.
+     * @return the created execution
      */
     public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime plannedFor, LocalDateTime expiresAt, Long batchId,
                     Long chainId, boolean uniqueQueued) {
