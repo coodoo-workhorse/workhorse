@@ -2,8 +2,6 @@ package io.coodoo.workhorse.core.entity;
 
 import java.time.ZoneId;
 
-import io.coodoo.workhorse.core.boundary.annotation.InitialJobConfig;
-
 /**
  * The class defines all the configurations that can be applied to Workhorse to adapt it for multiples usage.
  * 

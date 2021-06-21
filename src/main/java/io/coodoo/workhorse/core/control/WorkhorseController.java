@@ -209,7 +209,7 @@ public class WorkhorseController {
             }
 
             job.setUniqueQueued(initialJobConfig.uniqueQueued());
-            
+
         } else {
 
             // Use initial default worker informations
