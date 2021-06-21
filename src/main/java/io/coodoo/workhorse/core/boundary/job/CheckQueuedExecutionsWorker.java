@@ -90,13 +90,19 @@ public class CheckQueuedExecutionsWorker extends Worker {
                 areExecutionNewInQueue = 1;
             }
 
+            logInfo(logger, String.format("%17d | %7d | %s", jobExecutionCount.getQueued(), jobThreads == null ? 0 : jobThreads.size(), job.getName()));
+
             // If at least 2/3 conditions are reached, send an email.
             if ((areThereRunningExecutions + areThereJobThreads + areExecutionNewInQueue) >= 2) {
                 // TODO Send Email !!
-                logWarn(logger, "Executions are no longer processed: " + job);
-            }
+                String message = "Executions are no longer processed: " + job;
+                logWarn(logger, message);
+                workhorseLogService.logMessage(message, job.getId(), false);
 
-            logInfo(logger, String.format("%17d | %7d | %s", jobExecutionCount.getQueued(), jobThreads == null ? 0 : jobThreads.size(), job.getName()));
+                // Try to restart the job.
+                workhorseService.deactivateJob(job.getId());
+                workhorseService.activateJob(job.getId());
+            }
 
         }
 
