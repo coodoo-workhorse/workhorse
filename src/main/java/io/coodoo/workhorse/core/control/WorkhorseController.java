@@ -202,10 +202,14 @@ public class WorkhorseController {
             job.setFailRetries(initialJobConfig.failRetries());
             job.setRetryDelay(initialJobConfig.retryDelay());
 
-            job.setMinutesUntilCleanUp(initialJobConfig.minutesUntilCleanUp());
+            if (initialJobConfig.minutesUntilCleanUp() < 0) {
+                job.setMinutesUntilCleanUp((int) StaticConfig.MINUTES_UNTIL_CLEANUP);
+            } else if (initialJobConfig.minutesUntilCleanUp() > 0) {
+                job.setMinutesUntilCleanUp(initialJobConfig.minutesUntilCleanUp());
+            }
 
             job.setUniqueQueued(initialJobConfig.uniqueQueued());
-
+            
         } else {
 
             // Use initial default worker informations
@@ -505,8 +509,13 @@ public class WorkhorseController {
     public int deleteOlderExecutions(Long jobId, long minMinutesOld) {
 
         // In this case the cleanup of executions is disabled for this job
-        if (minMinutesOld < 1) {
+        if (minMinutesOld == 0) {
             return 0;
+        }
+
+        // In this case the value to use is the default one defined by the WorkhorseConfig.MINUTES_UNTIL_CLEANUP
+        if (minMinutesOld < 0) {
+            minMinutesOld = StaticConfig.MINUTES_UNTIL_CLEANUP;
         }
 
         LocalDateTime time = LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)).minusMinutes(minMinutesOld);
