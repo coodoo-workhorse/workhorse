@@ -150,7 +150,7 @@ public class JobThread {
                             chainId = execution.getChainId();
                             chainedExecutions = executionPersistence.getChain(jobId, execution.getChainId());
                             // If the returned list don't contain at least 2 elements, stop the loop here. The first element has already been processed.
-                            if (chainedExecutions == null || chainedExecutions.isEmpty() || chainedExecutions.size() < 2) {
+                            if (chainedExecutions == null || chainedExecutions.size() < 2) {
                                 break executionLoop;
                             }
                             chainedExecutions.removeIf(exe -> exe.getId().equals(chainId));
