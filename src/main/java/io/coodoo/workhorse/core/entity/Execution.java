@@ -224,10 +224,10 @@ public class Execution extends BaseEntity {
 
     @Override
     public String toString() {
-        return "Execution [ID=" + id + ", batchId=" + batchId + ", chainId=" + chainId + ", duration=" + duration + ", endedAt=" + endedAt + ", expiresAt="
-                        + expiresAt + ", failRetry=" + failRetry + ", failRetryExecutionId=" + failRetryExecutionId + ", failStatus=" + failStatus + ", jobId="
-                        + jobId + ", parameters=" + parameters + ", parametersHash=" + parametersHash + ", plannedFor=" + plannedFor + ", priority=" + priority
-                        + ", startedAt=" + startedAt + ", status=" + status + "]";
+        return "Execution [batchId=" + batchId + ", chainId=" + chainId + ", duration=" + duration + ", endedAt=" + endedAt + ", expiresAt=" + expiresAt
+                        + ", failRetry=" + failRetry + ", failRetryExecutionId=" + failRetryExecutionId + ", failStatus=" + failStatus + ", jobId=" + jobId
+                        + ", parameters=" + parameters + ", parametersHash=" + parametersHash + ", plannedFor=" + plannedFor + ", priority=" + priority
+                        + ", startedAt=" + startedAt + ", status=" + status + ", summary=" + summary + "]";
     }
 
 }
