@@ -822,4 +822,21 @@ public class WorkhorseController {
         }
     }
 
+    /**
+     * Add a message to summarize the last processed executions of this job
+     * 
+     * @param jobId ID of the corresponding {@link Job}
+     * @param executionId ID of the corresponding {@link Execution}
+     * @param summary message to add
+     */
+    public void summerizeExecutions(Long jobId, Long executionId, String summary) {
+
+        Execution execution = getExecutionById(jobId, executionId);
+        execution.setSummary(summary);
+
+        // No special update of the summary field is defined as adding a summary-information do not occur often. Only one execution of a series holds the
+        // summary of all executions of this series
+        updateExecution(execution);
+    }
+
 }

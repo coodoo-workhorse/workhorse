@@ -181,7 +181,7 @@ public interface ExecutionPersistence {
     ExecutionLog getLog(Long jobId, Long executionId);
 
     /**
-     * Adds a message to the log as a new line.
+     * Add a message to the log as a new line.
      * 
      * @param jobId ID of the corresponding {@link Job}
      * @param executionId ID of corresponding {@link Execution}
