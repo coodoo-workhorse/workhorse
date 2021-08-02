@@ -100,6 +100,7 @@ public class CheckQueuedExecutionsWorker extends Worker {
                 workhorseLogService.logMessage(message, job.getId(), false);
 
                 // Try to restart the job.
+                workhorseLogService.logMessage("Try to restart the job", job.getId(), false);
                 workhorseService.deactivateJob(job.getId());
                 workhorseService.activateJob(job.getId());
             }
