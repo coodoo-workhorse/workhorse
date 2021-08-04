@@ -24,6 +24,7 @@ import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
+import io.coodoo.workhorse.core.entity.JobBufferStatus;
 import io.coodoo.workhorse.core.entity.JobExecutionCount;
 import io.coodoo.workhorse.core.entity.JobExecutionStatusSummary;
 import io.coodoo.workhorse.core.entity.JobStatus;
@@ -141,6 +142,9 @@ public class WorkhorseService {
      * @param workhorseConfig Configuration of the chosen persistence (this can only be done once and is final).
      */
     public void start(WorkhorseConfig workhorseConfig) {
+
+        long ms = System.currentTimeMillis();
+
         // Check if the persistence is already initialized. If so the engine is already living but paused and should now start again.
         if (!persistenceManager.isInitialized()) {
             currentWorkhorseConfig = workhorseConfig;
@@ -153,18 +157,26 @@ public class WorkhorseService {
         workhorse.start();
         jobScheduler.startScheduler();
 
-        log.info("Workhorse is running...");
+        ms = System.currentTimeMillis() - ms;
+        String startMessage = "Workhorse " + WorkhorseUtil.getVersion() + " (Persistence: " + workhorseConfig.getPersistenceName() + " "
+                        + workhorseConfig.getPersistenceVersion() + ") started in " + ms + "ms";
+        workhorseLogService.logMessage(startMessage, null, true);
     }
 
     /**
      * Stop Workhorse
      */
     public void stop() {
+
+        long ms = System.currentTimeMillis();
+
         workhorse.stop();
-
         jobScheduler.stopScheduler();
-
         executionBuffer.clearMemoryQueue();
+
+        ms = System.currentTimeMillis() - ms;
+        String startMessage = "Workhorse stopped in " + ms + "ms";
+        workhorseLogService.logMessage(startMessage, null, true);
     }
 
     /**
@@ -256,7 +268,7 @@ public class WorkhorseService {
     }
 
     /**
-     * Retrieves a {@link Execution} by Id
+     * Retrieves a {@link Execution} by ID
      */
     public Execution getExecutionById(Long jobId, Long executionId) {
         return workhorseController.getExecutionById(jobId, executionId);
@@ -275,7 +287,7 @@ public class WorkhorseService {
     }
 
     /**
-     * Retrieves a Job by Id
+     * Retrieves a Job by ID
      * 
      * @return Job
      */
@@ -346,9 +358,48 @@ public class WorkhorseService {
         }
     }
 
+    /**
+     * @deprecated This version must be deleted as soon as the corresponding resource endpoint in the Workhorse-ui-api project is deleted.
+     * 
+     *             create an {@link Execution}
+     * 
+     * @param jobId ID of the corresponding job
+     * @param parameters parameters of the execution
+     * @param priority if <code>true</code> the execution will be process before other execution. Otherwise the execution will be process in order of add.
+     * @param plannedFor if a plannedFor is given, the job execution will not be executed before this time.
+     * @param expiresAt if expiresAt is given, the execution have to be process before this time. Otherwise the execution is cancelled.
+     * @param batchId ID to refer to a group of executions to handle as a single entity.
+     * @param chainId ID to refer to a group of executions to process by an order.
+     * @param uniqueQueued if true then no more than one execution with specified paramters can be queued at the time.
+     * @return the created execution
+     */
+    @Deprecated
     public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime plannedFor, LocalDateTime expiresAt, Long batchId,
                     Long chainId, boolean uniqueQueued) {
-        return workhorseController.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, uniqueQueued);
+
+        return createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId);
+    }
+
+    /**
+     * create an {@link Execution}
+     * 
+     * @param jobId ID of the corresponding job
+     * @param parameters parameters of the execution
+     * @param priority if <code>true</code> the execution will be process before other execution. Otherwise the execution will be process in order of add.
+     * @param plannedFor if a plannedFor is given, the job execution will not be executed before this time.
+     * @param expiresAt if expiresAt is given, the execution have to be process before this time. Otherwise the execution is cancelled.
+     * @param batchId ID to refer to a group of executions to handle as a single entity.
+     * @param chainId ID to refer to a group of executions to process by an order.
+     * @return the created execution
+     */
+    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime plannedFor, LocalDateTime expiresAt, Long batchId,
+                    Long chainId) {
+
+        Job job = getJobById(jobId);
+        if (job == null) {
+            throw new RuntimeException("No Job for JobId found");
+        }
+        return workhorseController.createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId, job.isUniqueQueued());
     }
 
     public Execution updateExecution(Long jobId, Long executionId, ExecutionStatus status, String parameters, boolean priority, LocalDateTime plannedFor,
@@ -617,12 +668,20 @@ public class WorkhorseService {
     public Set<JobThread> getJobThreads(Job job) {
 
         Set<JobThread> jobThreads = new HashSet<>();
-
         if (job != null) {
             jobThreads = executionBuffer.getJobThreads().get(job.getId());
         }
-
         return jobThreads;
+    }
+
+    /**
+     * Get the status (executions, threads, CompletionStages) of the buffer of the given job
+     * 
+     * @param job job whose status has to be retrieve
+     * @return JobBufferStatus
+     */
+    public JobBufferStatus getJobBufferStatus(Job job) {
+        return executionBuffer.getJobBufferStatus(job);
     }
 
 }

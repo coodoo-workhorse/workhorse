@@ -28,7 +28,7 @@ public class ExecutionCleanupWorker extends Worker {
     @Override
     public void doWork() throws Exception {
 
-        if (StaticConfig.MINUTES_UNTIL_CLEANUP < 1) {
+        if (StaticConfig.MINUTES_UNTIL_CLEANUP == 0) {
             logInfo(logger, "The cleanup is deactivated.");
             return;
         }
@@ -44,6 +44,10 @@ public class ExecutionCleanupWorker extends Worker {
         String failedJobInfo = "";
         for (Job job : jobs) {
             try {
+                if (job.getMinutesUntilCleanUp() == 0) {
+                    // In this case the cleanup of executions is disabled for this job
+                    continue;
+                }
                 long millisAtStart = System.currentTimeMillis();
                 int deleted = workhorseController.deleteOlderExecutions(job.getId(), job.getMinutesUntilCleanUp());
                 long duration = System.currentTimeMillis() - millisAtStart;
