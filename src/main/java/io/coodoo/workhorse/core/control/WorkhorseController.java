@@ -204,7 +204,7 @@ public class WorkhorseController {
 
             if (initialJobConfig.minutesUntilCleanUp() < 0) {
                 job.setMinutesUntilCleanUp((int) StaticConfig.MINUTES_UNTIL_CLEANUP);
-            } else if (initialJobConfig.minutesUntilCleanUp() > 0) {
+            } else if (initialJobConfig.minutesUntilCleanUp() >= 0) {
                 job.setMinutesUntilCleanUp(initialJobConfig.minutesUntilCleanUp());
             }
 
@@ -218,7 +218,9 @@ public class WorkhorseController {
             job.setUniqueQueued(InitialJobConfig.JOB_CONFIG_UNIQUE_IN_QUEUE);
             job.setStatus(JobStatus.ACTIVE);
             job.setThreads(InitialJobConfig.JOB_CONFIG_THREADS);
-            job.setMinutesUntilCleanUp(InitialJobConfig.JOB_CONFIG_MINUTES_UNTIL_CLEANUP);
+
+            // In this case the value to use is the default one defined by StaticConfig.MINUTES_UNTIL_CLEANUP
+            job.setMinutesUntilCleanUp((int) StaticConfig.MINUTES_UNTIL_CLEANUP);
         }
 
         String parameterClassName = getWorkerParameterName(workerClass);
@@ -513,7 +515,7 @@ public class WorkhorseController {
             return 0;
         }
 
-        // In this case the value to use is the default one defined by the WorkhorseConfig.MINUTES_UNTIL_CLEANUP
+        // In this case the value to use is the default one defined by StaticConfig.MINUTES_UNTIL_CLEANUP
         if (minMinutesOld < 0) {
             minMinutesOld = StaticConfig.MINUTES_UNTIL_CLEANUP;
         }
