@@ -202,6 +202,7 @@ public class WorkhorseController {
             job.setFailRetries(initialJobConfig.failRetries());
             job.setRetryDelay(initialJobConfig.retryDelay());
 
+            // Use workhorse default cleanup config if configuration is set to number less zero
             if (initialJobConfig.minutesUntilCleanUp() < 0) {
                 job.setMinutesUntilCleanUp((int) StaticConfig.MINUTES_UNTIL_CLEANUP);
             } else if (initialJobConfig.minutesUntilCleanUp() >= 0) {
