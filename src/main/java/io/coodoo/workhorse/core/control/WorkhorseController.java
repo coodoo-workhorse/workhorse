@@ -3,6 +3,7 @@ package io.coodoo.workhorse.core.control;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -843,11 +844,38 @@ public class WorkhorseController {
     public void summerizeExecutions(Long jobId, Long executionId, String summary) {
 
         Execution execution = getExecutionById(jobId, executionId);
-        execution.setSummary(summary);
+
+        if (execution == null) {
+            return;
+        }
+
+        StringBuilder summaryToPersist = new StringBuilder();
+        int maxSummaryLength = StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH;
+
+        if (summary.length() > maxSummaryLength) {
+
+            summaryToPersist.append(summary.substring(0, maxSummaryLength));
+            summaryToPersist.append("...");
+
+            StringBuilder summaryToPersistAsLog = new StringBuilder();
+
+            DateTimeFormatter logTimeFormat = DateTimeFormatter.ofPattern(StaticConfig.LOG_TIME_FORMATTER);
+            String time = WorkhorseUtil.timestamp().format(logTimeFormat) + " ";
+
+            String marker = time + "[SUMMARY]" + " ";
+
+            summaryToPersistAsLog.append(marker).append(summary);
+            appendExecutionLog(jobId, executionId, summaryToPersistAsLog.toString());
+        } else {
+            summaryToPersist.append(summary);
+        }
+
+        execution.setSummary(summaryToPersist.toString());
 
         // No special update of the summary field is defined as adding a summary-information do not occur often. Only one execution of a series holds the
         // summary of all executions of this series
         updateExecution(execution);
+
     }
 
 }

@@ -45,7 +45,7 @@ public class Execution extends BaseEntity {
     private Long duration;
 
     /**
-     * Message summarizing executions that have been processed
+     * Message of max 140 characters to summarize executions that have been processed
      */
     private String summary;
 

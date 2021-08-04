@@ -92,4 +92,9 @@ public final class StaticConfig {
      */
     public static String LOG_ERROR_MARKER;
 
+    /**
+     * Max length of the summary of an execution. Default is <code>140</code>
+     */
+    public static int MAX_EXECUTION_SUMMARY_LENGTH = 140;
+
 }
