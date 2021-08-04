@@ -605,6 +605,7 @@ public class WorkhorseControllerTest {
     public void testCreateJob() throws Exception {
 
         Class<?> workerClass = TestWorker.class;
+        StaticConfig.MINUTES_UNTIL_CLEANUP = 4000;
 
         // Job with Id to bypass the trigger of exception
         Job job = new Job();
@@ -620,7 +621,7 @@ public class WorkhorseControllerTest {
         assertEquals(InitialJobConfig.JOB_CONFIG_UNIQUE_IN_QUEUE, argument.getValue().isUniqueQueued());
         assertEquals(JobStatus.ACTIVE, argument.getValue().getStatus());
         assertEquals(InitialJobConfig.JOB_CONFIG_THREADS, argument.getValue().getThreads());
-        assertEquals(InitialJobConfig.JOB_CONFIG_MINUTES_UNTIL_CLEANUP, argument.getValue().getMinutesUntilCleanUp());
+        assertEquals(StaticConfig.MINUTES_UNTIL_CLEANUP, argument.getValue().getMinutesUntilCleanUp());
         assertNull(argument.getValue().getSchedule());
     }
 
