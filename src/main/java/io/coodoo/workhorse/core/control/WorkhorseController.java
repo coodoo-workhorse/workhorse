@@ -202,7 +202,12 @@ public class WorkhorseController {
             job.setFailRetries(initialJobConfig.failRetries());
             job.setRetryDelay(initialJobConfig.retryDelay());
 
-            job.setMinutesUntilCleanUp(initialJobConfig.minutesUntilCleanUp());
+            // Use workhorse default cleanup config if configuration is set to number less zero
+            if (initialJobConfig.minutesUntilCleanUp() < 0) {
+                job.setMinutesUntilCleanUp((int) StaticConfig.MINUTES_UNTIL_CLEANUP);
+            } else if (initialJobConfig.minutesUntilCleanUp() >= 0) {
+                job.setMinutesUntilCleanUp(initialJobConfig.minutesUntilCleanUp());
+            }
 
             job.setUniqueQueued(initialJobConfig.uniqueQueued());
 
@@ -214,7 +219,9 @@ public class WorkhorseController {
             job.setUniqueQueued(InitialJobConfig.JOB_CONFIG_UNIQUE_IN_QUEUE);
             job.setStatus(JobStatus.ACTIVE);
             job.setThreads(InitialJobConfig.JOB_CONFIG_THREADS);
-            job.setMinutesUntilCleanUp(InitialJobConfig.JOB_CONFIG_MINUTES_UNTIL_CLEANUP);
+
+            // In this case the value to use is the default one defined by StaticConfig.MINUTES_UNTIL_CLEANUP
+            job.setMinutesUntilCleanUp((int) StaticConfig.MINUTES_UNTIL_CLEANUP);
         }
 
         String parameterClassName = getWorkerParameterName(workerClass);
@@ -504,8 +511,12 @@ public class WorkhorseController {
      */
     public int deleteOlderExecutions(Long jobId, long minMinutesOld) {
 
-        // Is minMinutesOld negativ the global default value of minutesUntilCleanup is
-        // to use.
+        // In this case the cleanup of executions is disabled for this job
+        if (minMinutesOld == 0) {
+            return 0;
+        }
+
+        // In this case the value to use is the default one defined by StaticConfig.MINUTES_UNTIL_CLEANUP
         if (minMinutesOld < 0) {
             minMinutesOld = StaticConfig.MINUTES_UNTIL_CLEANUP;
         }

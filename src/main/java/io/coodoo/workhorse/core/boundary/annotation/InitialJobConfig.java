@@ -15,6 +15,8 @@ public @interface InitialJobConfig {
     public static final int JOB_CONFIG_MAX_PER_MINUTE = 0;
     public static final int JOB_CONFIG_FAIL_RETRIES = 0;
     public static final int JOB_CONFIG_RETRY_DELAY = 4000;
+
+    // use the workhorse default value
     public static final int JOB_CONFIG_MINUTES_UNTIL_CLEANUP = -1;
     public static final boolean JOB_CONFIG_UNIQUE_IN_QUEUE = false;
 
@@ -64,7 +66,7 @@ public @interface InitialJobConfig {
     int retryDelay() default JOB_CONFIG_RETRY_DELAY;
 
     /**
-     * @return Number of minutes after the job executions get deleted. Default is 30 minutes, if set to 0 no job execution will get deleted.
+     * @return Number of minutes after the job executions get deleted. The default value depends on the active persistence.
      */
     int minutesUntilCleanUp() default JOB_CONFIG_MINUTES_UNTIL_CLEANUP;
 

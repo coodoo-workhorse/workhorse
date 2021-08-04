@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
+import io.coodoo.workhorse.core.entity.JobBufferStatus;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
 
 /**
@@ -67,6 +68,30 @@ public class ExecutionBuffer {
         jobThreadCounts.put(job.getId(), job.getThreads());
         runningJobThreadCounts.put(job.getId(), 0);
         completionStages.put(job.getId(), new HashSet<>());
+    }
+
+    /**
+     * Get the status (executions, threads, CompletionStages) of the buffer of the given job
+     * 
+     * @param job job whose status has to be retrieve
+     * @return JobBufferStatus
+     */
+    public JobBufferStatus getJobBufferStatus(Job job) {
+
+        if (job == null) {
+            return null;
+        }
+
+        Queue<Long> jobsExecutions = executions.get(job.getId());
+        Queue<Long> jobsPriorityExecutions = priorityExecutions.get(job.getId());
+        Set<Long> jobsRunningExecutions = runningExecutions.get(job.getId());
+        Set<JobThread> threads = jobThreads.get(job.getId());
+        Set<CompletionStage<Job>> jobsCompletionStages = completionStages.get(job.getId());
+        Integer jobsRunningJobThreadCounts = runningJobThreadCounts.get(job.getId());
+        Integer jobsThreadCounts = jobThreadCounts.get(job.getId());
+
+        return new JobBufferStatus(jobsExecutions, jobsPriorityExecutions, jobsRunningExecutions, threads, jobsCompletionStages, jobsRunningJobThreadCounts,
+                        jobsThreadCounts);
     }
 
     public void clear() {

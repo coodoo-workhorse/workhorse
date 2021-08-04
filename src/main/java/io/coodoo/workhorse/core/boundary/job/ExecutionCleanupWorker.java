@@ -16,7 +16,8 @@ import io.coodoo.workhorse.core.entity.Job;
 
 // TODO The repetition rate of this job must be able, to be updated by the persisitence.
 @ApplicationScoped
-@InitialJobConfig(name = "Execution Cleanup", schedule = "0 13 * * * *", failRetries = 1, description = "Deletes old executions from the persistence")
+@InitialJobConfig(name = "Execution Cleanup", schedule = "0 13 * * * *", failRetries = 1, description = "Deletes old executions from the persistence",
+                tags = "System")
 public class ExecutionCleanupWorker extends Worker {
 
     private final Logger logger = LoggerFactory.getLogger(ExecutionCleanupWorker.class);
@@ -27,7 +28,7 @@ public class ExecutionCleanupWorker extends Worker {
     @Override
     public void doWork() throws Exception {
 
-        if (StaticConfig.MINUTES_UNTIL_CLEANUP < 1) {
+        if (StaticConfig.MINUTES_UNTIL_CLEANUP == 0) {
             logInfo(logger, "The cleanup is deactivated.");
             return;
         }
@@ -43,6 +44,10 @@ public class ExecutionCleanupWorker extends Worker {
         String failedJobInfo = "";
         for (Job job : jobs) {
             try {
+                if (job.getMinutesUntilCleanUp() == 0) {
+                    // In this case the cleanup of executions is disabled for this job
+                    continue;
+                }
                 long millisAtStart = System.currentTimeMillis();
                 int deleted = workhorseController.deleteOlderExecutions(job.getId(), job.getMinutesUntilCleanUp());
                 long duration = System.currentTimeMillis() - millisAtStart;

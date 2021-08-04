@@ -3,6 +3,7 @@ package io.coodoo.workhorse.core.boundary;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,6 +24,7 @@ import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
+import io.coodoo.workhorse.core.entity.JobBufferStatus;
 import io.coodoo.workhorse.core.entity.JobExecutionCount;
 import io.coodoo.workhorse.core.entity.JobExecutionStatusSummary;
 import io.coodoo.workhorse.core.entity.JobStatus;
@@ -655,6 +657,31 @@ public class WorkhorseService {
      */
     public Map<Long, Set<JobThread>> getJobThreads() {
         return executionBuffer.getJobThreads();
+    }
+
+    /**
+     * Retrieves all {@link JobThread} of a {@link Job}
+     * 
+     * @param job
+     * @return a set of {@link JobThread}
+     */
+    public Set<JobThread> getJobThreads(Job job) {
+
+        Set<JobThread> jobThreads = new HashSet<>();
+        if (job != null) {
+            jobThreads = executionBuffer.getJobThreads().get(job.getId());
+        }
+        return jobThreads;
+    }
+
+    /**
+     * Get the status (executions, threads, CompletionStages) of the buffer of the given job
+     * 
+     * @param job job whose status has to be retrieve
+     * @return JobBufferStatus
+     */
+    public JobBufferStatus getJobBufferStatus(Job job) {
+        return executionBuffer.getJobBufferStatus(job);
     }
 
 }

@@ -54,6 +54,7 @@ public class WorkhorseControllerTest {
     private final static String NON_VALID_SCHEDULE = " ";
     private final static String TAGS = "unit, test, java";
     private final static int MAX_PER_MINUTE = 1000;
+    private final static int MINUTES_UNTIL_CLEANUP = 400;
 
     public class TestWorker extends Worker {
         @Override
@@ -96,6 +97,14 @@ public class WorkhorseControllerTest {
 
     @InitialJobConfig(maxPerMinute = MAX_PER_MINUTE)
     public class TestWorkerWithMaxPerMinute extends Worker {
+        @Override
+        public void doWork() throws Exception {
+            return;
+        }
+    }
+
+    @InitialJobConfig(minutesUntilCleanUp = MINUTES_UNTIL_CLEANUP)
+    public class TestWorkerWithInitialConfigMinuteUntilCleanup extends Worker {
         @Override
         public void doWork() throws Exception {
             return;
@@ -596,6 +605,7 @@ public class WorkhorseControllerTest {
     public void testCreateJob() throws Exception {
 
         Class<?> workerClass = TestWorker.class;
+        StaticConfig.MINUTES_UNTIL_CLEANUP = 4000;
 
         // Job with Id to bypass the trigger of exception
         Job job = new Job();
@@ -611,7 +621,7 @@ public class WorkhorseControllerTest {
         assertEquals(InitialJobConfig.JOB_CONFIG_UNIQUE_IN_QUEUE, argument.getValue().isUniqueQueued());
         assertEquals(JobStatus.ACTIVE, argument.getValue().getStatus());
         assertEquals(InitialJobConfig.JOB_CONFIG_THREADS, argument.getValue().getThreads());
-        assertEquals(InitialJobConfig.JOB_CONFIG_MINUTES_UNTIL_CLEANUP, argument.getValue().getMinutesUntilCleanUp());
+        assertEquals(StaticConfig.MINUTES_UNTIL_CLEANUP, argument.getValue().getMinutesUntilCleanUp());
         assertNull(argument.getValue().getSchedule());
     }
 
@@ -659,7 +669,7 @@ public class WorkhorseControllerTest {
     public void testCreateJob_with_InitialJobConfig() throws Exception {
 
         Class<?> workerClass = TestWorkerWithInitialConfig.class;
-
+        StaticConfig.MINUTES_UNTIL_CLEANUP = 40000l;
         // Job with Id to bypass the trigger of exception
         Job job = new Job();
         job.setId(1L);
@@ -674,7 +684,28 @@ public class WorkhorseControllerTest {
         assertEquals(workerClass.getName(), argument.getValue().getWorkerClassName());
         assertEquals(InitialJobConfig.JOB_CONFIG_UNIQUE_IN_QUEUE, argument.getValue().isUniqueQueued());
         assertEquals(JobStatus.ACTIVE, argument.getValue().getStatus());
-        assertEquals(InitialJobConfig.JOB_CONFIG_MINUTES_UNTIL_CLEANUP, argument.getValue().getMinutesUntilCleanUp());
+        assertEquals(StaticConfig.MINUTES_UNTIL_CLEANUP, argument.getValue().getMinutesUntilCleanUp());
+        assertNull(argument.getValue().getSchedule());
+    }
+
+    @Test
+    public void testCreateJob_with_InitialJobConfig_MINUTE_UNTIL_CLEANUP() throws Exception {
+
+        Class<?> workerClass = TestWorkerWithInitialConfigMinuteUntilCleanup.class;
+
+        // Job with Id to bypass the trigger of exception
+        Job job = new Job();
+        job.setId(1L);
+        when(jobPersistence.persist(anyObject())).thenReturn(job);
+
+        classUnderTest.createJob(workerClass);
+
+        ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
+        verify(jobPersistence).persist(argument.capture());
+        assertEquals(workerClass.getName(), argument.getValue().getWorkerClassName());
+        assertEquals(InitialJobConfig.JOB_CONFIG_UNIQUE_IN_QUEUE, argument.getValue().isUniqueQueued());
+        assertEquals(JobStatus.ACTIVE, argument.getValue().getStatus());
+        assertEquals(MINUTES_UNTIL_CLEANUP, argument.getValue().getMinutesUntilCleanUp());
         assertNull(argument.getValue().getSchedule());
     }
 
