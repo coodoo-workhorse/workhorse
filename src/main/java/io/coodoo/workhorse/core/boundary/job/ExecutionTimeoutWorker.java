@@ -23,7 +23,8 @@ import io.coodoo.workhorse.util.WorkhorseUtil;
  * @author coodoo GmbH (coodoo.io)
  */
 @ApplicationScoped
-@InitialJobConfig(name = "Hunt timeout executions ", schedule = "5 * * * * *", failRetries = 1, description = "Hunt too long running executions and cure them.")
+@InitialJobConfig(name = "Hunt timeout executions", schedule = "5 * * * * *", failRetries = 1,
+                description = "Hunt too long-running zombie executions and cure them.", tags = "System")
 public class ExecutionTimeoutWorker extends Worker {
 
     private final Logger log = LoggerFactory.getLogger(ExecutionTimeoutWorker.class);
