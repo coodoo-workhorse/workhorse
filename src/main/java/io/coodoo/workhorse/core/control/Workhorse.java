@@ -126,7 +126,7 @@ public class Workhorse {
      */
     public void poll(Job job) {
         if (!JobStatus.ACTIVE.equals(job.getStatus())) {
-            log.error("The status of the job is expected to be ACTIVE. But the given one is: {}", job.getStatus());
+            log.error("Executions of this job can not be polled. The status of the job is expected to be ACTIVE. But the given one is: {}", job.getStatus());
             return;
         }
         if (executionBuffer.getNumberOfExecution(job.getId()) < StaticConfig.BUFFER_MIN) {
