@@ -95,8 +95,10 @@ public class CheckQueuedExecutionsWorker extends Worker {
             // If at least 2/3 conditions are reached, send an email.
             if ((areThereRunningExecutions + areThereJobThreads + areExecutionNewInQueue) >= 2) {
                 // TODO Send Email !!
-                String message = "Executions are no longer processed: " + job;
+
+                String message = "Executions of the job: " + job.getName() + " with ID: " + job.getId() + " are no longer processed.";
                 logWarn(logger, message);
+                executionContext.summerize(message);
                 workhorseLogService.logMessage(message, job.getId(), false);
 
                 // Try to restart the job.
