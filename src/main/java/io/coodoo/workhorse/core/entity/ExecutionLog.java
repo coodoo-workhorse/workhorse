@@ -1,5 +1,10 @@
 package io.coodoo.workhorse.core.entity;
 
+/**
+ * The class defines all types of messages that can be stored about an execution.
+ * 
+ * @author coodoo GmbH (coodoo.io)
+ */
 public class ExecutionLog extends BaseEntity {
 
     /**

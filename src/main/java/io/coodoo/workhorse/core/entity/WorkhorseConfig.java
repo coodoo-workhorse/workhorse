@@ -49,6 +49,11 @@ public abstract class WorkhorseConfig {
     protected int executionTimeout = 120;
 
     /**
+     * Max length of the summary of an execution. Default is <code>140</code>
+     */
+    protected int maxExecutionSummaryLength = 140;
+
+    /**
      * 
      * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and doesn't change for {@link WorkhorseConfig#executionTimeout} seconds, it is in
      * timeout!
@@ -153,6 +158,14 @@ public abstract class WorkhorseConfig {
         this.executionTimeout = executionTimeout;
     }
 
+    public int getMaxExecutionSummaryLength() {
+        return maxExecutionSummaryLength;
+    }
+
+    public void setMaxExecutionSummaryLength(int maxExecutionSummaryLength) {
+        this.maxExecutionSummaryLength = maxExecutionSummaryLength;
+    }
+
     public ExecutionStatus getExecutionTimeoutStatus() {
         return executionTimeoutStatus;
     }
@@ -207,7 +220,8 @@ public abstract class WorkhorseConfig {
                         + ", bufferPushFallbackPollInterval=" + bufferPushFallbackPollInterval + ", executionTimeout=" + executionTimeout
                         + ", executionTimeoutStatus=" + executionTimeoutStatus + ", logChange=" + logChange + ", logErrorMarker=" + logErrorMarker
                         + ", logInfoMarker=" + logInfoMarker + ", logTimeFormat=" + logTimeFormat + ", logWarnMarker=" + logWarnMarker
-                        + ", minutesUntilCleanup=" + minutesUntilCleanup + ", timeZone=" + timeZone + "]";
+                        + ", maxExecutionSummaryLength=" + maxExecutionSummaryLength + ", minutesUntilCleanup=" + minutesUntilCleanup + ", timeZone=" + timeZone
+                        + "]";
     }
 
 }

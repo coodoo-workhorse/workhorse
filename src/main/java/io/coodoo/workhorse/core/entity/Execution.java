@@ -44,7 +44,10 @@ public class Execution extends BaseEntity {
      */
     private Long duration;
 
-    // TODO Execution Outomce als teil eines info-features: status zeit outcome
+    /**
+     * Message of max 140 characters to summarize executions that have been processed
+     */
+    private String summary;
 
     /**
      * If a exectution has the priority set to <code>true</code> it will be executed before all jobs with priority <code>false</code>.
@@ -105,6 +108,14 @@ public class Execution extends BaseEntity {
 
     public void setDuration(Long duration) {
         this.duration = duration;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 
     public String getParameters() {
@@ -213,10 +224,10 @@ public class Execution extends BaseEntity {
 
     @Override
     public String toString() {
-        return "Execution [ID=" + id + ", batchId=" + batchId + ", chainId=" + chainId + ", duration=" + duration + ", endedAt=" + endedAt + ", expiresAt="
-                        + expiresAt + ", failRetry=" + failRetry + ", failRetryExecutionId=" + failRetryExecutionId + ", failStatus=" + failStatus + ", jobId="
-                        + jobId + ", parameters=" + parameters + ", parametersHash=" + parametersHash + ", plannedFor=" + plannedFor + ", priority=" + priority
-                        + ", startedAt=" + startedAt + ", status=" + status + "]";
+        return "Execution [batchId=" + batchId + ", chainId=" + chainId + ", duration=" + duration + ", endedAt=" + endedAt + ", expiresAt=" + expiresAt
+                        + ", failRetry=" + failRetry + ", failRetryExecutionId=" + failRetryExecutionId + ", failStatus=" + failStatus + ", jobId=" + jobId
+                        + ", parameters=" + parameters + ", parametersHash=" + parametersHash + ", plannedFor=" + plannedFor + ", priority=" + priority
+                        + ", startedAt=" + startedAt + ", status=" + status + ", summary=" + summary + "]";
     }
 
 }

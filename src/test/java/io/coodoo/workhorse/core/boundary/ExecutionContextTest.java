@@ -1,11 +1,16 @@
 package io.coodoo.workhorse.core.boundary;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -201,6 +206,100 @@ public class ExecutionContextTest {
         classUnderTest.appendLog(message, false, "w");
 
         verify(executionPersistence).log(execution.getJobId(), execution.getId(), message);
+
+    }
+
+    @Test
+    public void testSummerize_positiv_szenario() throws Exception {
+
+        String summary = "Message";
+        StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH = 10;
+
+        Execution executionOfTheContext = new Execution();
+        executionOfTheContext.setJobId(1L);
+        executionOfTheContext.setId(1L);
+
+        classUnderTest.init(executionOfTheContext);
+        classUnderTest.summerize(summary);
+
+        ArgumentCaptor<Execution> argument = ArgumentCaptor.forClass(Execution.class);
+        verify(executionPersistence).update(argument.capture());
+        assertEquals(summary, argument.getValue().getSummary());
+    }
+
+    @Test
+    public void testSummerize_with_too_long_summary() throws Exception {
+
+        String summary = "Message to test.";
+        StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH = 10;
+
+        String expectedSummary = "Message to...";
+
+        Execution executionOfTheContext = new Execution();
+        executionOfTheContext.setJobId(1L);
+        executionOfTheContext.setId(1L);
+
+        classUnderTest.init(executionOfTheContext);
+        classUnderTest.summerize(summary);
+
+        Execution expectedExecution = execution;
+        expectedExecution.setSummary(summary);
+
+        ArgumentCaptor<Execution> argument = ArgumentCaptor.forClass(Execution.class);
+        verify(executionPersistence).update(argument.capture());
+        assertEquals(expectedSummary, argument.getValue().getSummary());
+    }
+
+    @Test
+    public void testSummerize_persist_as_log_summary_too_long() throws Exception {
+
+        String summary = "Message to test.";
+        StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH = 10;
+
+        Execution executionOfTheContext = new Execution();
+        executionOfTheContext.setJobId(1L);
+        executionOfTheContext.setId(1L);
+
+        classUnderTest.init(executionOfTheContext);
+        classUnderTest.summerize(summary);
+
+        Execution expectedExecution = execution;
+        expectedExecution.setSummary(summary);
+
+        ArgumentCaptor<String> argumentString = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Long> argumentJobId = ArgumentCaptor.forClass(Long.class);
+        ArgumentCaptor<Long> argumentExecutionId = ArgumentCaptor.forClass(Long.class);
+        verify(executionPersistence).log(argumentJobId.capture(), argumentExecutionId.capture(), argumentString.capture());
+
+        assertTrue(argumentString.getValue().endsWith("[SUMMARY]" + " " + summary));
+
+    }
+
+    @Test
+    public void testSummerize_with_NULL_as_parameter() throws Exception {
+
+        Execution executionOfTheContext = new Execution();
+        executionOfTheContext.setJobId(1L);
+        executionOfTheContext.setId(1L);
+
+        classUnderTest.init(executionOfTheContext);
+        classUnderTest.summerize(null);
+
+        verify(executionPersistence, never()).update(anyObject());
+
+    }
+
+    @Test
+    public void testSummerize_with_EMPTY_paramter() throws Exception {
+
+        Execution executionOfTheContext = new Execution();
+        executionOfTheContext.setJobId(1L);
+        executionOfTheContext.setId(1L);
+
+        classUnderTest.init(executionOfTheContext);
+        classUnderTest.summerize("         ");
+
+        verify(executionPersistence, never()).update(anyObject());
 
     }
 }
