@@ -200,9 +200,14 @@ public class ExecutionContext {
     }
 
     /**
-     * Add a message to summarize the last processed executions of this job
+     * <p>
+     * Add a short message to summarize this execution.
+     * </p>
+     * The number of character in a summary can not exceed a value defined in {@link WorkhorseConfig#getMaxExecutionSummaryLength()}.<br>
+     * Otherwise the summary is cut to the permitted length and the full-length summary is appended to the logs ({@link ExecutionLog#getLog()}) of the current
+     * execution.
      * 
-     * @param summary message to add
+     * @param summary short message to add
      */
     public void summerize(String summary) {
 
