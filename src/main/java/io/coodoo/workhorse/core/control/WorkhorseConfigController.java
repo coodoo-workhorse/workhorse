@@ -77,6 +77,7 @@ public class WorkhorseConfigController {
         updateLogInfoMarker(workhorseConfig, newWorkhorseConfig.getLogInfoMarker());
         updateLogWarnMarker(workhorseConfig, newWorkhorseConfig.getLogWarnMarker());
         updateLogErrorMarker(workhorseConfig, newWorkhorseConfig.getLogErrorMarker());
+        updateMaxExecutionSummaryLength(workhorseConfig, newWorkhorseConfig.getMaxExecutionSummaryLength());
 
         configPersistence.update(workhorseConfig);
         log.info("Updated: {}", workhorseConfig);
@@ -106,6 +107,7 @@ public class WorkhorseConfigController {
         StaticConfig.LOG_INFO_MARKER = workhorseConfig.getLogInfoMarker();
         StaticConfig.LOG_WARN_MARKER = workhorseConfig.getLogWarnMarker();
         StaticConfig.LOG_ERROR_MARKER = workhorseConfig.getLogErrorMarker();
+        StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH = workhorseConfig.getMaxExecutionSummaryLength();
 
         configPersistence.update(workhorseConfig);
 
@@ -162,6 +164,23 @@ public class WorkhorseConfigController {
             String message = executionTimeout > 0 ? null : "Execution timeout is set to '0', so the hunt is off!";
             workhorseLogService.logChange(null, null, "Execution timeout", workhorseConfig.getExecutionTimeout(), executionTimeout, message);
             workhorseConfig.setExecutionTimeout(executionTimeout);
+        }
+    }
+
+    protected void updateMaxExecutionSummaryLength(WorkhorseConfig workhorseConfig, int maxExecutionSummaryLength) {
+
+        if (maxExecutionSummaryLength < 0) {
+            maxExecutionSummaryLength = 0;
+            log.trace("For robustness the value of maxExecutionSummaryLength is set to '0', when the given value is negativ.");
+        }
+        if (workhorseConfig.getMaxExecutionSummaryLength() != maxExecutionSummaryLength) {
+
+            StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH = maxExecutionSummaryLength;
+
+            String message = maxExecutionSummaryLength > 0 ? null : "Execution timeout is set to '0', so execution can not have summary!";
+            workhorseLogService.logChange(null, null, "maxExecutionSummaryLength", workhorseConfig.getMaxExecutionSummaryLength(), maxExecutionSummaryLength,
+                            message);
+            workhorseConfig.setMaxExecutionSummaryLength(maxExecutionSummaryLength);
         }
     }
 

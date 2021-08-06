@@ -58,6 +58,11 @@ public final class StaticConfig {
     public static int EXECUTION_TIMEOUT;
 
     /**
+     * Max length of the summary of an execution.
+     */
+    public static int MAX_EXECUTION_SUMMARY_LENGTH;
+
+    /**
      * 
      * If an execution is stuck in status {@link ExecutionStatus#RUNNING} and doesn't change for {@link WorkhorseConfig#executionTimeout} seconds, it is in
      * timout!
@@ -91,10 +96,5 @@ public final class StaticConfig {
      * Execution log error marker. Default is <code>[ERROR]</code>
      */
     public static String LOG_ERROR_MARKER;
-
-    /**
-     * Max length of the summary of an execution. Default is <code>140</code>
-     */
-    public static int MAX_EXECUTION_SUMMARY_LENGTH = 140;
 
 }

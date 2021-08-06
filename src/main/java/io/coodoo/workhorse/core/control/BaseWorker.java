@@ -287,15 +287,6 @@ public abstract class BaseWorker {
     }
 
     /**
-     * Add a message to summarize the last processed executions of this job
-     * 
-     * @param summary message to add
-     */
-    public void summarize(String summary) {
-        workhorseController.summerizeExecutions(executionContext.getJobId(), executionContext.getExecutionId(), summary);
-    }
-
-    /**
      * @return the log text of the current running job execution or <code>null</code> if there isn't any
      */
     public String getJobExecutionLog() {
