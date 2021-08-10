@@ -49,7 +49,9 @@ public class CheckQueuedExecutionsWorker extends Worker {
         logInfo(logger, "Starting check queued Execution.");
         logInfo(logger, "Queued executions | Threads | Job's name");
 
-        boolean areThereAnyProblem = false;
+        // This value is set only if the job finds a problem.
+        // This behavior is used to set a default summary message by healthy queues
+        String summary = null;
 
         // Get only jobs with the status ACTIVE
         List<Job> activeJobs = workhorseController.getAllJobsByStatus(JobStatus.ACTIVE);
@@ -99,14 +101,11 @@ public class CheckQueuedExecutionsWorker extends Worker {
             // If at least 2/3 conditions are reached, send an email.
             if ((areThereRunningExecutions + areThereJobThreads + areExecutionNewInQueue) >= 2) {
 
-                // With this boolean value the summary that should be added for "well done" is not added
-                areThereAnyProblem = true;
-
                 // TODO Send Email !!
 
                 // This state of the job is logged
-                String message = "Executions of the job: " + job.getName() + " with ID: " + job.getId() + " are no longer processed.";
-                logWarn(logger, message);
+                summary = "Executions of the job: " + job.getName() + " with ID: " + job.getId() + " are no longer processed.";
+                logWarn(logger, summary);
 
                 JobBufferStatus jobBufferStatus = workhorseService.getJobBufferStatus(job);
                 logInfo(logger, "State of the intern buffer of the job");
@@ -117,8 +116,8 @@ public class CheckQueuedExecutionsWorker extends Worker {
                 logInfo(logger, "executions: " + jobBufferStatus.executions);
                 logInfo(logger, "Thread: " + jobBufferStatus.jobThreads.stream().map(thread -> thread.getThread().getName()).collect(Collectors.toList()));
 
-                executionContext.summarize(message);
-                workhorseLogService.logMessage(message, job.getId(), false);
+                executionContext.summarize(summary);
+                workhorseLogService.logMessage(summary, job.getId(), false);
 
                 // Try to restart the job.
                 workhorseLogService.logMessage("Try to restart the job", job.getId(), false);
@@ -127,7 +126,8 @@ public class CheckQueuedExecutionsWorker extends Worker {
             }
 
         }
-        if (!areThereAnyProblem) {
+
+        if (summary == null) {
             executionContext.summarize("All execution are processed.");
         }
 
