@@ -104,7 +104,7 @@ public class CheckQueuedExecutionsWorker extends Worker {
                 // TODO Send Email !!
 
                 // This state of the job is logged
-                summary = "Executions of the job: " + job.getName() + " with ID: " + job.getId() + " are no longer processed.";
+                summary = "Executions of the job: " + job.getName() + " with ID: " + job.getId() + " are no longer processed. This job has been restarted.";
                 logWarn(logger, summary);
 
                 JobBufferStatus jobBufferStatus = workhorseService.getJobBufferStatus(job);
