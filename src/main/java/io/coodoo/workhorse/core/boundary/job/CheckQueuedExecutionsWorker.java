@@ -3,6 +3,7 @@ package io.coodoo.workhorse.core.boundary.job;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -16,6 +17,7 @@ import io.coodoo.workhorse.core.boundary.annotation.InitialJobConfig;
 import io.coodoo.workhorse.core.control.JobThread;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
+import io.coodoo.workhorse.core.entity.JobBufferStatus;
 import io.coodoo.workhorse.core.entity.JobExecutionCount;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
@@ -46,6 +48,8 @@ public class CheckQueuedExecutionsWorker extends Worker {
 
         logInfo(logger, "Starting check queued Execution.");
         logInfo(logger, "Queued executions | Threads | Job's name");
+
+        boolean areThereAnyProblem = false;
 
         // Get only jobs with the status ACTIVE
         List<Job> activeJobs = workhorseController.getAllJobsByStatus(JobStatus.ACTIVE);
@@ -94,11 +98,26 @@ public class CheckQueuedExecutionsWorker extends Worker {
 
             // If at least 2/3 conditions are reached, send an email.
             if ((areThereRunningExecutions + areThereJobThreads + areExecutionNewInQueue) >= 2) {
+
+                // With this boolean value the summary that should be added for "well done" is not added
+                areThereAnyProblem = true;
+
                 // TODO Send Email !!
 
+                // This state of the job is logged
                 String message = "Executions of the job: " + job.getName() + " with ID: " + job.getId() + " are no longer processed.";
                 logWarn(logger, message);
-                executionContext.summerize(message);
+
+                JobBufferStatus jobBufferStatus = workhorseService.getJobBufferStatus(job);
+                logInfo(logger, "State of the intern buffer of the job");
+                logInfo(logger, "jobThreadCounts: " + jobBufferStatus.jobThreadCounts);
+                logInfo(logger, "runningJobThreadCounts: " + jobBufferStatus.runningJobThreadCounts);
+                logInfo(logger, "runningExecutions: " + jobBufferStatus.runningExecutions);
+                logInfo(logger, "priorityExecutions: " + jobBufferStatus.priorityExecutions);
+                logInfo(logger, "executions: " + jobBufferStatus.executions);
+                logInfo(logger, "Thread: " + jobBufferStatus.jobThreads.stream().map(thread -> thread.getThread().getName()).collect(Collectors.toList()));
+
+                executionContext.summarize(message);
                 workhorseLogService.logMessage(message, job.getId(), false);
 
                 // Try to restart the job.
@@ -108,8 +127,11 @@ public class CheckQueuedExecutionsWorker extends Worker {
             }
 
         }
+        if (!areThereAnyProblem) {
+            executionContext.summarize("All execution are processed.");
+        }
 
-        logInfo(logger, "Finished hunt queued executions.");
+        logInfo(logger, "Finished check queued executions.");
     }
 
 }

@@ -210,7 +210,7 @@ public class ExecutionContextTest {
     }
 
     @Test
-    public void testSummerize_positiv_szenario() throws Exception {
+    public void testSummarize_positiv_szenario() throws Exception {
 
         String summary = "Message";
         StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH = 10;
@@ -220,7 +220,7 @@ public class ExecutionContextTest {
         executionOfTheContext.setId(1L);
 
         classUnderTest.init(executionOfTheContext);
-        classUnderTest.summerize(summary);
+        classUnderTest.summarize(summary);
 
         ArgumentCaptor<Execution> argument = ArgumentCaptor.forClass(Execution.class);
         verify(executionPersistence).update(argument.capture());
@@ -228,7 +228,7 @@ public class ExecutionContextTest {
     }
 
     @Test
-    public void testSummerize_with_too_long_summary() throws Exception {
+    public void testSummarize_with_too_long_summary() throws Exception {
 
         String summary = "Message to test.";
         StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH = 10;
@@ -240,7 +240,7 @@ public class ExecutionContextTest {
         executionOfTheContext.setId(1L);
 
         classUnderTest.init(executionOfTheContext);
-        classUnderTest.summerize(summary);
+        classUnderTest.summarize(summary);
 
         Execution expectedExecution = execution;
         expectedExecution.setSummary(summary);
@@ -251,7 +251,7 @@ public class ExecutionContextTest {
     }
 
     @Test
-    public void testSummerize_persist_as_log_summary_too_long() throws Exception {
+    public void testSummarize_persist_as_log_summary_too_long() throws Exception {
 
         String summary = "Message to test.";
         StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH = 10;
@@ -261,7 +261,7 @@ public class ExecutionContextTest {
         executionOfTheContext.setId(1L);
 
         classUnderTest.init(executionOfTheContext);
-        classUnderTest.summerize(summary);
+        classUnderTest.summarize(summary);
 
         Execution expectedExecution = execution;
         expectedExecution.setSummary(summary);
@@ -276,28 +276,28 @@ public class ExecutionContextTest {
     }
 
     @Test
-    public void testSummerize_with_NULL_as_parameter() throws Exception {
+    public void testSummarize_with_NULL_as_parameter() throws Exception {
 
         Execution executionOfTheContext = new Execution();
         executionOfTheContext.setJobId(1L);
         executionOfTheContext.setId(1L);
 
         classUnderTest.init(executionOfTheContext);
-        classUnderTest.summerize(null);
+        classUnderTest.summarize(null);
 
         verify(executionPersistence, never()).update(anyObject());
 
     }
 
     @Test
-    public void testSummerize_with_EMPTY_paramter() throws Exception {
+    public void testSummarize_with_EMPTY_paramter() throws Exception {
 
         Execution executionOfTheContext = new Execution();
         executionOfTheContext.setJobId(1L);
         executionOfTheContext.setId(1L);
 
         classUnderTest.init(executionOfTheContext);
-        classUnderTest.summerize("         ");
+        classUnderTest.summarize("         ");
 
         verify(executionPersistence, never()).update(anyObject());
 
