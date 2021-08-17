@@ -831,4 +831,138 @@ public class WorkhorseConfigControllerTest {
         verify(workhorseLogService).logChange(null, null, "Execution timeout", workhorseConfigDefault.getExecutionTimeout(), executionTimeout, message);
     }
 
+    @Test
+    public void testUpdateMaxExecutionSummaryLength() throws Exception {
+
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        int maxExecutionSummaryLength = 256;
+
+        // Default is 140
+        assertEquals(140, workhorseConfig.getMaxExecutionSummaryLength());
+
+        classUnderTest.updateMaxExecutionSummaryLength(workhorseConfig, maxExecutionSummaryLength);
+
+        assertEquals(maxExecutionSummaryLength, workhorseConfig.getMaxExecutionSummaryLength());
+    }
+
+    @Test
+    public void testUpdateMaxExecutionSummaryLength_staticConfigIsChanged() throws Exception {
+
+        StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH = 200;
+
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        int maxExecutionSummaryLength = 300;
+
+        classUnderTest.updateMaxExecutionSummaryLength(workhorseConfig, maxExecutionSummaryLength);
+
+        assertEquals(maxExecutionSummaryLength, StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH);
+    }
+
+    @Test
+    public void testUpdateMaxExecutionSummaryLength_dontUpdateIfEquals() throws Exception {
+
+        int maxExecutionSummaryLength = 222;
+
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        workhorseConfig.setMaxExecutionSummaryLength(maxExecutionSummaryLength);
+
+        classUnderTest.updateMaxExecutionSummaryLength(workhorseConfig, maxExecutionSummaryLength);
+
+        // if nothing has changed, there will be no log and no restart
+        verify(workhorseLogService, never()).logChange(anyLong(), any(JobStatus.class), anyString(), anyObject(), anyObject(), anyString());
+        verify(workhorse, never()).isRunning();
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testUpdateMaxExecutionSummaryLength_toLow() throws Exception {
+        classUnderTest.updateMaxExecutionSummaryLength(new MemoryConfigBuilder().build(), 29);
+    }
+
+    @Test
+    public void testUpdateMaxExecutionSummaryLength_toLowMessage() throws Exception {
+        try {
+            classUnderTest.updateMaxExecutionSummaryLength(new MemoryConfigBuilder().build(), 29);
+            fail("maxExecutionSummaryLength to low!");
+        } catch (Exception e) {
+            assertEquals(RuntimeException.class, e.getClass());
+            assertEquals("The max length of an execution summary must be between 30 and 500!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testUpdateMaxExecutionSummaryLength_Lowest() throws Exception {
+
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        int maxExecutionSummaryLength = 30;
+
+        classUnderTest.updateMaxExecutionSummaryLength(workhorseConfig, maxExecutionSummaryLength);
+        assertEquals(maxExecutionSummaryLength, workhorseConfig.getMaxExecutionSummaryLength());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testUpdateMaxExecutionSummaryLength_toHigh() throws Exception {
+        classUnderTest.updateMaxExecutionSummaryLength(new MemoryConfigBuilder().build(), 501);
+    }
+
+    @Test
+    public void testUpdateMaxExecutionSummaryLength_toHighMessage() throws Exception {
+        try {
+            classUnderTest.updateMaxExecutionSummaryLength(new MemoryConfigBuilder().build(), 01);
+            fail("maxExecutionSummaryLength to high!");
+        } catch (Exception e) {
+            assertEquals(RuntimeException.class, e.getClass());
+            assertEquals("The max length of an execution summary must be between 30 and 500!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testUpdateMaxExecutionSummaryLength_Highest() throws Exception {
+
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        int maxExecutionSummaryLength = 500;
+
+        classUnderTest.updateMaxExecutionSummaryLength(workhorseConfig, maxExecutionSummaryLength);
+        assertEquals(maxExecutionSummaryLength, workhorseConfig.getMaxExecutionSummaryLength());
+    }
+
+    @Test
+    public void testUpdateMaxExecutionSummaryLength_logMessage() throws Exception {
+
+        // Default is 140
+        WorkhorseConfig workhorseConfigDefaults = new MemoryConfigBuilder().build();
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        int maxExecutionSummaryLength = 120;
+
+        classUnderTest.updateMaxExecutionSummaryLength(workhorseConfig, maxExecutionSummaryLength);
+
+        verify(workhorseLogService).logChange(null, null, "Max length of an execution summary", workhorseConfigDefaults.getMaxExecutionSummaryLength(),
+                        maxExecutionSummaryLength, null);
+    }
+
+    @Test
+    public void testUpdateMaxExecutionSummaryLength_with_too_high_maxExecutionSummaryLength() throws Exception {
+
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        int maxExecutionSummaryLength = 501;
+
+        exceptionRule.expect(RuntimeException.class);
+        exceptionRule.expectMessage("The max length of an execution summary must be between 30 and 500!");
+
+        classUnderTest.updateMaxExecutionSummaryLength(workhorseConfig, maxExecutionSummaryLength);
+
+    }
+
+    @Test
+    public void testUpdateMaxExecutionSummaryLength_with_too_small_maxExecutionSummaryLength() throws Exception {
+
+        WorkhorseConfig workhorseConfig = new MemoryConfigBuilder().build();
+        int maxExecutionSummaryLength = 29;
+
+        exceptionRule.expect(RuntimeException.class);
+        exceptionRule.expectMessage("The max length of an execution summary must be between 30 and 500!");
+
+        classUnderTest.updateMaxExecutionSummaryLength(workhorseConfig, maxExecutionSummaryLength);
+
+    }
+
 }
