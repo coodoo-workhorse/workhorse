@@ -41,6 +41,8 @@ Just fire jobs on demand when ever from where ever in your code and Workhorse wi
 
 ## Install
 
+### Maven dependency
+
 Add the following dependency to your project ([published on Maven Central](https://search.maven.org/artifact/io.coodoo/workhorse))
    
    ```xml
@@ -50,7 +52,36 @@ Add the following dependency to your project ([published on Maven Central](https
        <version>2.0.0-RC2-SNAPSHOT</version>
    </dependency>
    ```
-   
+### Start the engine
+
+You can now start the engine. For it just call the method `start()` of the `WorkhorseService` in a singleton bean (i.e `StartUp`) of your application. You can also define which persistence you want to use. There is also a `stop()` method to halt that beast.
+
+```java
+
+@ApplicationScoped
+public class StartUp { 
+
+  @Inject
+  WorkhorseService workhorseService;
+
+  public void init() { 
+      workhorseService.start(new MemoryConfig());
+  }
+
+}
+```
+
+### Log lines 
+
+The following log lines are expected when workhorse starts.
+
+```
+Workhorse Core initializing… ([Version])
+Workhorse Persistence initializing... ([Version])
+Workhorse Jobs initializing…
+
+```
+
 Depending on your environment there may be additional steps necessary. Have a look into our example projects: 
 
 - [Quarkus](https://gitlab.coodoo.io/workhorse/workhorse-example-quarkus)
@@ -61,7 +92,9 @@ Depending on your environment there may be additional steps necessary. Have a lo
 
 ## Getting started
 
-Lets create a hello world job . Therefore you just need to extend the `Worker` class that provides you the `doWork` method. And this method is where the magic happens!
+### Your first worker
+
+Lets create a hello world worker . Therefore you just need to extend the `Worker` class that provides you the `doWork` method. And this method is where the magic happens!
 
 ```java
 @Dependent
@@ -88,20 +121,9 @@ public void performHelloWorld() {
 }
 ```
 
-Now you have to start up Workhorse. The method `init()` of the `WorkhorseService` allows you to define which persistence you want to use. After it just call the method `start()` of the `WorkhorseService` somewhere in your application. There is also a `stop()` method to halt that beast.
+### Worker with parameters
 
-```java
-@Inject
-WorkhorseService workhorseService;
-
-public void init() {
-    workhorseService.init(new MemoryConfig());
-    
-    workhorseService.start();
-}
-```
-
-Let's add some parameters to this job! You can access the parameters by changing the `Worker` to `WorkerWith` and using a type or an object as parameters.
+Let's add some parameters to this worker! You can access the parameters by changing the `Worker` to `WorkerWith` and using a type or an object as parameters.
 
 ```java
 @Dependent
@@ -116,7 +138,9 @@ public class HelloWorldWorker extends WorkerWith<String> {
 }
 ```
 
-We can process the `HelloWorldWorker` on a regular basis, so lets tell this worker to run every night half past three by adding `@InitialJobConfig` annotation. Many other configuration on this worker can initially defined by this annotation, have a [look](src/main/java/io/coodoo/workhorse/core/boundary/annotation/InitialJobConfig.java "@InitialJobConfig")!
+### Scheduled worker
+
+We can also process the `HelloWorldWorker` on a regular basis, so lets tell this worker to run every night half past three by adding `@InitialJobConfig` annotation. Many other configuration on this worker can initially defined by this annotation, have a [look](src/main/java/io/coodoo/workhorse/core/boundary/annotation/InitialJobConfig.java "@InitialJobConfig")!
 In this case we overwrite the method `onSchedule()` witch triggers an execution to add some parameters.
 
 ```java
