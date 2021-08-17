@@ -233,7 +233,9 @@ public class ExecutionContextTest {
         String summary = "Message to test.";
         StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH = 10;
 
-        String expectedSummary = "Message to...";
+        String expectedSummary = "Message t…";
+        assertEquals("Summary length must not exceed value of MAX_EXECUTION_SUMMARY_LENGTH!", StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH,
+                        expectedSummary.length());
 
         Execution executionOfTheContext = new Execution();
         executionOfTheContext.setJobId(1L);
@@ -247,6 +249,7 @@ public class ExecutionContextTest {
 
         ArgumentCaptor<Execution> argument = ArgumentCaptor.forClass(Execution.class);
         verify(executionPersistence).update(argument.capture());
+
         assertEquals(expectedSummary, argument.getValue().getSummary());
     }
 
