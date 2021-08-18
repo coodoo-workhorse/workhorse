@@ -169,17 +169,14 @@ public class WorkhorseConfigController {
 
     protected void updateMaxExecutionSummaryLength(WorkhorseConfig workhorseConfig, int maxExecutionSummaryLength) {
 
-        if (maxExecutionSummaryLength < 0) {
-            maxExecutionSummaryLength = 0;
-            log.trace("For robustness the value of maxExecutionSummaryLength is set to '0', when the given value is negativ.");
+        if (maxExecutionSummaryLength < 30 || maxExecutionSummaryLength > 500) {
+            throw new RuntimeException("The max length of an execution summary must be between 30 and 500!");
         }
         if (workhorseConfig.getMaxExecutionSummaryLength() != maxExecutionSummaryLength) {
 
             StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH = maxExecutionSummaryLength;
-
-            String message = maxExecutionSummaryLength > 0 ? null : "Execution timeout is set to '0', so execution can not have summary!";
-            workhorseLogService.logChange(null, null, "maxExecutionSummaryLength", workhorseConfig.getMaxExecutionSummaryLength(), maxExecutionSummaryLength,
-                            message);
+            workhorseLogService.logChange(null, null, "Max length of an execution summary", workhorseConfig.getMaxExecutionSummaryLength(),
+                            maxExecutionSummaryLength, null);
             workhorseConfig.setMaxExecutionSummaryLength(maxExecutionSummaryLength);
         }
     }
