@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 
 import io.coodoo.workhorse.core.control.StaticConfig;
 import io.coodoo.workhorse.core.entity.Execution;
+import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
@@ -254,8 +255,8 @@ public class ExecutionContext {
 
         if (summary.length() > maxSummaryLength) {
 
-            summaryToPersist.append(summary.substring(0, maxSummaryLength));
-            summaryToPersist.append("...");
+            summaryToPersist.append(summary.substring(0, maxSummaryLength - 1));
+            summaryToPersist.append("…");
 
             StringBuilder summaryToPersistInExecutionLog = new StringBuilder();
 
