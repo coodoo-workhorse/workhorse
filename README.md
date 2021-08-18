@@ -64,7 +64,7 @@ public class StartUp {
   @Inject
   WorkhorseService workhorseService;
 
-  public void init() { 
+  public void init(@Observes @Initialized(ApplicationScoped.class) Object o) { 
       workhorseService.start(new MemoryConfig());
   }
 
