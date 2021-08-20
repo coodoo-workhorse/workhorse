@@ -1,7 +1,5 @@
 package io.coodoo.workhorse.core.control;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
