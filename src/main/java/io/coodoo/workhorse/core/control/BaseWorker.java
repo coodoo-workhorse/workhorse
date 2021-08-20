@@ -135,7 +135,7 @@ public abstract class BaseWorker {
 
     public Job getJob() {
         if (job == null) {
-            job = workhorseController.getByWorkerClassName(getClass().getName());
+            job = workhorseController.getByWorkerClassName(getClassName());
         }
         return job;
     }
@@ -145,6 +145,21 @@ public abstract class BaseWorker {
      */
     public Class<? extends BaseWorker> getWorkerClass() {
         return getClass();
+    }
+
+    /**
+     * This method retrieves the class's name with CDI-surffix like stored in the persistence
+     * 
+     * @return the persisted class name
+     */
+    public String getClassName() {
+
+        // To support Quarkus 2.0
+        // Using beanManager.getReference() to get an instance of a worker that we can use to call the doWork-method, the returned instance is a CDI-subclass
+        // (from Worker to Worker_subClass) of the wanted class.
+        // It is not fundamentally a problem, but the name of the class stored in the persistence don't have this surffix _subClass. This is the reason why we
+        // have at this point to remove this surffix if exsiting.
+        return getClass().getName().split("_Subclass")[0];
     }
 
     /**

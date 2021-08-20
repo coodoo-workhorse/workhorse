@@ -83,6 +83,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
     }
 
     private Type getParameterWorkerClassType() {
+
         return ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 

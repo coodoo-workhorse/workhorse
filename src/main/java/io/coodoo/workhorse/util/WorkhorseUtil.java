@@ -42,6 +42,7 @@ public class WorkhorseUtil {
      * @return Java class <tt>T</tt> object as defined in JSON string
      */
     public static <T> T jsonToParameters(String parametersJson, Class<T> parametersClass) {
+        logger.info("jsonToParameters: parametersJson: {} |  parametersClass: {}", parametersJson, parametersClass);
         if (parametersJson == null || parametersJson.isEmpty()) {
             return null;
         }
