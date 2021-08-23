@@ -37,7 +37,16 @@ public abstract class WorkerWith<T> extends BaseWorker {
 
     @SuppressWarnings("unchecked")
     public T getParameters(Execution execution) {
-        getParametersClass();
+        try {
+            getParametersClass();
+        } catch (Exception e) {
+
+            try {
+                parametersClass = Class.forName(getJob().getParametersClassName(), false, Thread.currentThread().getContextClassLoader());
+            } catch (ClassNotFoundException exception) {
+                exception.printStackTrace();
+            }
+        }
         return (T) WorkhorseUtil.jsonToParameters(execution.getParameters(), parametersClass);
     }
 
