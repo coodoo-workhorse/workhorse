@@ -89,7 +89,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
         Class<?> workerClass;
         try {
 
-            // In Quarkus 2.0 the instance of a worker is a pseudo class with surffix like myClass_SubClass.java.
+            // In Quarkus 2.0 the instance of a worker is a pseudo class with suffix like myClass_SubClass.java.
             // To get the real class of our worker we have to use the real worker name as stored in the persistence.
             // With the real class of the worker we can access the parameter class <T> of a WorkerWith<T> worker.
             String workerClassName = getClassName();
