@@ -100,6 +100,6 @@ public final class StaticConfig {
     /**
      * Suffix added by Quarkus 2.0 by instancing a worker.
      */
-    public static String CDI_WORKER_SUFFIX = "_Subclass";
+    public static final String CDI_WORKER_SUFFIX = "_Subclass";
 
 }
