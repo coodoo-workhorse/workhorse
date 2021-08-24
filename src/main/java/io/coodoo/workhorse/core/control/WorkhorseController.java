@@ -274,9 +274,9 @@ public class WorkhorseController {
         Object workerInstance;
         try {
             workerInstance = worker.newInstance();
-            log.info("new instance created: {}", workerInstance);
+            log.trace("new instance created: {}", workerInstance);
             if (workerInstance instanceof WorkerWith) {
-                log.info("new instance created is a workerWith: {}", workerInstance);
+                log.trace("new instance created is a workerWith: {}", workerInstance);
                 return ((WorkerWith) workerInstance).getParametersClassName();
             }
         } catch (InstantiationException | IllegalAccessException e) {
