@@ -159,7 +159,7 @@ public abstract class BaseWorker {
         // (from Worker to Worker_subClass) of the wanted class.
         // It is not fundamentally a problem, but the name of the class stored in the persistence don't have this suffix _subClass. This is the reason why we
         // have at this point to remove this suffix if existing.
-        return getClass().getName().split(StaticConfig.QUARKUS_WORKER_SUFFIX)[0];
+        return getClass().getName().split(StaticConfig.CDI_WORKER_SUFFIX)[0];
     }
 
     /**
