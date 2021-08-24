@@ -37,16 +37,9 @@ public abstract class WorkerWith<T> extends BaseWorker {
 
     @SuppressWarnings("unchecked")
     public T getParameters(Execution execution) {
-        try {
-            getParametersClass();
-        } catch (Exception e) {
 
-            try {
-                parametersClass = Class.forName(getJob().getParametersClassName(), false, Thread.currentThread().getContextClassLoader());
-            } catch (ClassNotFoundException exception) {
-                exception.printStackTrace();
-            }
-        }
+        getParametersClass();
+
         return (T) WorkhorseUtil.jsonToParameters(execution.getParameters(), parametersClass);
     }
 
@@ -93,7 +86,18 @@ public abstract class WorkerWith<T> extends BaseWorker {
 
     private Type getParameterWorkerClassType() {
 
-        return ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+        Class<?> workerClass;
+        try {
+
+            // In Quarkus 2.0 the instance of a worker is a pseudo class with surffix like myClass_SubClass.java.
+            // To get the real class of our worker we have to use the real worker name as stored in the persistence.
+            // With the real class of the worker we can access the parameter class <T> of a WorkerWith<T> worker.
+            String workerClassName = getClassName();
+            workerClass = Class.forName(workerClassName, false, Thread.currentThread().getContextClassLoader());
+        } catch (ClassNotFoundException e) {
+            workerClass = getClass();
+        }
+        return ((ParameterizedType) workerClass.getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
     /**

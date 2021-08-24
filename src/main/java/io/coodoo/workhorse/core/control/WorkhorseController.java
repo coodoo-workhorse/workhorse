@@ -100,11 +100,9 @@ public class WorkhorseController {
         // check if persisted jobs can be mapped a with a worker class
         for (Job job : jobPersistence.getAll()) {
             String workerClassName = job.getWorkerClassName();
-            BaseWorker workerOfDbJob;
             Class<?> workerClass;
             try {
                 workerClass = getWorkerClass(job);
-                workerOfDbJob = getWorker(job);
             } catch (ClassNotFoundException exception) {
 
                 job.setStatus(JobStatus.ERROR);
@@ -273,9 +271,6 @@ public class WorkhorseController {
      * @return name of the parameter
      */
     public String getWorkerParameterName(Class<?> worker) {
-        // Type type = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-
-        // return type.getTypeName();
         Object workerInstance;
         try {
             workerInstance = worker.newInstance();
@@ -286,7 +281,7 @@ public class WorkhorseController {
             }
         } catch (InstantiationException | IllegalAccessException e) {
 
-            log.error("New Instance not found", e);
+            log.error("An new instance of {} could not be created. {}", worker, e);
         }
         return null;
     }

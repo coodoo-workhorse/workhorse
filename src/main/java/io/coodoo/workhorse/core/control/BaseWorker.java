@@ -148,11 +148,11 @@ public abstract class BaseWorker {
     }
 
     /**
-     * This method retrieves the class's name with CDI-surffix like stored in the persistence
+     * This method retrieves the class's name without CDI-surffix (_SubClass) like stored in the persistence
      * 
      * @return the persisted class name
      */
-    public String getClassName() {
+    protected String getClassName() {
 
         // To support Quarkus 2.0
         // Using beanManager.getReference() to get an instance of a worker that we can use to call the doWork-method, the returned instance is a CDI-subclass

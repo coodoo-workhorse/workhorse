@@ -11,7 +11,6 @@ import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.ObservesAsync;
 import javax.enterprise.inject.Any;
-import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.util.AnnotationLiteral;
@@ -40,10 +39,6 @@ public class JobThread {
     BeanManager beanManager;
 
     @Inject
-    @Any
-    Instance<BaseWorker> baseWorkerInstances;
-
-    @Inject
     @ExecutionQualifier
     ExecutionPersistence executionPersistence;
 
@@ -68,17 +63,6 @@ public class JobThread {
     private Long chainId = null;
 
     private static final Logger log = LoggerFactory.getLogger(JobThread.class);
-
-    private BaseWorker getWorker(String jobName) throws ClassNotFoundException {
-        for (BaseWorker baseWorker : baseWorkerInstances) {
-            if (baseWorker != null && jobName.equals(baseWorker.getClassName())) {
-                return baseWorker;
-            }
-        }
-
-        log.error("No worker class {} found for {} ({})", job.getWorkerClassName(), job.getName(), job.getId());
-        throw new ClassNotFoundException(job.getWorkerClassName());
-    }
 
     private BaseWorker getWorker(Job job) throws ClassNotFoundException {
         Set<Bean<?>> beans = beanManager.getBeans(BaseWorker.class, new AnnotationLiteral<Any>() {});
@@ -107,7 +91,7 @@ public class JobThread {
 
         executionBuffer.addJobThreads(jobId, this);
 
-        final BaseWorker workerInstance = getWorker(job.getWorkerClassName());
+        final BaseWorker workerInstance = getWorker(job);
 
         while (true) {
             if (this.stopMe) {
@@ -132,7 +116,7 @@ public class JobThread {
 
                 long millisAtStart = System.currentTimeMillis();
 
-                log.info("On Running Job Execution: {}", runningExecution);
+                log.trace("On Running Job Execution: {}", runningExecution);
 
                 try {
 
@@ -151,7 +135,7 @@ public class JobThread {
 
                     workhorseController.setExecutionStatusToFinished(execution);
 
-                    log.info("Execution {}, duration: {} was successfull", execution.getId(), execution.getDuration());
+                    log.trace("Execution {}, duration: {} was successfull", execution.getId(), execution.getDuration());
                     executionBuffer.removeRunningExecution(jobId, execution.getId());
 
                     workerInstance.onFinished(execution.getId());
@@ -181,7 +165,7 @@ public class JobThread {
                         }
                         // "remove" gets me the element...
                         execution = chainedExecutions.remove(0);
-                        log.info("This execution, Id: {} of the chain {} will be process as next.", execution.getId(), execution.getChainId());
+                        log.trace("This execution, Id: {} of the chain {} will be process as next.", execution.getId(), execution.getChainId());
 
                         runningExecution = execution;
                         continue executionLoop;
@@ -201,7 +185,7 @@ public class JobThread {
 
                     runningExecution = execution;
 
-                    log.info("Execution {} failed. It will be retry in {} seconds. ", execution.getJobId(), job.getRetryDelay() / 1000);
+                    log.trace("Execution {} failed. It will be retry in {} seconds. ", execution.getJobId(), job.getRetryDelay() / 1000);
 
                     Thread.sleep(job.getRetryDelay());
                 }
@@ -209,7 +193,7 @@ public class JobThread {
         }
 
         long t2 = System.currentTimeMillis();
-        log.info("End of the Thread in {} milli .", (t2 - t1));
+        log.trace("End of the Thread in {} milli .", (t2 - t1));
 
         return Long.valueOf(t2 - t1);
     }
@@ -242,12 +226,12 @@ public class JobThread {
 
             // If they are no more Execution, finish the JobThread
             if (execution == null) {
-                log.info("No more executions for the Job: {} to execute", job);
+                log.trace("No more executions for the Job: {} to execute", job);
 
                 executionBuffer.removeJobThread(jobId, this);
                 executionBuffer.removeRunningJobThreadCounts(jobId);
                 if (executionBuffer.getJobThreads(jobId).isEmpty()) {
-                    log.info("All job executions done for job {} ", job);
+                    log.trace("All job executions done for job {} ", job);
                 }
 
             }
