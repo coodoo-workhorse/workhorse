@@ -46,7 +46,7 @@ import io.coodoo.workhorse.util.CronExpression;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
 /**
- * Class to acces to {@link Job} and {@link Execution}
+ * Class to access to {@link Job} and {@link Execution}
  * 
  * @author coodoo GmbH (coodoo.io)
  */
@@ -79,7 +79,7 @@ public class WorkhorseController {
 
         List<Class<?>> workerClasses = new ArrayList<>();
 
-        log.info("Initializing Workhorse Jobs...");
+        log.info("Workhorse Jobs initializing...");
 
         // check whether new worker exists and must be created and persisted
         Set<Bean<?>> beans = beanManager.getBeans(BaseWorker.class, new AnnotationLiteral<Any>() {});
@@ -100,10 +100,10 @@ public class WorkhorseController {
         // check if persisted jobs can be mapped a with a worker class
         for (Job job : jobPersistence.getAll()) {
             String workerClassName = job.getWorkerClassName();
-            BaseWorker workerOfDbJob;
+            Class<?> workerClass;
             try {
-                workerOfDbJob = getWorker(job);
-            } catch (Exception exception) {
+                workerClass = getWorkerClass(job);
+            } catch (ClassNotFoundException exception) {
 
                 job.setStatus(JobStatus.ERROR);
                 log.error("[{}] Worker class not found ({})", workerClassName, job.getName());
@@ -111,7 +111,6 @@ public class WorkhorseController {
                 continue;
             }
 
-            Class<?> workerClass = workerOfDbJob.getWorkerClass();
             if (!workerClasses.contains(workerClass)) {
                 log.trace("JobStatus of Job {} updated from {} to {}", job, job.getStatus(), JobStatus.NO_WORKER);
                 job.setStatus(JobStatus.NO_WORKER);
@@ -132,8 +131,9 @@ public class WorkhorseController {
             }
 
             // Check if parameter class has changed
-            String parametersClassName = getWorkerParameterName(workerOfDbJob);
+            String parametersClassName = getWorkerParameterName(workerClass);
 
+            log.info("parametersClassName: {} ", parametersClassName);
             // The Objects-Class is null-safe and can handle Worker-classes without Parameters
             if (!Objects.equals(parametersClassName, job.getParametersClassName())) {
                 log.info("Parameters class name of job worker {} changed from {} to {}", job.getWorkerClassName(), job.getParametersClassName(),
@@ -257,7 +257,7 @@ public class WorkhorseController {
      * @throws Exception
      */
     @SuppressWarnings("rawtypes")
-    public String getWorkerParameterName(BaseWorker worker) {
+    private String getWorkerParameterName(BaseWorker worker) {
         if (worker instanceof WorkerWith) {
             return ((WorkerWith) worker).getParametersClassName();
         }
@@ -274,12 +274,14 @@ public class WorkhorseController {
         Object workerInstance;
         try {
             workerInstance = worker.newInstance();
+            log.trace("new instance created: {}", workerInstance);
             if (workerInstance instanceof WorkerWith) {
+                log.trace("new instance created is a workerWith: {}", workerInstance);
                 return ((WorkerWith) workerInstance).getParametersClassName();
             }
         } catch (InstantiationException | IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+
+            log.error("An new instance of {} could not be created. {}", worker, e);
         }
         return null;
     }
@@ -311,6 +313,34 @@ public class WorkhorseController {
                 return (BaseWorker) beanManager.getReference(bean, bean.getBeanClass(), creationalContext);
             }
 
+        }
+
+        log.error("No Worker class found for {}", job);
+        workhorseLogService.logChange(job.getId(), JobStatus.NO_WORKER, "Status", job.getStatus(), JobStatus.NO_WORKER, null);
+
+        job.setStatus(JobStatus.NO_WORKER);
+        jobPersistence.update(job);
+
+        jobErrorEvent.fire(new JobErrorEvent(new ClassNotFoundException(), ErrorType.NO_JOB_WORKER_FOUND.getMessage(), job.getId(), job.getStatus()));
+        throw new ClassNotFoundException();
+
+    }
+
+    /**
+     * retrieves the Worker of a Job.
+     * 
+     * @param job
+     * @return Baseworker
+     * @throws ClassNotFoundException
+     * @throws Exception
+     */
+    private Class<?> getWorkerClass(Job job) throws ClassNotFoundException {
+        Set<Bean<?>> beans = beanManager.getBeans(BaseWorker.class, new AnnotationLiteral<Any>() {});
+        for (Bean<?> bean : beans) {
+            Class<?> workerclass = bean.getBeanClass();
+            if (job.getWorkerClassName().equals(workerclass.getName())) {
+                return workerclass;
+            }
         }
 
         log.error("No Worker class found for {}", job);
@@ -468,6 +498,7 @@ public class WorkhorseController {
         Execution failedExecution = executionPersistence.getById(job.getId(), executionId);
         Execution retryExecution = null;
 
+        log.error("The execution failed", exception);
         if (failedExecution == null) {
             String message = "The execution with ID: " + executionId + " of job: " + job.getName() + " with JobID: " + job.getId()
                             + " could not be found in the persistence.";

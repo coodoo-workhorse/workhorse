@@ -98,6 +98,8 @@ public class WorkhorseService {
 
         String version = WorkhorseUtil.getVersion();
 
+        log.info("Workhorse Core initializing... {}", version);
+        log.info("                                                      ");
         log.info("hyyyyyyhdmNmhs++/+//+/+/+//+/+//+/oNm-                ");
         log.info("dhyhdmNNdyo++//+/+////+/+//+/+//+/+omN/:/+++/-`       ");
         log.info("hmNNdyo+////+//++++++///++/+/+//+//+hMNhso+oydmh:     ");
@@ -109,8 +111,8 @@ public class WorkhorseService {
         log.info("+/+/+/+/sMo      /mms`   oMs/++/+oNm:          `oNy`  ");
         log.info("//+/+///+dN/            /Nd+/+//+/+hNh+-`  ``:omm+    ");
         log.info("//+/+//+/+hNy-`      `-yNh++/+//+/+++sdmmmmmmdmN/     ");
-        log.info("//+/+//+//+ohmmhsooshmmho+/+/+//+//////++++++++dN+    Workhorse");
-        log.info("+/+/+//+/////++ssyyss++/+//+/+//+/+/++/+/+///++yNMo   " + version);
+        log.info("//+/+//+//+ohmmhsooshmmho+/+/+//+//////++++++++dN+    ");
+        log.info("+/+/+//+/////++ssyyss++/+//+/+//+/+/++/+/+///++yNMo   ");
         log.info("//+////////////////////////+/+////////////+ohmNdshMs` ");
 
         currentWorkhorseConfig = workhorseConfig;
@@ -147,9 +149,7 @@ public class WorkhorseService {
 
         // Check if the persistence is already initialized. If so the engine is already living but paused and should now start again.
         if (!persistenceManager.isInitialized()) {
-            currentWorkhorseConfig = workhorseConfig;
-            persistenceManager.initializePersistence(workhorseConfig);
-            workhorseConfigController.initializeStaticConfig(workhorseConfig);
+            init(workhorseConfig);
         }
 
         workhorseController.loadWorkers();

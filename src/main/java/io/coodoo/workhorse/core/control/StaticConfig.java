@@ -97,4 +97,9 @@ public final class StaticConfig {
      */
     public static String LOG_ERROR_MARKER;
 
+    /**
+     * Suffix added by Quarkus 2.0 by instancing a worker.
+     */
+    public static final String CDI_WORKER_SUFFIX = "_Subclass";
+
 }

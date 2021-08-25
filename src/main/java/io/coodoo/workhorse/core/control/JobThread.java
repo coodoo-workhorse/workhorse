@@ -69,6 +69,7 @@ public class JobThread {
         for (Bean<?> bean : beans) {
             Class<?> workerclass = bean.getBeanClass();
             if (job.getWorkerClassName().equals(workerclass.getName())) {
+
                 CreationalContext<?> creationalContext = beanManager.createCreationalContext(bean);
                 return (BaseWorker) beanManager.getReference(bean, bean.getBeanClass(), creationalContext);
             }

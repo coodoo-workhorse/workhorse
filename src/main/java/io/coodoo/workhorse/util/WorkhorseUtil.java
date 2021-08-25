@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import io.coodoo.workhorse.core.control.StaticConfig;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 
 public class WorkhorseUtil {
 
