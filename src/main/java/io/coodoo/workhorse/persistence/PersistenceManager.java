@@ -80,7 +80,7 @@ public class PersistenceManager {
             log.warn("The persistence configuration can not be null. The default persistence {} is used", configuration);
         }
 
-        log.info("Initialize Persistence: {} {}", configuration.getPersistenceName(), configuration.getPersistenceVersion());
+        log.info("Workhorse Persistence initializing: {} {}", configuration.getPersistenceName(), configuration.getPersistenceVersion());
 
         initializeConfigPersistence(configuration);
         initializeJobPersistence(configuration);

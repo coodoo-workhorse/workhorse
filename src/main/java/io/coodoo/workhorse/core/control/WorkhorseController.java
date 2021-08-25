@@ -79,7 +79,7 @@ public class WorkhorseController {
 
         List<Class<?>> workerClasses = new ArrayList<>();
 
-        log.info("Initializing Workhorse Jobs...");
+        log.info("Workhorse Jobs initializing...");
 
         // check whether new worker exists and must be created and persisted
         Set<Bean<?>> beans = beanManager.getBeans(BaseWorker.class, new AnnotationLiteral<Any>() {});
