@@ -76,9 +76,26 @@ public class StartUp {
 The following log lines are expected when workhorse starts.
 
 ```
-Workhorse Core initializing… ([Version])
+Workhorse Core initializing... ([Version])
+
+hyyyyyyhdmNmhs++/+//+/+/+//+/+//+/oNm-                
+dhyhdmNNdyo++//+/+////+/+//+/+//+/+omN/:/+++/-`       
+hmNNdyo+////+//++++++///++/+/+//+//+hMNhso+oydmh:     
+/++++//////+oydmmmmmNdyo+//+/+//++yNd/`       .oNd-   
+//+/++++++omNs:``  ``:yNms++++/++yMo`           .dN-  
+//+/+//++yNy.          .yNy+/+//oNh`   `::.      :Ny  
++/+/+///oNy`            `hNo/+//oNs    sMMm.     .Nd` 
++/+/+///yM+      +mNs`   /My/+//+mm.   .oo-      +Mo  
++/+/+/+/sMo      /mms`   oMs/++/+oNm:          `oNy`  
+//+/+///+dN/            /Nd+/+//+/+hNh+-`  ``:omm+    
+//+/+//+/+hNy-`      `-yNh++/+//+/+++sdmmmmmmdmN/     
+//+/+//+//+ohmmhsooshmmho+/+/+//+//////++++++++dN+    
++/+/+//+/////++ssyyss++/+//+/+//+/+/++/+/+///++yNMo   
+//+////////////////////////+/+////////////+ohmNdshMs` 
+
 Workhorse Persistence initializing... ([Version])
-Workhorse Jobs initializing…
+
+Workhorse Jobs initializing...
 
 ```
 
