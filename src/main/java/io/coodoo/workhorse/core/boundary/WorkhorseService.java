@@ -98,22 +98,27 @@ public class WorkhorseService {
 
         String version = WorkhorseUtil.getVersion();
 
-        log.info("Workhorse Core initializing... {}", version);
-        log.info("                                                      ");
-        log.info("hyyyyyyhdmNmhs++/+//+/+/+//+/+//+/oNm-                ");
-        log.info("dhyhdmNNdyo++//+/+////+/+//+/+//+/+omN/:/+++/-`       ");
-        log.info("hmNNdyo+////+//++++++///++/+/+//+//+hMNhso+oydmh:     ");
-        log.info("/++++//////+oydmmmmmNdyo+//+/+//++yNd/`       .oNd-   ");
-        log.info("//+/++++++omNs:``  ``:yNms++++/++yMo`           .dN-  ");
-        log.info("//+/+//++yNy.          .yNy+/+//oNh`   `::.      :Ny  ");
-        log.info("+/+/+///oNy`            `hNo/+//oNs    sMMm.     .Nd` ");
-        log.info("+/+/+///yM+      +mNs`   /My/+//+mm.   .oo-      +Mo  ");
-        log.info("+/+/+/+/sMo      /mms`   oMs/++/+oNm:          `oNy`  ");
-        log.info("//+/+///+dN/            /Nd+/+//+/+hNh+-`  ``:omm+    ");
-        log.info("//+/+//+/+hNy-`      `-yNh++/+//+/+++sdmmmmmmdmN/     ");
-        log.info("//+/+//+//+ohmmhsooshmmho+/+/+//+//////++++++++dN+    ");
-        log.info("+/+/+//+/////++ssyyss++/+//+/+//+/+/++/+/+///++yNMo   ");
-        log.info("//+////////////////////////+/+////////////+ohmNdshMs` ");
+        // @formatter:off
+        log.info("Workhorse Core initializing... \n" 
+        + "                                                            \n"
+        + "hyyyyyyhdmNmhs++/+//+/+/+//+/+//+/oNm-                      \n"
+        + "dhyhdmNNdyo++//+/+////+/+//+/+//+/+omN/:/+++/-`             \n"
+        + "hmNNdyo+////+//++++++///++/+/+//+//+hMNhso+oydmh:           \n"
+        + "/++++//////+oydmmmmmNdyo+//+/+//++yNd/`       .oNd-         \n"
+        + "//+/++++++omNs:``  ``:yNms++++/++yMo`           .dN-        \n"
+        + "//+/+//++yNy.          .yNy+/+//oNh`   `::.      :Ny        \n"
+        + "+/+/+///oNy`            `hNo/+//oNs    sMMm.     .Nd`       \n"
+        + "+/+/+///yM+      +mNs`   /My/+//+mm.   .oo-      +Mo        \n"
+        + "+/+/+/+/sMo      /mms`   oMs/++/+oNm:          `oNy`        \n"
+        + "//+/+///+dN/            /Nd+/+//+/+hNh+-`  ``:omm+          \n"
+        + "//+/+//+/+hNy-`      `-yNh++/+//+/+++sdmmmmmmdmN/           \n"
+        + "//+/+//+//+ohmmhsooshmmho+/+/+//+//////++++++++dN+          \n"
+        + "+/+/+//+/////++ssyyss++/+//+/+//+/+/++/+/+///++yNMo         \n"
+        + "//+////////////////////////+/+////////////+ohmNdshMs`       \n"
+        + "                                                            \n"
+        + "Workhorse Core Version: " +  version + "             \n"
+        + "https://workhorse.coodoo.io                                  ");
+        // @formatter:on
 
         currentWorkhorseConfig = workhorseConfig;
         persistenceManager.initializePersistence(workhorseConfig);
