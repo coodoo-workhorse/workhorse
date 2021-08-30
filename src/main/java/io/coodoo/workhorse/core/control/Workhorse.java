@@ -98,6 +98,7 @@ public class Workhorse {
         }
 
         if (executionPersistence.isPusherAvailable()) {
+            executionPersistence.subscribe();
             scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0, StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL, TimeUnit.SECONDS);
 
             log.trace("Job queue pusher started. Backup poller started with a {} seconds interval", StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL);
@@ -178,6 +179,7 @@ public class Workhorse {
             scheduledFuture = null;
 
             if (executionPersistence.isPusherAvailable()) {
+                executionPersistence.unsubscribe();
                 log.trace("Job queue pusher stopped");
             } else {
                 log.trace("Job queue poller stopped");

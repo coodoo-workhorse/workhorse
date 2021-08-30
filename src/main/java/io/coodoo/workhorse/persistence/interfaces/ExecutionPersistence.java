@@ -217,4 +217,14 @@ public interface ExecutionPersistence {
      * @return boolean
      */
     boolean isPusherAvailable();
+
+    /**
+     * subcribe channnels to recieve push notifications from the persistence on new created executions
+     */
+    void subscribe();
+
+    /**
+     * unsubscribe channnels to no more recieve push notifications from the persistence on new created executions
+     */
+    void unsubscribe();
 }
