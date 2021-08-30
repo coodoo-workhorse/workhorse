@@ -389,4 +389,10 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
         return new JobExecutionCount(jobId, from, to, countPlanned, countQueued, countRunning, countFinished, countFailed, countAbort);
     }
 
+    @Override
+    public void subscribe() {}
+
+    @Override
+    public void unsubscribe() {}
+
 }
