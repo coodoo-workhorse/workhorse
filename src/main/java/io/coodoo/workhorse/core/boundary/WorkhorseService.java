@@ -99,6 +99,7 @@ public class WorkhorseService {
         String version = WorkhorseUtil.getVersion();
 
         // @formatter:off
+        // spotless:off
         log.info("Workhorse Core initializing... \n" 
         + "                                                            \n"
         + "hyyyyyyhdmNmhs++/+//+/+/+//+/+//+/oNm-                      \n"
@@ -119,6 +120,7 @@ public class WorkhorseService {
         + "Workhorse Core Version: " +  version + "             \n"
         + "https://workhorse.coodoo.io                                  ");
         // @formatter:on
+        // spotless:on
 
         currentWorkhorseConfig = workhorseConfig;
         persistenceManager.initializePersistence(workhorseConfig);

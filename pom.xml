@@ -167,6 +167,7 @@
 				<configuration>
 					<!-- Java Formatter -->
 					<java>
+						<toggleOffOn />
 						<eclipse>
 							<file>src/main/resources/coodooJavaStyle.xml</file>
 						</eclipse>
