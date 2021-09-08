@@ -17,7 +17,7 @@ email, or any other method with the owners of this repository before making a ch
 
 - Simplicity first, *the code must be easy to read and understand*
 - All is in English
-- Avoid shotcuts in names
+- Avoid shortcuts in names
 - When in doubt name or do it like others did
 - Leave short comments on complicated code
 
