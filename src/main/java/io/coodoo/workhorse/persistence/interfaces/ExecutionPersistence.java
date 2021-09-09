@@ -19,6 +19,12 @@ import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 public interface ExecutionPersistence {
 
     /**
+     * 
+     * @return retrieve the name of the persistence to initialize
+     */
+    String getPersistenceName();
+
+    /**
      * Retrieves the job execution by given Id of a job and id of job execution
      * 
      * @param jobId Id of the job
@@ -198,18 +204,6 @@ public interface ExecutionPersistence {
      * @param stacktrace stacktrace of the {@link Execution}
      */
     void log(Long jobId, Long executionId, String error, String stacktrace);
-
-    /**
-     * 
-     * initialize the connection with the persistence
-     */
-    void connect(Object... params);
-
-    /**
-     * 
-     * @return retrieve the name of the persistence to initialize
-     */
-    String getPersistenceName();
 
     /**
      * can the implemented persistence emit event by new created job execution

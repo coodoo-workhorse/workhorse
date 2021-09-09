@@ -8,9 +8,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.core.entity.JobStatusCount;
@@ -23,12 +20,15 @@ import io.coodoo.workhorse.util.WorkhorseUtil;
 @ApplicationScoped
 public class MemoryJobPersistence implements JobPersistence {
 
-    private static Logger log = LoggerFactory.getLogger(MemoryJobPersistence.class);
-
     @Inject
     MemoryPersistence memoryPersistence;
 
     private AtomicLong incId = new AtomicLong(0);
+
+    @Override
+    public String getPersistenceName() {
+        return MemoryConfig.NAME;
+    }
 
     @Override
     public Job get(Long jobId) {
@@ -89,11 +89,6 @@ public class MemoryJobPersistence implements JobPersistence {
     @Override
     public Long count() {
         return Long.valueOf(memoryPersistence.getJobs().size());
-    }
-
-    @Override
-    public String getPersistenceName() {
-        return MemoryConfig.NAME;
     }
 
     @Override
@@ -158,8 +153,5 @@ public class MemoryJobPersistence implements JobPersistence {
 
         return new JobStatusCount(countActive, countInactive, countNoWorker, countError);
     }
-
-    @Override
-    public void connect(Object... params) {}
 
 }

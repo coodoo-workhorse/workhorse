@@ -148,24 +148,22 @@ public class Workhorse {
      * @param newExecutionEvent describes the newly persisted execution
      */
     public void push(@ObservesAsync NewExecutionEvent newExecutionEvent) {
-        if (!executionPersistence.isPusherAvailable() || !isRunning()) {
-            return;
-        }
-        log.trace("New Execution pushed: {}", newExecutionEvent);
-        if (executionBuffer.getNumberOfExecution(newExecutionEvent.jobId) < StaticConfig.BUFFER_MAX) {
-            Execution execution = executionPersistence.getById(newExecutionEvent.jobId, newExecutionEvent.executionId);
-            if (execution == null) {
-                log.error("No execution found for executionId: {} ", newExecutionEvent.executionId);
-                return;
-            }
-            if (execution.getStatus() == ExecutionStatus.PLANNED) {
-                long delayInSeconds = ChronoUnit.SECONDS.between(WorkhorseUtil.timestamp(), execution.getPlannedFor());
-                scheduledExecutorService.schedule(() -> {
+        if (executionPersistence.isPusherAvailable() && isRunning() && newExecutionEvent.execution != null) {
+
+            log.trace("New Execution pushed: {}", newExecutionEvent);
+            Execution execution = newExecutionEvent.execution;
+
+            if (executionBuffer.getNumberOfExecution(execution.getJobId()) < StaticConfig.BUFFER_MAX) {
+
+                if (execution.getStatus() == ExecutionStatus.PLANNED) {
+                    long delayInSeconds = ChronoUnit.SECONDS.between(WorkhorseUtil.timestamp(), execution.getPlannedFor());
+                    scheduledExecutorService.schedule(() -> {
+                        executionDistributor(execution);
+                    }, delayInSeconds, TimeUnit.SECONDS);
+                    log.trace("Execution {} will be process in {} seconds", execution.getId(), delayInSeconds);
+                } else {
                     executionDistributor(execution);
-                }, delayInSeconds, TimeUnit.SECONDS);
-                log.trace("Execution {} will be process in {} seconds", execution.getId(), delayInSeconds);
-            } else {
-                executionDistributor(execution);
+                }
             }
         }
     }

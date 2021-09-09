@@ -13,9 +13,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.coodoo.workhorse.core.control.StaticConfig;
 import io.coodoo.workhorse.core.control.event.NewExecutionEvent;
 import io.coodoo.workhorse.core.entity.Execution;
@@ -34,8 +31,6 @@ import io.coodoo.workhorse.util.WorkhorseUtil;
 @ApplicationScoped
 public class MemoryExecutionPersistence implements ExecutionPersistence {
 
-    private static Logger log = LoggerFactory.getLogger(MemoryExecutionPersistence.class);
-
     @Inject
     MemoryPersistence memoryPersistence;
 
@@ -43,6 +38,11 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     Event<NewExecutionEvent> newExecutionEventEvent;
 
     private AtomicLong executionId = new AtomicLong(0);
+
+    @Override
+    public String getPersistenceName() {
+        return MemoryConfig.NAME;
+    }
 
     @Override
     public Execution getById(Long jobId, Long executionId) {
@@ -78,13 +78,8 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
         jobData.executions.put(id, execution);
         jobData.orderedIds.add(id);
 
-        newExecutionEventEvent.fireAsync(new NewExecutionEvent(execution.getJobId(), execution.getId()));
+        newExecutionEventEvent.fireAsync(new NewExecutionEvent(execution));
         return execution;
-    }
-
-    @Override
-    public String getPersistenceName() {
-        return MemoryConfig.NAME;
     }
 
     @Override
@@ -92,11 +87,6 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
         ListingParameters listingParameters = new ListingParameters(limit.intValue());
         ListingResult<Execution> listingResult = getExecutionListing(jobId, listingParameters);
         return listingResult.getResults();
-    }
-
-    @Override
-    public void connect(Object... params) {
-        return;
     }
 
     @Override
