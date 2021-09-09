@@ -259,7 +259,14 @@ public class CollectionListing {
                     }
                     if (filter.contains(OPERATOR_OR) || filter.contains(OPERATOR_OR_WORD)) {
                         // one attribute for many filter
-                        List<String> orFilters = splitOr(filter.replaceAll(escape(OPERATOR_OR_WORD), OPERATOR_OR));
+                        List<String> splitResult = splitOr(filter.replaceAll(escape(OPERATOR_OR_WORD), OPERATOR_OR));
+                        List<String> orFilters = new ArrayList<>();
+                        for (String f : splitResult) {
+                            if (!f.isEmpty()) {
+                                orFilters.add(removeQuotes(f));
+                            }
+                        }
+
                         allPredicates.add(orFilters.stream().map(f -> createPredicate(clazz, field, f)).reduce(x -> false, Predicate::or));
                     } else {
                         // one attribute for one filter
