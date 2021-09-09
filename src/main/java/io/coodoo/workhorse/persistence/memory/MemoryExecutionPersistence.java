@@ -78,7 +78,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
         jobData.executions.put(id, execution);
         jobData.orderedIds.add(id);
 
-        newExecutionEventEvent.fireAsync(new NewExecutionEvent(execution.getJobId(), execution.getId()));
+        newExecutionEventEvent.fireAsync(new NewExecutionEvent(execution));
         return execution;
     }
 
