@@ -14,6 +14,19 @@ public class MemoryConfigPersistence implements ConfigPersistence {
     MemoryPersistence memoryPersistence;
 
     @Override
+    public String getPersistenceName() {
+        return MemoryConfig.NAME;
+    }
+
+    @Override
+    public String getPersistenceVersion() {
+        return WorkhorseUtil.getVersion();
+    }
+
+    @Override
+    public void initialize(Object... params) {}
+
+    @Override
     public WorkhorseConfig get() {
         return memoryPersistence.getWorkhorseConfig();
     }
@@ -22,21 +35,6 @@ public class MemoryConfigPersistence implements ConfigPersistence {
     public WorkhorseConfig update(WorkhorseConfig workhorseConfig) {
         memoryPersistence.setWorkhorseConfig(workhorseConfig);
         return workhorseConfig;
-    }
-
-    @Override
-    public void connect(Object... params) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public String getPersistenceName() {
-        return MemoryConfig.NAME;
-    }
-
-    @Override
-    public String getPersistenceVersion() {
-        return WorkhorseUtil.getVersion();
     }
 
 }

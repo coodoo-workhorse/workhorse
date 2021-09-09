@@ -23,6 +23,10 @@ public class MemoryLogPersistence implements LogPersistence {
 
     private AtomicLong incId = new AtomicLong(0);
 
+    public String getPersistenceName() {
+        return MemoryConfig.NAME;
+    }
+
     @Override
     public WorkhorseLog get(Long id) {
         return memoryPersistence.getWorkhorseLog().get(id);
@@ -76,17 +80,6 @@ public class MemoryLogPersistence implements LogPersistence {
             }
         }
         return count;
-    }
-
-    @Override
-    public String getPersistenceName() {
-        return MemoryConfig.NAME;
-    }
-
-    @Override
-    public void connect(Object... params) {
-        // TODO Auto-generated method stub
-
     }
 
 }

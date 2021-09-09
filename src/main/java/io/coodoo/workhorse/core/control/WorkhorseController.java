@@ -82,6 +82,7 @@ public class WorkhorseController {
         log.info("Workhorse Jobs initializing...");
 
         // check whether new worker exists and must be created and persisted
+        @SuppressWarnings("serial")
         Set<Bean<?>> beans = beanManager.getBeans(BaseWorker.class, new AnnotationLiteral<Any>() {});
         for (Bean<?> bean : beans) {
             Class<?> workerclass = bean.getBeanClass();
@@ -177,7 +178,8 @@ public class WorkhorseController {
 
                 try {
                     // Try to interpret the schedule as cron-syntax
-                    CronExpression cron = new CronExpression(schedule);
+                    new CronExpression(schedule);
+
                     job.setSchedule(schedule);
 
                 } catch (RuntimeException runtimeException) {
@@ -249,27 +251,12 @@ public class WorkhorseController {
     }
 
     /**
-     * retrieves the parameter's name of a Job from current workspace as String.
-     * 
-     * @param job
-     * @return
-     * @throws ClassNotFoundException
-     * @throws Exception
-     */
-    @SuppressWarnings("rawtypes")
-    private String getWorkerParameterName(BaseWorker worker) {
-        if (worker instanceof WorkerWith) {
-            return ((WorkerWith) worker).getParametersClassName();
-        }
-        return null;
-    }
-
-    /**
      * Retrieves the name of the parameter of a worker that extends the class {@link WorkerWith}.
      * 
      * @param worker class of the worker
      * @return name of the parameter
      */
+    @SuppressWarnings("rawtypes")
     public String getWorkerParameterName(Class<?> worker) {
         Object workerInstance;
         try {
@@ -305,6 +292,7 @@ public class WorkhorseController {
      * @throws Exception
      */
     private BaseWorker getWorker(Job job) throws ClassNotFoundException {
+        @SuppressWarnings("serial")
         Set<Bean<?>> beans = beanManager.getBeans(BaseWorker.class, new AnnotationLiteral<Any>() {});
         for (Bean<?> bean : beans) {
             Class<?> workerclass = bean.getBeanClass();
@@ -335,6 +323,7 @@ public class WorkhorseController {
      * @throws Exception
      */
     private Class<?> getWorkerClass(Job job) throws ClassNotFoundException {
+        @SuppressWarnings("serial")
         Set<Bean<?>> beans = beanManager.getBeans(BaseWorker.class, new AnnotationLiteral<Any>() {});
         for (Bean<?> bean : beans) {
             Class<?> workerclass = bean.getBeanClass();
