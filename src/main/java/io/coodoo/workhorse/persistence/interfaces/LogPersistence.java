@@ -9,6 +9,13 @@ import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 public interface LogPersistence {
 
     /**
+     * retrieve the name of the persistence to initialize
+     * 
+     * @return
+     */
+    String getPersistenceName();
+
+    /**
      * Get the log with given Id
      * 
      * @param logId Id of the log to retrieve
@@ -63,17 +70,5 @@ public interface LogPersistence {
      * @return Number of log, that have been deleted
      */
     int deleteByJobId(Long jobId);
-
-    /**
-     * retrieve the name of the persistence to initialize
-     * 
-     * @return
-     */
-    String getPersistenceName();
-
-    /**
-     * Callback fonction to initialize the connection with the persistence
-     */
-    void connect(Object... params);
 
 }

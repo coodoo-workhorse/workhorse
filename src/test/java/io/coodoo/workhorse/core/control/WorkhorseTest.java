@@ -3,7 +3,6 @@ package io.coodoo.workhorse.core.control;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,7 +12,6 @@ import java.time.ZoneId;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -62,7 +60,7 @@ public class WorkhorseTest {
         execution.setJobId(jobId);
         execution.setStatus(ExecutionStatus.QUEUED);
 
-        NewExecutionEvent newExecutionEvent = new NewExecutionEvent(jobId, executionId);
+        NewExecutionEvent newExecutionEvent = new NewExecutionEvent(execution);
 
         when(executionPersistence.isPusherAvailable()).thenReturn(true);
         when(executionPersistence.getById(jobId, executionId)).thenReturn(execution);
@@ -71,7 +69,6 @@ public class WorkhorseTest {
         classUnderTest.push(newExecutionEvent);
 
         verify(executionPersistence).isPusherAvailable();
-        verify(executionPersistence).getById(jobId, executionId);
         verify(executionBuffer).getNumberOfExecution(jobId);
         verify(scheduledExecutorService, never()).schedule(any(Runnable.class), anyLong(), anyObject());
     }
@@ -87,7 +84,7 @@ public class WorkhorseTest {
         execution.setJobId(jobId);
         execution.setStatus(ExecutionStatus.QUEUED);
 
-        NewExecutionEvent newExecutionEvent = new NewExecutionEvent(jobId, executionId);
+        NewExecutionEvent newExecutionEvent = new NewExecutionEvent(execution);
 
         when(executionPersistence.isPusherAvailable()).thenReturn(false);
         when(executionPersistence.getById(jobId, executionId)).thenReturn(execution);
@@ -112,7 +109,7 @@ public class WorkhorseTest {
         execution.setStatus(ExecutionStatus.PLANNED);
         execution.setPlannedFor(LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)).plusSeconds(30));
 
-        NewExecutionEvent newExecutionEvent = new NewExecutionEvent(jobId, executionId);
+        NewExecutionEvent newExecutionEvent = new NewExecutionEvent(execution);
 
         when(executionPersistence.isPusherAvailable()).thenReturn(true);
         when(executionPersistence.getById(jobId, executionId)).thenReturn(execution);
@@ -121,25 +118,19 @@ public class WorkhorseTest {
         classUnderTest.push(newExecutionEvent);
 
         verify(executionPersistence).isPusherAvailable();
-        verify(executionPersistence).getById(jobId, executionId);
         verify(executionBuffer).getNumberOfExecution(jobId);
         verify(scheduledExecutorService).schedule(any(Runnable.class), anyLong(), anyObject());
     }
 
-    @Ignore
     @Test
     public void testPush_status_execution_is_NULL() throws Exception {
 
         long jobId = 1L;
         long executionId = 4L;
-        StaticConfig.BUFFER_MAX = 4;
-        StaticConfig.TIME_ZONE = "UTC";
-
-        // Logger log = mock(Logger.class);
 
         Execution execution = null;
 
-        NewExecutionEvent newExecutionEvent = new NewExecutionEvent(jobId, executionId);
+        NewExecutionEvent newExecutionEvent = new NewExecutionEvent(execution);
 
         when(executionPersistence.isPusherAvailable()).thenReturn(true);
         when(executionBuffer.getNumberOfExecution(jobId)).thenReturn(1);
@@ -148,8 +139,6 @@ public class WorkhorseTest {
         classUnderTest.push(newExecutionEvent);
 
         verify(scheduledExecutorService, never()).schedule(any(Runnable.class), anyLong(), anyObject());
-        verify(log).error(anyString());
-
     }
 
 }

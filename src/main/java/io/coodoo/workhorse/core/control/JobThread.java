@@ -65,6 +65,7 @@ public class JobThread {
     private static final Logger log = LoggerFactory.getLogger(JobThread.class);
 
     private BaseWorker getWorker(Job job) throws ClassNotFoundException {
+        @SuppressWarnings("serial")
         Set<Bean<?>> beans = beanManager.getBeans(BaseWorker.class, new AnnotationLiteral<Any>() {});
         for (Bean<?> bean : beans) {
             Class<?> workerclass = bean.getBeanClass();

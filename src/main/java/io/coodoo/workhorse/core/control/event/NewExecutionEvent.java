@@ -1,28 +1,23 @@
 package io.coodoo.workhorse.core.control.event;
 
+import io.coodoo.workhorse.core.entity.Execution;
+
 /**
  * @author coodoo GmbH (coodoo.io)
  */
 public class NewExecutionEvent {
 
-    public Long jobId;
+    public Execution execution;
 
-    public Long executionId;
+    public NewExecutionEvent() {}
 
-    public NewExecutionEvent(Long jobId, Long executionId) {
-        this.jobId = jobId;
-        this.executionId = executionId;
+    public NewExecutionEvent(Execution execution) {
+        this.execution = execution;
     }
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("NewExecutionEvent [jobId=");
-        builder.append(jobId);
-        builder.append(", executionId=");
-        builder.append(executionId);
-        builder.append("]");
-        return builder.toString();
+        return "NewExecutionEvent [execution=" + execution == null ? null : (execution.getId()) + "]";
     }
 
 }

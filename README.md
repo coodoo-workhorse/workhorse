@@ -676,16 +676,6 @@ Pull requests and [issues](https://github.com/coodoo-io/workhorse/issues) are we
 You can read [how to contribute here](./CONTRIBUTING.md).
 
 
-### Definition of Done
-
-- There is JavaDoc 
-
-
-
-To spice things up
-
-
-
 ## License
 
 [Apache-2.0 © coodoo GmbH](./LICENSE)

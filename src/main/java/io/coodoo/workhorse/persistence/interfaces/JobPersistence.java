@@ -11,6 +11,12 @@ import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 public interface JobPersistence {
 
     /**
+     * 
+     * @return retrieve the name of the persistence to initialize
+     */
+    String getPersistenceName();
+
+    /**
      * Get a job by his Id
      * 
      * @param jobId
@@ -101,17 +107,11 @@ public interface JobPersistence {
      */
     Job update(Job job);
 
-    void deleteJob(Long jobId);
-
     /**
-     * rollback fonction to initialize the connection with the persistence
-     */
-    void connect(Object... params);
-
-    /**
+     * Delete the job given by Id
      * 
-     * @return retrieve the name of the persistence to initialize
+     * @param jobId
      */
-    String getPersistenceName();
+    void deleteJob(Long jobId);
 
 }
