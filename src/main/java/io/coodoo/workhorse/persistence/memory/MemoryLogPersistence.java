@@ -21,7 +21,7 @@ public class MemoryLogPersistence implements LogPersistence {
     @Inject
     MemoryPersistence memoryPersistence;
 
-    private AtomicLong incId = new AtomicLong(0);
+    private AtomicLong incId = new AtomicLong(1);
 
     public String getPersistenceName() {
         return MemoryConfig.NAME;

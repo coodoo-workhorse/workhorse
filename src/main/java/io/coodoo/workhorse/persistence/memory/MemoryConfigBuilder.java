@@ -12,6 +12,10 @@ public class MemoryConfigBuilder extends WorkhorseConfigBuilder {
     private MemoryConfig memoryConfig = new MemoryConfig();
 
     public MemoryConfigBuilder() {
+
+        // let the executions last 2 hours per default...
+        memoryConfig.setMinutesUntilCleanup(120);
+
         this.workhorseConfig = memoryConfig;
     }
 

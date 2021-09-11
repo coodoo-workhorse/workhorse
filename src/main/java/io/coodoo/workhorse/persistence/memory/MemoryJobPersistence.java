@@ -23,7 +23,7 @@ public class MemoryJobPersistence implements JobPersistence {
     @Inject
     MemoryPersistence memoryPersistence;
 
-    private AtomicLong incId = new AtomicLong(0);
+    private AtomicLong incId = new AtomicLong(1);
 
     @Override
     public String getPersistenceName() {
