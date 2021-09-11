@@ -202,7 +202,7 @@ public class ExecutionContext {
 
     /**
      * <p>
-     * Add a short message to summarize this execution.
+     * Add a short message to summarize this execution, that is also logged with the severity INFO
      * </p>
      * The number of character in a summary can not exceed a value defined in {@link WorkhorseConfig#getMaxExecutionSummaryLength()}.<br>
      * Otherwise the summary is cut to the permitted length and the full-length summary is appended to the logs ({@link ExecutionLog#getLog()}) of the current
@@ -218,7 +218,7 @@ public class ExecutionContext {
 
     /**
      * <p>
-     * Add a short message to summarize this execution.
+     * Add a short message to summarize this execution, that is also logged with the severity ERROR
      * </p>
      * The number of character in a summary can not exceed a value defined in {@link WorkhorseConfig#getMaxExecutionSummaryLength()}.<br>
      * Otherwise the summary is cut to the permitted length and the full-length summary is appended to the logs ({@link ExecutionLog#getLog()}) of the current
