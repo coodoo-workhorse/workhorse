@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import io.coodoo.workhorse.core.boundary.ExecutionContext;
 import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
 import io.coodoo.workhorse.core.entity.Execution;
+import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.entity.WorkhorseLog;
@@ -170,8 +171,10 @@ public abstract class BaseWorker {
     }
 
     /**
-     * Adds the message text in as a new line to the executions log <br>
-     * <i>CAUTION: This will only work in the context of the doWork method!</i>
+     * Adds the message text in as a new line to the executions log
+     * <p>
+     * <i> This will only work when used in method {@link #doWork(Execution)}! </i>
+     * </p>
      * 
      * @param message text to log
      */
@@ -182,8 +185,10 @@ public abstract class BaseWorker {
     /**
      * Adds a timestamp followed by the message text in as a new line to the executions log <br>
      * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in {@link JobEngineConfig#LOG_TIME_FORMATTER}<br>
-     * Example: <code>[22:06:42.680] Step 3 complete</code> <br>
-     * <i>CAUTION: This will only work in the context of the doWork method!</i>
+     * Example: <code>[22:06:42.680] Step 3 complete</code>
+     * <p>
+     * <i> This will only work when used in method {@link #doWork(Execution)}! </i>
+     * </p>
      * 
      * @param message text to log
      */
@@ -195,8 +200,10 @@ public abstract class BaseWorker {
      * Adds a timestamp followed by an info marker and the info message text in as a new line to the executions log<br>
      * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in {@link JobEngineConfig#LOG_TIME_FORMATTER}<br>
      * Info marker: Only if defined in {@link JobEngineConfig#LOG_INFO_MARKER}<br>
-     * Example: <code>[22:06:42.680] Step 3 complete</code> <br>
-     * <i>CAUTION: This will only work in the context of the doWork method!</i>
+     * Example: <code>[22:06:42.680] Step 3 complete</code>
+     * <p>
+     * <i> This will only work when used in method {@link #doWork(Execution)}! </i>
+     * </p>
      * 
      * @param message text to log
      */
@@ -209,8 +216,10 @@ public abstract class BaseWorker {
      * to the server log<br>
      * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in {@link JobEngineConfig#LOG_TIME_FORMATTER}<br>
      * Info marker: Only if defined in {@link JobEngineConfig#LOG_INFO_MARKER}<br>
-     * Example: <code>[22:06:42.680] Step 3 complete</code> <br>
-     * <i>CAUTION: This will only work in the context of the doWork method!</i>
+     * Example: <code>[22:06:42.680] Step 3 complete</code>
+     * <p>
+     * <i> This will only work when used in method {@link #doWork(Execution)}! </i>
+     * </p>
      * 
      * @param logger server log logger
      * @param message text to log
@@ -223,8 +232,10 @@ public abstract class BaseWorker {
      * Adds a timestamp followed by an warn marker and the warn message as a new line to the executions log<br>
      * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in {@link JobEngineConfig#LOG_TIME_FORMATTER}<br>
      * Error marker: <code>[WARN]</code> or as defined in {@link JobEngineConfig#LOG_WARN_MARKER}<br>
-     * Example: <code>[22:06:42.680] [WARN] Well thats suspicious...</code> <br>
-     * <i>CAUTION: This will only work in the context of the doWork method!</i>
+     * Example: <code>[22:06:42.680] [WARN] Well thats suspicious...</code>
+     * <p>
+     * <i> This will only work when used in method {@link #doWork(Execution)}! </i>
+     * </p>
      * 
      * @param message text to log
      */
@@ -237,8 +248,10 @@ public abstract class BaseWorker {
      * server log<br>
      * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in {@link JobEngineConfig#LOG_TIME_FORMATTER}<br>
      * Error marker: <code>[WARN]</code> or as defined in {@link JobEngineConfig#LOG_WARN_MARKER}<br>
-     * Example: <code>[22:06:42.680] [WARN] Well thats suspicious...</code> <br>
-     * <i>CAUTION: This will only work in the context of the doWork method!</i>
+     * Example: <code>[22:06:42.680] [WARN] Well thats suspicious...</code>
+     * <p>
+     * <i> This will only work when used in method {@link #doWork(Execution)}! </i>
+     * </p>
      * 
      * @param logger server log logger
      * @param message text to log
@@ -251,8 +264,10 @@ public abstract class BaseWorker {
      * Adds a timestamp followed by an error marker and the error message as a new line to the executions log<br>
      * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in {@link JobEngineConfig#LOG_TIME_FORMATTER}<br>
      * Error marker: <code>[ERROR]</code> or as defined in {@link JobEngineConfig#LOG_ERROR_MARKER}<br>
-     * Example: <code>[22:06:42.680] [ERROR] Dafuq was that?!?!</code> <br>
-     * <i>CAUTION: This will only work in the context of the doWork method!</i>
+     * Example: <code>[22:06:42.680] [ERROR] Dafuq was that?!?!</code>
+     * <p>
+     * <i> This will only work when used in method {@link #doWork(Execution)}! </i>
+     * </p>
      * 
      * @param message text to log
      */
@@ -265,8 +280,10 @@ public abstract class BaseWorker {
      * server log<br>
      * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in {@link JobEngineConfig#LOG_TIME_FORMATTER}<br>
      * Error marker: <code>[ERROR]</code> or as defined in {@link JobEngineConfig#LOG_ERROR_MARKER}<br>
-     * Example: <code>[22:06:42.680] [ERROR] Dafuq was that?!?!</code> <br>
-     * <i>CAUTION: This will only work in the context of the doWork method!</i>
+     * Example: <code>[22:06:42.680] [ERROR] Dafuq was that?!?!</code>
+     * <p>
+     * <i> This will only work when used in method {@link #doWork(Execution)}! </i>
+     * </p>
      * 
      * @param logger server log logger
      * @param message text to log
@@ -280,8 +297,10 @@ public abstract class BaseWorker {
      * the throwable to the server log<br>
      * Timestamp pattern: <code>[HH:mm:ss.SSS]</code> or as defined in {@link JobEngineConfig#LOG_TIME_FORMATTER}<br>
      * Error marker: <code>[ERROR]</code> or as defined in {@link JobEngineConfig#LOG_ERROR_MARKER}<br>
-     * Example: <code>[22:06:42.680] [ERROR] Dafuq was that?!?!</code> <br>
-     * <i>CAUTION: This will only work in the context of the doWork method!</i>
+     * Example: <code>[22:06:42.680] [ERROR] Dafuq was that?!?!</code>
+     * <p>
+     * <i> This will only work when used in method {@link #doWork(Execution)}! </i>
+     * </p>
      * 
      * @param logger server log logger
      * @param message text to log
@@ -314,4 +333,58 @@ public abstract class BaseWorker {
     public ExecutionContext getExecutionContext() {
         return executionContext;
     }
+
+    /**
+     * <p>
+     * Add a short message to summarize current execution, that is also logged with the severity INFO
+     * </p>
+     * <p>
+     * <i> This will only work when used in method {@link #doWork(Execution)}! </i>
+     * </p>
+     * The number of character in a summary can not exceed a value defined in {@link WorkhorseConfig#getMaxExecutionSummaryLength()}.<br>
+     * Otherwise the summary is cut to the permitted length and the full-length summary is appended to the logs ({@link ExecutionLog#getLog()}) of the current
+     * execution.
+     * 
+     * @param logger server log logger
+     * @param summary short message to add
+     */
+    public void summarizeInfo(Logger logger, String summary) {
+        summarizeInfo(logger, summary);
+    }
+
+    /**
+     * <p>
+     * Add a short message to summarize the current execution, that is also logged with the severity ERROR
+     * </p>
+     * <p>
+     * <i> This will only work when used in method {@link #doWork(Execution)}! </i>
+     * </p>
+     * The number of character in a summary can not exceed a value defined in {@link WorkhorseConfig#getMaxExecutionSummaryLength()}.<br>
+     * Otherwise the summary is cut to the permitted length and the full-length summary is appended to the logs ({@link ExecutionLog#getLog()}) of the current
+     * execution.
+     * 
+     * @param logger server log logger
+     * @param summary short message to add
+     */
+    public void summarizeError(Logger logger, String summary) {
+        summarizeError(logger, summary);
+    }
+
+    /**
+     * <p>
+     * Add a short message to summarize the current execution.
+     * </p>
+     * <p>
+     * <i> This will only work when used in method {@link #doWork(Execution)}! </i>
+     * </p>
+     * The number of character in a summary can not exceed a value defined in {@link WorkhorseConfig#getMaxExecutionSummaryLength()}.<br>
+     * Otherwise the summary is cut to the permitted length and the full-length summary is appended to the logs ({@link ExecutionLog#getLog()}) of the current
+     * execution.
+     * 
+     * @param summary short message to add
+     */
+    public void summarize(String summary) {
+        executionContext.summarize(summary);
+    }
+
 }
