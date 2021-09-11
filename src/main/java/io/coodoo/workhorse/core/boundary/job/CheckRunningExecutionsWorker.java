@@ -23,11 +23,11 @@ import io.coodoo.workhorse.util.WorkhorseUtil;
  * @author coodoo GmbH (coodoo.io)
  */
 @ApplicationScoped
-@InitialJobConfig(name = "Hunt timeout executions", schedule = "5 * * * * *", failRetries = 1,
-                description = "Hunt too long-running zombie executions and cure them.", tags = "System")
-public class ExecutionTimeoutWorker extends Worker {
+@InitialJobConfig(name = "Workhorse System: Check running executions", schedule = "20 */5 * * * *", failRetries = 1,
+                description = "Check for stuck running executions that are no longer executed.", tags = "System")
+public class CheckRunningExecutionsWorker extends Worker {
 
-    private final Logger log = LoggerFactory.getLogger(ExecutionTimeoutWorker.class);
+    private final Logger log = LoggerFactory.getLogger(CheckRunningExecutionsWorker.class);
 
     @Inject
     @ExecutionQualifier
@@ -47,30 +47,29 @@ public class ExecutionTimeoutWorker extends Worker {
         }
 
         for (Execution timeoutExecution : timeoutExecutions) {
-            log.warn("Execution in timeout found! {}", timeoutExecution);
+            log.warn("Stuck running execution found! {}", timeoutExecution);
 
-            ExecutionStatus cure = StaticConfig.EXECUTION_TIMEOUT_STATUS;
-            String logMessage = "Execution in timeout found (ID: " + timeoutExecution.getId() + "): ";
+            ExecutionStatus statusTransition = StaticConfig.EXECUTION_TIMEOUT_STATUS;
+            String logMessage = "Stuck running execution found (ID: " + timeoutExecution.getId() + "): ";
 
-            switch (cure) {
+            switch (statusTransition) {
                 case QUEUED:
                     Execution retryExecution = workhorseController.createRetryExecution(timeoutExecution);
                     workhorseController.setExecutionStatusToFailed(timeoutExecution, ExecutionFailStatus.TIMEOUT);
                     log.trace("Execution in timeout killed and risen from the death! Now it is {}", retryExecution);
-                    workhorseLogService.logMessage(logMessage + "Marked as failed and queued a clone", timeoutExecution.getJobId(), false);
+                    workhorseLogService.logMessage(logMessage + "Marked as failed and queued a clone (ID: " + retryExecution.getId() + ")",
+                                    timeoutExecution.getJobId(), false);
                     break;
                 case RUNNING:
-                    log.warn("Execution in timeout will still walk free with status {}", cure);
+                    log.warn("Execution in timeout will remain in status {}", statusTransition);
                     workhorseLogService.logMessage(logMessage + "No action is taken", timeoutExecution.getJobId(), false);
                     break;
                 default:
-                    workhorseController.updateExecutionStatus(timeoutExecution.getJobId(), timeoutExecution.getId(), cure);
-                    log.trace("Execution in timeout is cured with status {}", cure);
-                    workhorseLogService.logMessage(logMessage + "Put in status " + cure, timeoutExecution.getJobId(), false);
+                    workhorseController.updateExecutionStatus(timeoutExecution.getJobId(), timeoutExecution.getId(), statusTransition);
+                    log.trace("Execution in timeout is put in status {}", statusTransition);
+                    workhorseLogService.logMessage(logMessage + "Put in status " + statusTransition, timeoutExecution.getJobId(), false);
                     break;
             }
-
         }
     }
-
 }

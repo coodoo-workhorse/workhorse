@@ -97,8 +97,8 @@ public interface ExecutionPersistence {
     Execution updateStatus(Long jobId, Long executionId, ExecutionStatus status, ExecutionFailStatus failStatus);
 
     /**
-     * Given the Id of the corresponent job <code>jobId</code> and the limit date <code>preDate</code>, delete all job executions where
-     * <code>Execution.createdAt < preDate</code>
+     * Given the Id of the correspondent job <code>jobId</code> and the limit date <code>preDate</code>, delete all job executions where
+     * <code>Execution.createdAt &lt; preDate</code>
      * 
      * @param jobId
      * @param preDate
