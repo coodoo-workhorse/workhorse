@@ -283,7 +283,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
     }
 
     /**
-     * Create a builder to instantiate attributes of an execution
+     * Create a builder to instantiate attributes of an execution with parameters
      * 
      * <pre>
      * Example: {
@@ -299,86 +299,11 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * 
      * @return the builder
      */
-    public Builder execution() {
-        return new Builder();
+    public ParameterExecutionBuilder execution() {
+        return new ParameterExecutionBuilder();
     }
 
-    public class Builder {
-
-        private boolean priority;
-        private LocalDateTime plannedFor;
-        private LocalDateTime expiresAt;
-
-        /**
-         * Prioritize an execution over others of the worker class
-         * 
-         * @return the builder to set another feature
-         */
-        public Builder prioritize() {
-            this.priority = true;
-            return this;
-        }
-
-        /**
-         * Plan the processing of an execution to a given timestamp
-         * 
-         * @param plannedFor plannedFor specified time for the execution
-         * @return the builder to set another feature
-         */
-        public Builder plannedFor(LocalDateTime plannedFor) {
-            this.plannedFor = plannedFor;
-            return this;
-        }
-
-        /**
-         * Delay the processing of an execution for a given amount of time
-         * 
-         * <pre>
-         * Example:
-         * {@code 
-         * delayedFor(3L, ChronoUnit.SECONDS)
-         * }
-         * </pre>
-         * 
-         * @param delayValue time to wait
-         * @param delayUnit what kind of time to wait
-         * @return the builder to set another feature
-         */
-        public Builder delayedFor(Long delayValue, ChronoUnit delayUnit) {
-            this.plannedFor = WorkhorseUtil.delayToMaturity(delayValue, delayUnit);
-            return this;
-        }
-
-        /**
-         * Define a timestamp up to which the execution will expire (cancel), if not being processed
-         * 
-         * @param expiresAt specified time to cancel the execution
-         * @return the builder to set another feature
-         */
-        public Builder expiresAt(LocalDateTime expiresAt) {
-            this.expiresAt = expiresAt;
-            return this;
-        }
-
-        /**
-         * Define an period of time before the execution is expired (cancel), if not being processed
-         * 
-         * <pre>
-         * Example:
-         * {@code 
-         * expiresAt(3L, ChronoUnit.SECONDS)
-         * }
-         * </pre>
-         * 
-         * @param expiresValue time to observe
-         * @param expiresUnit what kind of time to observe
-         * @return the builder to set another feature
-         */
-        public Builder expiresAt(Long expiresValue, ChronoUnit expiresUnit) {
-
-            this.expiresAt = WorkhorseUtil.delayToMaturity(expiresValue, expiresUnit);
-            return this;
-        }
+    public class ParameterExecutionBuilder extends BaseExecutionBuilder {
 
         /**
          * This creates a batch of {@link Execution} objects
