@@ -808,49 +808,4 @@ public class WorkhorseController {
         return jobPersistence.getJobStatusCount();
     }
 
-    /**
-     * Hunt timeout executions and cure them
-     */
-    public void huntTimeoutExecution() {
-
-        if (StaticConfig.EXECUTION_TIMEOUT <= 0) {
-            return;
-        }
-
-        LocalDateTime time = WorkhorseUtil.timestamp().minusSeconds(StaticConfig.EXECUTION_TIMEOUT);
-        List<Execution> timeoutExecutions = executionPersistence.findTimeoutExecutions(time);
-
-        if (timeoutExecutions.isEmpty()) {
-            return;
-        }
-
-        for (Execution timeoutExecution : timeoutExecutions) {
-            log.warn("Zombie found! {}", timeoutExecution);
-
-            ExecutionStatus cure = StaticConfig.EXECUTION_TIMEOUT_STATUS;
-            String logMessage = "Zombie execution found (ID: " + timeoutExecution.getId() + "): ";
-
-            switch (cure) {
-                case QUEUED:
-                    Execution retryExecution = createRetryExecution(timeoutExecution);
-                    timeoutExecution.setStatus(ExecutionStatus.FAILED);
-                    log.info("Zombie killed and risen from the death! Now it is {}", retryExecution);
-                    workhorseLogService.logMessage(logMessage + "Marked as failed and queued a clone", timeoutExecution.getJobId(), false);
-                    break;
-                case RUNNING:
-                    log.warn("Zombie will still walk free with status {}", cure);
-                    workhorseLogService.logMessage(logMessage + "No action is taken", timeoutExecution.getJobId(), false);
-                    break;
-                default:
-                    timeoutExecution.setStatus(cure);
-                    log.info("Zombie is cured with status {}", cure);
-                    workhorseLogService.logMessage(logMessage + "Put in status " + cure, timeoutExecution.getJobId(), false);
-                    break;
-            }
-
-            executionPersistence.update(timeoutExecution);
-
-        }
-    }
-
 }

@@ -25,19 +25,18 @@ import io.coodoo.workhorse.util.CollectionListing;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
 /**
- * Check queued executions that are no longer executed.
- * 
- * This class is used until we find out why executions are not processed under load.
+ * @author coodoo GmbH (coodoo.io)
  */
 @ApplicationScoped
-@InitialJobConfig(name = "Check queued executions", schedule = "0 */5 * * * *", failRetries = 1,
+@InitialJobConfig(name = "Workhorse System: Check queued executions", schedule = "20 */5 * * * *", failRetries = 1,
                 description = "Check for stuck queued executions that are no longer executed.", tags = "System")
 public class CheckQueuedExecutionsWorker extends Worker {
+
+    // FIXME: This class is used until we find out why executions are not processed under load.
 
     private final Logger logger = LoggerFactory.getLogger(CheckQueuedExecutionsWorker.class);
 
     private static final long MIN_NUMBER_OF_QUEUED_EXECUTION = 1000L;
-
     private static final long DURATION_OF_EXECUTIONS_IN_STATUS_QUEUED_IN_MINUTE = 10;
 
     @Inject
@@ -133,5 +132,4 @@ public class CheckQueuedExecutionsWorker extends Worker {
 
         logInfo(logger, "Finished check queued executions.");
     }
-
 }

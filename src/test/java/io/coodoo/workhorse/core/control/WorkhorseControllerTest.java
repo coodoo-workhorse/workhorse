@@ -5,8 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -23,7 +21,6 @@ import java.util.List;
 import javax.enterprise.event.Event;
 import javax.enterprise.inject.spi.BeanManager;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -131,153 +128,6 @@ public class WorkhorseControllerTest {
 
     @Rule
     public ExpectedException exceptionRule = ExpectedException.none();
-
-    @Test
-    public void testHuntTimeoutExecutions() throws Exception {
-
-        StaticConfig.EXECUTION_TIMEOUT = 12;
-        StaticConfig.EXECUTION_TIMEOUT_STATUS = ExecutionStatus.ABORTED;
-        StaticConfig.TIME_ZONE = "UTC";
-
-        Execution execution1 = new Execution();
-        execution1.setId(1L);
-        execution1.setJobId(1L);
-        execution1.setStatus(ExecutionStatus.RUNNING);
-
-        Execution execution2 = new Execution();
-        execution1.setId(2L);
-        execution1.setJobId(1L);
-        execution2.setStatus(ExecutionStatus.RUNNING);
-
-        List<Execution> timeoutExecutions = new ArrayList<>();
-
-        timeoutExecutions.add(execution1);
-        timeoutExecutions.add(execution2);
-
-        // when(WorkhorseUtil.timestamp()).thenReturn(null);
-        when(executionPersistence.findTimeoutExecutions(anyObject())).thenReturn(timeoutExecutions);
-
-        classUnderTest.huntTimeoutExecution();
-
-        for (Execution zombiExecution : timeoutExecutions) {
-            assertEquals(ExecutionStatus.ABORTED, zombiExecution.getStatus());
-
-            String logMessage = "Zombie execution found (ID: " + zombiExecution.getId() + "): ";
-            verify(workhorseLogService).logMessage(logMessage + "Put in status " + ExecutionStatus.ABORTED, zombiExecution.getJobId(), false);
-
-            verify(executionPersistence).update(zombiExecution);
-        }
-
-    }
-
-    // The method executionPersistence.persist() of the called method createRetryExecution() can not be mocked.
-    @Ignore
-    @Test
-    public void testHuntTimeoutExecutions_ExecutionTimeoutStatus_is_QUEUED() throws Exception {
-
-        StaticConfig.EXECUTION_TIMEOUT = 12;
-        StaticConfig.EXECUTION_TIMEOUT_STATUS = ExecutionStatus.QUEUED;
-        StaticConfig.TIME_ZONE = "UTC";
-
-        Execution execution1 = new Execution();
-        execution1.setId(1L);
-        execution1.setJobId(1L);
-        execution1.setStatus(ExecutionStatus.RUNNING);
-
-        Execution execution2 = new Execution();
-        execution1.setId(2L);
-        execution1.setJobId(1L);
-        execution2.setStatus(ExecutionStatus.RUNNING);
-
-        List<Execution> timeoutExecutions = new ArrayList<>();
-
-        timeoutExecutions.add(execution1);
-        timeoutExecutions.add(execution2);
-
-        // when(WorkhorseUtil.timestamp()).thenReturn(null);
-        when(executionPersistence.findTimeoutExecutions(anyObject())).thenReturn(timeoutExecutions);
-
-        classUnderTest.huntTimeoutExecution();
-
-        for (Execution zombiExecution : timeoutExecutions) {
-            assertEquals(ExecutionStatus.FAILED, zombiExecution.getStatus());
-
-            String logMessage = "Zombie execution found (ID: " + zombiExecution.getId() + "): ";
-            verify(workhorseLogService).logMessage(logMessage + "Marked as failed and queued a clone", zombiExecution.getJobId(), false);
-
-            verify(executionPersistence).update(zombiExecution);
-        }
-    }
-
-    @Test
-    public void testHuntTimeoutExecutions_ExecutionTimeoutStatus_is_RUNNING() throws Exception {
-
-        StaticConfig.EXECUTION_TIMEOUT = 12;
-        StaticConfig.EXECUTION_TIMEOUT_STATUS = ExecutionStatus.RUNNING;
-        StaticConfig.TIME_ZONE = "UTC";
-
-        Execution execution1 = new Execution();
-        execution1.setId(1L);
-        execution1.setJobId(1L);
-        execution1.setStatus(ExecutionStatus.RUNNING);
-
-        Execution execution2 = new Execution();
-        execution1.setId(2L);
-        execution1.setJobId(1L);
-        execution2.setStatus(ExecutionStatus.RUNNING);
-
-        List<Execution> timeoutExecutions = new ArrayList<>();
-
-        timeoutExecutions.add(execution1);
-        timeoutExecutions.add(execution2);
-
-        when(executionPersistence.findTimeoutExecutions(anyObject())).thenReturn(timeoutExecutions);
-
-        classUnderTest.huntTimeoutExecution();
-
-        for (Execution zombiExecution : timeoutExecutions) {
-            assertEquals(ExecutionStatus.RUNNING, zombiExecution.getStatus());
-
-            String logMessage = "Zombie execution found (ID: " + zombiExecution.getId() + "): ";
-            verify(workhorseLogService).logMessage(logMessage + "No action is taken", zombiExecution.getJobId(), false);
-
-            verify(executionPersistence).update(zombiExecution);
-        }
-    }
-
-    @Test
-    public void testHuntTimeoutExecutions_withEmptyList() throws Exception {
-
-        StaticConfig.EXECUTION_TIMEOUT = 12;
-        StaticConfig.EXECUTION_TIMEOUT_STATUS = ExecutionStatus.ABORTED;
-        StaticConfig.TIME_ZONE = "UTC";
-
-        List<Execution> timeoutExecutions = new ArrayList<>();
-
-        when(executionPersistence.findTimeoutExecutions(anyObject())).thenReturn(timeoutExecutions);
-
-        classUnderTest.huntTimeoutExecution();
-
-        verify(executionPersistence).findTimeoutExecutions(anyObject());
-
-        verify(workhorseLogService, never()).logMessage(anyString(), anyLong(), anyBoolean());
-
-        verify(executionPersistence, never()).update(anyObject());
-    }
-
-    @Test
-    public void testHuntTimeoutExecutions_ToLow_ExecutionTimeout() throws Exception {
-
-        StaticConfig.EXECUTION_TIMEOUT = 0;
-
-        classUnderTest.huntTimeoutExecution();
-
-        verify(executionPersistence, never()).findTimeoutExecutions(anyObject());
-
-        verify(workhorseLogService, never()).logMessage(anyString(), anyLong(), anyBoolean());
-
-        verify(executionPersistence, never()).update(anyObject());
-    }
 
     @Test
     public void testCreateExecution_uniqueQueued_deactivated() throws Exception {

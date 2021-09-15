@@ -37,7 +37,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     @Inject
     Event<NewExecutionEvent> newExecutionEventEvent;
 
-    private AtomicLong executionId = new AtomicLong(0);
+    private AtomicLong executionId = new AtomicLong(1);
 
     @Override
     public String getPersistenceName() {
