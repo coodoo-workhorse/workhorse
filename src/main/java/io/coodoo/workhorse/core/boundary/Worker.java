@@ -25,16 +25,58 @@ public abstract class Worker extends BaseWorker {
     }
 
     /**
-     * <i>This is an access point to get the job engine started with a new job execution.</i><br>
-     * <br>
+     * Create a builder to instantiate attributes of an execution
      * 
-     * This creates a {@link Execution} object that gets added to the job engine to be executed as soon as possible.
+     * <pre>
+     * Examples:
+     * {@code 
      * 
-     * @param execution {@link Execution} object that gets added to the job engine
-     * @return execution ID
+     * createExecution().build();
+     * 
+     * createExecution().prioritize().expiresAtHours(3).build();
+     * }
+     * </pre>
+     * 
+     * @return the builder
      */
-    public Long createExecution(Execution execution) {
-        return createExecution(null, execution.isPriority(), execution.getPlannedFor(), execution.getExpiresAt(), null, null).getId();
+    public ExecutionBuilder executionBuilder() {
+        return new ExecutionBuilder();
+    }
+
+    public class ExecutionBuilder extends BaseExecutionBuilder {
+
+        /**
+         * Create an execution with the defined attributes.
+         * 
+         * @return execution ID
+         * @deprecated use the {@link #build()}
+         */
+        @Deprecated
+        public Long create() {
+            return build();
+        }
+
+    }
+
+    /**
+     * Create a builder to instantiate attributes of an execution
+     * 
+     * <pre>
+     * Example:
+     * {@code 
+     * 
+     * execution().create()
+     * 
+     * execution().prioritize().create()
+     * }
+     * </pre>
+     * 
+     * @return the builder
+     * @deprecated use the {@link #executionBuilder()}
+     */
+    @Deprecated
+    public ExecutionBuilder execution() {
+        return new ExecutionBuilder();
     }
 
     /**
@@ -136,34 +178,4 @@ public abstract class Worker extends BaseWorker {
         return createExecution(null, false, null, expiresAt, null, null).getId();
     }
 
-    /**
-     * Create a builder to instantiate attributes of an execution
-     * 
-     * <pre>
-     * Example:
-     * {@code 
-     * 
-     * execution().create()
-     * 
-     * execution().prioritize().create()
-     * }
-     * </pre>
-     * 
-     * @return the builder
-     */
-    public ExecutionBuilder execution() {
-        return new ExecutionBuilder();
-    }
-
-    public class ExecutionBuilder extends BaseExecutionBuilder {
-
-        /**
-         * Create an execution with the defined attributes.
-         * 
-         * @return execution ID
-         */
-        public Long create() {
-            return createExecution(null, priority, plannedFor, expiresAt, null, null).getId();
-        }
-    }
 }

@@ -395,6 +395,15 @@ public abstract class BaseWorker {
         protected LocalDateTime expiresAt;
 
         /**
+         * Builds an execution with the defined attributes.
+         * 
+         * @return execution ID
+         */
+        public Long build() {
+            return createExecution(null, priority, plannedFor, expiresAt, null, null).getId();
+        }
+
+        /**
          * Prioritize an execution over others of the worker class
          * 
          * @return the builder to set another feature
