@@ -6,7 +6,7 @@ import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
 import io.coodoo.workhorse.core.boundary.WorkhorseService;
 import io.coodoo.workhorse.core.boundary.job.ExecutionCleanupWorker;
-import io.coodoo.workhorse.persistence.PersistenceManager;
+import io.coodoo.workhorse.persistence.WorkhorsePersistence;
 import io.coodoo.workhorse.persistence.interfaces.ConfigPersistence;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
@@ -34,7 +34,7 @@ public class WorkhorseCDIExtension {
         bbdEvent.addAnnotatedType(JobPersistence.class, JobPersistence.class.getName());
         bbdEvent.addAnnotatedType(JobScheduler.class, JobScheduler.class.getName());
         bbdEvent.addAnnotatedType(WorkhorseLogService.class, WorkhorseLogService.class.getName());
-        bbdEvent.addAnnotatedType(PersistenceManager.class, PersistenceManager.class.getName());
+        bbdEvent.addAnnotatedType(WorkhorsePersistence.class, WorkhorsePersistence.class.getName());
         bbdEvent.addAnnotatedType(ExecutionCleanupWorker.class, ExecutionCleanupWorker.class.getName());
         bbdEvent.addAnnotatedType(JobThread.class, JobThread.class.getName());
         bbdEvent.addAnnotatedType(MemoryPersistence.class, MemoryPersistence.class.getName());

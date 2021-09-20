@@ -30,7 +30,7 @@ import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
-import io.coodoo.workhorse.persistence.PersistenceManager;
+import io.coodoo.workhorse.persistence.WorkhorsePersistence;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
 import io.coodoo.workhorse.persistence.interfaces.qualifier.ExecutionQualifier;
@@ -54,7 +54,7 @@ public class Workhorse {
     ExecutionPersistence executionPersistence;
 
     @Inject
-    PersistenceManager persistenceManager;
+    WorkhorsePersistence persistenceManager;
 
     @Inject
     ExecutionBuffer executionBuffer;
@@ -260,7 +260,6 @@ public class Workhorse {
 
         log.trace("Numbers of running's jobThreads: {}", executionBuffer.getRunningJobThreadCounts(jobId));
         if (executionBuffer.getJobThreadCounts(jobId) > executionBuffer.getRunningJobThreadCounts(jobId)) {
-            // lock = executionQueue.getLock(jobId);
             try {
                 lock.lock();
                 for (int i = executionBuffer.getRunningJobThreadCounts(jobId); i < executionBuffer.getJobThreadCounts(jobId); i++) {

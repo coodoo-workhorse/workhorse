@@ -21,8 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.Job;
-import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.core.entity.JobBufferStatus;
+import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
 
 /**
@@ -56,7 +56,7 @@ public class ExecutionBuffer {
         for (Job job : workhorseController.getAllJobsByStatus(JobStatus.ACTIVE)) {
             initialize(job);
         }
-        log.trace("Queue initialize !");
+        log.trace("Queue initialize!");
     }
 
     public void initialize(Job job) {

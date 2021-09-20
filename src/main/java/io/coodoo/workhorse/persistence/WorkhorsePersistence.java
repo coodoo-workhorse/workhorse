@@ -21,9 +21,9 @@ import io.coodoo.workhorse.persistence.interfaces.qualifier.LogQualifier;
 import io.coodoo.workhorse.persistence.memory.MemoryConfigBuilder;
 
 @ApplicationScoped
-public class PersistenceManager {
+public class WorkhorsePersistence {
 
-    private static final Logger log = LoggerFactory.getLogger(PersistenceManager.class);
+    private static final Logger log = LoggerFactory.getLogger(WorkhorsePersistence.class);
 
     @Inject
     @Any
@@ -57,10 +57,6 @@ public class PersistenceManager {
     @LogQualifier
     private LogPersistence logPersistence;
 
-    public void initializeStorage() {
-        initializePersistence(new MemoryConfigBuilder().build());
-    }
-
     /**
      * Check if all persistences are initialized
      */
@@ -73,82 +69,78 @@ public class PersistenceManager {
      * 
      * @param Configuration Configuration of the persistence.
      */
-    public void initializePersistence(WorkhorseConfig configuration) {
+    public void initialize(WorkhorseConfig workhorseConfig) {
 
-        if (configuration == null) {
-            configuration = new MemoryConfigBuilder().build();
-            log.warn("The persistence configuration can not be null. The default persistence {} is used", configuration);
+        if (workhorseConfig == null) {
+            workhorseConfig = new MemoryConfigBuilder().build();
+            log.warn("The WorkhorseConfig can not be null. The default persistence {} is used", workhorseConfig);
         }
 
-        log.info("Workhorse Persistence initializing: {} {}", configuration.getPersistenceName(), configuration.getPersistenceVersion());
+        log.info("Workhorse using {} {}", workhorseConfig.getPersistenceName(), workhorseConfig.getPersistenceVersion());
 
-        initializeConfigPersistence(configuration);
-        initializeJobPersistence(configuration);
-        initializeExecutionPersistence(configuration);
-        initializeLogPersistence(configuration);
+        initializeConfigPersistence(workhorseConfig);
+        initializeJobPersistence(workhorseConfig);
+        initializeExecutionPersistence(workhorseConfig);
+        initializeLogPersistence(workhorseConfig);
 
         if (!isInitialized()) {
-            configuration = new MemoryConfigBuilder().build();
-            log.error("The given persistence configuration could not be loaded, the default persistence is used: {}", configuration);
-            initializePersistence(configuration);
+            workhorseConfig = new MemoryConfigBuilder().build();
+            log.error("The given WorkhorseConfig could not be loaded, the default persistence is used: {}", workhorseConfig);
+            initialize(workhorseConfig);
         }
     }
 
-    protected ConfigPersistence initializeConfigPersistence(WorkhorseConfig persistenceConfiguration) {
+    protected ConfigPersistence initializeConfigPersistence(WorkhorseConfig workhorseConfig) {
         log.trace("ExecutionPersistence initialization");
         for (ConfigPersistence configPersistenceInstance : configPersistenceInstances) {
-            if (configPersistenceInstance != null && configPersistenceInstance.getPersistenceName().equals(persistenceConfiguration.getPersistenceName())) {
+            if (configPersistenceInstance != null && configPersistenceInstance.getPersistenceName().equals(workhorseConfig.getPersistenceName())) {
                 configPersistence = configPersistenceInstance;
 
-                logFoundPersistence(ConfigPersistence.class, configPersistence.getClass());
-                configPersistence.initialize(persistenceConfiguration);
+                logFoundPersistence(configPersistence.getClass());
+                configPersistence.initialize(workhorseConfig);
                 return configPersistence;
             }
         }
         return null;
     }
 
-    protected JobPersistence initializeJobPersistence(WorkhorseConfig persistenceConfiguration) {
+    protected JobPersistence initializeJobPersistence(WorkhorseConfig workhorseConfig) {
         log.trace("JobPersistence initialization");
         for (JobPersistence jobPersistenceInstance : jobPersistenceInstances) {
-            if (jobPersistenceInstance != null && jobPersistenceInstance.getPersistenceName().equals(persistenceConfiguration.getPersistenceName())) {
+            if (jobPersistenceInstance != null && jobPersistenceInstance.getPersistenceName().equals(workhorseConfig.getPersistenceName())) {
                 jobPersistence = jobPersistenceInstance;
-                logFoundPersistence(JobPersistence.class, jobPersistence.getClass());
+                logFoundPersistence(jobPersistence.getClass());
                 return jobPersistence;
             }
         }
         return null;
     }
 
-    protected ExecutionPersistence initializeExecutionPersistence(WorkhorseConfig persistenceConfiguration) {
+    protected ExecutionPersistence initializeExecutionPersistence(WorkhorseConfig workhorseConfig) {
         log.trace("ExecutionPersistence initialization");
         for (ExecutionPersistence executionPersistenceInstance : executionPersistenceInstances) {
-            if (executionPersistenceInstance != null
-                            && executionPersistenceInstance.getPersistenceName().equals(persistenceConfiguration.getPersistenceName())) {
+            if (executionPersistenceInstance != null && executionPersistenceInstance.getPersistenceName().equals(workhorseConfig.getPersistenceName())) {
                 executionPersistence = executionPersistenceInstance;
-                logFoundPersistence(ExecutionPersistence.class, executionPersistence.getClass());
+                logFoundPersistence(executionPersistence.getClass());
                 return executionPersistence;
             }
         }
         return null;
     }
 
-    protected LogPersistence initializeLogPersistence(WorkhorseConfig persistenceConfiguration) {
+    protected LogPersistence initializeLogPersistence(WorkhorseConfig workhorseConfig) {
         log.trace("LogPersistence initialization");
         for (LogPersistence logPersistenceInstance : logPersistenceInstances) {
-            if (logPersistenceInstance != null && logPersistenceInstance.getPersistenceName().equals(persistenceConfiguration.getPersistenceName())) {
+            if (logPersistenceInstance != null && logPersistenceInstance.getPersistenceName().equals(workhorseConfig.getPersistenceName())) {
                 logPersistence = logPersistenceInstance;
-                logFoundPersistence(LogPersistence.class, logPersistence.getClass());
+                logFoundPersistence(logPersistence.getClass());
                 return logPersistence;
             }
         }
         return null;
-
     }
 
-    private void logFoundPersistence(Class<?> persistenceInterface, Class<?> persistenceImplementation) {
-        String intName = persistenceInterface.getSimpleName();
-        String implName = persistenceImplementation.getName();
-        log.info("{} --> {}", intName, implName);
+    private void logFoundPersistence(Class<?> persistenceImplementation) {
+        log.info("⮑ {}", persistenceImplementation.getName());
     }
 }

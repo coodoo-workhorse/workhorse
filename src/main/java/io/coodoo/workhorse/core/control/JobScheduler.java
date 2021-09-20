@@ -69,6 +69,7 @@ public class JobScheduler {
     public void start(Job job) {
 
         if (JobStatus.ACTIVE.equals(job.getStatus()) && job.getSchedule() != null && !job.getSchedule().isEmpty()) {
+
             stop(job);
 
             try {
@@ -101,12 +102,8 @@ public class JobScheduler {
         ScheduledFuture<?> scheduledFuture = scheduledJobFutures.get(job.getId());
         if (scheduledFuture != null) {
             scheduledFuture.cancel(false);
-
             log.info("Schedule stopped for Job {} ", job.getName());
-        } else {
-            log.info("No scheduled execution found for the given job {} ", job.getName());
         }
-
     }
 
     /**

@@ -79,8 +79,6 @@ public class WorkhorseController {
 
         List<Class<?>> workerClasses = new ArrayList<>();
 
-        log.info("Workhorse Jobs initializing...");
-
         // check whether new worker exists and must be created and persisted
         @SuppressWarnings("serial")
         Set<Bean<?>> beans = beanManager.getBeans(BaseWorker.class, new AnnotationLiteral<Any>() {});
@@ -90,7 +88,7 @@ public class WorkhorseController {
             if (job == null) {
                 try {
                     job = createJob(workerclass);
-                    log.info("[{}] Job and Worker created and Configuration persisted ({})", job.getWorkerClassName(), job.getName());
+                    log.info("Registed new Job '{}' ({})", job.getName(), job.getWorkerClassName());
                 } catch (RuntimeException runtimeException) {
                     log.error(runtimeException.getMessage());
                 }
@@ -100,14 +98,13 @@ public class WorkhorseController {
 
         // check if persisted jobs can be mapped a with a worker class
         for (Job job : jobPersistence.getAll()) {
-            String workerClassName = job.getWorkerClassName();
             Class<?> workerClass;
             try {
                 workerClass = getWorkerClass(job);
             } catch (ClassNotFoundException exception) {
 
                 job.setStatus(JobStatus.ERROR);
-                log.error("[{}] Worker class not found ({})", workerClassName, job.getName());
+                log.error("Worker class not found for Job '{}' ({})", job.getName(), job.getWorkerClassName());
                 jobErrorEvent.fire(new JobErrorEvent(exception, ErrorType.ERROR_BY_FOUND_JOB_WORKER.getMessage(), job.getId(), job.getStatus()));
                 continue;
             }
@@ -116,7 +113,7 @@ public class WorkhorseController {
                 log.trace("JobStatus of Job {} updated from {} to {}", job, job.getStatus(), JobStatus.NO_WORKER);
                 job.setStatus(JobStatus.NO_WORKER);
                 jobPersistence.update(job);
-                log.error("No Worker Class found for Job: {}", job);
+                log.error("Worker class not found for Job '{}' ({})", job.getName(), job.getWorkerClassName());
                 jobErrorEvent.fire(new JobErrorEvent(new Throwable(ErrorType.NO_JOB_WORKER_FOUND.getMessage()), ErrorType.NO_JOB_WORKER_FOUND.getMessage(),
                                 job.getId(), job.getStatus()));
                 continue;
@@ -126,25 +123,22 @@ public class WorkhorseController {
             if (job.getStatus().equals(JobStatus.NO_WORKER)) {
                 job.setStatus(JobStatus.INACTIVE);
                 jobPersistence.update(job);
-                log.info("JobStatus of Job {} updated from {} to {}", job, JobStatus.NO_WORKER, JobStatus.INACTIVE);
+                log.info("Status of Job {} updated from {} to {}", job, JobStatus.NO_WORKER, JobStatus.INACTIVE);
                 workhorseLogService.logChange(job.getId(), job.getStatus(), "Status", JobStatus.NO_WORKER, JobStatus.INACTIVE, "Worker class found.");
 
             }
 
             // Check if parameter class has changed
             String parametersClassName = getWorkerParameterName(workerClass);
-
-            log.info("parametersClassName: {} ", parametersClassName);
             // The Objects-Class is null-safe and can handle Worker-classes without Parameters
             if (!Objects.equals(parametersClassName, job.getParametersClassName())) {
-                log.info("Parameters class name of job worker {} changed from {} to {}", job.getWorkerClassName(), job.getParametersClassName(),
-                                parametersClassName);
+                log.info("Parameters class changed from {} to {} for Job '{}' ({})", job.getWorkerClassName(), job.getParametersClassName(), job.getName(),
+                                job.getWorkerClassName());
                 workhorseLogService.logChange(job.getId(), job.getStatus(), "Parameters class", job.getParametersClassName(), parametersClassName, null);
 
                 job.setParametersClassName(parametersClassName);
                 jobPersistence.update(job);
             }
-
         }
     }
 
@@ -376,7 +370,7 @@ public class WorkhorseController {
      * @param expiresAt If expiresAt is given, the execution have to be process before this time. Otherwise the execution is cancelled.
      * @param batchId Id to refer to a group of executions to handle as a single entity.
      * @param chainId Id to refer to a group of executions to process by an order.
-     * @param uniqueQueued if true then no more than one execution with specified paramters can be queued at the time.
+     * @param uniqueQueued if true then no more than one execution with specified parameters can be queued at the time.
      * @return the created execution
      */
     public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime plannedFor, LocalDateTime expiresAt, Long batchId,
