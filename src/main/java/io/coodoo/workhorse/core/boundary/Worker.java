@@ -43,7 +43,7 @@ public abstract class Worker extends BaseWorker {
         return new ExecutionBuilder();
     }
 
-    public class ExecutionBuilder extends BaseExecutionBuilder {
+    public class ExecutionBuilder extends BaseExecutionBuilder<ExecutionBuilder> {
 
         /**
          * Create an execution with the defined attributes.

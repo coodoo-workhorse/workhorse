@@ -153,7 +153,7 @@ public abstract class WorkerWith<T> extends BaseWorker {
         return new ParameterExecutionBuilder();
     }
 
-    public class ParameterExecutionBuilder extends BaseExecutionBuilder {
+    public class ParameterExecutionBuilder extends BaseExecutionBuilder<ParameterExecutionBuilder> {
 
         /**
          * Builds an execution with the defined attributes.

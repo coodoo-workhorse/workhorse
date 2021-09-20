@@ -388,7 +388,7 @@ public abstract class BaseWorker {
         executionContext.summarize(summary);
     }
 
-    public abstract class BaseExecutionBuilder {
+    public abstract class BaseExecutionBuilder<T> {
 
         protected boolean priority;
         protected LocalDateTime plannedFor;
@@ -408,9 +408,10 @@ public abstract class BaseWorker {
          * 
          * @return the builder to set another feature
          */
-        public BaseExecutionBuilder prioritize() {
+        @SuppressWarnings("unchecked")
+        public T prioritize() {
             this.priority = true;
-            return this;
+            return (T) this;
         }
 
         /**
@@ -419,9 +420,10 @@ public abstract class BaseWorker {
          * @param plannedFor plannedFor specified time for the execution
          * @return the builder to set another feature
          */
-        public BaseExecutionBuilder plannedFor(LocalDateTime plannedFor) {
+        @SuppressWarnings("unchecked")
+        public T plannedFor(LocalDateTime plannedFor) {
             this.plannedFor = plannedFor;
-            return this;
+            return (T) this;
         }
 
         /**
@@ -437,7 +439,7 @@ public abstract class BaseWorker {
          * @param delayValue time to wait in seconds
          * @return the builder to set another feature
          */
-        public BaseExecutionBuilder delayedForSeconds(int delayValue) {
+        public T delayedForSeconds(int delayValue) {
             return delayedFor(delayValue, ChronoUnit.SECONDS);
         }
 
@@ -454,7 +456,7 @@ public abstract class BaseWorker {
          * @param delayValue time to wait in minutes
          * @return the builder to set another feature
          */
-        public BaseExecutionBuilder delayedForMinutes(int delayValue) {
+        public T delayedForMinutes(int delayValue) {
             return delayedFor(delayValue, ChronoUnit.MINUTES);
         }
 
@@ -471,7 +473,7 @@ public abstract class BaseWorker {
          * @param delayValue time to wait in hours
          * @return the builder to set another feature
          */
-        public BaseExecutionBuilder delayedForHours(int delayValue) {
+        public T delayedForHours(int delayValue) {
             return delayedFor(delayValue, ChronoUnit.HOURS);
         }
 
@@ -488,7 +490,7 @@ public abstract class BaseWorker {
          * @param delayValue time to wait in days
          * @return the builder to set another feature
          */
-        public BaseExecutionBuilder delayedForDays(int delayValue) {
+        public T delayedForDays(int delayValue) {
             return delayedFor(delayValue, ChronoUnit.DAYS);
         }
 
@@ -505,7 +507,7 @@ public abstract class BaseWorker {
          * @param delayValue time to wait in weeks
          * @return the builder to set another feature
          */
-        public BaseExecutionBuilder delayedForWeeks(int delayValue) {
+        public T delayedForWeeks(int delayValue) {
             return delayedFor(delayValue, ChronoUnit.WEEKS);
         }
 
@@ -522,7 +524,7 @@ public abstract class BaseWorker {
          * @param delayValue time to wait in months
          * @return the builder to set another feature
          */
-        public BaseExecutionBuilder delayedForMonths(int delayValue) {
+        public T delayedForMonths(int delayValue) {
             return delayedFor(delayValue, ChronoUnit.MONTHS);
         }
 
@@ -540,7 +542,7 @@ public abstract class BaseWorker {
          * @param delayUnit what kind of time to wait
          * @return the builder to set another feature
          */
-        public BaseExecutionBuilder delayedFor(int delayValue, ChronoUnit delayUnit) {
+        public T delayedFor(int delayValue, ChronoUnit delayUnit) {
             return delayedFor(Long.valueOf(delayValue), delayUnit);
         }
 
@@ -558,9 +560,10 @@ public abstract class BaseWorker {
          * @param delayUnit what kind of time to wait
          * @return the builder to set another feature
          */
-        public BaseExecutionBuilder delayedFor(long delayValue, ChronoUnit delayUnit) {
+        @SuppressWarnings("unchecked")
+        public T delayedFor(long delayValue, ChronoUnit delayUnit) {
             this.plannedFor = WorkhorseUtil.delayToMaturity(Long.valueOf(delayValue), delayUnit);
-            return this;
+            return (T) this;
         }
 
         /**
@@ -569,9 +572,10 @@ public abstract class BaseWorker {
          * @param expiresAt specified time to cancel the execution
          * @return the builder to set another feature
          */
-        public BaseExecutionBuilder expiresAt(LocalDateTime expiresAt) {
+        @SuppressWarnings("unchecked")
+        public T expiresAt(LocalDateTime expiresAt) {
             this.expiresAt = expiresAt;
-            return this;
+            return (T) this;
         }
 
         /**
@@ -587,7 +591,7 @@ public abstract class BaseWorker {
          * @param expiresAt Time until expiration in seconds
          * @return the builder to set another feature
          */
-        public BaseExecutionBuilder expiresAtSeconds(int expiresAt) {
+        public T expiresAtSeconds(int expiresAt) {
             return expiresAt(expiresAt, ChronoUnit.SECONDS);
         }
 
@@ -604,7 +608,7 @@ public abstract class BaseWorker {
          * @param expiresAt Time until expiration in minutes
          * @return the builder to set another feature
          */
-        public BaseExecutionBuilder expiresAtMinutes(int expiresAt) {
+        public T expiresAtMinutes(int expiresAt) {
             return expiresAt(expiresAt, ChronoUnit.MINUTES);
         }
 
@@ -621,7 +625,7 @@ public abstract class BaseWorker {
          * @param expiresAt Time until expiration in hours
          * @return the builder to set another feature
          */
-        public BaseExecutionBuilder expiresAtHours(int expiresAt) {
+        public T expiresAtHours(int expiresAt) {
             return expiresAt(expiresAt, ChronoUnit.HOURS);
         }
 
@@ -638,7 +642,7 @@ public abstract class BaseWorker {
          * @param expiresAt Time until expiration in days
          * @return the builder to set another feature
          */
-        public BaseExecutionBuilder expiresAtDays(int expiresAt) {
+        public T expiresAtDays(int expiresAt) {
             return expiresAt(expiresAt, ChronoUnit.DAYS);
         }
 
@@ -655,7 +659,7 @@ public abstract class BaseWorker {
          * @param expiresAt Time until expiration in weeks
          * @return the builder to set another feature
          */
-        public BaseExecutionBuilder expiresAtWeeks(int expiresAt) {
+        public T expiresAtWeeks(int expiresAt) {
             return expiresAt(expiresAt, ChronoUnit.WEEKS);
         }
 
@@ -672,7 +676,7 @@ public abstract class BaseWorker {
          * @param expiresAt Time until expiration in months
          * @return the builder to set another feature
          */
-        public BaseExecutionBuilder expiresAtMonths(int expiresAt) {
+        public T expiresAtMonths(int expiresAt) {
             return expiresAt(expiresAt, ChronoUnit.MONTHS);
         }
 
@@ -690,7 +694,7 @@ public abstract class BaseWorker {
          * @param delayUnit what kind of time to observe
          * @return the builder to set another feature
          */
-        public BaseExecutionBuilder expiresAt(int expiresValue, ChronoUnit expiresUnit) {
+        public T expiresAt(int expiresValue, ChronoUnit expiresUnit) {
             return expiresAt(Long.valueOf(expiresValue), expiresUnit);
         }
 
@@ -708,10 +712,11 @@ public abstract class BaseWorker {
          * @param expiresUnit what kind of time to observe
          * @return the builder to set another feature
          */
-        public BaseExecutionBuilder expiresAt(long expiresValue, ChronoUnit expiresUnit) {
+        @SuppressWarnings("unchecked")
+        public T expiresAt(long expiresValue, ChronoUnit expiresUnit) {
 
             this.expiresAt = WorkhorseUtil.delayToMaturity(expiresValue, expiresUnit);
-            return this;
+            return (T) this;
         }
     }
 }
