@@ -88,7 +88,7 @@ public class WorkhorseController {
             if (job == null) {
                 try {
                     job = createJob(workerclass);
-                    log.info("Registed new Job '{}' ({})", job.getName(), job.getWorkerClassName());
+                    log.info("Registered new Job '{}' ({})", job.getName(), job.getWorkerClassName());
                 } catch (RuntimeException runtimeException) {
                     log.error(runtimeException.getMessage());
                 }

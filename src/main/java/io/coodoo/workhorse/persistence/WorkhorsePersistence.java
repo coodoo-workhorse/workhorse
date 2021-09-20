@@ -96,7 +96,7 @@ public class WorkhorsePersistence {
             if (configPersistenceInstance != null && configPersistenceInstance.getPersistenceName().equals(workhorseConfig.getPersistenceName())) {
                 configPersistence = configPersistenceInstance;
 
-                logFoundPersistence(configPersistence.getClass());
+                logFoundPersistence(ConfigPersistence.class, configPersistence.getClass());
                 configPersistence.initialize(workhorseConfig);
                 return configPersistence;
             }
@@ -109,7 +109,7 @@ public class WorkhorsePersistence {
         for (JobPersistence jobPersistenceInstance : jobPersistenceInstances) {
             if (jobPersistenceInstance != null && jobPersistenceInstance.getPersistenceName().equals(workhorseConfig.getPersistenceName())) {
                 jobPersistence = jobPersistenceInstance;
-                logFoundPersistence(jobPersistence.getClass());
+                logFoundPersistence(JobPersistence.class, jobPersistence.getClass());
                 return jobPersistence;
             }
         }
@@ -121,7 +121,7 @@ public class WorkhorsePersistence {
         for (ExecutionPersistence executionPersistenceInstance : executionPersistenceInstances) {
             if (executionPersistenceInstance != null && executionPersistenceInstance.getPersistenceName().equals(workhorseConfig.getPersistenceName())) {
                 executionPersistence = executionPersistenceInstance;
-                logFoundPersistence(executionPersistence.getClass());
+                logFoundPersistence(ExecutionPersistence.class, executionPersistence.getClass());
                 return executionPersistence;
             }
         }
@@ -133,14 +133,17 @@ public class WorkhorsePersistence {
         for (LogPersistence logPersistenceInstance : logPersistenceInstances) {
             if (logPersistenceInstance != null && logPersistenceInstance.getPersistenceName().equals(workhorseConfig.getPersistenceName())) {
                 logPersistence = logPersistenceInstance;
-                logFoundPersistence(logPersistence.getClass());
+                logFoundPersistence(LogPersistence.class, logPersistence.getClass());
                 return logPersistence;
             }
         }
         return null;
     }
 
-    private void logFoundPersistence(Class<?> persistenceImplementation) {
-        log.info("⮑ {}", persistenceImplementation.getName());
+    private void logFoundPersistence(Class<?> persistenceInterface, Class<?> persistenceImplementation) {
+        String intName = persistenceInterface.getSimpleName();
+        String implName = persistenceImplementation.getName();
+        log.trace("{} ⮕ {}", intName, implName);
     }
+
 }
