@@ -76,7 +76,7 @@ public class WorkhorsePersistence {
             log.warn("The WorkhorseConfig can not be null. The default persistence {} is used", workhorseConfig);
         }
 
-        log.info("Workhorse using {} {}", workhorseConfig.getPersistenceName(), workhorseConfig.getPersistenceVersion());
+        log.trace("Workhorse using {} {}", workhorseConfig.getPersistenceName(), workhorseConfig.getPersistenceVersion());
 
         initializeConfigPersistence(workhorseConfig);
         initializeJobPersistence(workhorseConfig);

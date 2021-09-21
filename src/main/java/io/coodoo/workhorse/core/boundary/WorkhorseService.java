@@ -96,33 +96,38 @@ public class WorkhorseService {
      */
     public void init(WorkhorseConfig workhorseConfig) {
 
-        String version = WorkhorseUtil.getVersion();
-
-        // @formatter:off
-        // spotless:off
-        log.info("\n\n" + "hyyyyyyhdmNmhs++/+//+/+/+//+/+//+/oNm-                      \n" //
-                        + "dhyhdmNNdyo++//+/+////+/+//+/+//+/+omN/:/+++/-`             \n" //
-                        + "hmNNdyo+////+//++++++///++/+/+//+//+hMNhso+oydmh:           \n" //
-                        + "/++++//////+oydmmmmmNdyo+//+/+//++yNd/`       .oNd-         \n" //
-                        + "//+/++++++omNs:``  ``:yNms++++/++yMo`           .dN-        \n" //
-                        + "//+/+//++yNy.          .yNy+/+//oNh`   `::.      :Ny        \n" //
-                        + "+/+/+///oNy`            `hNo/+//oNs    sMMm.     .Nd`       \n" //
-                        + "+/+/+///yM+      +mNs`   /My/+//+mm.   .oo-      +Mo        \n" //
-                        + "+/+/+/+/sMo      /mms`   oMs/++/+oNm:          `oNy`        \n" //
-                        + "//+/+///+dN/            /Nd+/+//+/+hNh+-`  ``:omm+          \n" //
-                        + "//+/+//+/+hNy-`      `-yNh++/+//+/+++sdmmmmmmdmN/           \n" //
-                        + "//+/+//+//+ohmmhsooshmmho+/+/+//+//////++++++++dN+          \n" //
-                        + "+/+/+//+/////++ssyyss++/+//+/+//+/+/++/+/+///++yNMo         \n" //
-                        + "//+////////////////////////+/+////////////+ohmNdshMs`       \n" //
-                        + "                                                            \n" //
-                        + " Workhorse " + version + "\n" //
-                        + " https://workhorse.coodoo.io\n");//
-        // @formatter:on
-        // spotless:on
+        // SPLASH SCREEN!
+        logSpashScreen(workhorseConfig);
 
         currentWorkhorseConfig = workhorseConfig;
         workhorsePersistence.initialize(workhorseConfig);
         workhorseConfigController.initializeStaticConfig(workhorseConfig);
+    }
+
+    private void logSpashScreen(WorkhorseConfig workhorseConfig) {
+    
+        StringBuffer splashScreen = new StringBuffer();
+        splashScreen.append("\n\n");
+        splashScreen.append("hyyyyyyhdmNmhs++/+//+/+/+//+/+//+/oNm-                      \n");
+        splashScreen.append("dhyhdmNNdyo++//+/+////+/+//+/+//+/+omN/:/+++/-`             \n");
+        splashScreen.append("hmNNdyo+////+//++++++///++/+/+//+//+hMNhso+oydmh:           \n");
+        splashScreen.append("/++++//////+oydmmmmmNdyo+//+/+//++yNd/`       .oNd-         \n");
+        splashScreen.append("//+/++++++omNs:``  ``:yNms++++/++yMo`           .dN-        \n");
+        splashScreen.append("//+/+//++yNy.          .yNy+/+//oNh`   `::.      :Ny        \n");
+        splashScreen.append("+/+/+///oNy`            `hNo/+//oNs    sMMm.     .Nd`       \n");
+        splashScreen.append("+/+/+///yM+      +mNs`   /My/+//+mm.   .oo-      +Mo        \n");
+        splashScreen.append("+/+/+/+/sMo      /mms`   oMs/++/+oNm:          `oNy`        \n");
+        splashScreen.append("//+/+///+dN/            /Nd+/+//+/+hNh+-`  ``:omm+          \n");
+        splashScreen.append("//+/+//+/+hNy-`      `-yNh++/+//+/+++sdmmmmmmdmN/           \n");
+        splashScreen.append("//+/+//+//+ohmmhsooshmmho+/+/+//+//////++++++++dN+          \n");
+        splashScreen.append("+/+/+//+/////++ssyyss++/+//+/+//+/+/++/+/+///++yNMo         \n");
+        splashScreen.append("//+////////////////////////+/+////////////+ohmNdshMs`       \n");
+        splashScreen.append("                                                            \n");
+        splashScreen.append("  Workhorse " + WorkhorseUtil.getVersion() + "\n");
+        splashScreen.append("  " + workhorseConfig.getPersistenceName() + " " + workhorseConfig.getPersistenceVersion() + "\n");
+        splashScreen.append("  https://workhorse.coodoo.io\n");
+    
+        log.info(splashScreen.toString());
     }
 
     /**
