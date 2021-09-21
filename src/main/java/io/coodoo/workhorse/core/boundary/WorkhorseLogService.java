@@ -117,7 +117,13 @@ public class WorkhorseLogService {
         if (persistedWorkhorseLog == null || persistedWorkhorseLog.getId() == null) {
             throw new RuntimeException("The workhorseLog " + workhorseLog + " couldn't be persisited by the persisitence.");
         }
-        log.info("{}", workhorseLog);
+
+        if (message != null && jobId == null) {
+            log.info("{}", message);
+        } else {
+            log.info("{}", workhorseLog);
+        }
+
         return persistedWorkhorseLog;
     }
 

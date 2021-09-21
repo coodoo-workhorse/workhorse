@@ -10,7 +10,9 @@ public enum ErrorType {
 
     ERROR_BY_FOUND_JOB_WORKER("Can't handle Worker class found"),
 
-    INVALID_SCHEDULE("Invalid schedule found "),
+    INVALID_SCHEDULE("Invalid schedule found"),
+
+    FAILED_SCHEDULE("Failed to trigger schedule"),
 
     ERROR_BY_JOB_PERSIST("Can't persist job"),
 

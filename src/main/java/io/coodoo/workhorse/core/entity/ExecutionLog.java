@@ -59,9 +59,19 @@ public class ExecutionLog extends BaseEntity {
         this.stacktrace = stacktrace;
     }
 
+    /**
+     * {@link ExecutionLog#toString()} is used in logging, so it is kept short
+     */
     @Override
     public String toString() {
-        return "ExecutionLog [executionId=" + executionId + ", log=" + log + ", error=" + error + ", stacktrace=" + stacktrace + "]";
+
+        String appendix = null;
+        if (error != null) {
+            appendix = "Error: " + error;
+        } else {
+            appendix = "Log: " + log;
+        }
+        return "ExecutionLog ID=" + id + ", Execution-ID=" + executionId + ", " + appendix;
     }
 
 }

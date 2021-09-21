@@ -32,7 +32,7 @@ import io.coodoo.workhorse.core.entity.JobStatusCount;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.entity.WorkhorseConfigBuilder;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
-import io.coodoo.workhorse.persistence.PersistenceManager;
+import io.coodoo.workhorse.persistence.WorkhorsePersistence;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 import io.coodoo.workhorse.persistence.memory.MemoryConfig;
@@ -57,7 +57,7 @@ public class WorkhorseService {
     ExecutionBuffer executionBuffer;
 
     @Inject
-    PersistenceManager persistenceManager;
+    WorkhorsePersistence workhorsePersistence;
 
     @Inject
     WorkhorseLogService workhorseLogService;
@@ -96,35 +96,38 @@ public class WorkhorseService {
      */
     public void init(WorkhorseConfig workhorseConfig) {
 
-        String version = WorkhorseUtil.getVersion();
-
-        // @formatter:off
-        // spotless:off
-        log.info("Workhorse Core initializing... \n" 
-        + "                                                            \n"
-        + "hyyyyyyhdmNmhs++/+//+/+/+//+/+//+/oNm-                      \n"
-        + "dhyhdmNNdyo++//+/+////+/+//+/+//+/+omN/:/+++/-`             \n"
-        + "hmNNdyo+////+//++++++///++/+/+//+//+hMNhso+oydmh:           \n"
-        + "/++++//////+oydmmmmmNdyo+//+/+//++yNd/`       .oNd-         \n"
-        + "//+/++++++omNs:``  ``:yNms++++/++yMo`           .dN-        \n"
-        + "//+/+//++yNy.          .yNy+/+//oNh`   `::.      :Ny        \n"
-        + "+/+/+///oNy`            `hNo/+//oNs    sMMm.     .Nd`       \n"
-        + "+/+/+///yM+      +mNs`   /My/+//+mm.   .oo-      +Mo        \n"
-        + "+/+/+/+/sMo      /mms`   oMs/++/+oNm:          `oNy`        \n"
-        + "//+/+///+dN/            /Nd+/+//+/+hNh+-`  ``:omm+          \n"
-        + "//+/+//+/+hNy-`      `-yNh++/+//+/+++sdmmmmmmdmN/           \n"
-        + "//+/+//+//+ohmmhsooshmmho+/+/+//+//////++++++++dN+          \n"
-        + "+/+/+//+/////++ssyyss++/+//+/+//+/+/++/+/+///++yNMo         \n"
-        + "//+////////////////////////+/+////////////+ohmNdshMs`       \n"
-        + "                                                            \n"
-        + "Workhorse Core Version: " +  version + "             \n"
-        + "https://workhorse.coodoo.io                                  ");
-        // @formatter:on
-        // spotless:on
+        // SPLASH SCREEN!
+        logSpashScreen(workhorseConfig);
 
         currentWorkhorseConfig = workhorseConfig;
-        persistenceManager.initializePersistence(workhorseConfig);
+        workhorsePersistence.initialize(workhorseConfig);
         workhorseConfigController.initializeStaticConfig(workhorseConfig);
+    }
+
+    private void logSpashScreen(WorkhorseConfig workhorseConfig) {
+        // spotless:off
+        StringBuffer splashScreen = new StringBuffer();
+        splashScreen.append("\n\n");
+        splashScreen.append("hyyyyyyhdmNmhs++/+//+/+/+//+/+//+/oNm-                      \n");
+        splashScreen.append("dhyhdmNNdyo++//+/+////+/+//+/+//+/+omN/:/+++/-`             \n");
+        splashScreen.append("hmNNdyo+////+//++++++///++/+/+//+//+hMNhso+oydmh:           \n");
+        splashScreen.append("/++++//////+oydmmmmmNdyo+//+/+//++yNd/`       .oNd-         \n");
+        splashScreen.append("//+/++++++omNs:``  ``:yNms++++/++yMo`           .dN-        \n");
+        splashScreen.append("//+/+//++yNy.          .yNy+/+//oNh`   `::.      :Ny        \n");
+        splashScreen.append("+/+/+///oNy`            `hNo/+//oNs    sMMm.     .Nd`       \n");
+        splashScreen.append("+/+/+///yM+      +mNs`   /My/+//+mm.   .oo-      +Mo        \n");
+        splashScreen.append("+/+/+/+/sMo      /mms`   oMs/++/+oNm:          `oNy`        \n");
+        splashScreen.append("//+/+///+dN/            /Nd+/+//+/+hNh+-`  ``:omm+          \n");
+        splashScreen.append("//+/+//+/+hNy-`      `-yNh++/+//+/+++sdmmmmmmdmN/           \n");
+        splashScreen.append("//+/+//+//+ohmmhsooshmmho+/+/+//+//////++++++++dN+          \n");
+        splashScreen.append("+/+/+//+/////++ssyyss++/+//+/+//+/+/++/+/+///++yNMo         \n");
+        splashScreen.append("//+////////////////////////+/+////////////+ohmNdshMs`       \n");
+        splashScreen.append("                                                            \n");
+        splashScreen.append("  Workhorse " + WorkhorseUtil.getVersion() + "\n");
+        splashScreen.append("  " + workhorseConfig.getPersistenceName() + " " + workhorseConfig.getPersistenceVersion() + "\n");
+        splashScreen.append("  https://workhorse.coodoo.io\n");
+        // spotless:on
+        log.info(splashScreen.toString());
     }
 
     /**
@@ -155,7 +158,7 @@ public class WorkhorseService {
         long ms = System.currentTimeMillis();
 
         // Check if the persistence is already initialized. If so the engine is already living but paused and should now start again.
-        if (!persistenceManager.isInitialized()) {
+        if (!workhorsePersistence.isInitialized()) {
             init(workhorseConfig);
         }
 
@@ -165,9 +168,7 @@ public class WorkhorseService {
         jobScheduler.startScheduler();
 
         ms = System.currentTimeMillis() - ms;
-        String startMessage = "Workhorse " + WorkhorseUtil.getVersion() + " (Persistence: " + workhorseConfig.getPersistenceName() + " "
-                        + workhorseConfig.getPersistenceVersion() + ") started in " + ms + "ms";
-        workhorseLogService.logMessage(startMessage, null, true);
+        workhorseLogService.logMessage("▶︎ Workhorse started in " + ms + "ms", null, true);
     }
 
     /**
@@ -182,8 +183,7 @@ public class WorkhorseService {
         executionBuffer.clearMemoryQueue();
 
         ms = System.currentTimeMillis() - ms;
-        String startMessage = "Workhorse stopped in " + ms + "ms";
-        workhorseLogService.logMessage(startMessage, null, true);
+        workhorseLogService.logMessage("◼︎ Workhorse stopped in " + ms + "ms", null, true);
     }
 
     /**
@@ -432,7 +432,7 @@ public class WorkhorseService {
 
         Execution execution = getExecutionById(jobId, executionId);
         if (execution == null) {
-            log.info("Execution does not exist: {} ", execution);
+            log.warn("Execution with ID {} does not exist! ", executionId);
             return;
         }
         if (execution.getStatus() == ExecutionStatus.QUEUED) {
@@ -454,11 +454,11 @@ public class WorkhorseService {
 
         Execution execution = getExecutionById(jobId, executionId);
         if (ExecutionStatus.QUEUED == execution.getStatus() || ExecutionStatus.RUNNING == execution.getStatus()) {
-            log.warn("Can't redo Execution in status {}: {}", execution.getStatus(), execution);
+            log.warn("Can't redo in status {}: {}", execution.getStatus(), execution);
             return execution;
         }
 
-        log.info("Redo {} {}", execution.getStatus(), execution);
+        log.info("Redo {}", execution);
 
         execution.setPlannedFor(WorkhorseUtil.timestamp());
         execution.setStatus(ExecutionStatus.QUEUED);
@@ -485,7 +485,7 @@ public class WorkhorseService {
         if (job == null) {
             throw new RuntimeException("Job not found");
         }
-        log.info("Activate job {}", job.getName());
+        log.info("Activate {}", job);
         job.setStatus(JobStatus.ACTIVE);
 
         workhorseController.update(job);
@@ -505,7 +505,7 @@ public class WorkhorseService {
         if (job == null) {
             throw new RuntimeException("Job not found");
         }
-        log.info("Deactivate job {}", job.getName());
+        log.info("Deactivate {}", job);
         job.setStatus(JobStatus.INACTIVE);
         workhorseController.update(job);
         if (job.getSchedule() != null && !job.getSchedule().isEmpty()) {
