@@ -11,7 +11,7 @@ import io.coodoo.workhorse.util.WorkhorseUtil;
  */
 public class MemoryConfig extends WorkhorseConfig {
 
-    public static final String NAME = "MEMORY";
+    public static final String NAME = "Memory Persistence";
 
     @Override
     public String getPersistenceName() {

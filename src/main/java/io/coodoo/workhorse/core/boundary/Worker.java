@@ -25,16 +25,58 @@ public abstract class Worker extends BaseWorker {
     }
 
     /**
-     * <i>This is an access point to get the job engine started with a new job execution.</i><br>
-     * <br>
+     * Create a builder to instantiate attributes of an execution
      * 
-     * This creates a {@link Execution} object that gets added to the job engine to be executed as soon as possible.
+     * <pre>
+     * Examples:
+     * {@code 
      * 
-     * @param execution {@link Execution} object that gets added to the job engine
-     * @return execution ID
+     * createExecution().build();
+     * 
+     * createExecution().prioritize().expiresAtHours(3).build();
+     * }
+     * </pre>
+     * 
+     * @return the builder
      */
-    public Long createExecution(Execution execution) {
-        return createExecution(null, execution.isPriority(), execution.getPlannedFor(), execution.getExpiresAt(), null, null).getId();
+    public ExecutionBuilder executionBuilder() {
+        return new ExecutionBuilder();
+    }
+
+    public class ExecutionBuilder extends BaseExecutionBuilder<ExecutionBuilder> {
+
+        /**
+         * Create an execution with the defined attributes.
+         * 
+         * @return execution ID
+         * @deprecated use the {@link #build()}
+         */
+        @Deprecated
+        public Long create() {
+            return build();
+        }
+
+    }
+
+    /**
+     * Create a builder to instantiate attributes of an execution
+     * 
+     * <pre>
+     * Example:
+     * {@code 
+     * 
+     * execution().create()
+     * 
+     * execution().prioritize().create()
+     * }
+     * </pre>
+     * 
+     * @return the builder
+     * @deprecated use the {@link #executionBuilder()}
+     */
+    @Deprecated
+    public ExecutionBuilder execution() {
+        return new ExecutionBuilder();
     }
 
     /**
@@ -136,109 +178,4 @@ public abstract class Worker extends BaseWorker {
         return createExecution(null, false, null, expiresAt, null, null).getId();
     }
 
-    /**
-     * Create a builder to instantiate attributes of an execution
-     * 
-     * <pre>
-     * Example:
-     * {@code 
-     * 
-     * execution().create()
-     * 
-     * execution().prioritize().create()
-     * }
-     * </pre>
-     * 
-     * @return the builder
-     */
-    public Builder execution() {
-        return new Builder();
-    }
-
-    public class Builder {
-
-        private boolean priority;
-        private LocalDateTime plannedFor;
-        private LocalDateTime expiresAt;
-
-        /**
-         * Prioritize an execution over others of the worker class
-         * 
-         * @return the builder to set another feature
-         */
-        public Builder prioritize() {
-            this.priority = true;
-            return this;
-        }
-
-        /**
-         * Plan the processing of an execution to a given timestamp
-         * 
-         * @param plannedFor plannedFor specified time for the execution
-         * @return the builder to set another feature
-         */
-        public Builder plannedFor(LocalDateTime plannedFor) {
-            this.plannedFor = plannedFor;
-            return this;
-        }
-
-        /**
-         * Delay the processing of an execution for a given amount of time
-         * 
-         * <pre>
-         * Example:
-         * {@code 
-         * delayedFor(3L, ChronoUnit.SECONDS)
-         * }
-         * </pre>
-         * 
-         * @param delayValue time to wait
-         * @param delayUnit what kind of time to wait
-         * @return the builder to set another feature
-         */
-        public Builder delayedFor(Long delayValue, ChronoUnit delayUnit) {
-            this.plannedFor = WorkhorseUtil.delayToMaturity(delayValue, delayUnit);
-            return this;
-        }
-
-        /**
-         * Define a timestamp up to which the execution will expire (cancel), if not being processed
-         * 
-         * @param expiresAt specified time to cancel the execution
-         * @return the builder to set another feature
-         */
-        public Builder expiresAt(LocalDateTime expiresAt) {
-            this.expiresAt = expiresAt;
-            return this;
-        }
-
-        /**
-         * Define an period of time before the execution is expired (cancel), if not being processed
-         * 
-         * <pre>
-         * Example:
-         * {@code 
-         * expiresAt(3L, ChronoUnit.SECONDS)
-         * }
-         * </pre>
-         * 
-         * @param expiresValue time to observe
-         * @param expiresUnit what kind of time to observe
-         * @return the builder to set another feature
-         */
-        public Builder expiresAt(Long expiresValue, ChronoUnit expiresUnit) {
-
-            this.expiresAt = WorkhorseUtil.delayToMaturity(expiresValue, expiresUnit);
-            return this;
-        }
-
-        /**
-         * Create an execution with the defined attributes.
-         * 
-         * @return execution ID
-         */
-        public Long create() {
-            return createExecution(null, priority, plannedFor, expiresAt, null, null).getId();
-        }
-    }
 }

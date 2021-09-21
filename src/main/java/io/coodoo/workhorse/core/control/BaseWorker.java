@@ -2,6 +2,7 @@ package io.coodoo.workhorse.core.control;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 
 import javax.inject.Inject;
 
@@ -387,4 +388,335 @@ public abstract class BaseWorker {
         executionContext.summarize(summary);
     }
 
+    public abstract class BaseExecutionBuilder<T> {
+
+        protected boolean priority;
+        protected LocalDateTime plannedFor;
+        protected LocalDateTime expiresAt;
+
+        /**
+         * Builds an execution with the defined attributes.
+         * 
+         * @return execution ID
+         */
+        public Long build() {
+            return createExecution(null, priority, plannedFor, expiresAt, null, null).getId();
+        }
+
+        /**
+         * Prioritize an execution over others of the worker class
+         * 
+         * @return the builder to set another feature
+         */
+        @SuppressWarnings("unchecked")
+        public T prioritize() {
+            this.priority = true;
+            return (T) this;
+        }
+
+        /**
+         * Plan the processing of an execution to a given timestamp
+         * 
+         * @param plannedFor plannedFor specified time for the execution
+         * @return the builder to set another feature
+         */
+        @SuppressWarnings("unchecked")
+        public T plannedFor(LocalDateTime plannedFor) {
+            this.plannedFor = plannedFor;
+            return (T) this;
+        }
+
+        /**
+         * Delay the processing of an execution for a given amount of seconds
+         * 
+         * <pre>
+         * Example:
+         * {@code 
+         * delayedForSeconds(20)
+         * }
+         * </pre>
+         * 
+         * @param delayValue time to wait in seconds
+         * @return the builder to set another feature
+         */
+        public T delayedForSeconds(int delayValue) {
+            return delayedFor(delayValue, ChronoUnit.SECONDS);
+        }
+
+        /**
+         * Delay the processing of an execution for a given amount of minutes
+         * 
+         * <pre>
+         * Example:
+         * {@code 
+         * delayedForMinutes(30)
+         * }
+         * </pre>
+         * 
+         * @param delayValue time to wait in minutes
+         * @return the builder to set another feature
+         */
+        public T delayedForMinutes(int delayValue) {
+            return delayedFor(delayValue, ChronoUnit.MINUTES);
+        }
+
+        /**
+         * Delay the processing of an execution for a given amount of hours
+         * 
+         * <pre>
+         * Example:
+         * {@code 
+         * delayedForHours(6)
+         * }
+         * </pre>
+         * 
+         * @param delayValue time to wait in hours
+         * @return the builder to set another feature
+         */
+        public T delayedForHours(int delayValue) {
+            return delayedFor(delayValue, ChronoUnit.HOURS);
+        }
+
+        /**
+         * Delay the processing of an execution for a given amount of days
+         * 
+         * <pre>
+         * Example:
+         * {@code 
+         * delayedForDays(12)
+         * }
+         * </pre>
+         * 
+         * @param delayValue time to wait in days
+         * @return the builder to set another feature
+         */
+        public T delayedForDays(int delayValue) {
+            return delayedFor(delayValue, ChronoUnit.DAYS);
+        }
+
+        /**
+         * Delay the processing of an execution for a given amount of weeks
+         * 
+         * <pre>
+         * Example:
+         * {@code 
+         * delayedForWeeks(2)
+         * }
+         * </pre>
+         * 
+         * @param delayValue time to wait in weeks
+         * @return the builder to set another feature
+         */
+        public T delayedForWeeks(int delayValue) {
+            return delayedFor(delayValue, ChronoUnit.WEEKS);
+        }
+
+        /**
+         * Delay the processing of an execution for a given amount of months
+         * 
+         * <pre>
+         * Example:
+         * {@code 
+         * delayedForMonths(3)
+         * }
+         * </pre>
+         * 
+         * @param delayValue time to wait in months
+         * @return the builder to set another feature
+         */
+        public T delayedForMonths(int delayValue) {
+            return delayedFor(delayValue, ChronoUnit.MONTHS);
+        }
+
+        /**
+         * Delay the processing of an execution for a given amount of time
+         * 
+         * <pre>
+         * Example:
+         * {@code 
+         * delayedFor(42, ChronoUnit.MINUTES)
+         * }
+         * </pre>
+         * 
+         * @param delayValue time to wait
+         * @param delayUnit what kind of time to wait
+         * @return the builder to set another feature
+         */
+        public T delayedFor(int delayValue, ChronoUnit delayUnit) {
+            return delayedFor(Long.valueOf(delayValue), delayUnit);
+        }
+
+        /**
+         * Delay the processing of an execution for a given amount of time
+         * 
+         * <pre>
+         * Example:
+         * {@code 
+         * delayedFor(3L, ChronoUnit.SECONDS)
+         * }
+         * </pre>
+         * 
+         * @param delayValue time to wait
+         * @param delayUnit what kind of time to wait
+         * @return the builder to set another feature
+         */
+        @SuppressWarnings("unchecked")
+        public T delayedFor(long delayValue, ChronoUnit delayUnit) {
+            this.plannedFor = WorkhorseUtil.delayToMaturity(Long.valueOf(delayValue), delayUnit);
+            return (T) this;
+        }
+
+        /**
+         * Define a timestamp up to which the execution will expire (cancel), if not being processed
+         * 
+         * @param expiresAt specified time to cancel the execution
+         * @return the builder to set another feature
+         */
+        @SuppressWarnings("unchecked")
+        public T expiresAt(LocalDateTime expiresAt) {
+            this.expiresAt = expiresAt;
+            return (T) this;
+        }
+
+        /**
+         * The execution will expire within the given amount of seconds
+         * 
+         * <pre>
+         * Example:
+         * {@code 
+         * expiresAtSeconds(20)
+         * }
+         * </pre>
+         * 
+         * @param expiresAt Time until expiration in seconds
+         * @return the builder to set another feature
+         */
+        public T expiresAtSeconds(int expiresAt) {
+            return expiresAt(expiresAt, ChronoUnit.SECONDS);
+        }
+
+        /**
+         * The execution will expire within the given amount of minutes
+         * 
+         * <pre>
+         * Example:
+         * {@code 
+         * expiresAtMinutes(30)
+         * }
+         * </pre>
+         * 
+         * @param expiresAt Time until expiration in minutes
+         * @return the builder to set another feature
+         */
+        public T expiresAtMinutes(int expiresAt) {
+            return expiresAt(expiresAt, ChronoUnit.MINUTES);
+        }
+
+        /**
+         * The execution will expire within the given amount of hours
+         * 
+         * <pre>
+         * Example:
+         * {@code 
+         * expiresAtHours(6)
+         * }
+         * </pre>
+         * 
+         * @param expiresAt Time until expiration in hours
+         * @return the builder to set another feature
+         */
+        public T expiresAtHours(int expiresAt) {
+            return expiresAt(expiresAt, ChronoUnit.HOURS);
+        }
+
+        /**
+         * The execution will expire within the given amount of days
+         * 
+         * <pre>
+         * Example:
+         * {@code 
+         * expiresAtDays(12)
+         * }
+         * </pre>
+         * 
+         * @param expiresAt Time until expiration in days
+         * @return the builder to set another feature
+         */
+        public T expiresAtDays(int expiresAt) {
+            return expiresAt(expiresAt, ChronoUnit.DAYS);
+        }
+
+        /**
+         * The execution will expire within the given amount of weeks
+         * 
+         * <pre>
+         * Example:
+         * {@code 
+         * expiresAtWeeks(2)
+         * }
+         * </pre>
+         * 
+         * @param expiresAt Time until expiration in weeks
+         * @return the builder to set another feature
+         */
+        public T expiresAtWeeks(int expiresAt) {
+            return expiresAt(expiresAt, ChronoUnit.WEEKS);
+        }
+
+        /**
+         * The execution will expire within the given amount of months
+         * 
+         * <pre>
+         * Example:
+         * {@code 
+         * expiresAtMonths(3)
+         * }
+         * </pre>
+         * 
+         * @param expiresAt Time until expiration in months
+         * @return the builder to set another feature
+         */
+        public T expiresAtMonths(int expiresAt) {
+            return expiresAt(expiresAt, ChronoUnit.MONTHS);
+        }
+
+        /**
+         * The execution will expire within the given amount of time
+         * 
+         * <pre>
+         * Example:
+         * {@code 
+         * expiresAt(42, ChronoUnit.MINUTES)
+         * }
+         * </pre>
+         * 
+         * @param expiresAt time to wait
+         * @param delayUnit what kind of time to observe
+         * @return the builder to set another feature
+         */
+        public T expiresAt(int expiresValue, ChronoUnit expiresUnit) {
+            return expiresAt(Long.valueOf(expiresValue), expiresUnit);
+        }
+
+        /**
+         * Define an period of time before the execution is expired (cancel), if not being processed
+         * 
+         * <pre>
+         * Example:
+         * {@code 
+         * expiresAt(3L, ChronoUnit.SECONDS)
+         * }
+         * </pre>
+         * 
+         * @param expiresValue time to observe
+         * @param expiresUnit what kind of time to observe
+         * @return the builder to set another feature
+         */
+        @SuppressWarnings("unchecked")
+        public T expiresAt(long expiresValue, ChronoUnit expiresUnit) {
+
+            this.expiresAt = WorkhorseUtil.delayToMaturity(expiresValue, expiresUnit);
+            return (T) this;
+        }
+    }
 }
