@@ -73,7 +73,7 @@ public class WorkhorsePersistence {
 
         if (workhorseConfig == null) {
             workhorseConfig = new MemoryConfigBuilder().build();
-            log.warn("The WorkhorseConfig can not be null. The default persistence {} is used", workhorseConfig);
+            log.warn("The WorkhorseConfig can not be null. The default persistence is used: {}", workhorseConfig.getPersistenceName());
         }
 
         log.trace("Workhorse using {} {}", workhorseConfig.getPersistenceName(), workhorseConfig.getPersistenceVersion());
@@ -85,7 +85,7 @@ public class WorkhorsePersistence {
 
         if (!isInitialized()) {
             workhorseConfig = new MemoryConfigBuilder().build();
-            log.error("The given WorkhorseConfig could not be loaded, the default persistence is used: {}", workhorseConfig);
+            log.error("The given WorkhorseConfig could not be loaded, the default persistence is used: {}", workhorseConfig.getPersistenceName());
             initialize(workhorseConfig);
         }
     }

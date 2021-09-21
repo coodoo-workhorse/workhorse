@@ -105,7 +105,7 @@ public class WorkhorseService {
     }
 
     private void logSpashScreen(WorkhorseConfig workhorseConfig) {
-    
+
         StringBuffer splashScreen = new StringBuffer();
         splashScreen.append("\n\n");
         splashScreen.append("hyyyyyyhdmNmhs++/+//+/+/+//+/+//+/oNm-                      \n");
@@ -126,7 +126,7 @@ public class WorkhorseService {
         splashScreen.append("  Workhorse " + WorkhorseUtil.getVersion() + "\n");
         splashScreen.append("  " + workhorseConfig.getPersistenceName() + " " + workhorseConfig.getPersistenceVersion() + "\n");
         splashScreen.append("  https://workhorse.coodoo.io\n");
-    
+
         log.info(splashScreen.toString());
     }
 
@@ -432,7 +432,7 @@ public class WorkhorseService {
 
         Execution execution = getExecutionById(jobId, executionId);
         if (execution == null) {
-            log.info("Execution does not exist: {} ", execution);
+            log.warn("Execution with ID {} does not exist! ", executionId);
             return;
         }
         if (execution.getStatus() == ExecutionStatus.QUEUED) {
@@ -454,11 +454,11 @@ public class WorkhorseService {
 
         Execution execution = getExecutionById(jobId, executionId);
         if (ExecutionStatus.QUEUED == execution.getStatus() || ExecutionStatus.RUNNING == execution.getStatus()) {
-            log.warn("Can't redo Execution in status {}: {}", execution.getStatus(), execution);
+            log.warn("Can't redo in status {}: {}", execution.getStatus(), execution);
             return execution;
         }
 
-        log.info("Redo {} {}", execution.getStatus(), execution);
+        log.info("Redo {}", execution);
 
         execution.setPlannedFor(WorkhorseUtil.timestamp());
         execution.setStatus(ExecutionStatus.QUEUED);
@@ -485,7 +485,7 @@ public class WorkhorseService {
         if (job == null) {
             throw new RuntimeException("Job not found");
         }
-        log.info("Activate job {}", job.getName());
+        log.info("Activate {}", job);
         job.setStatus(JobStatus.ACTIVE);
 
         workhorseController.update(job);
@@ -505,7 +505,7 @@ public class WorkhorseService {
         if (job == null) {
             throw new RuntimeException("Job not found");
         }
-        log.info("Deactivate job {}", job.getName());
+        log.info("Deactivate {}", job);
         job.setStatus(JobStatus.INACTIVE);
         workhorseController.update(job);
         if (job.getSchedule() != null && !job.getSchedule().isEmpty()) {

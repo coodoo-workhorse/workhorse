@@ -222,12 +222,12 @@ public class Execution extends BaseEntity {
         this.failRetryExecutionId = failRetryExecutionId;
     }
 
+    /**
+     * {@link Execution#toString()} is used in logging, so it is kept short
+     */
     @Override
     public String toString() {
-        return "Execution [batchId=" + batchId + ", chainId=" + chainId + ", duration=" + duration + ", endedAt=" + endedAt + ", expiresAt=" + expiresAt
-                        + ", failRetry=" + failRetry + ", failRetryExecutionId=" + failRetryExecutionId + ", failStatus=" + failStatus + ", jobId=" + jobId
-                        + ", parameters=" + parameters + ", parametersHash=" + parametersHash + ", plannedFor=" + plannedFor + ", priority=" + priority
-                        + ", startedAt=" + startedAt + ", status=" + status + ", summary=" + summary + "]";
+        return "Execution ID=" + id + ", Job-ID=" + jobId + ", Status=" + status + ", Created at=" + createdAt;
     }
 
 }

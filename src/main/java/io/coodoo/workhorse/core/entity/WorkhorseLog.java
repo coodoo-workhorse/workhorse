@@ -126,25 +126,9 @@ public class WorkhorseLog extends BaseEntity {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("WorkhorseLog [message=");
-        builder.append(message);
-        builder.append(", jobId=");
-        builder.append(jobId);
-        builder.append(", jobStatus=");
-        builder.append(jobStatus);
-        builder.append(", byUser=");
-        builder.append(byUser);
-        builder.append(", changeParameter=");
-        builder.append(changeParameter);
-        builder.append(", changeOld=");
-        builder.append(changeOld);
-        builder.append(", changeNew=");
-        builder.append(changeNew);
-        builder.append(", hostName=");
-        builder.append(hostName);
-        builder.append("]");
-        return builder.toString();
+        return "WorkhorseLog [message=" + message + ", jobId=" + jobId + ", jobStatus=" + jobStatus + ", byUser=" + byUser + ", changeParameter="
+                        + changeParameter + ", changeOld=" + changeOld + ", changeNew=" + changeNew + ", hostName=" + hostName + ", stacktrace=" + stacktrace
+                        + "]";
     }
 
 }

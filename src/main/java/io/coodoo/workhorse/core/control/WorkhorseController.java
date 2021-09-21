@@ -88,7 +88,7 @@ public class WorkhorseController {
             if (job == null) {
                 try {
                     job = createJob(workerclass);
-                    log.info("Registered new Job '{}' ({})", job.getName(), job.getWorkerClassName());
+                    log.info("Registered new {}", job);
                 } catch (RuntimeException runtimeException) {
                     log.error(runtimeException.getMessage());
                 }
@@ -104,16 +104,16 @@ public class WorkhorseController {
             } catch (ClassNotFoundException exception) {
 
                 job.setStatus(JobStatus.ERROR);
-                log.error("Worker class not found for Job '{}' ({})", job.getName(), job.getWorkerClassName());
+                log.error("Worker class not found for {}", job);
                 jobErrorEvent.fire(new JobErrorEvent(exception, ErrorType.ERROR_BY_FOUND_JOB_WORKER.getMessage(), job.getId(), job.getStatus()));
                 continue;
             }
 
             if (!workerClasses.contains(workerClass)) {
-                log.trace("JobStatus of Job {} updated from {} to {}", job, job.getStatus(), JobStatus.NO_WORKER);
+                log.trace("JobStatus of {} updated from {} to {}", job, job.getStatus(), JobStatus.NO_WORKER);
                 job.setStatus(JobStatus.NO_WORKER);
                 jobPersistence.update(job);
-                log.error("Worker class not found for Job '{}' ({})", job.getName(), job.getWorkerClassName());
+                log.error("Worker class not found for {}", job);
                 jobErrorEvent.fire(new JobErrorEvent(new Throwable(ErrorType.NO_JOB_WORKER_FOUND.getMessage()), ErrorType.NO_JOB_WORKER_FOUND.getMessage(),
                                 job.getId(), job.getStatus()));
                 continue;
@@ -123,7 +123,7 @@ public class WorkhorseController {
             if (job.getStatus().equals(JobStatus.NO_WORKER)) {
                 job.setStatus(JobStatus.INACTIVE);
                 jobPersistence.update(job);
-                log.info("Status of Job {} updated from {} to {}", job, JobStatus.NO_WORKER, JobStatus.INACTIVE);
+                log.info("Status of {} updated from {} to {}", job, JobStatus.NO_WORKER, JobStatus.INACTIVE);
                 workhorseLogService.logChange(job.getId(), job.getStatus(), "Status", JobStatus.NO_WORKER, JobStatus.INACTIVE, "Worker class found.");
 
             }
@@ -132,8 +132,7 @@ public class WorkhorseController {
             String parametersClassName = getWorkerParameterName(workerClass);
             // The Objects-Class is null-safe and can handle Worker-classes without Parameters
             if (!Objects.equals(parametersClassName, job.getParametersClassName())) {
-                log.info("Parameters class changed from {} to {} for Job '{}' ({})", job.getWorkerClassName(), job.getParametersClassName(), job.getName(),
-                                job.getWorkerClassName());
+                log.info("Parameters class changed from {} to {} for {}", job.getParametersClassName(), parametersClassName, job);
                 workhorseLogService.logChange(job.getId(), job.getStatus(), "Parameters class", job.getParametersClassName(), parametersClassName, null);
 
                 job.setParametersClassName(parametersClassName);

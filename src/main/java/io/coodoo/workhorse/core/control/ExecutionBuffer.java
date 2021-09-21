@@ -124,7 +124,7 @@ public class ExecutionBuffer {
         log.trace("The Processing of the job {} will be cancel", job);
 
         if (!executions.containsKey(job.getId()) || !priorityExecutions.containsKey(job.getId())) {
-            log.warn("MemoryPersistence queue is missing for job: {} ", job);
+            log.warn("Queue is missing for job: {} ", job);
             return;
         }
 
@@ -193,13 +193,13 @@ public class ExecutionBuffer {
         Long executionId = execution.getId();
 
         if (runningExecutions.containsKey(jobId) && runningExecutions.get(jobId).contains(executionId)) {
-            log.warn("Can't remove running job execution from memory queue: {} ", execution);
+            log.warn("Can't remove running job execution from queue: {} ", execution);
 
         } else if (executions.containsKey(jobId) && executions.get(jobId).remove(executionId)) {
-            log.trace("Removed from memory queue: {} ", execution);
+            log.trace("Removed from queue: {} ", execution);
 
         } else if (priorityExecutions.containsKey(jobId) && priorityExecutions.get(jobId).remove(executionId)) {
-            log.trace("Removed from priority memory queue: {}", execution);
+            log.trace("Removed from priority queue: {}", execution);
         }
     }
 

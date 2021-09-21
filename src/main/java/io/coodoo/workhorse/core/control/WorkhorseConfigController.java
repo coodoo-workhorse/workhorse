@@ -49,7 +49,7 @@ public class WorkhorseConfigController {
 
             configPersistence.update(workhorseConfig);
 
-            log.info(" Created: {}", workhorseConfig);
+            log.info("Created: {}", workhorseConfig);
         }
         return workhorseConfig;
 
