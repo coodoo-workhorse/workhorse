@@ -105,7 +105,7 @@ public class WorkhorseService {
     }
 
     private void logSpashScreen(WorkhorseConfig workhorseConfig) {
-
+        // spotless:off
         StringBuffer splashScreen = new StringBuffer();
         splashScreen.append("\n\n");
         splashScreen.append("hyyyyyyhdmNmhs++/+//+/+/+//+/+//+/oNm-                      \n");
@@ -126,7 +126,7 @@ public class WorkhorseService {
         splashScreen.append("  Workhorse " + WorkhorseUtil.getVersion() + "\n");
         splashScreen.append("  " + workhorseConfig.getPersistenceName() + " " + workhorseConfig.getPersistenceVersion() + "\n");
         splashScreen.append("  https://workhorse.coodoo.io\n");
-
+        // spotless:on
         log.info(splashScreen.toString());
     }
 
