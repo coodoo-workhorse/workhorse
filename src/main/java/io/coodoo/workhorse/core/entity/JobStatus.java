@@ -1,5 +1,8 @@
 package io.coodoo.workhorse.core.entity;
 
+/**
+ * @author coodoo GmbH (coodoo.de)
+ */
 public enum JobStatus {
     /**
      * The Job can be process
@@ -19,5 +22,6 @@ public enum JobStatus {
     /**
      * Error occurred while processing the job
      */
-    ERROR
+    ERROR,
+
 }

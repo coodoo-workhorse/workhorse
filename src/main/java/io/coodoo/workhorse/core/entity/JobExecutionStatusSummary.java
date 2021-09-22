@@ -1,5 +1,8 @@
 package io.coodoo.workhorse.core.entity;
 
+/**
+ * @author coodoo GmbH (coodoo.de)
+ */
 public class JobExecutionStatusSummary {
 
     private ExecutionStatus status;
@@ -40,7 +43,7 @@ public class JobExecutionStatusSummary {
 
     @Override
     public String toString() {
-        return "JobExecutionStatusSummary [JobName=" + job.getId() + ", JobName=" + job.getName() + ", count=" + count + ", status=" + status + "]";
+        return "JobExecutionStatusSummary [status=" + status + ", count=" + count + ", job=" + job + "]";
     }
 
 }

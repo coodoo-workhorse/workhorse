@@ -69,6 +69,7 @@ public class JobScheduler {
     public void start(Job job) {
 
         if (JobStatus.ACTIVE.equals(job.getStatus()) && job.getSchedule() != null && !job.getSchedule().isEmpty()) {
+
             stop(job);
 
             try {
@@ -86,10 +87,11 @@ public class JobScheduler {
 
                 scheduledJobFutures.put(job.getId(), scheduledJobFuture);
 
-            } catch (Exception e) {
+            } catch (Exception exception) {
+                log.error("Failed to trigger schedule for {}.", job, exception);
                 job.setStatus(JobStatus.ERROR);
                 workhorseController.update(job);
-                jobErrorEvent.fire(new JobErrorEvent(e, ErrorType.INVALID_SCHEDULE.getMessage(), job.getId(), JobStatus.ERROR));
+                jobErrorEvent.fire(new JobErrorEvent(exception, ErrorType.INVALID_SCHEDULE.getMessage(), job.getId(), job.getStatus()));
             }
         }
     }
@@ -101,24 +103,20 @@ public class JobScheduler {
         ScheduledFuture<?> scheduledFuture = scheduledJobFutures.get(job.getId());
         if (scheduledFuture != null) {
             scheduledFuture.cancel(false);
-
-            log.info("Schedule stopped for Job {} ", job.getName());
-        } else {
-            log.info("No scheduled execution found for the given job {} ", job.getName());
+            log.info("Schedule stopped for {}", job);
         }
-
     }
 
     /**
      * Start an execution after timeout
      */
     public void triggerScheduledExecutionCreation(Job job) {
-        log.info("Timeout with Job: {} ", job.getName());
+        log.trace("Schedule triggered with {}", job);
         try {
             workhorseController.triggerScheduledExecutionCreation(job);
         } catch (Exception exception) {
-            log.error("Timeout failed for job {}.", job.getName(), exception);
+            log.error("Failed to trigger schedule for {}", job, exception);
+            jobErrorEvent.fire(new JobErrorEvent(exception, ErrorType.FAILED_SCHEDULE.getMessage(), job.getId(), job.getStatus()));
         }
     }
-
 }

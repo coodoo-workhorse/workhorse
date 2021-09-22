@@ -177,44 +177,12 @@ public class Job extends BaseEntity {
         this.schedule = schedule;
     }
 
+    /**
+     * {@link Job#toString()} is used in logging, so it is kept short
+     */
     @Override
     public String toString() {
-        final int maxLen = 10;
-        StringBuilder builder = new StringBuilder();
-        builder.append("Job [id=");
-        builder.append(id);
-        builder.append(", name=");
-        builder.append(name);
-        builder.append(", description=");
-        builder.append(description);
-        builder.append(", tags=");
-        builder.append(tags != null ? tags.subList(0, Math.min(tags.size(), maxLen)) : null);
-        builder.append(", workerClassName=");
-        builder.append(workerClassName);
-        builder.append(", parametersClassName=");
-        builder.append(parametersClassName);
-        builder.append(", status=");
-        builder.append(status);
-        builder.append(", threads=");
-        builder.append(threads);
-        builder.append(", maxPerMinute=");
-        builder.append(maxPerMinute);
-        builder.append(", failRetries=");
-        builder.append(failRetries);
-        builder.append(", retryDelay=");
-        builder.append(retryDelay);
-        builder.append(", minutesUntilCleanUp=");
-        builder.append(minutesUntilCleanUp);
-        builder.append(", uniqueQueued=");
-        builder.append(uniqueQueued);
-        builder.append(", schedule=");
-        builder.append(schedule);
-        builder.append(", createdAt=");
-        builder.append(createdAt);
-        builder.append(", updatedAt=");
-        builder.append(updatedAt);
-        builder.append("]");
-        return builder.toString();
+        return "Job '" + name + "' (ID " + id + ", " + workerClassName + ")";
     }
 
 }

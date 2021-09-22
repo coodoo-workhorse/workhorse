@@ -30,7 +30,7 @@ import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobExecutionCount;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
-import io.coodoo.workhorse.persistence.PersistenceManager;
+import io.coodoo.workhorse.persistence.WorkhorsePersistence;
 import io.coodoo.workhorse.persistence.memory.MemoryConfigBuilder;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -46,7 +46,7 @@ public class WorkhorseServiceTest {
     ExecutionBuffer executionBuffer;
 
     @Mock
-    PersistenceManager persistenceManager;
+    WorkhorsePersistence persistenceManager;
 
     @Mock
     WorkhorseLogService workhorseLogService;
@@ -128,7 +128,7 @@ public class WorkhorseServiceTest {
 
         assertEquals(config, classUnderTest.currentWorkhorseConfig);
 
-        verify(persistenceManager).initializePersistence(config);
+        verify(persistenceManager).initialize(config);
         verify(workhorseConfigController).initializeStaticConfig(config);
 
         verify(workhorseController).loadWorkers();
@@ -165,7 +165,7 @@ public class WorkhorseServiceTest {
 
         assertEquals(config.toString(), classUnderTest.currentWorkhorseConfig.toString());
 
-        verify(persistenceManager).initializePersistence(classUnderTest.currentWorkhorseConfig);
+        verify(persistenceManager).initialize(classUnderTest.currentWorkhorseConfig);
         verify(workhorseConfigController).initializeStaticConfig(classUnderTest.currentWorkhorseConfig);
 
         verify(workhorseController).loadWorkers();
@@ -184,7 +184,7 @@ public class WorkhorseServiceTest {
         classUnderTest.currentWorkhorseConfig = config;
         classUnderTest.start();
 
-        verify(persistenceManager).initializePersistence(config);
+        verify(persistenceManager).initialize(config);
         verify(workhorseConfigController).initializeStaticConfig(config);
 
         verify(workhorseController).loadWorkers();

@@ -6,8 +6,11 @@ import java.time.LocalDateTime;
  * <p>
  * A JobExecutionCount defines the counts of {@link Execution} by status for a specific job or for all jobs between a time interval
  * </p>
+ * 
+ * @author coodoo GmbH (coodoo.de)
  */
 public class JobExecutionCount {
+
     private Long jobId;
     private LocalDateTime from;
     private LocalDateTime to;
@@ -114,6 +117,12 @@ public class JobExecutionCount {
 
     public void setAborted(long aborted) {
         this.aborted = aborted;
+    }
+
+    @Override
+    public String toString() {
+        return "JobExecutionCount [jobId=" + jobId + ", from=" + from + ", to=" + to + ", total=" + total + ", planned=" + planned + ", queued=" + queued
+                        + ", running=" + running + ", finished=" + finished + ", failed=" + failed + ", aborted=" + aborted + "]";
     }
 
 }

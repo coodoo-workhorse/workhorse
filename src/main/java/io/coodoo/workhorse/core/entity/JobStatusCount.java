@@ -6,6 +6,7 @@ package io.coodoo.workhorse.core.entity;
  * @author coodoo GmbH (coodoo.io)
  */
 public class JobStatusCount {
+
     private long total;
     private long active;
     private long inactive;

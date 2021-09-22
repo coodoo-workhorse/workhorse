@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author coodoo GmbH (coodoo.de)
+ */
 public class WorkhorseInfo {
 
     private Long jobId;
@@ -69,4 +72,12 @@ public class WorkhorseInfo {
     public void setPaused(boolean paused) {
         this.paused = paused;
     }
+
+    @Override
+    public String toString() {
+        return "WorkhorseInfo [jobId=" + jobId + ", queuedExecutions=" + queuedExecutions + ", queuedPriorityExecutions=" + queuedPriorityExecutions
+                        + ", runningExecutions=" + runningExecutions + ", threadCount=" + threadCount + ", threadStartTime=" + threadStartTime + ", paused="
+                        + paused + "]";
+    }
+
 }
