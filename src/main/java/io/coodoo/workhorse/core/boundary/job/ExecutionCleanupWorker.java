@@ -65,7 +65,12 @@ public class ExecutionCleanupWorker extends Worker {
         if (minOneJobCleanupFailed) {
             throw new RuntimeException("Exception during cleaup of job " + failedJobInfo, firstException);
         }
-        return "Finished execution cleanup. Deleted " + deletedSum + " job executions";
+
+        if (deletedSum > 0) {
+            return "Deleted " + deletedSum + " job executions";
+        }
+
+        return "No executions for cleanup found.";
     }
 
 }

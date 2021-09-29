@@ -252,17 +252,16 @@ public class ExecutionContext {
     }
 
     /**
-     * @deprecated
-     *             <p>
-     *             Add a short message to summarize this execution.
-     *             </p>
-     *             The number of character in a summary can not exceed a value defined in {@link WorkhorseConfig#getMaxExecutionSummaryLength()}.<br>
-     *             Otherwise the summary is cut to the permitted length and the full-length summary is appended to the logs ({@link ExecutionLog#getLog()}) of
-     *             the current execution.
+     * 
+     * <p>
+     * Add a short message to summarize this execution.
+     * </p>
+     * The number of character in a summary can not exceed a value defined in {@link WorkhorseConfig#getMaxExecutionSummaryLength()}.<br>
+     * Otherwise the summary is cut to the permitted length and the full-length summary is appended to the logs ({@link ExecutionLog#getLog()}) of the current
+     * execution.
      * 
      * @param summary short message to add
      */
-    @Deprecated
     public void summarize(String summary) {
 
         // If the execution context is used in a custom service it can be invoked without an execution present.

@@ -46,10 +46,10 @@ public class CheckRunningExecutionsWorker extends Worker {
             return "They are no running executions in timeout ";
         }
 
+        ExecutionStatus statusTransition = StaticConfig.EXECUTION_TIMEOUT_STATUS;
         for (Execution timeoutExecution : timeoutExecutions) {
             log.warn("Stuck running execution found! {}", timeoutExecution);
 
-            ExecutionStatus statusTransition = StaticConfig.EXECUTION_TIMEOUT_STATUS;
             String logMessage = "Stuck running execution found (ID: " + timeoutExecution.getId() + "): ";
 
             switch (statusTransition) {
@@ -71,6 +71,6 @@ public class CheckRunningExecutionsWorker extends Worker {
                     break;
             }
         }
-        return "The check was successfull ";
+        return timeoutExecutions + " executions ran in timeout. They have been set in status " + statusTransition;
     }
 }
