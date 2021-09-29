@@ -124,7 +124,7 @@ public class JobThread {
                     workhorseController.setExecutionStatusToRunning(execution);
 
                     // mediterraneus
-                    workerInstance.doWork(execution);
+                    String summary = workerInstance.doWork(execution);
 
                     long duration = System.currentTimeMillis() - millisAtStart;
 
@@ -132,6 +132,10 @@ public class JobThread {
                         // this execution was to fast and must wait to not exceed the limit of
                         // executions per minute
                         TimeUnit.MILLISECONDS.sleep(minMillisPerExecution - duration);
+                    }
+
+                    if (summary != null && !summary.isEmpty()) {
+                        workhorseController.summarize(execution, summary);
                     }
 
                     workhorseController.setExecutionStatusToFinished(execution);

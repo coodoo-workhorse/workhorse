@@ -25,11 +25,11 @@ public class ExecutionCleanupWorker extends Worker {
     WorkhorseService workhorseService;
 
     @Override
-    public void doWork() throws Exception {
+    public String doWork() throws Exception {
 
         if (StaticConfig.MINUTES_UNTIL_CLEANUP == 0) {
             logInfo(logger, "The cleanup is deactivated.");
-            return;
+            return "The cleanup is deactivated.";
         }
 
         int deletedSum = 0;
@@ -65,6 +65,7 @@ public class ExecutionCleanupWorker extends Worker {
         if (minOneJobCleanupFailed) {
             throw new RuntimeException("Exception during cleaup of job " + failedJobInfo, firstException);
         }
+        return "Finished execution cleanup. Deleted " + deletedSum + " job executions";
     }
 
 }

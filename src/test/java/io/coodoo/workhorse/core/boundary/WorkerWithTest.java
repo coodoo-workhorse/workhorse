@@ -38,50 +38,58 @@ public class WorkerWithTest {
 
     public class TypeString extends WorkerWith<String> {
         @Override
-        public void doWork(String parameters) throws Exception {
+        public String doWork(String parameters) throws Exception {
             assertEquals(STRING, parameters);
+            return null;
         }
     }
     public class TypeLong extends WorkerWith<Long> {
         @Override
-        public void doWork(Long parameters) throws Exception {
+        public String doWork(Long parameters) throws Exception {
             assertEquals(LONG, parameters);
+            return null;
         }
     }
     public class TypePojo extends WorkerWith<Pojo> {
         @Override
-        public void doWork(Pojo parameters) throws Exception {
+        public String doWork(Pojo parameters) throws Exception {
             assertEquals(POJO, parameters);
+            return null;
         }
     }
     public class TypeListLong extends WorkerWith<List<Long>> {
         @Override
-        public void doWork(List<Long> parameters) throws Exception {
+        public String doWork(List<Long> parameters) throws Exception {
             assertEquals(LONG_LIST.toString(), parameters.toString());
+            return null;
         }
     }
     public class TypeListString extends WorkerWith<List<String>> {
         @Override
-        public void doWork(List<String> parameters) throws Exception {
+        public String doWork(List<String> parameters) throws Exception {
             assertEquals(STRING_LIST.toString(), parameters.toString());
+            return null;
         }
     }
     public class TypeListPojo extends WorkerWith<List<Pojo>> {
         @Override
-        public void doWork(List<Pojo> parameters) throws Exception {
+        public String doWork(List<Pojo> parameters) throws Exception {
             assertEquals(POJO_LIST.toString(), parameters.toString());
+            return null;
         }
     }
     public class TypeSetString extends WorkerWith<Set<String>> {
         @Override
-        public void doWork(Set<String> parameters) throws Exception {
+        public String doWork(Set<String> parameters) throws Exception {
             assertEquals(STRING_SET.toString(), parameters.toString());
+            return null;
         }
     }
     public class TypeMapLongString extends WorkerWith<Map<Long, String>> {
         @Override
-        public void doWork(Map<Long, String> parameters) throws Exception {
+        public String doWork(Map<Long, String> parameters) throws Exception {
             assertEquals(LONG_STRING_MAP.toString(), parameters.toString());
+            return null;
         }
     }
 

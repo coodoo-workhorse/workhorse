@@ -43,7 +43,7 @@ public class CheckQueuedExecutionsWorker extends Worker {
     WorkhorseService workhorseService;
 
     @Override
-    public void doWork() throws Exception {
+    public String doWork() throws Exception {
 
         logInfo(logger, "Starting check queued Execution.");
         logInfo(logger, "Queued executions | Threads | Job's name");
@@ -115,7 +115,6 @@ public class CheckQueuedExecutionsWorker extends Worker {
                 logInfo(logger, "executions: " + jobBufferStatus.executions);
                 logInfo(logger, "Thread: " + jobBufferStatus.jobThreads.stream().map(thread -> thread.getThread().getName()).collect(Collectors.toList()));
 
-                executionContext.summarize(summary);
                 workhorseLogService.logMessage(summary, job.getId(), false);
 
                 // Try to restart the job.
@@ -126,10 +125,11 @@ public class CheckQueuedExecutionsWorker extends Worker {
 
         }
 
-        if (summary == null) {
-            executionContext.summarize("All execution are processed.");
-        }
-
         logInfo(logger, "Finished check queued executions.");
+
+        if (summary == null) {
+            return "All execution are processed.";
+        }
+        return summary;
     }
 }

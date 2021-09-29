@@ -14,14 +14,20 @@ import io.coodoo.workhorse.util.WorkhorseUtil;
  */
 public abstract class Worker extends BaseWorker {
 
-    public abstract void doWork() throws Exception;
+    /**
+     * Process the execution
+     * 
+     * @return a message to summarize the execution
+     * @throws Exception
+     */
+    public abstract String doWork() throws Exception;
 
     @Override
-    public void doWork(Execution execution) throws Exception {
+    public String doWork(Execution execution) throws Exception {
 
         this.executionContext.init(execution);
 
-        doWork();
+        return doWork();
     }
 
     /**

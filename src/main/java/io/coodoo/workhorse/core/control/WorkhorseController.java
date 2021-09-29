@@ -3,6 +3,7 @@ package io.coodoo.workhorse.core.control;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,6 +37,7 @@ import io.coodoo.workhorse.core.entity.JobExecutionCount;
 import io.coodoo.workhorse.core.entity.JobExecutionStatusSummary;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.core.entity.JobStatusCount;
+import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
@@ -799,6 +801,53 @@ public class WorkhorseController {
      */
     public JobStatusCount getJobStatusCount() {
         return jobPersistence.getJobStatusCount();
+    }
+
+    /**
+     * <p>
+     * Add a short message to summarize this execution.
+     * </p>
+     * The number of character in a summary can not exceed a value defined in {@link WorkhorseConfig#getMaxExecutionSummaryLength()}.<br>
+     * Otherwise the summary is cut to the permitted length and the full-length summary is appended to the logs ({@link ExecutionLog#getLog()}) of the current
+     * execution.
+     * 
+     * @param summary short message to add
+     */
+    public void summarize(Execution execution, String summary) {
+
+        // If the execution context is used in a custom service it can be invoked without an execution present.
+        // It also check if the summary is empty or null.
+        if (executionPersistence == null || execution == null || execution.getId() == null || summary == null || summary.trim().isEmpty()) {
+            return;
+        }
+
+        StringBuilder summaryToPersist = new StringBuilder();
+        int maxSummaryLength = StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH;
+
+        if (summary.length() > maxSummaryLength) {
+
+            summaryToPersist.append(summary.substring(0, maxSummaryLength - 1));
+            summaryToPersist.append("…");
+
+            StringBuilder summaryToPersistInExecutionLog = new StringBuilder();
+
+            DateTimeFormatter logTimeFormat = DateTimeFormatter.ofPattern(StaticConfig.LOG_TIME_FORMATTER);
+            String time = WorkhorseUtil.timestamp().format(logTimeFormat) + " ";
+
+            String marker = time + "[SUMMARY]" + " ";
+
+            summaryToPersistInExecutionLog.append(marker).append(summary);
+            executionPersistence.log(execution.getJobId(), execution.getId(), summaryToPersistInExecutionLog.toString());
+        } else {
+            summaryToPersist.append(summary);
+        }
+
+        execution.setSummary(summaryToPersist.toString());
+
+        // No special update of the summary field is defined as adding a summary-information do not occur often. Only one execution of a series holds the
+        // summary of all executions of this series.
+        executionPersistence.update(execution);
+
     }
 
 }

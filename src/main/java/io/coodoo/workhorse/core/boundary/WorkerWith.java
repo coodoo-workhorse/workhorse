@@ -25,14 +25,21 @@ public abstract class WorkerWith<T> extends BaseWorker {
 
     private Class<?> parametersClass;
 
-    public abstract void doWork(T parameters) throws Exception;
+    /**
+     * Process the execution
+     * 
+     * @param parameters the object parameter needed for the execution
+     * @return a message to summarize the execution
+     * @throws Exception
+     */
+    public abstract String doWork(T parameters) throws Exception;
 
     @Override
-    public void doWork(Execution execution) throws Exception {
+    public String doWork(Execution execution) throws Exception {
 
         this.executionContext.init(execution);
 
-        doWork(getParameters(execution));
+        return doWork(getParameters(execution));
     }
 
     @SuppressWarnings("unchecked")

@@ -34,16 +34,16 @@ public class CheckRunningExecutionsWorker extends Worker {
     ExecutionPersistence executionPersistence;
 
     @Override
-    public void doWork() throws Exception {
+    public String doWork() throws Exception {
         if (StaticConfig.EXECUTION_TIMEOUT <= 0) {
-            return;
+            return "The system job is deactivate";
         }
 
         LocalDateTime time = WorkhorseUtil.timestamp().minusSeconds(StaticConfig.EXECUTION_TIMEOUT);
         List<Execution> timeoutExecutions = executionPersistence.findTimeoutExecutions(time);
 
         if (timeoutExecutions.isEmpty()) {
-            return;
+            return "They are no running executions in timeout ";
         }
 
         for (Execution timeoutExecution : timeoutExecutions) {
@@ -71,5 +71,6 @@ public class CheckRunningExecutionsWorker extends Worker {
                     break;
             }
         }
+        return "The check was successfull ";
     }
 }
