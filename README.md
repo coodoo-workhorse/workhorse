@@ -49,7 +49,7 @@ Add the following dependency to your project ([published on Maven Central](https
    <dependency>
        <groupId>io.coodoo</groupId>
        <artifactId>workhorse</artifactId>
-       <version>2.0.0-RC2-SNAPSHOT</version>
+       <version>2.0.0-RC4-SNAPSHOT</version>
    </dependency>
    ```
 ### Start the engine
@@ -117,11 +117,9 @@ Lets create a hello world worker . Therefore you just need to extend the `Worker
 @Dependent
 public class HelloWorldWorker extends Worker {
 
-    private final Logger log = LoggerFactory.getLogger(HelloWorldWorker.class);
-
     @Override
-    public void doWork() {
-        log.info("Hello World!");
+    public String doWork() {
+        return "Hello World!";
     }
 }
 ```
@@ -146,11 +144,9 @@ Let's add some parameters to this worker! You can access the parameters by chang
 @Dependent
 public class HelloWorldWorker extends WorkerWith<String> {
 
-    private final Logger log = LoggerFactory.getLogger(HelloWorldWorker.class);
-
     @Override
-    public void doWork(String environment) {
-        log.info("Hello World to: " + environment);
+    public String doWork(String environment) {
+        return "Hello World to: " + environment;
     }
 }
 ```
@@ -173,8 +169,8 @@ public class HelloWorldWorker extends WorkerWith<String> {
     }
 
     @Override
-    public void doWork(String environment) {
-        log.info("Hello World to: " + environment);
+    public String doWork(String environment) {
+        return "Hello World to: " + environment
     }
 }
 ```
@@ -208,8 +204,8 @@ To register your scheduled job, use the `@InitialJobConfig` annotation with the 
 public class SomeNiceJobWorker extends Worker {
 
     @Override
-    public void doWork() throws Exception {
-        log.info("This log will appear every 20 minutes");
+    public String doWork() throws Exception {
+        return "This log will appear every 20 minutes"
     }
 }
 ```
@@ -248,8 +244,8 @@ public class LoadDataWorker extends WorkerWith<User> {
     private static Logger log = LoggerFactory.getLogger(LoadDataWorker.class);
 
     @Override
-    public void doWork(User user) throws Exception {
-        log.info("Doing some serious loading with user: " + user);
+    public String doWork(User user) throws Exception {
+        return "Doing some serious loading with user: " + user;
     }
 
     @Override
@@ -360,10 +356,11 @@ public class SendEmailWorker extends WorkerWith<EmailData> {
     private static Logger log = LoggerFactory.getLogger(SendEmailWorker.class);
 
     @Override
-    public void doWork(EmailData emailData) throws Exception {
+    public String doWork(EmailData emailData) throws Exception {
 
         log.info(" Process an execution with paramter: " + emailData);
         //Send the e-mail ...
+        return "e-mail successfull sent";
     }
 }
 ```
@@ -386,9 +383,10 @@ public class MaxPerMinute extends Worker {
     private static Logger log = LoggerFactory.getLogger(MaxPerMinute.class);
 
     @Override
-    public void doWork() throws Exception {
+    public String doWork() throws Exception {
 
         log.info( "Process a job");
+        return "Execution was successful";
     }
 }
 ```
@@ -400,7 +398,7 @@ The contextual Information about an execution can be obtained also outside the c
 If the instructions to process a job aren't written in the worker's class under the `doWork()`-method, the context of the running execution is not lost.
 
 
-To get the execution context you just have to inject the class `JobContext`. Through this class the running execution and the corresponding job can be retrieved and messages can be added to the execution as logs.
+To get the execution context you just have to inject the class `ExecutionContext`. Through this class the running execution and the corresponding job can be retrieved and messages can be added to the execution as logs.
 
 
 Let's define a Worker `SendEmailWorker`.
@@ -416,33 +414,34 @@ public class SendEmailWorker extends WorkerWith<EmailData> {
     EmailService emailService;
 
     @Override
-    public void doWork(EmailData emailData) throws Exception {
+    public String doWork(EmailData emailData) throws Exception {
 
         log.info(" Process an execution with paramter: " + emailData);
         emailService.send(emailData);
+        return "Execution was successful";
     }
 }
 ```
-The `doWork(EmailData emailData)`-method of this Worker don't contain the instructions to execute the job. Instead, the method `send(EmailData emailData)` of the class `EmailService` is called to process the job. To keep the context of the current execution in the class `EmailService`, we just have to inject `JobContext`. 
+The `doWork(EmailData emailData)`-method of this Worker don't contain the instructions to execute the job. Instead, the method `send(EmailData emailData)` of the class `EmailService` is called to process the job. To keep the context of the current execution in the class `EmailService`, we just have to inject `ExecutionContext`. 
 
 ```java
 public class EmailService {
 
     @Inject
-    JobContext jobContext;
+    ExecutionContext executionContext;
 
     public void send() {
 
-        Execution execution = jobContext.getExecution();
-        Job job = jobContext.getJob();
+        Execution execution = executionContext.getExecution();
+        Job job = executionContext.getJob();
 
-        jobContext.logInfo(" Start the processing of the execution " + execution + " of the job " + job);
+        executionContext.logInfo(" Start the processing of the execution " + execution + " of the job " + job);
 
         // Do send..
     }
 }
 ```
-In this example the `Execution` and `Job` are retrieved through the injected instance of `JobContext`.
+In this example the `Execution` and `Job` are retrieved through the injected instance of `ExecutionContext`.
 
 ### Retry on failed
 If your job encounters a transient exception, it can be retried automatically after a given delay.
@@ -460,10 +459,11 @@ public class GenerateStatisticsWorker extends Worker {
     private static Logger log = LoggerFactory.getLogger(GenerateStatisticsWorker.class);
 
     @Override
-    public void doWork() throws Exception {
+    public String doWork() throws Exception {
 
         log.info( "Process a job");
         // Generate statistics
+        return "Execution was successful";
     }
 }
 ```
@@ -491,7 +491,7 @@ public class GenerateStatisticsWorker extends Worker {
     private static Logger log = LoggerFactory.getLogger(GenerateStatisticsWorker.class);
 
     @Override
-    public void doWork() throws Exception {
+    public String doWork() throws Exception {
         
         try() {
 
@@ -502,7 +502,9 @@ public class GenerateStatisticsWorker extends Worker {
         } catch (Exception exception) {
 
             logError("Generate the statistics encounters an exception.");
-        }    
+        }  
+
+        return "Execution was successful";  
     }
 }
 ```
@@ -522,11 +524,13 @@ public class ErrorHandlingWorker extends Worker {
     private static Logger log = LoggerFactory.getLogger(ErrorHandlingWorker.class);
 
     @Override
-    public void doWork() throws Exception {
+    public String doWork() throws Exception {
 
         logInfo("Begin of the job");
         
         logInfo("End of the job");
+
+        return "Execution was successful";
     }
 
     @Override
@@ -554,11 +558,13 @@ public class ImportDataWorker extends Worker {
     private static Logger log = LoggerFactory.getLogger(ImportDataWorker.class);
 
     @Override
-    public void doWork() throws Exception {
+    public String doWork() throws Exception {
 
         logInfo("Begin of the job");
         // Do work
         logInfo("End of the job");
+
+        return "Execution was successful";
     }
 
     @Override
