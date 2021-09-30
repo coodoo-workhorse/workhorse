@@ -28,8 +28,8 @@ public class ExecutionCleanupWorker extends Worker {
     public String doWork() throws Exception {
 
         if (StaticConfig.MINUTES_UNTIL_CLEANUP == 0) {
-            logInfo(logger, "The cleanup is deactivated.");
-            return "The cleanup is deactivated.";
+            logInfo(logger, "The cleanup is deactivated");
+            return "The cleanup is deactivated";
         }
 
         int deletedSum = 0;
@@ -70,7 +70,7 @@ public class ExecutionCleanupWorker extends Worker {
             return "Deleted " + deletedSum + " job executions";
         }
 
-        return "No executions for cleanup found.";
+        return "No executions for cleanup found";
     }
 
 }

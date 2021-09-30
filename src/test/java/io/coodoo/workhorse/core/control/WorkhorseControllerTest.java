@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
@@ -755,6 +756,92 @@ public class WorkhorseControllerTest {
         assertEquals(duration, argument.getValue().getDuration());
 
         assertNull(result);
+    }
+
+    @Test
+    public void testSummarize_positiv_szenario() throws Exception {
+
+        String summary = "Message";
+        StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH = 10;
+
+        Execution executionOfTheContext = new Execution();
+        executionOfTheContext.setJobId(1L);
+        executionOfTheContext.setId(1L);
+
+        classUnderTest.summarize(executionOfTheContext, summary);
+
+        ArgumentCaptor<Execution> argument = ArgumentCaptor.forClass(Execution.class);
+        verify(executionPersistence).update(argument.capture());
+        assertEquals(summary, argument.getValue().getSummary());
+    }
+
+    @Test
+    public void testSummarize_with_too_long_summary() throws Exception {
+
+        String summary = "Message to test.";
+        StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH = 10;
+
+        String expectedSummary = "Message t…";
+        assertEquals("Summary length must not exceed value of MAX_EXECUTION_SUMMARY_LENGTH!", StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH,
+                        expectedSummary.length());
+
+        Execution executionOfTheContext = new Execution();
+        executionOfTheContext.setJobId(1L);
+        executionOfTheContext.setId(1L);
+
+        classUnderTest.summarize(executionOfTheContext, summary);
+
+        ArgumentCaptor<Execution> argument = ArgumentCaptor.forClass(Execution.class);
+        verify(executionPersistence).update(argument.capture());
+
+        assertEquals(expectedSummary, argument.getValue().getSummary());
+    }
+
+    @Test
+    public void testSummarize_persist_as_log_summary_too_long() throws Exception {
+
+        String summary = "Message to test.";
+        StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH = 10;
+
+        Execution executionOfTheContext = new Execution();
+        executionOfTheContext.setJobId(1L);
+        executionOfTheContext.setId(1L);
+
+        classUnderTest.summarize(executionOfTheContext, summary);
+
+        ArgumentCaptor<String> argumentString = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Long> argumentJobId = ArgumentCaptor.forClass(Long.class);
+        ArgumentCaptor<Long> argumentExecutionId = ArgumentCaptor.forClass(Long.class);
+        verify(executionPersistence).log(argumentJobId.capture(), argumentExecutionId.capture(), argumentString.capture());
+
+        assertTrue(argumentString.getValue().endsWith("[SUMMARY]" + " " + summary));
+
+    }
+
+    @Test
+    public void testSummarize_with_NULL_as_parameter() throws Exception {
+
+        Execution executionOfTheContext = new Execution();
+        executionOfTheContext.setJobId(1L);
+        executionOfTheContext.setId(1L);
+
+        classUnderTest.summarize(executionOfTheContext, null);
+
+        verify(executionPersistence, never()).update(anyObject());
+
+    }
+
+    @Test
+    public void testSummarize_with_EMPTY_paramter() throws Exception {
+
+        Execution executionOfTheContext = new Execution();
+        executionOfTheContext.setJobId(1L);
+        executionOfTheContext.setId(1L);
+
+        classUnderTest.summarize(executionOfTheContext, "         ");
+
+        verify(executionPersistence, never()).update(anyObject());
+
     }
 
 }

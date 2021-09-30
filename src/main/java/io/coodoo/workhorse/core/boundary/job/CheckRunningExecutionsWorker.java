@@ -43,7 +43,7 @@ public class CheckRunningExecutionsWorker extends Worker {
         List<Execution> timeoutExecutions = executionPersistence.findTimeoutExecutions(time);
 
         if (timeoutExecutions.isEmpty()) {
-            return "They are no running executions in timeout ";
+            return "No timeouts";
         }
 
         ExecutionStatus statusTransition = StaticConfig.EXECUTION_TIMEOUT_STATUS;

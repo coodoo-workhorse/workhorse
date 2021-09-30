@@ -270,28 +270,14 @@ public class ExecutionContext {
             return;
         }
 
-        StringBuilder summaryToPersist = new StringBuilder();
-        int maxSummaryLength = StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH;
-
-        if (summary.length() > maxSummaryLength) {
-
-            summaryToPersist.append(summary.substring(0, maxSummaryLength - 1));
-            summaryToPersist.append("…");
-
-            StringBuilder summaryToPersistInExecutionLog = new StringBuilder();
-
-            DateTimeFormatter logTimeFormat = DateTimeFormatter.ofPattern(StaticConfig.LOG_TIME_FORMATTER);
-            String time = WorkhorseUtil.timestamp().format(logTimeFormat) + " ";
-
-            String marker = time + "[SUMMARY]" + " ";
-
-            summaryToPersistInExecutionLog.append(marker).append(summary);
-            executionPersistence.log(getJobId(), getExecutionId(), summaryToPersistInExecutionLog.toString());
+        if (summary.length() <= StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH) {
+            execution.setSummary(summary);
         } else {
-            summaryToPersist.append(summary);
+            // when the max length of the summary is exceeded, it gets cut off
+            execution.setSummary(summary.substring(0, StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH - 1) + "…");
+            // the prolonged summary gets logged to avoid data loss
+            executionPersistence.log(execution.getJobId(), execution.getId(), "[SUMMARY]" + " " + summary);
         }
-
-        execution.setSummary(summaryToPersist.toString());
 
         // No special update of the summary field is defined as adding a summary-information do not occur often. Only one execution of a series holds the
         // summary of all executions of this series.
