@@ -252,6 +252,22 @@ public class ExecutionContext {
     }
 
     /**
+     * <p>
+     * Add a short message to summarize this execution.
+     * </p>
+     * The number of character in a summary can not exceed a value defined in {@link WorkhorseConfig#getMaxExecutionSummaryLength()}.<br>
+     * Otherwise the summary is cut to the permitted length and the full-length summary is appended to the logs ({@link ExecutionLog#getLog()}) of the current
+     * execution.
+     * 
+     * @param execution execution of the summary
+     * @param summary short message to add
+     */
+    public void summarize(Execution execution, String summary) {
+        init(execution);
+        summarize(summary);
+    }
+
+    /**
      * 
      * <p>
      * Add a short message to summarize this execution.
@@ -276,7 +292,7 @@ public class ExecutionContext {
             // when the max length of the summary is exceeded, it gets cut off
             execution.setSummary(summary.substring(0, StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH - 1) + "…");
             // the prolonged summary gets logged to avoid data loss
-            executionPersistence.log(execution.getJobId(), execution.getId(), "[SUMMARY]" + " " + summary);
+            executionPersistence.log(execution.getJobId(), execution.getId(), "[SUMMARY] " + summary);
         }
 
         // No special update of the summary field is defined as adding a summary-information do not occur often. Only one execution of a series holds the

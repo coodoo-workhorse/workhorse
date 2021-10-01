@@ -36,7 +36,6 @@ import io.coodoo.workhorse.core.entity.JobExecutionCount;
 import io.coodoo.workhorse.core.entity.JobExecutionStatusSummary;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.core.entity.JobStatusCount;
-import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.JobPersistence;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
@@ -799,39 +798,6 @@ public class WorkhorseController {
      */
     public JobStatusCount getJobStatusCount() {
         return jobPersistence.getJobStatusCount();
-    }
-
-    /**
-     * <p>
-     * Add a short message to summarize this execution.
-     * </p>
-     * The number of character in a summary can not exceed a value defined in {@link WorkhorseConfig#getMaxExecutionSummaryLength()}.<br>
-     * Otherwise the summary is cut to the permitted length and the full-length summary is appended to the logs ({@link ExecutionLog#getLog()}) of the current
-     * execution.
-     * 
-     * @param summary short message to add
-     */
-    public void summarize(Execution execution, String summary) {
-
-        // If the execution context is used in a custom service it can be invoked without an execution present.
-        // It also check if the summary is empty or null.
-        if (executionPersistence == null || execution == null || execution.getId() == null || summary == null || summary.trim().isEmpty()) {
-            return;
-        }
-
-        if (summary.length() <= StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH) {
-            execution.setSummary(summary);
-        } else {
-            // when the max length of the summary is exceeded, it gets cut off
-            execution.setSummary(summary.substring(0, StaticConfig.MAX_EXECUTION_SUMMARY_LENGTH - 1) + "…");
-            // the prolonged summary gets logged to avoid data loss
-            executionPersistence.log(execution.getJobId(), execution.getId(), "[SUMMARY]" + " " + summary);
-        }
-
-        // No special update of the summary field is defined as adding a summary-information do not occur often. Only one execution of a series holds the
-        // summary of all executions of this series.
-        executionPersistence.update(execution);
-
     }
 
 }

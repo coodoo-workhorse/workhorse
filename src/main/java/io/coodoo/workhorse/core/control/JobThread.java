@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.coodoo.workhorse.core.boundary.ExecutionContext;
 import io.coodoo.workhorse.core.control.event.AllExecutionsDoneEvent;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.Job;
@@ -54,6 +55,9 @@ public class JobThread {
 
     @Inject
     Event<AllExecutionsDoneEvent> allExecutionsDoneEvent;
+
+    @Inject
+    ExecutionContext executionContext;
 
     private Job job;
     private boolean stopMe;
@@ -135,7 +139,7 @@ public class JobThread {
                     }
 
                     if (summary != null && !summary.isEmpty()) {
-                        workhorseController.summarize(execution, summary);
+                        executionContext.summarize(execution, summary);
                     }
 
                     workhorseController.setExecutionStatusToFinished(execution);
