@@ -246,7 +246,6 @@ public class CollectionListingTest {
         assertTrue(listingResult.getResults().contains(job2));
     }
 
-    @Ignore
     @Test
     public void testGetListingResult_filterWildcardString() throws Exception {
 
@@ -260,13 +259,16 @@ public class CollectionListingTest {
         Job job3 = new Job();
         job3.setName("xyy");
         collection.add(job3);
+        Job job4 = new Job();
+        job4.setName("x12y");
+        collection.add(job4);
 
         ListingParameters listingParameters = new ListingParameters();
-        listingParameters.addFilterAttributes("name", "x" + CollectionListing.WILDCARD_ONE + "y");
+        listingParameters.addFilterAttributes("name", "x" + CollectionListing.WILDCARD_ONE + "y");// x?y
 
         ListingResult<Job> listingResult = CollectionListing.getListingResult(collection, Job.class, listingParameters);
 
-        assertEquals(1, listingResult.getResults().size());
+        assertEquals(2, listingResult.getResults().size());
         assertTrue(listingResult.getResults().contains(job1));
         assertTrue(listingResult.getResults().contains(job3));
     }
@@ -646,7 +648,7 @@ public class CollectionListingTest {
         assertEquals(217, listingResult.getResults().size());
     }
 
-    @Ignore
+    @Ignore // FIXME!
     @Test
     public void testGetListingResult_filterLocalDateTime_DATE_COLLECTION_gtYYYY() throws Exception {
 
@@ -1160,6 +1162,100 @@ public class CollectionListingTest {
 
         assertEquals(1, listingResult.getResults().size());
         assertTrue(listingResult.getResults().contains(job1));
+    }
+
+    @Test
+    public void testGetListingResult_filterEnumOR() throws Exception {
+
+        Set<Job> collection = new HashSet<>();
+        Job job1 = new Job();
+        job1.setStatus(JobStatus.ACTIVE);
+        collection.add(job1);
+        Job job2 = new Job();
+        job2.setStatus(JobStatus.ERROR);
+        collection.add(job2);
+        Job job3 = new Job();
+        job3.setStatus(JobStatus.INACTIVE);
+        collection.add(job3);
+        Job job4 = new Job();
+        job4.setStatus(JobStatus.NO_WORKER);
+        collection.add(job4);
+        Job job5 = new Job();
+        job5.setStatus(JobStatus.ACTIVE);
+        collection.add(job5);
+
+        ListingParameters listingParameters = new ListingParameters();
+        listingParameters.addFilterAttributes("status", "\"ACTIVE\"|\"ERROR\"");
+
+        ListingResult<Job> listingResult = CollectionListing.getListingResult(collection, Job.class, listingParameters);
+
+        assertEquals(3, listingResult.getResults().size());
+        assertTrue(listingResult.getResults().contains(job1));
+        assertTrue(listingResult.getResults().contains(job2));
+        assertTrue(listingResult.getResults().contains(job5));
+    }
+
+    @Test
+    public void testGetListingResult_filterEnumOR_Pipe() throws Exception {
+
+        Set<Job> collection = new HashSet<>();
+        Job job1 = new Job();
+        job1.setStatus(JobStatus.ACTIVE);
+        collection.add(job1);
+        Job job2 = new Job();
+        job2.setStatus(JobStatus.ERROR);
+        collection.add(job2);
+        Job job3 = new Job();
+        job3.setStatus(JobStatus.INACTIVE);
+        collection.add(job3);
+        Job job4 = new Job();
+        job4.setStatus(JobStatus.NO_WORKER);
+        collection.add(job4);
+        Job job5 = new Job();
+        job5.setStatus(JobStatus.ACTIVE);
+        collection.add(job5);
+
+        ListingParameters listingParameters = new ListingParameters();
+        listingParameters.addFilterAttributes("status", "\"ACTIVE\"|\"ERROR\"|");
+
+        ListingResult<Job> listingResult = CollectionListing.getListingResult(collection, Job.class, listingParameters);
+
+        assertEquals(3, listingResult.getResults().size());
+        assertTrue(listingResult.getResults().contains(job1));
+        assertTrue(listingResult.getResults().contains(job2));
+        assertTrue(listingResult.getResults().contains(job5));
+    }
+
+    @Test
+    public void testGetListingResult_filterEnumORUnquoted() throws Exception {
+
+        Set<Job> collection = new HashSet<>();
+        Job job1 = new Job();
+        job1.setStatus(JobStatus.ACTIVE);
+        collection.add(job1);
+        Job job2 = new Job();
+        job2.setStatus(JobStatus.ERROR);
+        collection.add(job2);
+        Job job3 = new Job();
+        job3.setStatus(JobStatus.INACTIVE);
+        collection.add(job3);
+        Job job4 = new Job();
+        job4.setStatus(JobStatus.NO_WORKER);
+        collection.add(job4);
+        Job job5 = new Job();
+        job5.setStatus(JobStatus.ACTIVE);
+        collection.add(job5);
+
+        ListingParameters listingParameters = new ListingParameters();
+        listingParameters.addFilterAttributes("status", "ACTIVE|ERROR");
+
+        ListingResult<Job> listingResult = CollectionListing.getListingResult(collection, Job.class, listingParameters);
+
+        assertEquals(4, listingResult.getResults().size());
+        assertTrue(listingResult.getResults().contains(job1));
+        assertTrue(listingResult.getResults().contains(job2));
+        assertTrue(listingResult.getResults().contains(job3));
+        assertTrue(listingResult.getResults().contains(job5));
     }
 
     @Test

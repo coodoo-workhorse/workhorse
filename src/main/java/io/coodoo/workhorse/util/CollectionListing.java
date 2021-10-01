@@ -90,16 +90,17 @@ public class CollectionListing {
     private static String OPERATOR_OR_WORD_BLANK = "OR";
     public static String OPERATOR_OR_WORD = BLANC + OPERATOR_OR_WORD_BLANK + BLANC;
 
-    /**
-     * AND operator
-     */
-    public static String OPERATOR_AND = "&";
-
-    /**
-     * AND operator as word
-     */
-    private static String OPERATOR_AND_WORD_BLANK = "AND";
-    public static String OPERATOR_AND_WORD = BLANC + OPERATOR_AND_WORD_BLANK + BLANC;
+    // TODO
+    // /**
+    // * AND operator
+    // */
+    // public static String OPERATOR_AND = "&";
+    //
+    // /**
+    // * AND operator as word
+    // */
+    // private static String OPERATOR_AND_WORD_BLANK = "AND";
+    // public static String OPERATOR_AND_WORD = BLANC + OPERATOR_AND_WORD_BLANK + BLANC;
 
     /**
      * LIKE operator
@@ -230,6 +231,7 @@ public class CollectionListing {
                     continue;
                 }
                 String filter = filterAttributes.get(attribute);
+
                 if (filter == null || filter.isEmpty()) {
                     continue;
                 }
@@ -259,14 +261,7 @@ public class CollectionListing {
                     }
                     if (filter.contains(OPERATOR_OR) || filter.contains(OPERATOR_OR_WORD)) {
                         // one attribute for many filter
-                        List<String> splitResult = splitOr(filter.replaceAll(escape(OPERATOR_OR_WORD), OPERATOR_OR));
-                        List<String> orFilters = new ArrayList<>();
-                        for (String f : splitResult) {
-                            if (!f.isEmpty()) {
-                                orFilters.add(removeQuotes(f));
-                            }
-                        }
-
+                        List<String> orFilters = splitOr(filter.replaceAll(escape(OPERATOR_OR_WORD), OPERATOR_OR));
                         allPredicates.add(orFilters.stream().map(f -> createPredicate(clazz, field, f)).reduce(x -> false, Predicate::or));
                     } else {
                         // one attribute for one filter
@@ -712,8 +707,9 @@ public class CollectionListing {
                     }
                     List<Object> enumValues = new ArrayList<>();
                     for (Object enumValue : field.getType().getEnumConstants()) {
-                        if (enumValue.toString().toUpperCase().contains(((String) filter).toUpperCase())) {
+                        if (enumValue.toString().toUpperCase().contains(filter.toUpperCase())) {
                             enumValues.add(enumValue);
+                            continue;
                         }
                     }
                     return instance -> {
@@ -754,7 +750,7 @@ public class CollectionListing {
     }
 
     private static String likeValue(String value) {
-        return ".*" + value.replace(escape(WILDCARD_MANY), ".*").replace(escape(WILDCARD_ONE), ".").toLowerCase() + ".*";
+        return ".*" + value.replace(WILDCARD_MANY, ".*").replace(WILDCARD_ONE, ".{1}").toLowerCase() + ".*";
     }
 
     private static boolean isQuoted(String value) {
@@ -766,7 +762,7 @@ public class CollectionListing {
     }
 
     private static List<String> splitOr(String value) {
-        return Arrays.asList(value.split(escape(OPERATOR_OR), -1));
+        return Arrays.asList(value.split(escape(OPERATOR_OR)));
     }
 
     /**
