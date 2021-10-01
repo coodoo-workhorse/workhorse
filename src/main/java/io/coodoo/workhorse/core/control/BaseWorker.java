@@ -41,7 +41,7 @@ public abstract class BaseWorker {
      * @param execution execution object, containing parameters and meta information
      * @throws Exception in case the execution fails
      */
-    public abstract void doWork(Execution execution) throws Exception;
+    public abstract String doWork(Execution execution) throws Exception;
 
     /**
      * This method will be called by the schedule timer in order to check if there is stuff to do.<br>
@@ -369,23 +369,6 @@ public abstract class BaseWorker {
      */
     public void summarizeError(Logger logger, String summary) {
         summarizeError(logger, summary);
-    }
-
-    /**
-     * <p>
-     * Add a short message to summarize the current execution.
-     * </p>
-     * <p>
-     * <i> This will only work when used in method {@link #doWork(Execution)}! </i>
-     * </p>
-     * The number of character in a summary can not exceed a value defined in {@link WorkhorseConfig#getMaxExecutionSummaryLength()}.<br>
-     * Otherwise the summary is cut to the permitted length and the full-length summary is appended to the logs ({@link ExecutionLog#getLog()}) of the current
-     * execution.
-     * 
-     * @param summary short message to add
-     */
-    public void summarize(String summary) {
-        executionContext.summarize(summary);
     }
 
     public abstract class BaseExecutionBuilder<T> {

@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.coodoo.workhorse.core.boundary.ExecutionContext;
 import io.coodoo.workhorse.core.control.event.AllExecutionsDoneEvent;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.Job;
@@ -54,6 +55,9 @@ public class JobThread {
 
     @Inject
     Event<AllExecutionsDoneEvent> allExecutionsDoneEvent;
+
+    @Inject
+    ExecutionContext executionContext;
 
     private Job job;
     private boolean stopMe;
@@ -124,7 +128,7 @@ public class JobThread {
                     workhorseController.setExecutionStatusToRunning(execution);
 
                     // mediterraneus
-                    workerInstance.doWork(execution);
+                    String summary = workerInstance.doWork(execution);
 
                     long duration = System.currentTimeMillis() - millisAtStart;
 
@@ -132,6 +136,10 @@ public class JobThread {
                         // this execution was to fast and must wait to not exceed the limit of
                         // executions per minute
                         TimeUnit.MILLISECONDS.sleep(minMillisPerExecution - duration);
+                    }
+
+                    if (summary != null && !summary.isEmpty()) {
+                        executionContext.summarize(execution, summary);
                     }
 
                     workhorseController.setExecutionStatusToFinished(execution);

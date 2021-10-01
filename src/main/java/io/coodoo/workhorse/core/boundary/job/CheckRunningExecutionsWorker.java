@@ -34,22 +34,22 @@ public class CheckRunningExecutionsWorker extends Worker {
     ExecutionPersistence executionPersistence;
 
     @Override
-    public void doWork() throws Exception {
+    public String doWork() throws Exception {
         if (StaticConfig.EXECUTION_TIMEOUT <= 0) {
-            return;
+            return "The system job is deactivate";
         }
 
         LocalDateTime time = WorkhorseUtil.timestamp().minusSeconds(StaticConfig.EXECUTION_TIMEOUT);
         List<Execution> timeoutExecutions = executionPersistence.findTimeoutExecutions(time);
 
         if (timeoutExecutions.isEmpty()) {
-            return;
+            return "No timeouts";
         }
 
+        ExecutionStatus statusTransition = StaticConfig.EXECUTION_TIMEOUT_STATUS;
         for (Execution timeoutExecution : timeoutExecutions) {
             log.warn("Stuck running execution found! {}", timeoutExecution);
 
-            ExecutionStatus statusTransition = StaticConfig.EXECUTION_TIMEOUT_STATUS;
             String logMessage = "Stuck running execution found (ID: " + timeoutExecution.getId() + "): ";
 
             switch (statusTransition) {
@@ -71,5 +71,6 @@ public class CheckRunningExecutionsWorker extends Worker {
                     break;
             }
         }
+        return timeoutExecutions + " executions ran in timeout. They have been set in status " + statusTransition;
     }
 }

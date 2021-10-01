@@ -43,9 +43,8 @@ public class CheckQueuedExecutionsWorker extends Worker {
     WorkhorseService workhorseService;
 
     @Override
-    public void doWork() throws Exception {
+    public String doWork() throws Exception {
 
-        logInfo(logger, "Starting check queued Execution.");
         logInfo(logger, "Queued executions | Threads | Job's name");
 
         // This value is set only if the job finds a problem.
@@ -103,7 +102,7 @@ public class CheckQueuedExecutionsWorker extends Worker {
                 // TODO Send Email !!
 
                 // This state of the job is logged
-                summary = "Executions of the job: " + job.getName() + " with ID: " + job.getId() + " are no longer processed. This job has been restarted.";
+                summary = "Executions of the job: " + job.getName() + " with ID: " + job.getId() + " are no longer processed. This job has been restarted";
                 logWarn(logger, summary);
 
                 JobBufferStatus jobBufferStatus = workhorseService.getJobBufferStatus(job);
@@ -115,7 +114,6 @@ public class CheckQueuedExecutionsWorker extends Worker {
                 logInfo(logger, "executions: " + jobBufferStatus.executions);
                 logInfo(logger, "Thread: " + jobBufferStatus.jobThreads.stream().map(thread -> thread.getThread().getName()).collect(Collectors.toList()));
 
-                executionContext.summarize(summary);
                 workhorseLogService.logMessage(summary, job.getId(), false);
 
                 // Try to restart the job.
@@ -127,9 +125,8 @@ public class CheckQueuedExecutionsWorker extends Worker {
         }
 
         if (summary == null) {
-            executionContext.summarize("All execution are processed.");
+            return "all is fine";
         }
-
-        logInfo(logger, "Finished check queued executions.");
+        return summary;
     }
 }

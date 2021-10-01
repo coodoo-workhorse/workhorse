@@ -389,8 +389,7 @@ public class WorkhorseController {
             // im Status QUEUED ist. Wenn ja diese zurückgeben.
             Execution equalQueuedJobExcecution = executionPersistence.getFirstCreatedByJobIdAndParametersHash(jobId, parametersHash);
             if (equalQueuedJobExcecution != null) {
-                // TODO Warn Log ausgeben, dass es versucht wurde, eine Execution mit dem
-                // gleichen Parameter zu erstellen.
+                log.trace("Attempt to create {} that is already in queue! Parameters: {}", equalQueuedJobExcecution, parameters);
                 return equalQueuedJobExcecution;
             }
         }

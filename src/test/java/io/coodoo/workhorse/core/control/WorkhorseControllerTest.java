@@ -55,56 +55,56 @@ public class WorkhorseControllerTest {
 
     public class TestWorker extends Worker {
         @Override
-        public void doWork() throws Exception {
-            return;
+        public String doWork() throws Exception {
+            return null;
         }
     }
 
     @InitialJobConfig(name = TEST_WORKER_WITH_INITIAL_JOB_CONFIG_NAME, threads = THREADS)
     public class TestWorkerWithInitialConfig extends Worker {
         @Override
-        public void doWork() throws Exception {
-            return;
+        public String doWork() throws Exception {
+            return null;
         }
     }
 
     @InitialJobConfig(schedule = SCHEDULE)
     public class TestWorkerScheduler extends Worker {
         @Override
-        public void doWork() throws Exception {
-            return;
+        public String doWork() throws Exception {
+            return null;
         }
     }
 
     @InitialJobConfig(schedule = NON_VALID_SCHEDULE)
     public class TestWorkerNonValidScheduler extends Worker {
         @Override
-        public void doWork() throws Exception {
-            return;
+        public String doWork() throws Exception {
+            return null;
         }
     }
 
     @InitialJobConfig(tags = TAGS)
     public class TestWorkerWithTags extends Worker {
         @Override
-        public void doWork() throws Exception {
-            return;
+        public String doWork() throws Exception {
+            return null;
         }
     }
 
     @InitialJobConfig(maxPerMinute = MAX_PER_MINUTE)
     public class TestWorkerWithMaxPerMinute extends Worker {
         @Override
-        public void doWork() throws Exception {
-            return;
+        public String doWork() throws Exception {
+            return null;
         }
     }
 
     @InitialJobConfig(minutesUntilCleanUp = MINUTES_UNTIL_CLEANUP)
     public class TestWorkerWithInitialConfigMinuteUntilCleanup extends Worker {
         @Override
-        public void doWork() throws Exception {
-            return;
+        public String doWork() throws Exception {
+            return null;
         }
     }
 
