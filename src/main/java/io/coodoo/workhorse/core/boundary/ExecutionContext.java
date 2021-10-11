@@ -233,25 +233,6 @@ public class ExecutionContext {
     }
 
     /**
-     * @deprecated
-     *             <p>
-     *             Use the function {@link #summarize(String summary)} instead.
-     *             </p>
-     *             <p>
-     *             Add a short message to summarize this execution.
-     *             </p>
-     *             The number of character in a summary can not exceed a value defined in {@link WorkhorseConfig#getMaxExecutionSummaryLength()}.<br>
-     *             Otherwise the summary is cut to the permitted length and the full-length summary is appended to the logs ({@link ExecutionLog#getLog()}) of
-     *             the current execution.
-     * 
-     * @param summary short message to add
-     */
-    @Deprecated
-    public void summerize(String summary) {
-        summarize(summary);
-    }
-
-    /**
      * <p>
      * Add a short message to summarize this execution.
      * </p>
