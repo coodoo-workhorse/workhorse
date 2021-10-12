@@ -366,28 +366,6 @@ public class WorkhorseService {
     }
 
     /**
-     * @deprecated This version must be deleted as soon as the corresponding resource endpoint in the Workhorse-ui-api project is deleted.
-     * 
-     *             create an {@link Execution}
-     * 
-     * @param jobId ID of the corresponding job
-     * @param parameters parameters of the execution
-     * @param priority if <code>true</code> the execution will be process before other execution. Otherwise the execution will be process in order of add.
-     * @param plannedFor if a plannedFor is given, the job execution will not be executed before this time.
-     * @param expiresAt if expiresAt is given, the execution have to be process before this time. Otherwise the execution is cancelled.
-     * @param batchId ID to refer to a group of executions to handle as a single entity.
-     * @param chainId ID to refer to a group of executions to process by an order.
-     * @param uniqueQueued if true then no more than one execution with specified paramters can be queued at the time.
-     * @return the created execution
-     */
-    @Deprecated
-    public Execution createExecution(Long jobId, String parameters, Boolean priority, LocalDateTime plannedFor, LocalDateTime expiresAt, Long batchId,
-                    Long chainId, boolean uniqueQueued) {
-
-        return createExecution(jobId, parameters, priority, plannedFor, expiresAt, batchId, chainId);
-    }
-
-    /**
      * create an {@link Execution}
      * 
      * @param jobId ID of the corresponding job
