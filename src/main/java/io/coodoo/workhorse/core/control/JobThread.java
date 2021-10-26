@@ -138,7 +138,7 @@ public class JobThread {
                 try {
 
                     workhorseController.setExecutionStatusToRunning(execution);
-                    workerInstance.executionContext.init(execution);
+                    workerInstance.getExecutionContext().init(execution);
                     String summary = null;
 
                     // THIS IS WHERE THE MAGIC HAPPENS!
