@@ -210,6 +210,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
         long millis = WorkhorseUtil.toEpochMilli(preDate);
 
         ListingParameters listingParameters = new ListingParameters(0);
+        listingParameters.addFilterAttributes("status", ExecutionStatus.FINISHED + CollectionListing.OPERATOR_OR + ExecutionStatus.FAILED);
         listingParameters.addFilterAttributes("createdAt", CollectionListing.OPERATOR_LT + millis);
 
         ListingResult<Execution> executionListing = getExecutionListing(jobId, listingParameters);
