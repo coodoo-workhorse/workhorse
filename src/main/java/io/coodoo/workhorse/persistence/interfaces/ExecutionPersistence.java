@@ -97,12 +97,12 @@ public interface ExecutionPersistence {
     Execution updateStatus(Long jobId, Long executionId, ExecutionStatus status, ExecutionFailStatus failStatus);
 
     /**
-     * Given the Id of the correspondent job <code>jobId</code> and the limit date <code>preDate</code>, delete all job executions where
-     * <code>Execution.createdAt &lt; preDate</code>
+     * Given the Id of the correspondent job <code>jobId</code> and the limit date <code>preDate</code>, delete all job executions that are in status
+     * {@link ExecutionStatus#FINISHED} or {@link ExecutionStatus#FAILED} where <code>Execution.createdAt &lt; preDate</code>
      * 
-     * @param jobId
-     * @param preDate
-     * @return
+     * @param jobId Id of the corresponding job
+     * @param preDate time to define the execution as "older"
+     * @return Amount of deleted older executions
      */
     int deleteOlderExecutions(Long jobId, LocalDateTime preDate);
 
