@@ -32,6 +32,9 @@ public class ExecutionContext {
     @ExecutionQualifier
     ExecutionPersistence executionPersistence;
 
+    /**
+     * The job engine will uses this method to initialize the context by providing the execution.
+     */
     public void init(Execution execution) {
         this.execution = execution;
     }

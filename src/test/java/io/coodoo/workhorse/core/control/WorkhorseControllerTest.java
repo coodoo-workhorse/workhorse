@@ -646,7 +646,7 @@ public class WorkhorseControllerTest {
 
         when(executionPersistence.getById(job.getId(), execution.getId())).thenReturn(null);
 
-        Execution result = classUnderTest.handleFailedExecution(job, execution.getId(), exception, duration, null);
+        Execution result = classUnderTest.handleFailedExecution(job, execution.getId(), exception, duration, false, null, null, null);
 
         String message = "The execution with ID: " + execution.getId() + " of job: " + job.getName() + " with JobID: " + job.getId()
                         + " could not be found in the persistence.";
@@ -683,7 +683,7 @@ public class WorkhorseControllerTest {
         // anyObject() is used because the parameter to pass contains a timestamp.
         when(executionPersistence.persist(anyObject())).thenReturn(persistedExecution);
 
-        Execution result = classUnderTest.handleFailedExecution(job, failedExecution.getId(), exception, duration, worker);
+        Execution result = classUnderTest.handleFailedExecution(job, failedExecution.getId(), exception, duration, false, worker, null, null);
 
         verify(executionPersistence).log(job.getId(), failedExecution.getId(), WorkhorseUtil.getMessagesFromException(exception),
                         WorkhorseUtil.stacktraceToString(exception));
@@ -713,9 +713,9 @@ public class WorkhorseControllerTest {
 
         when(executionPersistence.getById(job.getId(), failedExecution.getId())).thenReturn(failedExecution);
 
-        Execution result = classUnderTest.handleFailedExecution(job, failedExecution.getId(), exception, duration, worker);
+        Execution result = classUnderTest.handleFailedExecution(job, failedExecution.getId(), exception, duration, false, worker, null, null);
 
-        verify(worker).onFailed(failedExecution.getId());
+        verify(worker).onFailed(failedExecution.getId(), exception);
 
         ArgumentCaptor<Execution> argument = ArgumentCaptor.forClass(Execution.class);
         verify(executionPersistence).update(argument.capture());
@@ -743,7 +743,7 @@ public class WorkhorseControllerTest {
 
         when(executionPersistence.getById(job.getId(), failedExecution.getId())).thenReturn(failedExecution);
 
-        Execution result = classUnderTest.handleFailedExecution(job, failedExecution.getId(), exception, duration, worker);
+        Execution result = classUnderTest.handleFailedExecution(job, failedExecution.getId(), exception, duration, false, worker, null, null);
 
         verify(executionPersistence).abortChain(job.getId(), failedExecution.getChainId());
 

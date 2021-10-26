@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.coodoo.workhorse.core.boundary.Worker;
 import io.coodoo.workhorse.core.boundary.WorkerWith;
 import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
 import io.coodoo.workhorse.core.boundary.annotation.InitialJobConfig;
@@ -470,16 +471,21 @@ public class WorkhorseController {
      * 
      * @param job correspondent job
      * @param executionId ID of the execution that failed
-     * @param exception exception occurred during execution processing
+     * @param throwable Cause of the failure occurred during execution processing
      * @param duration duration of the execution
-     * @param worker worker's instance
-     * @return new created clone execution
+     * @param isWorkerWithParamters <code>true</code>, if the workers instance is based on {@link WorkerWith}
+     * @param worker instance of {@link Worker}, given if parameter <code>isWorkerWithParamters</code> is <code>false</code>
+     * @param workerWith instance of {@link WorkerWith}, given if parameter <code>isWorkerWithParamters</code> is <code>true</code>
+     * @param paramters job parameters object if paramter <code>isWorkerWithParamters</code> is <code>true</code>
+     * @return new created/cloned execution
      */
-    public synchronized Execution handleFailedExecution(Job job, Long executionId, Exception exception, Long duration, BaseWorker worker) {
+    public synchronized Execution handleFailedExecution(Job job, Long executionId, Throwable throwable, Long duration, boolean isWorkerWithParamters,
+                    Worker worker, WorkerWith<Object> workerWith, Object paramters) {
+
         Execution failedExecution = executionPersistence.getById(job.getId(), executionId);
         Execution retryExecution = null;
 
-        log.error("The execution failed", exception);
+        log.error("The execution failed", throwable);
         if (failedExecution == null) {
             String message = "The execution with ID: " + executionId + " of job: " + job.getName() + " with JobID: " + job.getId()
                             + " could not be found in the persistence.";
@@ -498,17 +504,27 @@ public class WorkhorseController {
         failedExecution.setEndedAt(LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)));
         failedExecution.setDuration(duration);
 
-        executionPersistence.log(job.getId(), executionId, WorkhorseUtil.getMessagesFromException(exception), WorkhorseUtil.stacktraceToString(exception));
+        executionPersistence.log(job.getId(), executionId, WorkhorseUtil.getMessagesFromException(throwable), WorkhorseUtil.stacktraceToString(throwable));
 
-        if (retryExecution == null) {
-            worker.onFailed(executionId);
-            if (failedExecution.getChainId() != null) {
-                worker.onFailedChain(failedExecution.getChainId(), executionId);
+        if (isWorkerWithParamters) {
+            if (retryExecution == null) {
+                workerWith.onFailed(executionId, paramters, throwable);
+                if (failedExecution.getChainId() != null) {
+                    workerWith.onFailedChain(failedExecution.getChainId(), executionId);
+                }
+            } else {
+                workerWith.onRetry(executionId, retryExecution.getId(), paramters, throwable);
             }
         } else {
-            worker.onRetry(executionId, retryExecution.getId());
+            if (retryExecution == null) {
+                worker.onFailed(executionId, throwable);
+                if (failedExecution.getChainId() != null) {
+                    worker.onFailedChain(failedExecution.getChainId(), executionId);
+                }
+            } else {
+                worker.onRetry(executionId, retryExecution.getId(), throwable);
+            }
         }
-
         executionPersistence.update(failedExecution);
 
         return retryExecution;

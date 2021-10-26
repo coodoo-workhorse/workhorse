@@ -20,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.coodoo.workhorse.core.boundary.ExecutionContext;
+import io.coodoo.workhorse.core.boundary.Worker;
+import io.coodoo.workhorse.core.boundary.WorkerWith;
 import io.coodoo.workhorse.core.control.event.AllExecutionsDoneEvent;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.Job;
@@ -85,6 +87,7 @@ public class JobThread {
         throw new ClassNotFoundException(job.getWorkerClassName());
     }
 
+    @SuppressWarnings("unchecked")
     public Long execute(@ObservesAsync Job job) throws Exception {
 
         long t1 = System.currentTimeMillis();
@@ -97,6 +100,14 @@ public class JobThread {
         executionBuffer.addJobThreads(jobId, this);
 
         final BaseWorker workerInstance = getWorker(job);
+        boolean isWorkerWithParamters = workerInstance instanceof WorkerWith;
+        Worker worker = null;
+        WorkerWith<Object> workerWith = null;
+        if (isWorkerWithParamters) {
+            workerWith = (WorkerWith<Object>) workerInstance;
+        } else {
+            worker = ((Worker) workerInstance);
+        }
 
         while (true) {
             if (this.stopMe) {
@@ -119,16 +130,24 @@ public class JobThread {
 
                 executionBuffer.addRunningExecution(jobId, execution.getId());
 
-                long millisAtStart = System.currentTimeMillis();
-
                 log.trace("On Running Job Execution: {}", runningExecution);
+
+                long millisAtStart = System.currentTimeMillis();
+                Object parameters = null;
 
                 try {
 
                     workhorseController.setExecutionStatusToRunning(execution);
+                    workerInstance.getExecutionContext().init(execution);
+                    String summary = null;
 
-                    // mediterraneus
-                    String summary = workerInstance.doWork(execution);
+                    // THIS IS WHERE THE MAGIC HAPPENS!
+                    if (isWorkerWithParamters) {
+                        parameters = workerWith.getParameters(execution);
+                        summary = workerWith.doWork(parameters);
+                    } else {
+                        summary = worker.doWork();
+                    }
 
                     long duration = System.currentTimeMillis() - millisAtStart;
 
@@ -147,8 +166,11 @@ public class JobThread {
                     log.trace("Execution {}, duration: {} was successfull", execution.getId(), execution.getDuration());
                     executionBuffer.removeRunningExecution(jobId, execution.getId());
 
-                    workerInstance.onFinished(execution.getId());
-
+                    if (isWorkerWithParamters) {
+                        workerWith.onFinished(jobId, parameters, summary);
+                    } else {
+                        worker.onFinished(jobId, summary);
+                    }
                     if (executionPersistence.isBatchFinished(jobId, execution.getBatchId())) {
                         workerInstance.onFinishedBatch(execution.getBatchId(), execution.getId());
                     }
@@ -186,7 +208,8 @@ public class JobThread {
                     long duration = System.currentTimeMillis() - millisAtStart;
 
                     // create a new Job Execution to retry this fail.
-                    execution = workhorseController.handleFailedExecution(job, execution.getId(), e, duration, workerInstance);
+                    execution = workhorseController.handleFailedExecution(job, execution.getId(), e, duration, isWorkerWithParamters, worker, workerWith,
+                                    parameters);
 
                     if (execution == null) {
                         break executionLoop; // Do not retry

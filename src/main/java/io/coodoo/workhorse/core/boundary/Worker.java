@@ -1,7 +1,6 @@
 package io.coodoo.workhorse.core.boundary;
 
 import io.coodoo.workhorse.core.control.BaseWorker;
-import io.coodoo.workhorse.core.entity.Execution;
 
 /**
  * Worker class to define the creation and processing of execution. Your job needs parameters? See {@link WorkerWith}!
@@ -18,12 +17,38 @@ public abstract class Worker extends BaseWorker {
      */
     public abstract String doWork() throws Exception;
 
-    @Override
-    public String doWork(Execution execution) throws Exception {
+    /**
+     * The job engine will call this callback method after the job execution is finished. <br>
+     * <i>If needed, this method can be overwritten to react on a finished job execution.</i>
+     * 
+     * @param executionId ID of current job execution that is finished
+     * @param summary the message that summarizes the execution
+     */
+    public void onFinished(Long executionId, String summary) {
+        super.onFinished(executionId);
+    }
 
-        this.executionContext.init(execution);
+    /**
+     * The job engine will call this callback method after the job execution has failed and there will be a retry of the failed job execution. <br>
+     * <i>If needed, this method can be overwritten to react on a retry job execution.</i>
+     * 
+     * @param failedExecutionId ID of current job execution that has failed
+     * @param retryExecutionId ID of new job execution that that will retry the failed one
+     * @param throwable Cause of the failure
+     */
+    public void onRetry(Long failedExecutionId, Long retryExecutionId, Throwable throwable) {
+        super.onRetry(failedExecutionId, retryExecutionId);
+    }
 
-        return doWork();
+    /**
+     * The job engine will call this callback method after the job execution has failed. <br>
+     * <i>If needed, this method can be overwritten to react on a failed job execution.</i>
+     * 
+     * @param executionId ID of current job execution that has failed
+     * @param throwable Cause of the failure
+     */
+    public void onFailed(Long executionId, Throwable throwable) {
+        super.onFailed(executionId);
     }
 
     /**
