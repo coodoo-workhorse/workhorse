@@ -1,12 +1,8 @@
 package io.coodoo.workhorse.core.boundary;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.verify;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -163,16 +158,6 @@ public class WorkerWithTest {
     }
 
     @Test
-    public void testDoWorkExecutionString() throws Exception {
-
-        Execution jobExecution = new Execution();
-        jobExecution.setParameters(WorkhorseUtil.parametersToJson(STRING));
-        workerWithString.doWork(jobExecution);
-
-        verify(jobContext).init(jobExecution);
-    }
-
-    @Test
     public void testGetParametersLong() throws Exception {
 
         String parameters = WorkhorseUtil.parametersToJson(LONG);
@@ -197,16 +182,6 @@ public class WorkerWithTest {
     public void testDoWorkLong() throws Exception {
 
         workerWithLong.doWork(LONG);
-    }
-
-    @Test
-    public void testDoWorkExecutionLong() throws Exception {
-
-        Execution jobExecution = new Execution();
-        jobExecution.setParameters(WorkhorseUtil.parametersToJson(LONG));
-        workerWithLong.doWork(jobExecution);
-
-        verify(jobContext).init(jobExecution);
     }
 
     @Test
@@ -239,61 +214,6 @@ public class WorkerWithTest {
     }
 
     @Test
-    public void testDoWorkExecutionPojoEmpty() throws Exception {
-
-        POJO = new Pojo();
-
-        Execution jobExecution = new Execution();
-        jobExecution.setParameters(WorkhorseUtil.parametersToJson(POJO));
-        workerWithPojo.doWork(jobExecution);
-
-        verify(jobContext).init(jobExecution);
-    }
-
-    @Test
-    public void testDoWorkExecutionPojoFull() throws Exception {
-
-        POJO = new Pojo();
-        POJO.i = -2;
-        POJO.io = new Integer(32456);
-        POJO.setL(987654L);
-        POJO.setLo(new Long(-1));
-        POJO.s = "Stringily";
-        POJO.b = true;
-        POJO.bo = Boolean.FALSE;
-        POJO.d = new Date();
-        POJO.lt = LocalTime.now();
-        POJO.ldt = LocalDateTime.now();
-        Pojo mojoPojo = new Pojo();
-        mojoPojo.setL(LONG);
-        POJO.mp = mojoPojo;
-        List<String> list = new ArrayList<>();
-        list.add("a");
-        list.add("");
-        list.add(null);
-        POJO.ls = list;
-        Map<Long, String> map = new HashMap<>();
-        map.put(0L, "value");
-        map.put(1L, null);
-        POJO.mls = map;
-        POJO.ia = new int[] {10, 20, 30, 40, 50, 60, 71, 80, 90, 91};
-
-        Execution jobExecution = new Execution();
-        jobExecution.setParameters(WorkhorseUtil.parametersToJson(POJO));
-        workerWithPojo.doWork(jobExecution);
-    }
-
-    @Test
-    public void testDoWorkExecutionListString() throws Exception {
-
-        Execution jobExecution = new Execution();
-        jobExecution.setParameters(WorkhorseUtil.parametersToJson(STRING_LIST));
-        workerWithListString.doWork(jobExecution);
-
-        verify(jobContext).init(jobExecution);
-    }
-
-    @Test
     public void testGetParametersListString() throws Exception {
 
         String parameters = WorkhorseUtil.parametersToJson(STRING_LIST);
@@ -318,43 +238,6 @@ public class WorkerWithTest {
     public void testDoWorkListString() throws Exception {
 
         workerWithListString.doWork(STRING_LIST);
-    }
-
-    @Test
-    public void testDoWorkExecutionListStringEmpty() throws Exception {
-
-        STRING_LIST = new ArrayList<>();
-
-        Execution jobExecution = new Execution();
-        jobExecution.setParameters(WorkhorseUtil.parametersToJson(STRING_LIST));
-        workerWithListString.doWork(jobExecution);
-
-        verify(jobContext).init(jobExecution);
-    }
-
-    @Test
-    public void testDoWorkExecutionListStringFull() throws Exception {
-
-        STRING_LIST = new ArrayList<>();
-        STRING_LIST.add("x");
-        STRING_LIST.add("");
-        STRING_LIST.add(null);
-
-        Execution jobExecution = new Execution();
-        jobExecution.setParameters(WorkhorseUtil.parametersToJson(STRING_LIST));
-        workerWithListString.doWork(jobExecution);
-
-        verify(jobContext).init(jobExecution);
-    }
-
-    @Test
-    public void testDoWorkExecutionListLong() throws Exception {
-
-        Execution jobExecution = new Execution();
-        jobExecution.setParameters(WorkhorseUtil.parametersToJson(LONG_LIST));
-        workerWithListLong.doWork(jobExecution);
-
-        verify(jobContext).init(jobExecution);
     }
 
     @Test
@@ -385,44 +268,6 @@ public class WorkerWithTest {
     }
 
     @Test
-    public void testDoWorkExecutionListLongEmpty() throws Exception {
-
-        LONG_LIST = new ArrayList<>();
-
-        Execution jobExecution = new Execution();
-        jobExecution.setParameters(WorkhorseUtil.parametersToJson(LONG_LIST));
-        workerWithListLong.doWork(jobExecution);
-
-        verify(jobContext).init(jobExecution);
-    }
-
-    @Test
-    public void testDoWorkExecutionListLongFull() throws Exception {
-
-        LONG_LIST = new ArrayList<>();
-        LONG_LIST.add(-1L);
-        LONG_LIST.add(0L);
-        LONG_LIST.add(null);
-        LONG_LIST.add(1L);
-
-        Execution jobExecution = new Execution();
-        jobExecution.setParameters(WorkhorseUtil.parametersToJson(LONG_LIST));
-        workerWithListLong.doWork(jobExecution);
-
-        verify(jobContext).init(jobExecution);
-    }
-
-    @Test
-    public void testDoWorkExecutionListPojo() throws Exception {
-
-        Execution jobExecution = new Execution();
-        jobExecution.setParameters(WorkhorseUtil.parametersToJson(POJO_LIST));
-        workerWithListPojo.doWork(jobExecution);
-
-        verify(jobContext).init(jobExecution);
-    }
-
-    @Test
     public void testGetParametersListPojo() throws Exception {
 
         String parameters = WorkhorseUtil.parametersToJson(POJO_LIST);
@@ -439,67 +284,6 @@ public class WorkerWithTest {
     public void testDoWorkListPojo() throws Exception {
 
         workerWithListPojo.doWork(POJO_LIST);
-    }
-
-    @Test
-    public void testDoWorkExecutionListPojoEmpty() throws Exception {
-
-        POJO_LIST = new ArrayList<>();
-
-        Execution jobExecution = new Execution();
-        jobExecution.setParameters(WorkhorseUtil.parametersToJson(POJO_LIST));
-        workerWithListPojo.doWork(jobExecution);
-
-        verify(jobContext).init(jobExecution);
-    }
-
-    @Ignore // Lists only work with primitive Java objects...
-    @Test
-    public void testDoWorkExecutionListPojoFull() throws Exception {
-
-        POJO = new Pojo();
-        POJO.i = -2;
-        POJO.io = new Integer(32456);
-        POJO.setL(987654L);
-        POJO.setLo(new Long(-1));
-        POJO.s = "Stringily";
-        POJO.b = true;
-        POJO.bo = Boolean.FALSE;
-        POJO.d = new Date();
-        POJO.lt = LocalTime.now();
-        POJO.ldt = LocalDateTime.now();
-        Pojo mojoPojo = new Pojo();
-        mojoPojo.setL(LONG);
-        POJO.mp = mojoPojo;
-        List<String> list = new ArrayList<>();
-        list.add("a");
-        list.add("");
-        list.add(null);
-        POJO.ls = list;
-        Map<Long, String> map = new HashMap<>();
-        map.put(0L, "value");
-        map.put(1L, null);
-        POJO.mls = map;
-        POJO.ia = new int[] {10, 20, 30, 40, 50, 60, 71, 80, 90, 91};
-
-        POJO_LIST = new ArrayList<>();
-        POJO_LIST.add(POJO);
-        POJO_LIST.add(null);
-        POJO_LIST.add(new Pojo());
-
-        Execution jobExecution = new Execution();
-        jobExecution.setParameters(WorkhorseUtil.parametersToJson(POJO_LIST));
-        workerWithListPojo.doWork(jobExecution);
-    }
-
-    @Test
-    public void testDoWorkExecutionSetString() throws Exception {
-
-        Execution jobExecution = new Execution();
-        jobExecution.setParameters(WorkhorseUtil.parametersToJson(STRING_SET));
-        workerWithSetString.doWork(jobExecution);
-
-        verify(jobContext).init(jobExecution);
     }
 
     @Test
@@ -530,43 +314,6 @@ public class WorkerWithTest {
     }
 
     @Test
-    public void testDoWorkExecutionSetStringEmpty() throws Exception {
-
-        STRING_SET = new HashSet<>();
-
-        Execution jobExecution = new Execution();
-        jobExecution.setParameters(WorkhorseUtil.parametersToJson(STRING_SET));
-        workerWithSetString.doWork(jobExecution);
-
-        verify(jobContext).init(jobExecution);
-    }
-
-    @Test
-    public void testDoWorkExecutionSetStringFull() throws Exception {
-
-        STRING_SET = new HashSet<>();
-        STRING_SET.add("x");
-        STRING_SET.add("");
-        STRING_SET.add(null);
-
-        Execution jobExecution = new Execution();
-        jobExecution.setParameters(WorkhorseUtil.parametersToJson(STRING_SET));
-        workerWithSetString.doWork(jobExecution);
-
-        verify(jobContext).init(jobExecution);
-    }
-
-    @Test
-    public void testDoWorkExecutionMapLongString() throws Exception {
-
-        Execution jobExecution = new Execution();
-        jobExecution.setParameters(WorkhorseUtil.parametersToJson(LONG_STRING_MAP));
-        workerWithMapLongString.doWork(jobExecution);
-
-        verify(jobContext).init(jobExecution);
-    }
-
-    @Test
     public void testGetParametersMapLongString() throws Exception {
 
         String parameters = WorkhorseUtil.parametersToJson(LONG_STRING_MAP);
@@ -593,30 +340,4 @@ public class WorkerWithTest {
         workerWithMapLongString.doWork(LONG_STRING_MAP);
     }
 
-    @Test
-    public void testDoWorkExecutionMapLongStringEmpty() throws Exception {
-
-        LONG_STRING_MAP = new HashMap<>();
-
-        Execution jobExecution = new Execution();
-        jobExecution.setParameters(WorkhorseUtil.parametersToJson(LONG_STRING_MAP));
-        workerWithMapLongString.doWork(jobExecution);
-
-        verify(jobContext).init(jobExecution);
-    }
-
-    @Test
-    public void testDoWorkExecutionMapLongStringFull() throws Exception {
-
-        LONG_STRING_MAP = new HashMap<>();
-        LONG_STRING_MAP.put(-1L, "x");
-        LONG_STRING_MAP.put(0L, "");
-        LONG_STRING_MAP.put(1L, null);
-
-        Execution jobExecution = new Execution();
-        jobExecution.setParameters(WorkhorseUtil.parametersToJson(LONG_STRING_MAP));
-        workerWithMapLongString.doWork(jobExecution);
-
-        verify(jobContext).init(jobExecution);
-    }
 }

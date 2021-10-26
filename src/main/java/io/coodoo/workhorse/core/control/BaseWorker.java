@@ -35,13 +35,13 @@ public abstract class BaseWorker {
 
     private Job job;
 
-    /**
-     * The job engine will uses this method to perform the execution.
-     * 
-     * @param execution execution object, containing parameters and meta information
-     * @throws Exception in case the execution fails
-     */
-    public abstract String doWork(Execution execution) throws Exception;
+    // /**
+    // * The job engine will uses this method to perform the execution.
+    // *
+    // * @param execution execution object, containing parameters and meta information
+    // * @throws Exception in case the execution fails
+    // */
+    // public abstract String doWork(Execution execution) throws Exception;
 
     /**
      * This method will be called by the schedule timer in order to check if there is stuff to do.<br>
@@ -102,6 +102,8 @@ public abstract class BaseWorker {
      * @param batchId chain ID
      * @param executionId ID of last job execution of a batch that has failed
      */
+    // FIXME restore usage:
+    // https://github.com/coodoo-io/workhorse/blob/03c6ecebeed0cf0653c248f2256905cee6c49c16/src/main/java/io/coodoo/workhorse/jobengine/control/JobEngine.java#L273
     public void onFailedBatch(Long batchId, Long executionId) {}
 
     /**
