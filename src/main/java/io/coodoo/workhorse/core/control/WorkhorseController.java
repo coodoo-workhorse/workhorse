@@ -6,6 +6,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -79,11 +80,13 @@ public class WorkhorseController {
     public void loadWorkers() {
 
         List<Class<?>> workerClasses = new ArrayList<>();
-
-        // check whether new worker exists and must be created and persisted
         @SuppressWarnings("serial")
         Set<Bean<?>> beans = beanManager.getBeans(BaseWorker.class, new AnnotationLiteral<Any>() {});
-        for (Bean<?> bean : beans) {
+        List<Bean<?>> sortedBeans = new ArrayList<>(beans);
+        // sort Beans by class name to avoid shuffled Job-IDs
+        sortedBeans.sort(Comparator.comparing(bean -> bean.getBeanClass().getName()));
+        // check whether new worker exists and must be created and persisted
+        for (Bean<?> bean : sortedBeans) {
             Class<?> workerclass = bean.getBeanClass();
             Job job = jobPersistence.getByWorkerClassName(workerclass.getName());
             if (job == null) {

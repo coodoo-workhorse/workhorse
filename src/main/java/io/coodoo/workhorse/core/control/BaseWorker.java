@@ -35,14 +35,6 @@ public abstract class BaseWorker {
 
     private Job job;
 
-    // /**
-    // * The job engine will uses this method to perform the execution.
-    // *
-    // * @param execution execution object, containing parameters and meta information
-    // * @throws Exception in case the execution fails
-    // */
-    // public abstract String doWork(Execution execution) throws Exception;
-
     /**
      * This method will be called by the schedule timer in order to check if there is stuff to do.<br>
      * Its goal is to create one (or more) {@link Execution} that gets added to the job engine to be executed. <i>If not overwritten, this method will create a
