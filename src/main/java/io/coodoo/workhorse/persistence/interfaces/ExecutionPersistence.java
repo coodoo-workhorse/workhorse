@@ -196,14 +196,13 @@ public interface ExecutionPersistence {
     void log(Long jobId, Long executionId, String log);
 
     /**
-     * Add an error message and stacktrace to the log.
+     * Add a stacktrace to the log.
      * 
      * @param jobId Id of the corresponding {@link Job}
      * @param executionId ID of corresponding {@link Execution}
-     * @param error error message
      * @param stacktrace stacktrace of the {@link Execution}
      */
-    void log(Long jobId, Long executionId, String error, String stacktrace);
+    void logStacktrace(Long jobId, Long executionId, String stacktrace);
 
     /**
      * can the implemented persistence emit event by new created job execution

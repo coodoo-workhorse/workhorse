@@ -507,7 +507,12 @@ public class WorkhorseController {
         failedExecution.setEndedAt(LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)));
         failedExecution.setDuration(duration);
 
-        executionPersistence.log(job.getId(), executionId, WorkhorseUtil.getMessagesFromException(throwable), WorkhorseUtil.stacktraceToString(throwable));
+        if (failedExecution.getSummary() == null) {
+            failedExecution.setSummary(WorkhorseUtil.getMessagesFromException(throwable));
+        } else {
+            executionPersistence.log(job.getId(), executionId, WorkhorseUtil.getMessagesFromException(throwable));
+        }
+        executionPersistence.logStacktrace(job.getId(), executionId, WorkhorseUtil.stacktraceToString(throwable));
 
         if (isWorkerWithParamters) {
             if (retryExecution == null) {

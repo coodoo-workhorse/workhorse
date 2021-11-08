@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -685,8 +686,7 @@ public class WorkhorseControllerTest {
 
         Execution result = classUnderTest.handleFailedExecution(job, failedExecution.getId(), exception, duration, false, worker, null, null);
 
-        verify(executionPersistence).log(job.getId(), failedExecution.getId(), WorkhorseUtil.getMessagesFromException(exception),
-                        WorkhorseUtil.stacktraceToString(exception));
+        verify(executionPersistence).logStacktrace(job.getId(), failedExecution.getId(), WorkhorseUtil.stacktraceToString(exception));
 
         ArgumentCaptor<Execution> argument = ArgumentCaptor.forClass(Execution.class);
         verify(executionPersistence).update(argument.capture());
@@ -755,6 +755,80 @@ public class WorkhorseControllerTest {
         assertEquals(duration, argument.getValue().getDuration());
 
         assertNull(result);
+    }
+
+    @Test
+    public void testHandleFailedExecution_MessagesFromExceptionAsSummary() throws Exception {
+
+        String expectedSummary = "D | C | B | A";
+
+        Exception exceptionA = new Exception("A");
+        Exception exceptionB = new Exception("B", exceptionA);
+        Exception exceptionC = new Exception("C", exceptionB);
+        Exception exceptionD = new Exception("D", exceptionC);
+
+        StaticConfig.TIME_ZONE = "UTC";
+
+        Long jobId = 1L;
+        Long executionId = 2L;
+
+        Job job = new Job();
+        job.setId(jobId);
+        Execution failedExecution = new Execution();
+        failedExecution.setId(executionId);
+        Long duration = 50L;
+        Worker worker = mock(TestWorkerWithMaxPerMinute.class);
+
+        when(executionPersistence.getById(jobId, executionId)).thenReturn(failedExecution);
+
+        Execution result = classUnderTest.handleFailedExecution(job, executionId, exceptionD, duration, false, worker, null, null);
+        assertNull(result);
+
+        ArgumentCaptor<Execution> argument = ArgumentCaptor.forClass(Execution.class);
+        verify(executionPersistence).update(argument.capture());
+        assertEquals(ExecutionStatus.FAILED, argument.getValue().getStatus());
+        assertEquals(duration, argument.getValue().getDuration());
+
+        assertEquals(expectedSummary, argument.getValue().getSummary());
+        verify(executionPersistence, never()).log(anyLong(), anyLong(), anyString());
+    }
+
+    @Test
+    public void testHandleFailedExecution_MessagesFromExceptionAsLog() throws Exception {
+
+        String expectedSummary = "summ summ summ Bienchen summ herum";
+        String expectedLog = "D | C | B | A";
+
+        Exception exceptionA = new Exception("A");
+        Exception exceptionB = new Exception("B", exceptionA);
+        Exception exceptionC = new Exception("C", exceptionB);
+        Exception exceptionD = new Exception("D", exceptionC);
+
+        StaticConfig.TIME_ZONE = "UTC";
+
+        Long jobId = 1L;
+        Long executionId = 2L;
+
+        Job job = new Job();
+        job.setId(jobId);
+        Execution failedExecution = new Execution();
+        failedExecution.setId(executionId);
+        failedExecution.setSummary(expectedSummary);
+        Long duration = 50L;
+        Worker worker = mock(TestWorkerWithMaxPerMinute.class);
+
+        when(executionPersistence.getById(anyLong(), anyLong())).thenReturn(failedExecution);
+
+        Execution result = classUnderTest.handleFailedExecution(job, failedExecution.getId(), exceptionD, duration, false, worker, null, null);
+        assertNull(result);
+
+        ArgumentCaptor<Execution> argument = ArgumentCaptor.forClass(Execution.class);
+        verify(executionPersistence).update(argument.capture());
+        assertEquals(ExecutionStatus.FAILED, argument.getValue().getStatus());
+        assertEquals(duration, argument.getValue().getDuration());
+
+        assertEquals(expectedSummary, argument.getValue().getSummary());
+        verify(executionPersistence).log(jobId, executionId, expectedLog);
     }
 
 }
