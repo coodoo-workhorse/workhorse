@@ -285,7 +285,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     }
 
     @Override
-    public void log(Long jobId, Long executionId, String error, String stacktrace) {
+    public void logStacktrace(Long jobId, Long executionId, String stacktrace) {
 
         JobData jobData = memoryPersistence.getJobDataMap().get(jobId);
         ExecutionLog executionLog = jobData.executionLogs.get(executionId);
@@ -299,8 +299,6 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
         } else {
             executionLog.setUpdatedAt(WorkhorseUtil.timestamp());
         }
-
-        executionLog.setError(error);
         executionLog.setStacktrace(stacktrace);
 
         jobData.executionLogs.put(executionId, executionLog);
@@ -326,7 +324,6 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
             if (count > 0) {
                 result.add(new JobExecutionStatusSummary(status, Long.valueOf(count), job));
             }
-
         }
         return result;
     }
