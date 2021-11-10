@@ -29,14 +29,15 @@ import io.coodoo.workhorse.util.WorkhorseUtil;
  */
 @ApplicationScoped
 @InitialJobConfig(name = "Workhorse System: Check queued executions", schedule = "20 */5 * * * *", failRetries = 1,
-                description = "Check for stuck queued executions that are no longer executed.", tags = "System")
+                description = "Check for stuck queued executions that are no longer executed. A Job is affected when 2 of the following 3 conditions are met: -There are no executions running- . -There are no threads- . -There are more than 3 queued executions that were created for 10 minutes-",
+                tags = "System")
 public class CheckQueuedExecutionsWorker extends Worker {
 
     // FIXME: This class is used until we find out why executions are not processed under load.
 
     private final Logger logger = LoggerFactory.getLogger(CheckQueuedExecutionsWorker.class);
 
-    private static final long MIN_NUMBER_OF_QUEUED_EXECUTION = 1000L;
+    private static final long MIN_NUMBER_OF_QUEUED_EXECUTION = 3L;
     private static final long DURATION_OF_EXECUTIONS_IN_STATUS_QUEUED_IN_MINUTE = 10;
 
     @Inject
