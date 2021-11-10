@@ -45,11 +45,10 @@ public class CheckQueuedExecutionsWorker extends Worker {
     @Override
     public String doWork() throws Exception {
 
-        logInfo(logger, "Queued executions | Threads | Job's name");
-
         // This value is set only if the job finds a problem.
         // This behavior is used to set a default summary message by healthy queues
         String summary = null;
+        boolean logHeader = true;
 
         // Get only jobs with the status ACTIVE
         List<Job> activeJobs = workhorseController.getAllJobsByStatus(JobStatus.ACTIVE);
@@ -94,6 +93,10 @@ public class CheckQueuedExecutionsWorker extends Worker {
                 areExecutionNewInQueue = 1;
             }
 
+            if (logHeader) {
+                logHeader = false;
+                logInfo(logger, "Queued executions | Threads | Job's name");
+            }
             logInfo(logger, String.format("%17d | %7d | %s", jobExecutionCount.getQueued(), jobThreads == null ? 0 : jobThreads.size(), job.getName()));
 
             // If at least 2/3 conditions are reached, send an email.
