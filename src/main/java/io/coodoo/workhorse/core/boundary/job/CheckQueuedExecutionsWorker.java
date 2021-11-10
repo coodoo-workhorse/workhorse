@@ -36,7 +36,7 @@ public class CheckQueuedExecutionsWorker extends Worker {
 
     private final Logger logger = LoggerFactory.getLogger(CheckQueuedExecutionsWorker.class);
 
-    private static final long MIN_NUMBER_OF_QUEUED_EXECUTION = 1000L;
+    private static final long MIN_NUMBER_OF_QUEUED_EXECUTION = 3L;
     private static final long DURATION_OF_EXECUTIONS_IN_STATUS_QUEUED_IN_MINUTE = 10;
 
     @Inject
