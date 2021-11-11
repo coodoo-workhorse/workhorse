@@ -126,9 +126,7 @@ public class WorkhorseLog extends BaseEntity {
 
     @Override
     public String toString() {
-        return "WorkhorseLog [message=" + message + ", jobId=" + jobId + ", jobStatus=" + jobStatus + ", byUser=" + byUser + ", changeParameter="
-                        + changeParameter + ", changeOld=" + changeOld + ", changeNew=" + changeNew + ", hostName=" + hostName + ", stacktrace=" + stacktrace
-                        + "]";
+        return "WorkhorseLog [message=" + message + ", jobId=" + jobId + ", jobStatus=" + jobStatus + "]";
     }
 
 }
