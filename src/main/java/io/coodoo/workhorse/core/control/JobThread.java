@@ -157,23 +157,12 @@ public class JobThread {
                         TimeUnit.MILLISECONDS.sleep(minMillisPerExecution - duration);
                     }
 
-                    if (summary != null && !summary.isEmpty()) {
-                        executionContext.summarize(execution, summary);
+                    // Executions of asynch jobs get terminated by an extern(of Workhorse) call
+                    if (job.isAsynch()) {
+                        break executionLoop;
                     }
 
-                    workhorseController.setExecutionStatusToFinished(execution);
-
-                    log.trace("Execution {}, duration: {} was successfull", execution.getId(), execution.getDuration());
-                    executionBuffer.removeRunningExecution(jobId, execution.getId());
-
-                    if (isWorkerWithParamters) {
-                        workerWith.onFinished(jobId, parameters, summary);
-                    } else {
-                        worker.onFinished(jobId, summary);
-                    }
-                    if (executionPersistence.isBatchFinished(jobId, execution.getBatchId())) {
-                        workerInstance.onFinishedBatch(execution.getBatchId(), execution.getId());
-                    }
+                    workhorseController.finishExecution(job, execution, workerInstance, worker, workerWith, isWorkerWithParamters, parameters, summary);
 
                     // Handle chained execution
                     if (execution.getChainId() != null) {

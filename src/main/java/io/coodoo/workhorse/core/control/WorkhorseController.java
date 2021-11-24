@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.coodoo.workhorse.core.boundary.ExecutionContext;
 import io.coodoo.workhorse.core.boundary.Worker;
 import io.coodoo.workhorse.core.boundary.WorkerWith;
 import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
@@ -61,6 +62,9 @@ public class WorkhorseController {
     BeanManager beanManager;
 
     @Inject
+    ExecutionBuffer executionBuffer;
+
+    @Inject
     @JobQualifier
     JobPersistence jobPersistence;
 
@@ -73,6 +77,9 @@ public class WorkhorseController {
 
     @Inject
     Event<JobErrorEvent> jobErrorEvent;
+
+    @Inject
+    ExecutionContext executionContext;
 
     /**
      * Load all worker-Class of the classpath
@@ -210,6 +217,8 @@ public class WorkhorseController {
 
             job.setUniqueQueued(initialJobConfig.uniqueQueued());
 
+            job.setAsynch(initialJobConfig.asynch());
+
         } else {
 
             // Use initial default worker informations
@@ -218,6 +227,7 @@ public class WorkhorseController {
             job.setUniqueQueued(InitialJobConfig.JOB_CONFIG_UNIQUE_IN_QUEUE);
             job.setStatus(JobStatus.ACTIVE);
             job.setThreads(InitialJobConfig.JOB_CONFIG_THREADS);
+            job.setAsynch(InitialJobConfig.JOB_CONFIG_ASYNCH);
 
             // In this case the value to use is the default one defined by StaticConfig.MINUTES_UNTIL_CLEANUP
             job.setMinutesUntilCleanUp((int) StaticConfig.MINUTES_UNTIL_CLEANUP);
@@ -822,6 +832,75 @@ public class WorkhorseController {
      */
     public JobStatusCount getJobStatusCount() {
         return jobPersistence.getJobStatusCount();
+    }
+
+    /**
+     * Terminate an execution of a job marked as asynch job (job.isAsynch == true)
+     * 
+     * @param jobId ID of the job
+     * @param executionId ID of the execution to terminate
+     * @param summary message to summarize the execution
+     * @return true if the execution could be terminated successfully
+     */
+    public boolean terminateExecution(Long jobId, Long executionId, String summary) {
+
+        Job job = getJobById(jobId);
+
+        // Only jobs with the flag job.asynch = true can be terminated outside of the JobThread
+        if (job != null && job.isAsynch()) {
+
+            Execution execution = getExecutionById(jobId, executionId);
+
+            if (ExecutionStatus.RUNNING.equals(execution.getStatus())) {
+
+                try {
+                    final BaseWorker workerInstance = getWorker(job);
+                    boolean isWorkerWithParamters = workerInstance instanceof WorkerWith;
+                    Worker worker = null;
+                    WorkerWith<Object> workerWith = null;
+                    if (isWorkerWithParamters) {
+                        workerWith = (WorkerWith<Object>) workerInstance;
+                    } else {
+                        worker = ((Worker) workerInstance);
+                    }
+
+                    finishExecution(job, execution, workerInstance, worker, workerWith, isWorkerWithParamters, workerWith, summary);
+                    return true;
+
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+            } else {
+                log.error("The execution {} is no more in status RUNNING", execution);
+            }
+        }
+
+        log.error("The Job {} doesn't permit asynch job", job);
+        return false;
+
+    }
+
+    public void finishExecution(Job job, Execution execution, BaseWorker workerInstance, Worker worker, WorkerWith<Object> workerWith,
+                    boolean isWorkerWithParamters, Object parameters, String summary) {
+
+        if (summary != null && !summary.isEmpty()) {
+            executionContext.summarize(execution, summary);
+        }
+
+        setExecutionStatusToFinished(execution);
+
+        log.trace("Execution {}, duration: {} was successfull", execution.getId(), execution.getDuration());
+        executionBuffer.removeRunningExecution(job.getId(), execution.getId());
+
+        if (isWorkerWithParamters) {
+            workerWith.onFinished(job.getId(), parameters, summary);
+        } else {
+            worker.onFinished(job.getId(), summary);
+        }
+        if (executionPersistence.isBatchFinished(job.getId(), execution.getBatchId())) {
+            workerInstance.onFinishedBatch(execution.getBatchId(), execution.getId());
+        }
     }
 
 }
