@@ -157,11 +157,16 @@ public class JobThread {
                         TimeUnit.MILLISECONDS.sleep(minMillisPerExecution - duration);
                     }
 
-                    // Executions of asynch jobs get terminated by an extern(of Workhorse) call
-                    if (job.isAsynch()) {
+                    if (summary != null && !summary.isEmpty()) {
+                        executionContext.summarize(execution, summary);
+                    }
+
+                    // Executions of asynchronous jobs get terminated by a external (of Workhorse) call
+                    if (job.isAsynchronous()) {
                         break executionLoop;
                     }
 
+                    // Set the execution on status FINISHED and calls the callback method onFinished()
                     workhorseController.finishExecution(job, execution, workerInstance, worker, workerWith, isWorkerWithParamters, parameters, summary);
 
                     // Handle chained execution

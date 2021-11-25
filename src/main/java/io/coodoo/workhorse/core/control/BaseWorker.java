@@ -9,9 +9,12 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 
 import io.coodoo.workhorse.core.boundary.ExecutionContext;
+import io.coodoo.workhorse.core.boundary.Worker;
+import io.coodoo.workhorse.core.boundary.WorkerWith;
 import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
+import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.core.entity.WorkhorseLog;
@@ -94,8 +97,8 @@ public abstract class BaseWorker {
      * @param batchId chain ID
      * @param executionId ID of last job execution of a batch that has failed
      */
-       // FIXME restore usage:
-       // https://github.com/coodoo-io/workhorse/blob/03c6ecebeed0cf0653c248f2256905cee6c49c16/src/main/java/io/coodoo/workhorse/jobengine/control/JobEngine.java#L273
+    // FIXME restore usage:
+    // https://github.com/coodoo-io/workhorse/blob/03c6ecebeed0cf0653c248f2256905cee6c49c16/src/main/java/io/coodoo/workhorse/jobengine/control/JobEngine.java#L273
     public void onFailedBatch(Long batchId, Long executionId) {}
 
     /**
@@ -363,6 +366,49 @@ public abstract class BaseWorker {
      */
     public void summarizeError(Logger logger, String summary) {
         summarizeError(logger, summary);
+    }
+
+    /**
+     * Terminate an execution of a job marked as asynch job (job.isAsynch == true)
+     * 
+     * @param jobId ID of the job
+     * @param executionId ID of the execution to terminate
+     * @param summary message to summarize the execution
+     * @return true if the execution could be terminated successfully
+     */
+    @SuppressWarnings("unchecked")
+    public boolean terminateExecution(Long executionId, String summary) {
+
+        Job job = getJob();
+
+        // Only jobs with the flag job.asynchronous = true can be terminated outside of the JobThread
+        if (job != null && job.isAsynchronous()) {
+
+            Execution execution = workhorseController.getExecutionById(job.getId(), executionId);
+
+            if (ExecutionStatus.RUNNING.equals(execution.getStatus())) {
+
+                try {
+                    final BaseWorker workerInstance = workhorseController.getWorker(job);
+                    boolean isWorkerWithParamters = workerInstance instanceof WorkerWith;
+                    Worker worker = null;
+                    WorkerWith<Object> workerWith = null;
+                    if (isWorkerWithParamters) {
+                        workerWith = (WorkerWith<Object>) workerInstance;
+                    } else {
+                        worker = ((Worker) workerInstance);
+                    }
+
+                    workhorseController.finishExecution(job, execution, workerInstance, worker, workerWith, isWorkerWithParamters, workerWith, summary);
+                    return true;
+
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+        return false;
     }
 
     public abstract class BaseExecutionBuilder<T> {

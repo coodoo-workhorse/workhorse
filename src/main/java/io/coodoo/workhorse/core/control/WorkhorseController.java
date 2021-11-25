@@ -217,7 +217,7 @@ public class WorkhorseController {
 
             job.setUniqueQueued(initialJobConfig.uniqueQueued());
 
-            job.setAsynch(initialJobConfig.asynch());
+            job.setAsynchronous(initialJobConfig.asynchronous());
 
         } else {
 
@@ -227,7 +227,7 @@ public class WorkhorseController {
             job.setUniqueQueued(InitialJobConfig.JOB_CONFIG_UNIQUE_IN_QUEUE);
             job.setStatus(JobStatus.ACTIVE);
             job.setThreads(InitialJobConfig.JOB_CONFIG_THREADS);
-            job.setAsynch(InitialJobConfig.JOB_CONFIG_ASYNCH);
+            job.setAsynchronous(InitialJobConfig.JOB_CONFIG_ASYNCHRONOUS);
 
             // In this case the value to use is the default one defined by StaticConfig.MINUTES_UNTIL_CLEANUP
             job.setMinutesUntilCleanUp((int) StaticConfig.MINUTES_UNTIL_CLEANUP);
@@ -298,7 +298,7 @@ public class WorkhorseController {
      * @throws ClassNotFoundException
      * @throws Exception
      */
-    private BaseWorker getWorker(Job job) throws ClassNotFoundException {
+    public BaseWorker getWorker(Job job) throws ClassNotFoundException {
         @SuppressWarnings("serial")
         Set<Bean<?>> beans = beanManager.getBeans(BaseWorker.class, new AnnotationLiteral<Any>() {});
         for (Bean<?> bean : beans) {
@@ -835,52 +835,17 @@ public class WorkhorseController {
     }
 
     /**
-     * Terminate an execution of a job marked as asynch job (job.isAsynch == true)
+     * Set the execution on status FINISHED and calls the callback method onFinished()
      * 
-     * @param jobId ID of the job
-     * @param executionId ID of the execution to terminate
-     * @param summary message to summarize the execution
-     * @return true if the execution could be terminated successfully
+     * @param job the corresponding job
+     * @param execution the execution to finish
+     * @param workerInstance an instance of {@link BaseWorker}
+     * @param worker an instance of {@link Worker}
+     * @param workerWith an instance of {@link WorkerWith}
+     * @param isWorkerWithParamters is true if the job take parameters (instance of WorkerWith)
+     * @param parameters the parameters used during the executions
+     * @param summary a message to summarize the execution
      */
-    public boolean terminateExecution(Long jobId, Long executionId, String summary) {
-
-        Job job = getJobById(jobId);
-
-        // Only jobs with the flag job.asynch = true can be terminated outside of the JobThread
-        if (job != null && job.isAsynch()) {
-
-            Execution execution = getExecutionById(jobId, executionId);
-
-            if (ExecutionStatus.RUNNING.equals(execution.getStatus())) {
-
-                try {
-                    final BaseWorker workerInstance = getWorker(job);
-                    boolean isWorkerWithParamters = workerInstance instanceof WorkerWith;
-                    Worker worker = null;
-                    WorkerWith<Object> workerWith = null;
-                    if (isWorkerWithParamters) {
-                        workerWith = (WorkerWith<Object>) workerInstance;
-                    } else {
-                        worker = ((Worker) workerInstance);
-                    }
-
-                    finishExecution(job, execution, workerInstance, worker, workerWith, isWorkerWithParamters, workerWith, summary);
-                    return true;
-
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-
-            } else {
-                log.error("The execution {} is no more in status RUNNING", execution);
-            }
-        }
-
-        log.error("The Job {} doesn't permit asynch job", job);
-        return false;
-
-    }
-
     public void finishExecution(Job job, Execution execution, BaseWorker workerInstance, Worker worker, WorkerWith<Object> workerWith,
                     boolean isWorkerWithParamters, Object parameters, String summary) {
 

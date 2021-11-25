@@ -19,7 +19,7 @@ public @interface InitialJobConfig {
     // use the workhorse default value
     public static final int JOB_CONFIG_MINUTES_UNTIL_CLEANUP = -1;
     public static final boolean JOB_CONFIG_UNIQUE_IN_QUEUE = false;
-    public static final boolean JOB_CONFIG_ASYNCH = false;
+    public static final boolean JOB_CONFIG_ASYNCHRONOUS = false;
 
     /**
      * @return Unique name of the job
@@ -80,5 +80,5 @@ public @interface InitialJobConfig {
     /**
      * @return If <code>true</code> executions of this job are executed by the engine but the user decides when the execution terminate
      */
-    boolean asynch() default JOB_CONFIG_ASYNCH;
+    boolean asynchronous() default JOB_CONFIG_ASYNCHRONOUS;
 }

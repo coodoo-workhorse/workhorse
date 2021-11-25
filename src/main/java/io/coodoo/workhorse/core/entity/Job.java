@@ -76,7 +76,7 @@ public class Job extends BaseEntity {
     /**
      * If <code>true</code> executions of this job are executed by the engine but the user decides when the execution terminate
      */
-    private boolean asynch;
+    private boolean asynchronous;
 
     public String getName() {
         return name;
@@ -182,12 +182,12 @@ public class Job extends BaseEntity {
         this.schedule = schedule;
     }
 
-    public boolean isAsynch() {
-        return asynch;
+    public boolean isAsynchronous() {
+        return asynchronous;
     }
 
-    public void setAsynch(boolean asynch) {
-        this.asynch = asynch;
+    public void setAsynchronous(boolean asynchronous) {
+        this.asynchronous = asynchronous;
     }
 
     /**

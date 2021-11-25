@@ -669,16 +669,4 @@ public class WorkhorseService {
         return executionBuffer.getJobBufferStatus(job);
     }
 
-    /**
-     * Terminate an execution of a job marked as asynch job (job.isAsynch == true)
-     * 
-     * @param jobId ID of the job
-     * @param executionId ID of the execution to terminate
-     * @param summary message to summarize the execution
-     * @return true if the execution could be terminated successfully
-     */
-    public boolean terminateExecution(Long jobId, Long executionId, String summary) {
-        return workhorseController.terminateExecution(jobId, executionId, summary);
-    }
-
 }
