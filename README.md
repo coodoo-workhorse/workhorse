@@ -22,6 +22,7 @@
   - [Throughput control](#throughput-control)
   - [Execution context](#execution-context)
   - [Retry on failed](#retry-on-failed)
+  - [Asynchronous job](#asynchronous-job) 
   - [Logging](#logging)
   - [Error handling](#error-handling)
   - [Callbacks](#callbacks)
@@ -468,6 +469,45 @@ public class GenerateStatisticsWorker extends Worker {
 }
 ```
 With the config `failRetries = 3` an execution is retried until three times after failed. With the config `retryDelay = 2000` a delay of `2000 milliseconds` is observed between two executions.
+
+### Asynchronous job
+A asynchronous job is a job whose executions have to be interactively terminated by the user.
+
+You can configure this feature at the definition of your Worker. Under the annotation `@InitialJobConfig` you can activate or deactive the `Asynchronous job` with the paramater `asynchronous`.
+
+In this example the worker `SendEmailWorker` is created to send a request to a server that asynchronously send emails. 
+
+```java
+@Dependent
+@InitialJobConfig(asynchronous = true)
+public class SendEmailWorker extends WorkerWith<EmailData> {
+
+    private static Logger log = LoggerFactory.getLogger(SendEmailWorker.class);
+
+    @Override
+    public String doWork(EmailData emailData) throws Exception {
+
+        log.info(" Process an execution with paramter: " + emailData);
+        //Send the e-mail ...
+        return "e-mail successfull sent";
+    }
+}
+```
+
+With `@InitialJobConfig(asynchronous = true)` the user can decide, when the emails were sent, by terminating the associated execution.
+
+To terminate an execution just call the method `terminateAsynchronousExecution(Long executionId, String summary)` on the instance of your Worker.
+
+The following example shows how to terminate an execution of the asynchronous job SendEmailWorker.
+
+```java
+@Inject
+SendEmailWorker sendEmailWorker;
+
+public void terminateSendEmail(Long executionId) {
+    sendEmailWorker.terminateAsynchronousExecution(executionId , "The execution was successful");
+}
+```
 
 ### Logging
 
