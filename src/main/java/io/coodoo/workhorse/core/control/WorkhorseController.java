@@ -441,6 +441,40 @@ public class WorkhorseController {
     }
 
     /**
+     * Set the execution on status FINISHED and calls the callback method onFinished() and/or onFinishedBatch()
+     * 
+     * @param job the corresponding job
+     * @param execution the execution to finish
+     * @param workerInstance an instance of {@link BaseWorker}
+     * @param worker an instance of {@link Worker}
+     * @param workerWith an instance of {@link WorkerWith}
+     * @param isWorkerWithParamters is true if the job take parameters (instance of WorkerWith)
+     * @param parameters the parameters used during the executions
+     * @param summary a message to summarize the execution
+     */
+    public void finishExecution(Job job, Execution execution, BaseWorker workerInstance, Worker worker, WorkerWith<Object> workerWith,
+                    boolean isWorkerWithParamters, Object parameters, String summary) {
+
+        if (summary != null && !summary.isEmpty()) {
+            executionContext.summarize(execution, summary);
+        }
+
+        setExecutionStatusToFinished(execution);
+
+        log.trace("Execution {}, duration: {} was successfull", execution.getId(), execution.getDuration());
+        executionBuffer.removeRunningExecution(job.getId(), execution.getId());
+
+        if (isWorkerWithParamters) {
+            workerWith.onFinished(job.getId(), parameters, summary);
+        } else {
+            worker.onFinished(job.getId(), summary);
+        }
+        if (executionPersistence.isBatchFinished(job.getId(), execution.getBatchId())) {
+            workerInstance.onFinishedBatch(execution.getBatchId(), execution.getId());
+        }
+    }
+
+    /**
      * Create a new job execution to retry an execution
      * 
      * @param failedExecution job execution to retry
@@ -832,40 +866,6 @@ public class WorkhorseController {
      */
     public JobStatusCount getJobStatusCount() {
         return jobPersistence.getJobStatusCount();
-    }
-
-    /**
-     * Set the execution on status FINISHED and calls the callback method onFinished() and/or onFinishedBatch()
-     * 
-     * @param job the corresponding job
-     * @param execution the execution to finish
-     * @param workerInstance an instance of {@link BaseWorker}
-     * @param worker an instance of {@link Worker}
-     * @param workerWith an instance of {@link WorkerWith}
-     * @param isWorkerWithParamters is true if the job take parameters (instance of WorkerWith)
-     * @param parameters the parameters used during the executions
-     * @param summary a message to summarize the execution
-     */
-    public void finishExecution(Job job, Execution execution, BaseWorker workerInstance, Worker worker, WorkerWith<Object> workerWith,
-                    boolean isWorkerWithParamters, Object parameters, String summary) {
-
-        if (summary != null && !summary.isEmpty()) {
-            executionContext.summarize(execution, summary);
-        }
-
-        setExecutionStatusToFinished(execution);
-
-        log.trace("Execution {}, duration: {} was successfull", execution.getId(), execution.getDuration());
-        executionBuffer.removeRunningExecution(job.getId(), execution.getId());
-
-        if (isWorkerWithParamters) {
-            workerWith.onFinished(job.getId(), parameters, summary);
-        } else {
-            worker.onFinished(job.getId(), summary);
-        }
-        if (executionPersistence.isBatchFinished(job.getId(), execution.getBatchId())) {
-            workerInstance.onFinishedBatch(execution.getBatchId(), execution.getId());
-        }
     }
 
 }

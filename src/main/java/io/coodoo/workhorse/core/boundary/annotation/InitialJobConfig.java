@@ -80,7 +80,7 @@ public @interface InitialJobConfig {
 
     /**
      * @return If <code>true</code> any execution of this job must be interactively terminated by a call of the method
-     *         {@link BaseWorker#terminateExecution(Long executionId, String summary)}
+     *         {@link BaseWorker#terminateAsynchronousExecution(Long executionId, String summary)}
      */
     boolean asynchronous() default JOB_CONFIG_ASYNCHRONOUS;
 }

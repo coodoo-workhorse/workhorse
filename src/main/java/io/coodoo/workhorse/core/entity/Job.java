@@ -77,7 +77,7 @@ public class Job extends BaseEntity {
 
     /**
      * If <code>true</code> any execution of this job must be interactively terminated by a call of the method
-     * {@link BaseWorker#terminateExecution(Long executionId, String summary)}
+     * {@link BaseWorker#terminateAsynchronousExecution(Long executionId, String summary)}
      */
     private boolean asynchronous;
 

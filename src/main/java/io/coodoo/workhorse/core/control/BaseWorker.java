@@ -371,13 +371,15 @@ public abstract class BaseWorker {
     /**
      * Terminate an execution of the corresponding asynchronous job
      * 
+     * Only jobs with the flag job.asynchronous = true can be terminated outside of the JobThread
+     * 
      * @param jobId ID of the job
      * @param executionId ID of the execution to terminate
      * @param summary message to summarize the execution
-     * @return true if the execution could be terminated successfully
+     * @return <code>true</code> if the execution terminated successfully
      */
     @SuppressWarnings("unchecked")
-    public boolean terminateExecution(Long executionId, String summary) {
+    public boolean terminateAsynchronousExecution(Long executionId, String summary) throws Exception {
 
         Job job = getJob();
 
@@ -388,23 +390,18 @@ public abstract class BaseWorker {
 
             if (ExecutionStatus.RUNNING.equals(execution.getStatus())) {
 
-                try {
-                    final BaseWorker workerInstance = workhorseController.getWorker(job);
-                    boolean isWorkerWithParamters = workerInstance instanceof WorkerWith;
-                    Worker worker = null;
-                    WorkerWith<Object> workerWith = null;
-                    if (isWorkerWithParamters) {
-                        workerWith = (WorkerWith<Object>) workerInstance;
-                    } else {
-                        worker = ((Worker) workerInstance);
-                    }
-
-                    workhorseController.finishExecution(job, execution, workerInstance, worker, workerWith, isWorkerWithParamters, workerWith, summary);
-                    return true;
-
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+                final BaseWorker workerInstance = workhorseController.getWorker(job);
+                boolean isWorkerWithParamters = workerInstance instanceof WorkerWith;
+                Worker worker = null;
+                WorkerWith<Object> workerWith = null;
+                if (isWorkerWithParamters) {
+                    workerWith = (WorkerWith<Object>) workerInstance;
+                } else {
+                    worker = ((Worker) workerInstance);
                 }
+
+                workhorseController.finishExecution(job, execution, workerInstance, worker, workerWith, isWorkerWithParamters, workerWith, summary);
+                return true;
 
             }
         }
