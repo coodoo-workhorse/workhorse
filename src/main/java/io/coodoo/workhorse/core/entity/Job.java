@@ -3,6 +3,8 @@ package io.coodoo.workhorse.core.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.coodoo.workhorse.core.control.BaseWorker;
+
 /**
  * @author coodoo GmbH (coodoo.io)
  */
@@ -74,7 +76,8 @@ public class Job extends BaseEntity {
     private String schedule;
 
     /**
-     * If <code>true</code> executions of this job are executed by the engine but the user decides when the execution terminate
+     * If <code>true</code> any execution of this job must be interactively terminated by a call of the method
+     * {@link BaseWorker#terminateExecution(Long executionId, String summary)}
      */
     private boolean asynchronous;
 
