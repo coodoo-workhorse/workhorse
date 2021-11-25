@@ -5,6 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import io.coodoo.workhorse.core.control.BaseWorker;
 import io.coodoo.workhorse.core.entity.JobStatus;
 
 @Retention(RetentionPolicy.RUNTIME)
@@ -78,7 +79,8 @@ public @interface InitialJobConfig {
     boolean uniqueQueued() default JOB_CONFIG_UNIQUE_IN_QUEUE;
 
     /**
-     * @return If <code>true</code> executions of this job are executed by the engine but the user decides when the execution terminate
+     * @return If <code>true</code> any execution of this job must be interactively terminated by a call of the method
+     *         {@link BaseWorker#terminateExecution(Long executionId, String summary)}
      */
     boolean asynchronous() default JOB_CONFIG_ASYNCHRONOUS;
 }

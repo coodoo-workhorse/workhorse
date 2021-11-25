@@ -835,7 +835,7 @@ public class WorkhorseController {
     }
 
     /**
-     * Set the execution on status FINISHED and calls the callback method onFinished()
+     * Set the execution on status FINISHED and calls the callback method onFinished() and/or onFinishedBatch()
      * 
      * @param job the corresponding job
      * @param execution the execution to finish

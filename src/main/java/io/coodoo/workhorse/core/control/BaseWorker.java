@@ -369,7 +369,7 @@ public abstract class BaseWorker {
     }
 
     /**
-     * Terminate an execution of a job marked as asynch job (job.isAsynch == true)
+     * Terminate an execution of the corresponding asynchronous job
      * 
      * @param jobId ID of the job
      * @param executionId ID of the execution to terminate

@@ -161,7 +161,7 @@ public class JobThread {
                         executionContext.summarize(execution, summary);
                     }
 
-                    // Executions of asynchronous jobs get terminated by a external (of Workhorse) call
+                    // Executions of asynchronous jobs get terminated by a external call
                     if (job.isAsynchronous()) {
                         break executionLoop;
                     }
