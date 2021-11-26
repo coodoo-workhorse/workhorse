@@ -473,7 +473,7 @@ With the config `failRetries = 3` an execution is retried until three times afte
 ### Asynchronous job
 A asynchronous job is a job whose executions have to be interactively terminated by the user.
 
-You can configure this feature at the definition of your Worker. Under the annotation `@InitialJobConfig` you can activate or deactive the `Asynchronous job` with the paramater `asynchronous`.
+You can configure this feature at the definition of your Worker. Under the annotation `@InitialJobConfig` you can activate or deactive the `Asynchronous job` with the boolean paramater `asynchronous`.
 
 In this example the worker `SendEmailWorker` is created to send a request to a server that asynchronously send emails. 
 
@@ -496,9 +496,9 @@ public class SendEmailWorker extends WorkerWith<EmailData> {
 
 With `@InitialJobConfig(asynchronous = true)` the user can decide, when the emails were sent, by terminating the associated execution.
 
-To terminate an execution just call the method `terminateAsynchronousExecution(Long executionId, String summary)` on the instance of your Worker.
+To terminate an execution he just have to call the method `terminateAsynchronousExecution(Long executionId, String summary)` on the instance of the Worker.
 
-The following example shows how to terminate an execution of the asynchronous job SendEmailWorker.
+The following example shows how to terminate an execution of the asynchronous job `SendEmailWorker`.
 
 ```java
 @Inject
