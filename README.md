@@ -471,9 +471,11 @@ public class GenerateStatisticsWorker extends Worker {
 With the config `failRetries = 3` an execution is retried until three times after failed. With the config `retryDelay = 2000` a delay of `2000 milliseconds` is observed between two executions.
 
 ### Asynchronous job
-A asynchronous job is a job whose executions have to be interactively terminated by the user.
+A asynchronous job is a job whose executions have to be interactively terminated by the user. That means that the user decides whether an execution either finished successfully or failed.
 
-You can configure this feature at the definition of your Worker. Under the annotation `@InitialJobConfig` you can activate or deactive the `Asynchronous job` with the boolean paramater `asynchronous`.
+You can configure this feature at the definition of your Worker. Under the annotation `@InitialJobConfig` you can activate or deactive the Asynchronous job with the boolean paramater `asynchronous`.
+
+Remark: The features [chained jobs](#chained-jobs) and [Retry Execution](#retry-on-failed) are not supported by `Asynchronous job`.
 
 In this example the worker `SendEmailWorker` is created to send a request to a server that asynchronously send emails. 
 
@@ -494,18 +496,24 @@ public class SendEmailWorker extends WorkerWith<EmailData> {
 }
 ```
 
-With `@InitialJobConfig(asynchronous = true)` the user can decide, when the emails were sent, by terminating the associated execution.
+With `@InitialJobConfig(asynchronous = true)` the user can decide, when the emails were sent and can also let the execution fail, if the emails couldn't be sent.
 
-To terminate an execution he just have to call the method `terminateAsynchronousExecution(Long executionId, String summary)` on the instance of the Worker.
+To terminate an execution successfully you just have to call the method `setAsynchronousExecutionToFinished(Long executionId, String summary)` on the instance of the Worker.
 
-The following example shows how to terminate an execution of the asynchronous job `SendEmailWorker`.
+To terminate an execution with error you just have to call the method `setAsynchronousExecutionToFailed(Long executionId, Exception exception)` on the instance of the Worker.
+
+The following example shows how to terminate an execution of the asynchronous job `SendEmailWorker` with both final status available.
 
 ```java
 @Inject
 SendEmailWorker sendEmailWorker;
 
-public void terminateSendEmail(Long executionId) {
-    sendEmailWorker.terminateAsynchronousExecution(executionId , "The execution was successful");
+public void emailSuccessfullySent(Long executionId) {
+    sendEmailWorker.setAsynchronousExecutionToFinished(executionId , "The execution was successful");
+}
+
+public void emailCouldNotBeSend(Long executionId, RuntimeException exception) {
+    sendEmailWorker.setAsynchronousExecutionToFailed(executionId , exception);
 }
 ```
 
