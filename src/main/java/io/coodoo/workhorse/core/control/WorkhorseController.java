@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.coodoo.workhorse.core.boundary.ExecutionContext;
 import io.coodoo.workhorse.core.boundary.Worker;
 import io.coodoo.workhorse.core.boundary.WorkerWith;
 import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
@@ -61,6 +62,9 @@ public class WorkhorseController {
     BeanManager beanManager;
 
     @Inject
+    ExecutionBuffer executionBuffer;
+
+    @Inject
     @JobQualifier
     JobPersistence jobPersistence;
 
@@ -73,6 +77,9 @@ public class WorkhorseController {
 
     @Inject
     Event<JobErrorEvent> jobErrorEvent;
+
+    @Inject
+    ExecutionContext executionContext;
 
     /**
      * Load all worker-Class of the classpath
@@ -210,6 +217,8 @@ public class WorkhorseController {
 
             job.setUniqueQueued(initialJobConfig.uniqueQueued());
 
+            job.setAsynchronous(initialJobConfig.asynchronous());
+
         } else {
 
             // Use initial default worker informations
@@ -218,6 +227,7 @@ public class WorkhorseController {
             job.setUniqueQueued(InitialJobConfig.JOB_CONFIG_UNIQUE_IN_QUEUE);
             job.setStatus(JobStatus.ACTIVE);
             job.setThreads(InitialJobConfig.JOB_CONFIG_THREADS);
+            job.setAsynchronous(InitialJobConfig.JOB_CONFIG_ASYNCHRONOUS);
 
             // In this case the value to use is the default one defined by StaticConfig.MINUTES_UNTIL_CLEANUP
             job.setMinutesUntilCleanUp((int) StaticConfig.MINUTES_UNTIL_CLEANUP);
@@ -288,7 +298,7 @@ public class WorkhorseController {
      * @throws ClassNotFoundException
      * @throws Exception
      */
-    private BaseWorker getWorker(Job job) throws ClassNotFoundException {
+    public BaseWorker getWorker(Job job) throws ClassNotFoundException {
         @SuppressWarnings("serial")
         Set<Bean<?>> beans = beanManager.getBeans(BaseWorker.class, new AnnotationLiteral<Any>() {});
         for (Bean<?> bean : beans) {
@@ -431,6 +441,40 @@ public class WorkhorseController {
     }
 
     /**
+     * Set the execution on status FINISHED and calls the callback method onFinished() and/or onFinishedBatch()
+     * 
+     * @param job the corresponding job
+     * @param execution the execution to finish
+     * @param workerInstance an instance of {@link BaseWorker}
+     * @param worker an instance of {@link Worker}
+     * @param workerWith an instance of {@link WorkerWith}
+     * @param isWorkerWithParamters is true if the job take parameters (instance of WorkerWith)
+     * @param parameters the parameters used during the executions
+     * @param summary a message to summarize the execution
+     */
+    public void finishExecution(Job job, Execution execution, BaseWorker workerInstance, Worker worker, WorkerWith<Object> workerWith,
+                    boolean isWorkerWithParamters, Object parameters, String summary) {
+
+        if (summary != null && !summary.isEmpty()) {
+            executionContext.summarize(execution, summary);
+        }
+
+        setExecutionStatusToFinished(execution);
+
+        log.trace("Execution {}, duration: {} was successfull", execution.getId(), execution.getDuration());
+        executionBuffer.removeRunningExecution(job.getId(), execution.getId());
+
+        if (isWorkerWithParamters) {
+            workerWith.onFinished(job.getId(), parameters, summary);
+        } else {
+            worker.onFinished(job.getId(), summary);
+        }
+        if (executionPersistence.isBatchFinished(job.getId(), execution.getBatchId())) {
+            workerInstance.onFinishedBatch(execution.getBatchId(), execution.getId());
+        }
+    }
+
+    /**
      * Create a new job execution to retry an execution
      * 
      * @param failedExecution job execution to retry
@@ -485,6 +529,8 @@ public class WorkhorseController {
     public synchronized Execution handleFailedExecution(Job job, Long executionId, Throwable throwable, Long duration, boolean isWorkerWithParamters,
                     Worker worker, WorkerWith<Object> workerWith, Object paramters) {
 
+        executionBuffer.removeRunningExecution(job.getId(), executionId);
+
         Execution failedExecution = executionPersistence.getById(job.getId(), executionId);
         Execution retryExecution = null;
 
@@ -496,7 +542,9 @@ public class WorkhorseController {
             workhorseLogService.logMessage(message, job.getId(), false);
             return null;
         }
-        if (failedExecution.getFailRetry() < job.getFailRetries()) {
+
+        // Asynchronous Job didn't support Retry Execution
+        if (!job.isAsynchronous() && failedExecution.getFailRetry() < job.getFailRetries()) {
             retryExecution = createRetryExecution(failedExecution);
         } else if (failedExecution.getChainId() != null) {
 

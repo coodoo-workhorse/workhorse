@@ -3,6 +3,8 @@ package io.coodoo.workhorse.core.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.coodoo.workhorse.core.control.BaseWorker;
+
 /**
  * @author coodoo GmbH (coodoo.io)
  */
@@ -72,6 +74,13 @@ public class Job extends BaseEntity {
      * Timstamp as Cron-syntax to schedule the job
      */
     private String schedule;
+
+    /**
+     * If <code>true</code> any execution of this job must be interactively finished by a call of the method
+     * {@link BaseWorker#setAsynchronousExecutionToFinished(Long, String)} and can be failed by calling the method
+     * {@link BaseWorker#setAsynchronousExecutionToFailed(Long, Exception)}
+     */
+    private boolean asynchronous;
 
     public String getName() {
         return name;
@@ -175,6 +184,14 @@ public class Job extends BaseEntity {
 
     public void setSchedule(String schedule) {
         this.schedule = schedule;
+    }
+
+    public boolean isAsynchronous() {
+        return asynchronous;
+    }
+
+    public void setAsynchronous(boolean asynchronous) {
+        this.asynchronous = asynchronous;
     }
 
     /**

@@ -161,19 +161,13 @@ public class JobThread {
                         executionContext.summarize(execution, summary);
                     }
 
-                    workhorseController.setExecutionStatusToFinished(execution);
-
-                    log.trace("Execution {}, duration: {} was successfull", execution.getId(), execution.getDuration());
-                    executionBuffer.removeRunningExecution(jobId, execution.getId());
-
-                    if (isWorkerWithParamters) {
-                        workerWith.onFinished(jobId, parameters, summary);
-                    } else {
-                        worker.onFinished(jobId, summary);
+                    // Executions of asynchronous jobs get terminated by a external call
+                    if (job.isAsynchronous()) {
+                        break executionLoop;
                     }
-                    if (executionPersistence.isBatchFinished(jobId, execution.getBatchId())) {
-                        workerInstance.onFinishedBatch(execution.getBatchId(), execution.getId());
-                    }
+
+                    // Set the execution on status FINISHED and calls the callback method onFinished()
+                    workhorseController.finishExecution(job, execution, workerInstance, worker, workerWith, isWorkerWithParamters, parameters, summary);
 
                     // Handle chained execution
                     if (execution.getChainId() != null) {
@@ -204,7 +198,7 @@ public class JobThread {
 
                     break executionLoop;
                 } catch (Exception e) {
-                    executionBuffer.removeRunningExecution(jobId, execution.getId());
+
                     long duration = System.currentTimeMillis() - millisAtStart;
 
                     // create a new Job Execution to retry this fail.

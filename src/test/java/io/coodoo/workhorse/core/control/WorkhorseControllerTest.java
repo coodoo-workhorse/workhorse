@@ -119,6 +119,9 @@ public class WorkhorseControllerTest {
     JobPersistence jobPersistence;
 
     @Mock
+    ExecutionBuffer executionBuffer;
+
+    @Mock
     Event<JobErrorEvent> jobErrorEvent;
 
     @Mock

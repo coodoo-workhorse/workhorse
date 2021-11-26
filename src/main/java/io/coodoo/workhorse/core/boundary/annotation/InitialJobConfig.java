@@ -5,8 +5,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import io.coodoo.workhorse.core.control.BaseWorker;
 import io.coodoo.workhorse.core.entity.JobStatus;
 
+/**
+ * Initial Job Config
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface InitialJobConfig {
@@ -19,6 +23,7 @@ public @interface InitialJobConfig {
     // use the workhorse default value
     public static final int JOB_CONFIG_MINUTES_UNTIL_CLEANUP = -1;
     public static final boolean JOB_CONFIG_UNIQUE_IN_QUEUE = false;
+    public static final boolean JOB_CONFIG_ASYNCHRONOUS = false;
 
     /**
      * @return Unique name of the job
@@ -75,4 +80,19 @@ public @interface InitialJobConfig {
      *         queue.
      */
     boolean uniqueQueued() default JOB_CONFIG_UNIQUE_IN_QUEUE;
+
+    /**
+     * @return If <code>true</code> any execution of this job must be interactively finished. <br>
+     *         By calling the method {@link BaseWorker#setAsynchronousExecutionToFinished(Long, String)} the given execution is set to status finished <br>
+     *         By calling the method {@link BaseWorker#setAsynchronousExecutionToFailed(Long, Exception)} the given execution is set to status failed <br>
+     *         <br>
+     * 
+     *         The following features are no longer supported for this kind of job: <br>
+     *         <ul>
+     *         <li>Chained Executions</li>
+     *         <li>Retry of failed Executions</li>
+     *         </ul>
+     * 
+     */
+    boolean asynchronous() default JOB_CONFIG_ASYNCHRONOUS;
 }
