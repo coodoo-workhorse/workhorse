@@ -98,8 +98,8 @@ public abstract class BaseWorker {
      * @param batchId chain ID
      * @param executionId ID of last job execution of a batch that has failed
      */
-    // FIXME restore usage:
-    // https://github.com/coodoo-io/workhorse/blob/03c6ecebeed0cf0653c248f2256905cee6c49c16/src/main/java/io/coodoo/workhorse/jobengine/control/JobEngine.java#L273
+       // FIXME restore usage:
+       // https://github.com/coodoo-io/workhorse/blob/03c6ecebeed0cf0653c248f2256905cee6c49c16/src/main/java/io/coodoo/workhorse/jobengine/control/JobEngine.java#L273
     public void onFailedBatch(Long batchId, Long executionId) {}
 
     /**
