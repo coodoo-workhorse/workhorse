@@ -198,7 +198,7 @@ public class JobThread {
 
                     break executionLoop;
                 } catch (Exception e) {
-                    executionBuffer.removeRunningExecution(jobId, execution.getId());
+
                     long duration = System.currentTimeMillis() - millisAtStart;
 
                     // create a new Job Execution to retry this fail.

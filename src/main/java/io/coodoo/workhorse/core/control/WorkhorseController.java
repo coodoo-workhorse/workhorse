@@ -529,6 +529,8 @@ public class WorkhorseController {
     public synchronized Execution handleFailedExecution(Job job, Long executionId, Throwable throwable, Long duration, boolean isWorkerWithParamters,
                     Worker worker, WorkerWith<Object> workerWith, Object paramters) {
 
+        executionBuffer.removeRunningExecution(job.getId(), executionId);
+
         Execution failedExecution = executionPersistence.getById(job.getId(), executionId);
         Execution retryExecution = null;
 
@@ -540,7 +542,9 @@ public class WorkhorseController {
             workhorseLogService.logMessage(message, job.getId(), false);
             return null;
         }
-        if (failedExecution.getFailRetry() < job.getFailRetries()) {
+
+        // Asynchronous Job didn't support Retry Execution
+        if (!job.isAsynchronous() && failedExecution.getFailRetry() < job.getFailRetries()) {
             retryExecution = createRetryExecution(failedExecution);
         } else if (failedExecution.getChainId() != null) {
 

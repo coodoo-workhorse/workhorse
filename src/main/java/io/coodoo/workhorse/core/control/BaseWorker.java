@@ -1,5 +1,6 @@
 package io.coodoo.workhorse.core.control;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -97,8 +98,8 @@ public abstract class BaseWorker {
      * @param batchId chain ID
      * @param executionId ID of last job execution of a batch that has failed
      */
-       // FIXME restore usage:
-       // https://github.com/coodoo-io/workhorse/blob/03c6ecebeed0cf0653c248f2256905cee6c49c16/src/main/java/io/coodoo/workhorse/jobengine/control/JobEngine.java#L273
+    // FIXME restore usage:
+    // https://github.com/coodoo-io/workhorse/blob/03c6ecebeed0cf0653c248f2256905cee6c49c16/src/main/java/io/coodoo/workhorse/jobengine/control/JobEngine.java#L273
     public void onFailedBatch(Long batchId, Long executionId) {}
 
     /**
@@ -369,17 +370,20 @@ public abstract class BaseWorker {
     }
 
     /**
-     * Terminate an execution of the corresponding asynchronous job
+     * Terminate an execution of the corresponding asynchronous job, by setting it to either status {@link ExecutionStatus#FINISHED} or status
+     * {@link ExecutionStatus#FAILED}
      * 
      * Only jobs with the flag job.asynchronous = true can be terminated outside of the JobThread
      * 
-     * @param jobId ID of the job
      * @param executionId ID of the execution to terminate
      * @param summary message to summarize the execution
+     * @param exception exception Object describing the failure
+     * @param failed if <code>true</code> the execution is set to status {@link ExecutionStatus#FAILED}, otherwise the execution is set to status
+     *        {@link ExecutionStatus#FINISHED}
      * @return <code>true</code> if the execution terminated successfully
      */
     @SuppressWarnings("unchecked")
-    public boolean terminateAsynchronousExecution(Long executionId, String summary) throws Exception {
+    private boolean terminateAsynchronousExecution(Long executionId, String summary, Exception exception, boolean failed) throws Exception {
 
         Job job = getJob();
 
@@ -394,18 +398,60 @@ public abstract class BaseWorker {
                 boolean isWorkerWithParamters = workerInstance instanceof WorkerWith;
                 Worker worker = null;
                 WorkerWith<Object> workerWith = null;
+                Object parameters = null;
                 if (isWorkerWithParamters) {
                     workerWith = (WorkerWith<Object>) workerInstance;
+                    parameters = workerWith.getParameters(execution);
                 } else {
                     worker = ((Worker) workerInstance);
                 }
 
-                workhorseController.finishExecution(job, execution, workerInstance, worker, workerWith, isWorkerWithParamters, workerWith, summary);
+                long duration = Duration.between(execution.getStartedAt(), WorkhorseUtil.timestamp()).toMillis();
+
+                if (failed) {
+
+                    workhorseController.handleFailedExecution(job, execution.getId(), exception, duration, isWorkerWithParamters, worker, workerWith,
+                                    parameters);
+                } else {
+
+                    workhorseController.finishExecution(job, execution, workerInstance, worker, workerWith, isWorkerWithParamters, parameters, summary);
+                }
+
                 return true;
 
             }
         }
         return false;
+    }
+
+    /**
+     * Only for Asynchronous job {@link Job#isAsynchronous()}.<br>
+     * 
+     * 
+     * Terminate an execution with the given ID by setting it to status {@link ExecutionStatus#FINISHED}
+     * 
+     * @param executionId ID of the execution to finish
+     * @param summary message to summarize the execution
+     * @return <code>true</code> if the execution has been successfully set to status {@link ExecutionStatus#FINISHED}, <code>false</code> otherwise
+     */
+    public boolean setAsynchronousExecutionToFinished(Long executionId, String summary) throws Exception {
+
+        return terminateAsynchronousExecution(executionId, summary, null, false);
+    }
+
+    /**
+     * Only for Asynchronous job {@link Job#isAsynchronous()}.<br>
+     * 
+     * 
+     * Terminate an execution with the given ID by setting it to status {@link ExecutionStatus#FAILED}
+     * 
+     * @param executionId ID of the execution to set failed
+     * @param exception exception Object describing the failure
+     * @return <code>true</code> if the execution has been successfully set to status {@link ExecutionStatus#FAILED}, <code>false</code> otherwise
+     */
+    public boolean setAsynchronousExecutionToFailed(Long executionId, Exception exception) throws Exception {
+
+        return terminateAsynchronousExecution(executionId, null, exception, true);
     }
 
     public abstract class BaseExecutionBuilder<T> {
