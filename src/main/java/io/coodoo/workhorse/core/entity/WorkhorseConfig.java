@@ -37,11 +37,11 @@ public abstract class WorkhorseConfig {
     /**
      * Number of minutes an execution can be held in the persistence before being automatically deleted.
      * 
-     * Default is 30 days (432000 minutes) but it depends on the active persictence.
+     * Default is 30 days (43200 minutes) but it depends on the active persistence.
      * 
      * If set to 0, no cleanup is performed.
      */
-    protected long minutesUntilCleanup = 432000l;
+    protected long minutesUntilCleanup = 43200l;
 
     /**
      * Duration in seconds after which an EXECUTION in status {@link ExecutionStatus#RUNNING} is consider in timeout.(if set to 0 the value is ignored)
