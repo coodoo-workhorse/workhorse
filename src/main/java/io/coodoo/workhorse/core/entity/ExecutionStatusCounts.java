@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 
  * @author coodoo GmbH (coodoo.de)
  */
-public class JobExecutionCount {
+public class ExecutionStatusCounts {
 
     private Long jobId;
     private LocalDateTime from;
@@ -22,9 +22,9 @@ public class JobExecutionCount {
     private long failed;
     private long aborted;
 
-    public JobExecutionCount() {}
+    public ExecutionStatusCounts() {}
 
-    public JobExecutionCount(Long jobId, LocalDateTime from, LocalDateTime to, long planned, long queued, long running, long finished, long failed,
+    public ExecutionStatusCounts(Long jobId, LocalDateTime from, LocalDateTime to, long planned, long queued, long running, long finished, long failed,
                     long aborted) {
         this.jobId = jobId;
         this.from = from;

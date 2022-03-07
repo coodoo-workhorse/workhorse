@@ -139,7 +139,7 @@ public class MemoryJobPersistence implements JobPersistence {
 
         ListingParameters listingParameters = new ListingParameters(0);
 
-        listingParameters.addFilterAttributes("status", JobStatus.ACTIVE);
+        listingParameters.addFilterAttributes("status", "\"" + JobStatus.ACTIVE + "\"");
         countActive = countActive + getJobListing(listingParameters).getMetadata().getCount();
 
         listingParameters.addFilterAttributes("status", JobStatus.INACTIVE);

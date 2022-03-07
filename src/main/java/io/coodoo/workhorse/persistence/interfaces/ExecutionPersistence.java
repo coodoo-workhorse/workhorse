@@ -7,8 +7,8 @@ import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
+import io.coodoo.workhorse.core.entity.ExecutionStatusCounts;
 import io.coodoo.workhorse.core.entity.Job;
-import io.coodoo.workhorse.core.entity.JobExecutionCount;
 import io.coodoo.workhorse.core.entity.JobExecutionStatusSummary;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
@@ -174,9 +174,9 @@ public interface ExecutionPersistence {
      * @param jobId optional ID of the corresponding job. If <code>null</code>, the count is executed for all jobs.
      * @param from only executions that were created after this timestamp are considered
      * @param to only executions that were created before this timestamp are considered
-     * @return {@link JobExecutionCount}
+     * @return {@link ExecutionStatusCounts}
      */
-    JobExecutionCount getJobExecutionCount(Long jobId, LocalDateTime from, LocalDateTime to);
+    ExecutionStatusCounts getExecutionStatusCounts(Long jobId, LocalDateTime from, LocalDateTime to);
 
     /**
      * Get a {@link ExecutionLog}

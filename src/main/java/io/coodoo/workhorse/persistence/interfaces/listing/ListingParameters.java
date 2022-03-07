@@ -165,7 +165,6 @@ public class ListingParameters {
      * @param value filter value
      */
     public void addFilterAttributes(String attribute, Object value) {
-
         if (value != null) {
             filterAttributes.put(attribute, value.toString());
         }
@@ -175,12 +174,17 @@ public class ListingParameters {
      * @return Map of attribute specific filters
      */
     public Map<String, String> getFilterAttributes() {
-
         return filterAttributes;
     }
 
     public void setFilterAttributes(Map<String, String> filterAttributes) {
         this.filterAttributes = filterAttributes;
+    }
+
+    @Override
+    public String toString() {
+        return "ListingParameters [index=" + index + ", page=" + page + ", limit=" + limit + ", sortAttribute=" + sortAttribute + ", filter=" + filter
+                        + ", filterAttributes=" + filterAttributes + "]";
     }
 
 }

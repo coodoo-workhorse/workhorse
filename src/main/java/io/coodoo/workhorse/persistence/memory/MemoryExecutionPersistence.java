@@ -19,8 +19,8 @@ import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
+import io.coodoo.workhorse.core.entity.ExecutionStatusCounts;
 import io.coodoo.workhorse.core.entity.Job;
-import io.coodoo.workhorse.core.entity.JobExecutionCount;
 import io.coodoo.workhorse.core.entity.JobExecutionStatusSummary;
 import io.coodoo.workhorse.persistence.interfaces.ExecutionPersistence;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
@@ -329,7 +329,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
     }
 
     @Override
-    public JobExecutionCount getJobExecutionCount(Long jobId, LocalDateTime from, LocalDateTime to) {
+    public ExecutionStatusCounts getExecutionStatusCounts(Long jobId, LocalDateTime from, LocalDateTime to) {
 
         Collection<Job> jobs = new ArrayList<>();
 
@@ -374,7 +374,7 @@ public class MemoryExecutionPersistence implements ExecutionPersistence {
             countAbort = countAbort + getExecutionListing(job.getId(), listingParameters).getMetadata().getCount();
         }
 
-        return new JobExecutionCount(jobId, from, to, countPlanned, countQueued, countRunning, countFinished, countFailed, countAbort);
+        return new ExecutionStatusCounts(jobId, from, to, countPlanned, countQueued, countRunning, countFinished, countFailed, countAbort);
     }
 
     @Override

@@ -27,7 +27,7 @@ import io.coodoo.workhorse.core.control.Workhorse;
 import io.coodoo.workhorse.core.control.WorkhorseConfigController;
 import io.coodoo.workhorse.core.control.WorkhorseController;
 import io.coodoo.workhorse.core.entity.Job;
-import io.coodoo.workhorse.core.entity.JobExecutionCount;
+import io.coodoo.workhorse.core.entity.ExecutionStatusCounts;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 import io.coodoo.workhorse.persistence.WorkhorsePersistence;
@@ -64,58 +64,58 @@ public class WorkhorseServiceTest {
     public ExpectedException exceptionRule = ExpectedException.none();
 
     @Test
-    public void testGetJobExecutionCount_with_FROM_in_the_future() throws Exception {
-
-        Long jobId = 1L;
-        StaticConfig.TIME_ZONE = "UTC";
-        LocalDateTime from = LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)).plusHours(5);
-        LocalDateTime to = LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE));
-
-        JobExecutionCount result = new JobExecutionCount();
-
-        when(workhorseController.getJobExecutionCount(jobId, from, to)).thenReturn(result);
-
-        classUnderTest.getJobExecutionCount(jobId, from, to);
-
-        verify(workhorseController).getJobExecutionCount(jobId, to.minusHours(24), to);
-
-    }
-
-    @Test
-    public void testGetJobExecutionCount_with_FROM_null() throws Exception {
-
-        Long jobId = 1L;
-        StaticConfig.TIME_ZONE = "UTC";
-        LocalDateTime from = null;
-        LocalDateTime to = LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE));
-
-        JobExecutionCount result = new JobExecutionCount();
-
-        when(workhorseController.getJobExecutionCount(jobId, from, to)).thenReturn(result);
-
-        classUnderTest.getJobExecutionCount(jobId, from, to);
-
-        verify(workhorseController).getJobExecutionCount(jobId, to.minusHours(24), to);
-
-    }
+        public void testGetExecutionStatusCounts_with_FROM_in_the_future() throws Exception {
+    
+            Long jobId = 1L;
+            StaticConfig.TIME_ZONE = "UTC";
+            LocalDateTime from = LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE)).plusHours(5);
+            LocalDateTime to = LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE));
+    
+            ExecutionStatusCounts result = new ExecutionStatusCounts();
+    
+            when(workhorseController.getExecutionStatusCounts(jobId, from, to)).thenReturn(result);
+    
+            classUnderTest.getExecutionStatusCounts(jobId, from, to);
+    
+            verify(workhorseController).getExecutionStatusCounts(jobId, to.minusHours(24), to);
+    
+        }
 
     @Test
-    public void testGetJobExecutionCount_with_TO_null() throws Exception {
+        public void testGetExecutionStatusCounts_with_FROM_null() throws Exception {
+    
+            Long jobId = 1L;
+            StaticConfig.TIME_ZONE = "UTC";
+            LocalDateTime from = null;
+            LocalDateTime to = LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE));
+    
+            ExecutionStatusCounts result = new ExecutionStatusCounts();
+    
+            when(workhorseController.getExecutionStatusCounts(jobId, from, to)).thenReturn(result);
+    
+            classUnderTest.getExecutionStatusCounts(jobId, from, to);
+    
+            verify(workhorseController).getExecutionStatusCounts(jobId, to.minusHours(24), to);
+    
+        }
 
-        Long jobId = 1L;
-        StaticConfig.TIME_ZONE = "UTC";
-        LocalDateTime from = null;
-        LocalDateTime to = LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE));
-
-        JobExecutionCount result = new JobExecutionCount();
-
-        when(workhorseController.getJobExecutionCount(jobId, from, to)).thenReturn(result);
-
-        classUnderTest.getJobExecutionCount(jobId, from, to);
-
-        verify(workhorseController).getJobExecutionCount(jobId, to.minusHours(24), to);
-
-    }
+    @Test
+        public void testGetExecutionStatusCounts_with_TO_null() throws Exception {
+    
+            Long jobId = 1L;
+            StaticConfig.TIME_ZONE = "UTC";
+            LocalDateTime from = null;
+            LocalDateTime to = LocalDateTime.now(ZoneId.of(StaticConfig.TIME_ZONE));
+    
+            ExecutionStatusCounts result = new ExecutionStatusCounts();
+    
+            when(workhorseController.getExecutionStatusCounts(jobId, from, to)).thenReturn(result);
+    
+            classUnderTest.getExecutionStatusCounts(jobId, from, to);
+    
+            verify(workhorseController).getExecutionStatusCounts(jobId, to.minusHours(24), to);
+    
+        }
 
     @Test
     public void testStart_with_parameter_without_initialized_persisitence() throws Exception {

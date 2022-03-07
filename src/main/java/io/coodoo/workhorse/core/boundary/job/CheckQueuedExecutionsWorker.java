@@ -18,7 +18,7 @@ import io.coodoo.workhorse.core.control.JobThread;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobBufferStatus;
-import io.coodoo.workhorse.core.entity.JobExecutionCount;
+import io.coodoo.workhorse.core.entity.ExecutionStatusCounts;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
 import io.coodoo.workhorse.util.CollectionListing;
@@ -65,7 +65,7 @@ public class CheckQueuedExecutionsWorker extends Worker {
             LocalDateTime from = to.minusHours(24);
 
             // Count the executions of this job by execution's status
-            JobExecutionCount jobExecutionCount = workhorseService.getJobExecutionCount(job.getId(), from, to);
+            ExecutionStatusCounts jobExecutionCount = workhorseService.getExecutionStatusCounts(job.getId(), from, to);
 
             // The problem does not occur under a number of executions. An high arbitrary amount is here set.
             if (jobExecutionCount.getQueued() < MIN_NUMBER_OF_QUEUED_EXECUTION) {

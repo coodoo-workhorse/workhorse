@@ -34,8 +34,8 @@ import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionFailStatus;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
+import io.coodoo.workhorse.core.entity.ExecutionStatusCounts;
 import io.coodoo.workhorse.core.entity.Job;
-import io.coodoo.workhorse.core.entity.JobExecutionCount;
 import io.coodoo.workhorse.core.entity.JobExecutionStatusSummary;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.core.entity.JobStatusCount;
@@ -656,7 +656,8 @@ public class WorkhorseController {
     }
 
     public Job update(Job job) {
-        return jobPersistence.update(job);
+        return updateJob(job.getId(), job.getName(), job.getDescription(), job.getWorkerClassName(), job.getSchedule(), job.getStatus(), job.getThreads(),
+                        job.getMaxPerMinute(), job.getFailRetries(), job.getRetryDelay(), job.getMinutesUntilCleanUp(), job.isUniqueQueued());
     }
 
     /**
@@ -859,8 +860,8 @@ public class WorkhorseController {
      * @param to only executions that were created before this timestamp are considered
      * @return {@link JobExecutionCount}
      */
-    public JobExecutionCount getJobExecutionCount(Long jobId, LocalDateTime from, LocalDateTime to) {
-        return executionPersistence.getJobExecutionCount(jobId, from, to);
+    public ExecutionStatusCounts getExecutionStatusCounts(Long jobId, LocalDateTime from, LocalDateTime to) {
+        return executionPersistence.getExecutionStatusCounts(jobId, from, to);
     }
 
     /**
