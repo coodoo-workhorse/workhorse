@@ -100,10 +100,10 @@ public class JobThread {
         executionBuffer.addJobThreads(jobId, this);
 
         final BaseWorker workerInstance = getWorker(job);
-        boolean isWorkerWithParamters = workerInstance instanceof WorkerWith;
+        boolean isWorkerWithParameters = workerInstance instanceof WorkerWith;
         Worker worker = null;
         WorkerWith<Object> workerWith = null;
-        if (isWorkerWithParamters) {
+        if (isWorkerWithParameters) {
             workerWith = (WorkerWith<Object>) workerInstance;
         } else {
             worker = ((Worker) workerInstance);
@@ -142,7 +142,7 @@ public class JobThread {
                     String summary = null;
 
                     // THIS IS WHERE THE MAGIC HAPPENS!
-                    if (isWorkerWithParamters) {
+                    if (isWorkerWithParameters) {
                         parameters = workerWith.getParameters(execution);
                         summary = workerWith.doWork(parameters);
                     } else {
@@ -167,7 +167,7 @@ public class JobThread {
                     }
 
                     // Set the execution on status FINISHED and calls the callback method onFinished()
-                    workhorseController.finishExecution(job, execution, workerInstance, worker, workerWith, isWorkerWithParamters, parameters, summary);
+                    workhorseController.finishExecution(job, execution, workerInstance, worker, workerWith, isWorkerWithParameters, parameters, summary);
 
                     // Handle chained execution
                     if (execution.getChainId() != null) {
@@ -202,7 +202,7 @@ public class JobThread {
                     long duration = System.currentTimeMillis() - millisAtStart;
 
                     // create a new Job Execution to retry this fail.
-                    execution = workhorseController.handleFailedExecution(job, execution.getId(), e, duration, isWorkerWithParamters, worker, workerWith,
+                    execution = workhorseController.handleFailedExecution(job, execution.getId(), e, duration, isWorkerWithParameters, worker, workerWith,
                                     parameters);
 
                     if (execution == null) {

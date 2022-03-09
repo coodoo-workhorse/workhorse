@@ -395,11 +395,11 @@ public abstract class BaseWorker {
             if (ExecutionStatus.RUNNING.equals(execution.getStatus())) {
 
                 final BaseWorker workerInstance = workhorseController.getWorker(job);
-                boolean isWorkerWithParamters = workerInstance instanceof WorkerWith;
+                boolean isWorkerWithParameters = workerInstance instanceof WorkerWith;
                 Worker worker = null;
                 WorkerWith<Object> workerWith = null;
                 Object parameters = null;
-                if (isWorkerWithParamters) {
+                if (isWorkerWithParameters) {
                     workerWith = (WorkerWith<Object>) workerInstance;
                     parameters = workerWith.getParameters(execution);
                 } else {
@@ -410,11 +410,11 @@ public abstract class BaseWorker {
 
                 if (failed) {
 
-                    workhorseController.handleFailedExecution(job, execution.getId(), exception, duration, isWorkerWithParamters, worker, workerWith,
+                    workhorseController.handleFailedExecution(job, execution.getId(), exception, duration, isWorkerWithParameters, worker, workerWith,
                                     parameters);
                 } else {
 
-                    workhorseController.finishExecution(job, execution, workerInstance, worker, workerWith, isWorkerWithParamters, parameters, summary);
+                    workhorseController.finishExecution(job, execution, workerInstance, worker, workerWith, isWorkerWithParameters, parameters, summary);
                 }
 
                 return true;

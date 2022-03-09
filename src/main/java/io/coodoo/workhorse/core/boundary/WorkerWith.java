@@ -102,10 +102,10 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * <i>If needed, this method can be overwritten to react on a finished job execution.</i>
      * 
      * @param executionId ID of current job execution that is finished
-     * @param paramters the object parameter given for the execution
+     * @param parameters the object parameter given for the execution
      * @param summary the message that summarizes the execution
      */
-    public void onFinished(Long executionId, T paramters, String summary) {
+    public void onFinished(Long executionId, T parameters, String summary) {
         super.onFinished(executionId);
     }
 
@@ -115,10 +115,10 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * 
      * @param failedExecutionId ID of current job execution that has failed
      * @param retryExecutionId ID of new job execution that that will retry the failed one
-     * @param paramters the object parameter given for the failed execution
+     * @param parameters the object parameter given for the failed execution
      * @param throwable Cause of the failure
      */
-    public void onRetry(Long failedExecutionId, Long retryExecutionId, T paramters, Throwable throwable) {
+    public void onRetry(Long failedExecutionId, Long retryExecutionId, T parameters, Throwable throwable) {
         super.onRetry(failedExecutionId, retryExecutionId);
     }
 
@@ -127,10 +127,10 @@ public abstract class WorkerWith<T> extends BaseWorker {
      * <i>If needed, this method can be overwritten to react on a failed job execution.</i>
      * 
      * @param executionId ID of current job execution that has failed
-     * @param paramters the object parameter given for the failed execution
+     * @param parameters the object parameter given for the failed execution
      * @param throwable Cause of the failure
      */
-    public void onFailed(Long executionId, T paramters, Throwable throwable) {
+    public void onFailed(Long executionId, T parameters, Throwable throwable) {
         super.onFailed(executionId);
     }
 

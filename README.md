@@ -102,10 +102,10 @@ Workhorse Jobs initializing...
 
 Depending on your environment there may be additional steps necessary. Have a look into our example projects: 
 
-- [Quarkus](https://gitlab.coodoo.io/workhorse/workhorse-example-quarkus)
-- [Wildfly](https://gitlab.coodoo.io/workhorse/workhorse-example-wildfly)
-- [Tomcat](https://gitlab.coodoo.io/workhorse/workhorse-example-tomcat)
-- [Java SE](https://gitlab.coodoo.io/workhorse/workhorse-example-java-se)
+- [Quarkus](https://github.com/coodoo-workhorse/workhorse-example-quarkus)
+- [Wildfly](https://github.com/coodoo-workhorse/workhorse-example-wildfly)
+- [Tomcat](https://github.com/coodoo-workhorse/workhorse-example-tomcat)
+- [Java SE](https://github.com/coodoo-workhorse/workhorse-example-java-se)
 
 
 ## Getting started
@@ -359,7 +359,7 @@ public class SendEmailWorker extends WorkerWith<EmailData> {
     @Override
     public String doWork(EmailData emailData) throws Exception {
 
-        log.info(" Process an execution with paramter: " + emailData);
+        log.info(" Process an execution with parameter: " + emailData);
         //Send the e-mail ...
         return "e-mail successfull sent";
     }
@@ -417,7 +417,7 @@ public class SendEmailWorker extends WorkerWith<EmailData> {
     @Override
     public String doWork(EmailData emailData) throws Exception {
 
-        log.info(" Process an execution with paramter: " + emailData);
+        log.info(" Process an execution with parameter: " + emailData);
         emailService.send(emailData);
         return "Execution was successful";
     }
@@ -489,7 +489,7 @@ public class SendEmailWorker extends WorkerWith<EmailData> {
     @Override
     public String doWork(EmailData emailData) throws Exception {
 
-        log.info(" Process an execution with paramter: " + emailData);
+        log.info(" Process an execution with parameter: " + emailData);
         //Send the e-mail ...
         return "e-mail successfull sent";
     }

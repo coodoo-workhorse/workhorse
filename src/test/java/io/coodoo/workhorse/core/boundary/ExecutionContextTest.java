@@ -293,7 +293,7 @@ public class ExecutionContextTest {
     }
 
     @Test
-    public void testSummarize_with_EMPTY_paramter() throws Exception {
+    public void testSummarize_with_EMPTY_parameter() throws Exception {
 
         Execution executionOfTheContext = new Execution();
         executionOfTheContext.setJobId(1L);

@@ -448,12 +448,12 @@ public class WorkhorseController {
      * @param workerInstance an instance of {@link BaseWorker}
      * @param worker an instance of {@link Worker}
      * @param workerWith an instance of {@link WorkerWith}
-     * @param isWorkerWithParamters is true if the job take parameters (instance of WorkerWith)
+     * @param isWorkerWithParameters is true if the job take parameters (instance of WorkerWith)
      * @param parameters the parameters used during the executions
      * @param summary a message to summarize the execution
      */
     public void finishExecution(Job job, Execution execution, BaseWorker workerInstance, Worker worker, WorkerWith<Object> workerWith,
-                    boolean isWorkerWithParamters, Object parameters, String summary) {
+                    boolean isWorkerWithParameters, Object parameters, String summary) {
 
         if (summary != null && !summary.isEmpty()) {
             executionContext.summarize(execution, summary);
@@ -464,7 +464,7 @@ public class WorkhorseController {
         log.trace("Execution {}, duration: {} was successfull", execution.getId(), execution.getDuration());
         executionBuffer.removeRunningExecution(job.getId(), execution.getId());
 
-        if (isWorkerWithParamters) {
+        if (isWorkerWithParameters) {
             workerWith.onFinished(job.getId(), parameters, summary);
         } else {
             worker.onFinished(job.getId(), summary);
@@ -520,14 +520,14 @@ public class WorkhorseController {
      * @param executionId ID of the execution that failed
      * @param throwable Cause of the failure occurred during execution processing
      * @param duration duration of the execution
-     * @param isWorkerWithParamters <code>true</code>, if the workers instance is based on {@link WorkerWith}
-     * @param worker instance of {@link Worker}, given if parameter <code>isWorkerWithParamters</code> is <code>false</code>
-     * @param workerWith instance of {@link WorkerWith}, given if parameter <code>isWorkerWithParamters</code> is <code>true</code>
-     * @param paramters job parameters object if paramter <code>isWorkerWithParamters</code> is <code>true</code>
+     * @param isWorkerWithParameters <code>true</code>, if the workers instance is based on {@link WorkerWith}
+     * @param worker instance of {@link Worker}, given if parameter <code>isWorkerWithParameters</code> is <code>false</code>
+     * @param workerWith instance of {@link WorkerWith}, given if parameter <code>isWorkerWithParameters</code> is <code>true</code>
+     * @param parameters job parameters object if parameter <code>isWorkerWithParameters</code> is <code>true</code>
      * @return new created/cloned execution
      */
-    public synchronized Execution handleFailedExecution(Job job, Long executionId, Throwable throwable, Long duration, boolean isWorkerWithParamters,
-                    Worker worker, WorkerWith<Object> workerWith, Object paramters) {
+    public synchronized Execution handleFailedExecution(Job job, Long executionId, Throwable throwable, Long duration, boolean isWorkerWithParameters,
+                    Worker worker, WorkerWith<Object> workerWith, Object parameters) {
 
         executionBuffer.removeRunningExecution(job.getId(), executionId);
 
@@ -562,14 +562,14 @@ public class WorkhorseController {
         }
         executionPersistence.logStacktrace(job.getId(), executionId, WorkhorseUtil.stacktraceToString(throwable));
 
-        if (isWorkerWithParamters) {
+        if (isWorkerWithParameters) {
             if (retryExecution == null) {
-                workerWith.onFailed(executionId, paramters, throwable);
+                workerWith.onFailed(executionId, parameters, throwable);
                 if (failedExecution.getChainId() != null) {
                     workerWith.onFailedChain(failedExecution.getChainId(), executionId);
                 }
             } else {
-                workerWith.onRetry(executionId, retryExecution.getId(), paramters, throwable);
+                workerWith.onRetry(executionId, retryExecution.getId(), parameters, throwable);
             }
         } else {
             if (retryExecution == null) {
