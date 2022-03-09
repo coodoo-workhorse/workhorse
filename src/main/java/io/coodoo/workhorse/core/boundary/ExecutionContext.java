@@ -1,5 +1,6 @@
 package io.coodoo.workhorse.core.boundary;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import javax.enterprise.context.RequestScoped;
@@ -40,8 +41,7 @@ public class ExecutionContext {
     }
 
     /**
-     * Retrieves the ID of the {@link Job} object of the current execution. WARNING: Don't change the value of the job with the retrieved ID. Changes can be
-     * fatal or have no effect.
+     * Retrieves the ID of the {@link Job} object of the current execution.
      * 
      * @return the ID of the job
      */
@@ -53,8 +53,7 @@ public class ExecutionContext {
     }
 
     /**
-     * Retrieves the ID of the current execution. WARNING: Don't change the value of the execution with the retrieved ID. Changes can be fatal or have no
-     * effect.
+     * Retrieves the ID of the current execution.
      * 
      * @return the ID of the execution
      */
@@ -63,6 +62,146 @@ public class ExecutionContext {
             return null;
         }
         return execution.getId();
+    }
+
+    /**
+     * Retrieves if the current execution is priority.
+     * 
+     * @return <code>true</code> if priority
+     */
+    public boolean isPriority() {
+        if (execution == null) {
+            return false;
+        }
+        return execution.isPriority();
+    }
+
+    /**
+     * Retrieves if the current execution is expired.
+     * 
+     * @return <code>true</code> if expired
+     */
+    public boolean isExpired() {
+        LocalDateTime expiresAt = getExpiresAt();
+        if (expiresAt == null) {
+            return false;
+        }
+        return WorkhorseUtil.timestamp().isAfter(expiresAt);
+    }
+
+    /**
+     * @return If expiresAt is given, the execution could not be executed after, if the processing has not began until this time, otherwise <code>null</code>.
+     */
+    public LocalDateTime getExpiresAt() {
+        if (execution == null) {
+            return null;
+        }
+        return execution.getExpiresAt();
+    }
+
+    /**
+     * Retrieves if the current execution is part of a batch.
+     * 
+     * @return <code>true</code> if part of a batch
+     */
+    public boolean isBatch() {
+        return getBatchId() != null;
+    }
+
+    /**
+     * @return the batch Id if the current execution is part of a batch, otherwise <code>null</code>.
+     */
+    public Long getBatchId() {
+        if (execution == null) {
+            return null;
+        }
+        return execution.getBatchId();
+    }
+
+    /**
+     * Retrieves if the current execution is part of a chain.
+     * 
+     * @return <code>true</code> if part of a chain
+     */
+    public boolean isChain() {
+        return getChainId() != null;
+    }
+
+    /**
+     * @return the chain Id if the current execution is part of a chain, otherwise <code>null</code>.
+     */
+    public Long getChainId() {
+        if (execution == null) {
+            return null;
+        }
+        return execution.getChainId();
+    }
+
+    /**
+     * Retrieves if the current execution is already started.
+     * 
+     * @return <code>true</code> if started
+     */
+    public boolean isStarted() {
+        return getStartedAt() != null;
+    }
+
+    /**
+     * @return the timestamp of the start of the current execution.
+     */
+    public LocalDateTime getStartedAt() {
+        if (execution == null) {
+            return null;
+        }
+        return execution.getStartedAt();
+    }
+
+    /**
+     * Retrieves if the current execution is already ended.
+     * 
+     * @return <code>true</code> if ended
+     */
+    public boolean isEnded() {
+        return getEndedAt() != null;
+    }
+
+    /**
+     * @return the timestamp of the end of the current execution.
+     */
+    public LocalDateTime getEndedAt() {
+        if (execution == null) {
+            return null;
+        }
+        return execution.getEndedAt();
+    }
+
+    /**
+     * Retrieves if the current execution is a retry of a previews failed execution.
+     * 
+     * @return <code>true</code> if this is a retry
+     */
+    public boolean isFailRetry() {
+        return getFailRetry() > 0;
+    }
+
+    /**
+     * @return Number of retries of this execution
+     */
+    public int getFailRetry() {
+        if (execution == null) {
+            return 0;
+        }
+        return execution.getFailRetry();
+    }
+
+    /**
+     * @return Id of the failed Execution that should get retried with the current this execution
+     */
+    public Long getFailRetryExecutionId() {
+        if (execution == null) {
+            return null;
+        }
+        return execution.getFailRetryExecutionId();
     }
 
     /**
