@@ -90,7 +90,7 @@ public class Execution extends BaseEntity {
     private int failRetry;
 
     /**
-     * Id of the failed Execution that should be retry
+     * Id of the failed Execution that should get retried
      */
     private Long failRetryExecutionId;
 
