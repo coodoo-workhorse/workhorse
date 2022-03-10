@@ -485,18 +485,26 @@ public class WorkhorseService {
     }
 
     /**
-     * Get a Job by the classname of his worker.
+     * Get a Job by the his worker class.
      * 
-     * @param className
-     * @return
+     * @param class of worker
+     * @return {@link Job} instance if found, else <code>null</code>
+     */
+    public Job getJobByClass(Class<?> workerClass) {
+        return getJobByClassName(workerClass.getName());
+    }
+
+    /**
+     * Get a Job by the class name of his worker.
+     * 
+     * @param class Name as String
+     * @return {@link Job} instance if found, else <code>null</code>
      */
     public Job getJobByClassName(String className) {
-
-        Job job = null;
         if (className != null && !className.isEmpty()) {
-            job = workhorseController.getJobByClassName(className.trim());
+            return workhorseController.getJobByClassName(className.trim());
         }
-        return job;
+        return null;
     }
 
     public List<Execution> getExecutionBatch(Long jobId, Long batchId) {
