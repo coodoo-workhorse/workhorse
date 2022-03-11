@@ -88,8 +88,6 @@ public class Workhorse {
 
     /**
      * Start the Poller/Pusher of the Workhorse
-     * 
-     * @param usePusher May the pusher to be use instead of the poller ?
      */
     public void start() {
         // Check if the engine is already started. If so stop first and start again.
@@ -98,16 +96,16 @@ public class Workhorse {
         }
 
         if (executionPersistence.isPusherAvailable()) {
+
             executionPersistence.subscribe();
             scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0, StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL, TimeUnit.SECONDS);
-
             log.trace("Job queue pusher started. Backup poller started with a {} seconds interval", StaticConfig.BUFFER_PUSH_FALL_BACK_POLL_INTERVAL);
 
         } else {
+
             scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(this::poll, 0, StaticConfig.BUFFER_POLL_INTERVAL, TimeUnit.SECONDS);
             log.trace("Job queue poller started with a {} seconds interval", StaticConfig.BUFFER_POLL_INTERVAL);
         }
-
     }
 
     /**
@@ -117,7 +115,6 @@ public class Workhorse {
         for (Job job : jobPersistence.getAllByStatus(JobStatus.ACTIVE)) {
             poll(job);
         }
-
     }
 
     /**
@@ -308,7 +305,6 @@ public class Workhorse {
             log.trace("Thread is really over: {} ", fn);
             return this;
         });
-
     }
 
     public void allExecutionsDoneEvent(@Observes AllExecutionsDoneEvent event) {
