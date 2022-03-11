@@ -108,7 +108,7 @@ public class MemoryJobPersistence implements JobPersistence {
     public List<Job> getAllByStatus(JobStatus jobStatus) {
 
         ListingParameters listingParameters = new ListingParameters(0);
-        listingParameters.addFilterAttributes("status", jobStatus);
+        listingParameters.addFilterAttributes("status", quoted(jobStatus));
         ListingResult<Job> listingResult = getJobListing(listingParameters);
 
         return listingResult.getResults();
@@ -139,19 +139,23 @@ public class MemoryJobPersistence implements JobPersistence {
 
         ListingParameters listingParameters = new ListingParameters(0);
 
-        listingParameters.addFilterAttributes("status", "\"" + JobStatus.ACTIVE + "\"");
+        listingParameters.addFilterAttributes("status", quoted(JobStatus.ACTIVE));
         countActive = countActive + getJobListing(listingParameters).getMetadata().getCount();
 
-        listingParameters.addFilterAttributes("status", JobStatus.INACTIVE);
+        listingParameters.addFilterAttributes("status", quoted(JobStatus.INACTIVE));
         countInactive = countInactive + getJobListing(listingParameters).getMetadata().getCount();
 
-        listingParameters.addFilterAttributes("status", JobStatus.NO_WORKER);
+        listingParameters.addFilterAttributes("status", quoted(JobStatus.NO_WORKER));
         countNoWorker = countNoWorker + getJobListing(listingParameters).getMetadata().getCount();
 
-        listingParameters.addFilterAttributes("status", JobStatus.ERROR);
+        listingParameters.addFilterAttributes("status", quoted(JobStatus.ERROR));
         countError = countError + getJobListing(listingParameters).getMetadata().getCount();
 
         return new JobStatusCount(countActive, countInactive, countNoWorker, countError);
+    }
+
+    private String quoted(JobStatus jobStatus) {
+        return "\"" + jobStatus.name() + "\"";
     }
 
 }
