@@ -307,6 +307,7 @@ public class WorkhorseService {
      * The executions of this job can again be processed by the job engine
      * 
      * @param jobId ID of the job to activate
+     * @return activated Job
      */
     public Job activateJob(Long jobId) {
         Job job = getJobById(jobId);
@@ -319,11 +320,30 @@ public class WorkhorseService {
     }
 
     /**
+     * <i>Activate a job.</i><br>
+     * <br>
+     * The executions of this job can again be processed by the job engine
+     * 
+     * @param class of worker for the job to activate
+     * @return activated Job
+     */
+    public Job activateJob(Class<?> workerClass) {
+        Job job = getJobByClass(workerClass);
+        if (job == null) {
+            throw new RuntimeException("Job not found");
+        }
+        log.info("Activate {}", job);
+        return updateJob(job.getId(), job.getName(), job.getDescription(), job.getWorkerClassName(), job.getSchedule(), JobStatus.ACTIVE, job.getThreads(),
+                        job.getMaxPerMinute(), job.getFailRetries(), job.getRetryDelay(), job.getMinutesUntilCleanUp(), job.isUniqueQueued());
+    }
+
+    /**
      * <i>Deactivate a job.</i><br>
      * <br>
      * The next executions of this job will not be processed by the job engine
      * 
      * @param jobId ID of the job to deactivate
+     * @return deactivated Job
      */
     public Job deactivateJob(Long jobId) {
         Job job = getJobById(jobId);
@@ -332,6 +352,24 @@ public class WorkhorseService {
         }
         log.info("Deactivate {}", job);
         return updateJob(jobId, job.getName(), job.getDescription(), job.getWorkerClassName(), job.getSchedule(), JobStatus.INACTIVE, job.getThreads(),
+                        job.getMaxPerMinute(), job.getFailRetries(), job.getRetryDelay(), job.getMinutesUntilCleanUp(), job.isUniqueQueued());
+    }
+
+    /**
+     * <i>Deactivate a job.</i><br>
+     * <br>
+     * The executions of this job can again be processed by the job engine
+     * 
+     * @param class of worker for the job to deactivate
+     * @return deactivated Job
+     */
+    public Job deactivateJob(Class<?> workerClass) {
+        Job job = getJobByClass(workerClass);
+        if (job == null) {
+            throw new RuntimeException("Job not found");
+        }
+        log.info("Deactivate {}", job);
+        return updateJob(job.getId(), job.getName(), job.getDescription(), job.getWorkerClassName(), job.getSchedule(), JobStatus.INACTIVE, job.getThreads(),
                         job.getMaxPerMinute(), job.getFailRetries(), job.getRetryDelay(), job.getMinutesUntilCleanUp(), job.isUniqueQueued());
     }
 
