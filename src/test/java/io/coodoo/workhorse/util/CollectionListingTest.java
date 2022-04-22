@@ -201,6 +201,30 @@ public class CollectionListingTest {
     }
 
     @Test
+    public void testGetListingResult_filterNotNull() throws Exception {
+
+        Set<Job> collection = new HashSet<>();
+        Job job1 = new Job();
+        job1.setName("NULL");
+        collection.add(job1);
+        Job job2 = new Job();
+        job2.setName("null");
+        collection.add(job2);
+        Job job3 = new Job();
+        job3.setName(null);
+        collection.add(job3);
+
+        ListingParameters listingParameters = new ListingParameters();
+        listingParameters.addFilterAttributes("name", CollectionListing.OPERATOR_NOT_WORD + CollectionListing.OPERATOR_NULL);
+
+        ListingResult<Job> listingResult = CollectionListing.getListingResult(collection, Job.class, listingParameters);
+
+        assertEquals(2, listingResult.getResults().size());
+        assertTrue(listingResult.getResults().contains(job1));
+        assertTrue(listingResult.getResults().contains(job2));
+    }
+
+    @Test
     public void testGetListingResult_filterString() throws Exception {
 
         Set<Job> collection = new HashSet<>();
@@ -221,6 +245,30 @@ public class CollectionListingTest {
 
         assertEquals(1, listingResult.getResults().size());
         assertTrue(listingResult.getResults().contains(job2));
+    }
+
+    @Test
+    public void testGetListingResult_filterNotString() throws Exception {
+
+        Set<Job> collection = new HashSet<>();
+        Job job1 = new Job();
+        job1.setName("xxx");
+        collection.add(job1);
+        Job job2 = new Job();
+        job2.setName("yyy");
+        collection.add(job2);
+        Job job3 = new Job();
+        job3.setName("zzz");
+        collection.add(job3);
+
+        ListingParameters listingParameters = new ListingParameters();
+        listingParameters.addFilterAttributes("name", CollectionListing.OPERATOR_NOT_WORD + "yyy");
+
+        ListingResult<Job> listingResult = CollectionListing.getListingResult(collection, Job.class, listingParameters);
+
+        assertEquals(2, listingResult.getResults().size());
+        assertTrue(listingResult.getResults().contains(job1));
+        assertTrue(listingResult.getResults().contains(job3));
     }
 
     @Test

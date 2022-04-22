@@ -26,6 +26,8 @@ import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 import io.coodoo.workhorse.persistence.interfaces.listing.Metadata;
 
 /**
+ * This is based on https://github.com/coodoo-io/coodoo-listing but it works on Java Collections instead of JPA
+ * 
  * @author coodoo GmbH (coodoo.io)
  */
 public class CollectionListing {
@@ -58,15 +60,11 @@ public class CollectionListing {
      */
     public static int DEFAULT_LIMIT = 10;
 
+    // TODO
     /**
      * If this key is present in filterAttributes map, the attributes gets disjuncted (default is conjunction)
      */
     public static String FILTER_TYPE_DISJUNCTION = "Filter-Type-Disjunction";
-
-    /**
-     * Limit on OR operator separated predicated to handle it in an IN statement
-     */
-    public static int OR_LIMIT = 10;
 
     /**
      * NOT operator
@@ -335,8 +333,18 @@ public class CollectionListing {
         }
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     private static <T> Predicate<T> createPredicate(Class<T> clazz, Field field, String filter) {
+        if (filter.startsWith(OPERATOR_NOT)) {
+            return createFilterPredicate(clazz, field, filter.replaceFirst(OPERATOR_NOT, "")).negate();
+        }
+        if (filter.startsWith(OPERATOR_NOT_WORD)) {
+            return createFilterPredicate(clazz, field, filter.replaceFirst(OPERATOR_NOT_WORD, "")).negate();
+        }
+        return createFilterPredicate(clazz, field, filter);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static <T> Predicate<T> createFilterPredicate(Class<T> clazz, Field field, String filter) {
 
         String fieldName = field.getName();
         String simpleName = field.getType().getSimpleName();
