@@ -15,9 +15,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
@@ -25,8 +22,6 @@ import io.coodoo.workhorse.core.control.StaticConfig;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 
 public class WorkhorseUtil {
-
-    private static Logger logger = LoggerFactory.getLogger(WorkhorseUtil.class);
 
     private static ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
@@ -68,6 +63,13 @@ public class WorkhorseUtil {
         } catch (IOException e) {
             throw new RuntimeException("Parameter object could not be mapped to json", e);
         }
+    }
+
+    /**
+     * @return the commonly used ObjectMapper
+     */
+    public static ObjectMapper getObjectMapper() {
+        return objectMapper;
     }
 
     /**
@@ -119,8 +121,7 @@ public class WorkhorseUtil {
             stringWriter.flush();
             return stringWriter.toString();
         } catch (IOException iOException) {
-            logger.error("Couldn't write exception!", throwable);
-            return "Couldn't write exception!";
+            return "WorkhorseUtil.stacktraceToString() failed: " + getMessagesFromException(iOException);
         }
     }
 
@@ -142,7 +143,6 @@ public class WorkhorseUtil {
             }
             return joinedMessage;
         } catch (Exception e) {
-            logger.error("Couldn't get messages from exception!", throwable);
             return throwable.toString();
         }
     }
